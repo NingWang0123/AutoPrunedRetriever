@@ -283,3 +283,6 @@ def main():
 
 if __name__ == "__main__":
     graph, relations = main()
+
+
+# python py_files/graph_generator/generator_with_rules.py

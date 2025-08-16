@@ -120,3 +120,7 @@ if __name__ == "__main__":
 
     # Step 4: Visualize
     parser.visualize_graph(cg, title="Causal Graph from Questions")
+
+
+
+# python py_files/graph_generator/generator_with_causallearn.py
