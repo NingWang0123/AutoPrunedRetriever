@@ -162,13 +162,13 @@ def plot_graph(G, title=None):
 # ---------------- tests ----------------
 if __name__ == "__main__":
     questions = [
-    # "Is the Great Wall of China located in China?",
-    # "Does the Great Wall span over 13000 miles?", 
-    # "Was the Great Wall built during the Ming Dynasty?",
-    # "Can the Great Wall be seen from space?",
-    # "Is the Great Wall made of stone and brick?",
-    # "Does the Great Wall have watchtowers?",
-    # "Was the Great Wall constructed over 2000 years?",
+    "Is the Great Wall of China located in China?",
+    "Does the Great Wall span over 13000 miles?", 
+    "Was the Great Wall built during the Ming Dynasty?",
+    "Can the Great Wall be seen from space?",
+    "Is the Great Wall made of stone and brick?",
+    "Does the Great Wall have watchtowers?",
+    "Was the Great Wall constructed over 2000 years?",
     "Is the Great Wall an UNESCO World Heritage Site?",
     "Does the Great Wall stretch across the northern China?",
     "Are millions of tourists visiting the Great Wall annually?"
