@@ -1,0 +1,6 @@
+spacy
+networkx
+matplotlib
+numpy
+causal-learn
+re
