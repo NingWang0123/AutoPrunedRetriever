@@ -119,6 +119,23 @@ def sentence_relations(sentence, include_det=False):
                     tail = noun_phrase_label(p, include_det) if p.pos_ in {"NOUN","PROPN"} else p.text
                     triples.append((v, f"prep_{prep.text.lower()}", tail))
 
+        # NEW FIX: handle mis-tagged "NOUN" roots after auxiliaries ("Does ... stretch")
+        elif tok.pos_ == "NOUN" and tok.dep_ == "ROOT":
+            aux_before = [a for a in tok.lefts if a.pos_ == "AUX"]
+            if aux_before:
+                v = tok.text.lower()  # fallback: just use surface form as verb
+                if collect_neg(tok):
+                    v = f"not {v}"
+
+                subs = subjects_for(tok)
+                for s in subs:
+                    triples.append((noun_phrase_label(s, include_det), "subj", v))
+
+                for prep in (c for c in tok.children if c.dep_ == "prep"):
+                    for p in (c for c in prep.children if c.dep_ == "pobj"):
+                        tail = noun_phrase_label(p, include_det)
+                        triples.append((v, f"prep_{prep.text.lower()}", tail))
+
         # Case B: Copular nominal predicates: “X is a Y” → (X, isa, Y)
         elif tok.pos_ == "NOUN" and has_copula(tok):
             subs = subjects_for(tok)
