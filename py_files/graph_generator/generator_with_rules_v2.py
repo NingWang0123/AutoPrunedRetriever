@@ -117,7 +117,29 @@ def sentence_relations(sentence, include_det=False):
     # Track processed auxiliaries to avoid double-processing
     processed_aux = set()
 
-    for tok in doc:
+    for i, tok in enumerate(doc):
+        print(tok, " - ", tok.pos_, " - ", tok.dep_)
+        # --- Special fix for "do/does/did" questions mis-parsed ---
+        if tok.lemma_ in {"do", "does", "did"} and tok.dep_ == "ROOT":
+            for child in tok.children:
+                if child.dep_ == "nsubj" and child.pos_ in {"NOUN", "PROPN"}:
+                    # This is actually the subject of the *next word*, not the main predicate
+                    subject_np = noun_phrase_label(child, include_det)
+
+                if child.dep_ == "nsubj" and child.pos_ == "NOUN":
+                    # Check if this "NOUN" is actually the verb predicate (e.g., span mis-tagged)
+                    if child.text.lower() not in {"wall", "miles"}:  # crude filter
+                        child.pos_ = "VERB"
+                        child.dep_ = "ROOT"
+                        tok.dep_ = "aux"
+
+                        # steal tok’s dependents (prep phrases) and attach to child
+                        for dep in list(tok.children):
+                            if dep.dep_ == "prep":
+                                dep.head = child
+
+                        break
+
         # Case A: Handle passive voice constructions first
         if tok.pos_ == "AUX" and is_passive_auxiliary(tok) and tok.i not in processed_aux:
             main_verb = find_main_verb_in_passive(tok)
@@ -142,31 +164,35 @@ def sentence_relations(sentence, include_det=False):
 
         # Case B: Regular VERB predicates (non-passive)
         elif tok.pos_ == "VERB" and tok.i not in processed_aux:
-            # Skip if this verb is part of a passive construction we already handled
-            if any(aux.pos_ == "AUX" and aux.lemma_ == "be" and 
+            # Skip passive participles
+            if any(aux.pos_ == "AUX" and aux.lemma_ == "be" and
                    find_main_verb_in_passive(aux) == tok for aux in doc):
                 continue
-                
+
+            # Skip if this is a support-verb like "do/does/did"
+            if tok.lemma_ == "do" and any(c.pos_ == "VERB" for c in tok.children):
+                continue
+
             v = verb_label(tok)
             if collect_neg(tok):
                 v = f"not {v}"
 
             subs = subjects_for(tok)
             for s in subs:
-                subj = noun_phrase_label(s if s.pos_ in {"NOUN","PROPN"} else s.head, include_det)
+                subj = noun_phrase_label(s if s.pos_ in {"NOUN", "PROPN"} else s.head, include_det)
                 triples.append((subj, "subj", v))
 
             # objects
             for o in (c for c in tok.children if c.dep_ in OBJ_DEPS):
-                tail = noun_phrase_label(o, include_det) if o.pos_ in {"NOUN","PROPN"} else o.text
+                tail = noun_phrase_label(o, include_det) if o.pos_ in {"NOUN", "PROPN"} else o.text
                 triples.append((v, "obj", tail))
 
             # preps
             for prep in (c for c in tok.children if c.dep_ == "prep"):
                 for p in (c for c in prep.children if c.dep_ == "pobj"):
-                    tail = noun_phrase_label(p, include_det) if p.pos_ in {"NOUN","PROPN"} else p.text
+                    tail = noun_phrase_label(p, include_det) if p.pos_ in {"NOUN", "PROPN"} else p.text
                     triples.append((v, f"prep_{prep.text.lower()}", tail))
-                    
+
         # Case C: Handle mis-tagged "NOUN" roots after auxiliaries
         elif tok.pos_ == "NOUN" and tok.dep_ == "ROOT":
             aux_before = [a for a in tok.lefts if a.pos_ == "AUX"]
@@ -236,7 +262,7 @@ def plot_graph(G, title=None):
 if __name__ == "__main__":
     questions = [
         "Is the Great Wall of China located in China?",
-        "Does the Great Wall span over 13000 miles?", 
+        "Does the Great Wall span over 13000 miles?",
         "Was the Great Wall built during the Ming Dynasty?",
         "Can the Great Wall be seen from space?",
         "Is the Great Wall made of stone and brick?",
