@@ -1,3 +1,4 @@
+## Version 2 - Fixed for Passive Voice
 import spacy
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -25,7 +26,7 @@ def noun_phrase_label(head, include_det=False, use_ents=True):
         toks = [t for t in chunk if include_det or t.dep_ != "det"]
         return " ".join(t.text for t in toks).strip()
 
-    # 3) fallback: compounds/adjectives/numerals + head (+ “of”-PP)
+    # 3) fallback: compounds/adjectives/numerals + head (+ "of"-PP)
     keep = {"amod", "compound", "nummod", "poss"}
     left = []
     for c in sorted([c for c in head.lefts if c.dep_ in keep], key=lambda x: x.i):
@@ -48,6 +49,26 @@ def collect_neg(tok):
 def has_copula(tok):
     return any(c.dep_ == "cop" for c in tok.children)
 
+def is_passive_auxiliary(tok):
+    """Check if token is an auxiliary verb in passive construction"""
+    return (tok.pos_ == "AUX" and tok.lemma_ == "be" and 
+            any(c.dep_ in {"nsubjpass", "csubjpass"} for c in tok.children))
+
+def find_main_verb_in_passive(aux_tok):
+    """Find the main verb (participle) in passive construction"""
+    # Look for past participle that depends on this auxiliary
+    for child in aux_tok.children:
+        if child.pos_ == "VERB" and child.tag_ in {"VBN"}:  # past participle
+            return child
+    
+    # Alternative: look in the sentence for past participles
+    for tok in aux_tok.doc:
+        if (tok.i > aux_tok.i and tok.pos_ == "VERB" and 
+            tok.tag_ == "VBN" and tok.head == aux_tok):
+            return tok
+    
+    return None
+
 # -------- robust subject finder --------
 def subjects_for(pred):
     # 1) direct dependency
@@ -61,7 +82,14 @@ def subjects_for(pred):
         if sh:
             return sh
 
-    # 3) aux-fronted question: noun_chunks between last AUX and predicate
+    # 3) for passive constructions, check if there's an auxiliary with the subject
+    if pred.pos_ == "VERB":
+        for tok in pred.doc:
+            if (tok.pos_ == "AUX" and tok.lemma_ == "be" and
+                any(c.dep_ in SUBJ_DEPS for c in tok.children)):
+                return [c for c in tok.children if c.dep_ in SUBJ_DEPS]
+
+    # 4) aux-fronted question: noun_chunks between last AUX and predicate
     aux_before = [t for t in pred.doc if t.i < pred.i and t.pos_ == "AUX"]
     if aux_before:
         left_idx = max(a.i for a in aux_before)
@@ -69,16 +97,15 @@ def subjects_for(pred):
         if chunks:
             return [sorted(chunks, key=lambda nc: nc.end)[-1].root]
 
-    # 4) general fallback: rightmost noun_chunk before predicate
+    # 5) general fallback: rightmost noun_chunk before predicate
     chunks = [nc for nc in pred.doc.noun_chunks if nc.end <= pred.i]
     if chunks:
         return [sorted(chunks, key=lambda nc: nc.end)[-1].root]
 
-    # 5) token fallback
+    # 6) token fallback
     cands = [t for t in pred.doc if t.i < pred.i and t.pos_ in {"NOUN","PROPN","PRON"}]
     if cands:
         return [cands[-1]]
-
 
     return []
 
@@ -87,26 +114,47 @@ def sentence_relations(sentence, include_det=False):
     doc = nlp(sentence)
     triples = []
 
-    verb_used_type = None
-
-    for token in doc:
-        if token.pos_ == "VERB":
-            verb_used_type = 'VERB'
-    
-    if not verb_used_type:
-        verb_used_type = "AUX"
+    # Track processed auxiliaries to avoid double-processing
+    processed_aux = set()
 
     for tok in doc:
-        # Case A: VERB predicates (normal)
-        if tok.pos_ == verb_used_type:
+        # Case A: Handle passive voice constructions first
+        if tok.pos_ == "AUX" and is_passive_auxiliary(tok) and tok.i not in processed_aux:
+            main_verb = find_main_verb_in_passive(tok)
+            if main_verb:
+                processed_aux.add(tok.i)
+                
+                v = verb_label(main_verb)
+                if collect_neg(tok) or collect_neg(main_verb):
+                    v = f"not {v}"
+
+                # Get subjects from the auxiliary (passive subjects)
+                subs = [c for c in tok.children if c.dep_ in SUBJ_DEPS]
+                for s in subs:
+                    subj = noun_phrase_label(s if s.pos_ in {"NOUN","PROPN"} else s.head, include_det)
+                    triples.append((subj, "subj", v))
+
+                # Handle prepositional phrases attached to main verb
+                for prep in (c for c in main_verb.children if c.dep_ == "prep"):
+                    for p in (c for c in prep.children if c.dep_ == "pobj"):
+                        tail = noun_phrase_label(p, include_det) if p.pos_ in {"NOUN","PROPN"} else p.text
+                        triples.append((v, f"prep_{prep.text.lower()}", tail))
+
+        # Case B: Regular VERB predicates (non-passive)
+        elif tok.pos_ == "VERB" and tok.i not in processed_aux:
+            # Skip if this verb is part of a passive construction we already handled
+            if any(aux.pos_ == "AUX" and aux.lemma_ == "be" and 
+                   find_main_verb_in_passive(aux) == tok for aux in doc):
+                continue
+                
             v = verb_label(tok)
             if collect_neg(tok):
                 v = f"not {v}"
-            
 
             subs = subjects_for(tok)
             for s in subs:
-                triples.append((noun_phrase_label(s if s.pos_ in {"NOUN","PROPN"} else s.head, include_det), "subj", v))
+                subj = noun_phrase_label(s if s.pos_ in {"NOUN","PROPN"} else s.head, include_det)
+                triples.append((subj, "subj", v))
 
             # objects
             for o in (c for c in tok.children if c.dep_ in OBJ_DEPS):
@@ -118,25 +166,33 @@ def sentence_relations(sentence, include_det=False):
                 for p in (c for c in prep.children if c.dep_ == "pobj"):
                     tail = noun_phrase_label(p, include_det) if p.pos_ in {"NOUN","PROPN"} else p.text
                     triples.append((v, f"prep_{prep.text.lower()}", tail))
-
-        # NEW FIX: handle mis-tagged "NOUN" roots after auxiliaries ("Does ... stretch")
+                    
+        # Case C: Handle mis-tagged "NOUN" roots after auxiliaries
         elif tok.pos_ == "NOUN" and tok.dep_ == "ROOT":
             aux_before = [a for a in tok.lefts if a.pos_ == "AUX"]
             if aux_before:
-                v = tok.text.lower()  # fallback: just use surface form as verb
-                if collect_neg(tok):
-                    v = f"not {v}"
+                # Case 1: nominal predicate with copula ("X is a Y") → isa relation
+                if any(a.lemma_ == "be" for a in aux_before):
+                    subs = subjects_for(tok)
+                    for s in subs:
+                        subj = noun_phrase_label(s, include_det)
+                        pred = noun_phrase_label(tok, include_det)
+                        triples.append((subj, "isa", pred))
 
-                subs = subjects_for(tok)
-                for s in subs:
-                    triples.append((noun_phrase_label(s, include_det), "subj", v))
+                # Case 2: aux + verb mis-tagged as NOUN ("Does ... stretch")
+                else:
+                    v = tok.text.lower()
+                    if collect_neg(tok):
+                        v = f"not {v}"
+                    subs = subjects_for(tok)
+                    for s in subs:
+                        triples.append((noun_phrase_label(s, include_det), "subj", v))
+                    for prep in (c for c in tok.children if c.dep_ == "prep"):
+                        for p in (c for c in prep.children if c.dep_ == "pobj"):
+                            tail = noun_phrase_label(p, include_det)
+                            triples.append((v, f"prep_{prep.text.lower()}", tail))
 
-                for prep in (c for c in tok.children if c.dep_ == "prep"):
-                    for p in (c for c in prep.children if c.dep_ == "pobj"):
-                        tail = noun_phrase_label(p, include_det)
-                        triples.append((v, f"prep_{prep.text.lower()}", tail))
-
-        # Case B: Copular nominal predicates: “X is a Y” → (X, isa, Y)
+        # Case D: Copular nominal predicates: "X is a Y" → (X, isa, Y)
         elif tok.pos_ == "NOUN" and has_copula(tok):
             subs = subjects_for(tok)
             for s in subs:
@@ -144,7 +200,7 @@ def sentence_relations(sentence, include_det=False):
                 pred = noun_phrase_label(tok, include_det)
                 triples.append((subj, "isa", pred))
 
-        # Case C: Copular adjectival predicates: “X is located …”
+        # Case E: Copular adjectival predicates: "X is located …"
         elif tok.pos_ == "ADJ" and has_copula(tok):
             v = tok.lemma_
             subs = subjects_for(tok)
@@ -179,17 +235,17 @@ def plot_graph(G, title=None):
 # ---------------- tests ----------------
 if __name__ == "__main__":
     questions = [
-    "Is the Great Wall of China located in China?",
-    "Does the Great Wall span over 13000 miles?", 
-    "Was the Great Wall built during the Ming Dynasty?",
-    "Can the Great Wall be seen from space?",
-    "Is the Great Wall made of stone and brick?",
-    "Does the Great Wall have watchtowers?",
-    "Was the Great Wall constructed over 2000 years?",
-    "Is the Great Wall an UNESCO World Heritage Site?",
-    "Does the Great Wall stretch across the northern China?",
-    "Are millions of tourists visiting the Great Wall annually?"
-]
+        "Is the Great Wall of China located in China?",
+        "Does the Great Wall span over 13000 miles?", 
+        "Was the Great Wall built during the Ming Dynasty?",
+        "Can the Great Wall be seen from space?",
+        "Is the Great Wall made of stone and brick?",
+        "Does the Great Wall have watchtowers?",
+        "Was the Great Wall constructed over 2000 years?",
+        "Is the Great Wall an UNESCO World Heritage Site?",
+        "Does the Great Wall stretch across the northern China?",
+        "Are millions of tourists visiting the Great Wall annually?"
+    ]
 
     for s in questions:
         triples = sentence_relations(s, include_det=False)
@@ -198,7 +254,3 @@ if __name__ == "__main__":
             print("   ", t)
         G = build_graph(triples)
         plot_graph(G, s)
-
-
-
-# python py_files/graph_generator/generator_with_rules_v2.py
