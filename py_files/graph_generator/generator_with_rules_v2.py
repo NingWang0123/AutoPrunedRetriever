@@ -112,7 +112,7 @@ def subjects_for(pred):
 # -------- extraction --------
 def sentence_relations(sentence, include_det=False):
     doc = nlp(sentence)
-    triples = []
+    triples = set()
 
     # Track processed auxiliaries to avoid double-processing
     processed_aux = set()
@@ -140,6 +140,15 @@ def sentence_relations(sentence, include_det=False):
 
                         break
 
+        # Case F (NEW): Handle AUX as ROOT for IsA questions like "Is X Y?"
+        if tok.i == tok.head.i and tok.pos_ == "AUX" and tok.lemma_ == "be":
+            subjects = [c for c in tok.children if c.dep_ in SUBJ_DEPS]
+            attrs = [c for c in tok.children if c.dep_ in {"attr", "acomp"}]
+            if subjects and attrs:
+                subj = noun_phrase_label(subjects[0])
+                pred = noun_phrase_label(attrs[0])
+                triples.add((subj, "isa", pred))
+
         # Case A: Handle passive voice constructions first
         if tok.pos_ == "AUX" and is_passive_auxiliary(tok) and tok.i not in processed_aux:
             main_verb = find_main_verb_in_passive(tok)
@@ -154,13 +163,13 @@ def sentence_relations(sentence, include_det=False):
                 subs = [c for c in tok.children if c.dep_ in SUBJ_DEPS]
                 for s in subs:
                     subj = noun_phrase_label(s if s.pos_ in {"NOUN","PROPN"} else s.head, include_det)
-                    triples.append((subj, "subj", v))
+                    triples.add((subj, "subj", v))
 
                 # Handle prepositional phrases attached to main verb
                 for prep in (c for c in main_verb.children if c.dep_ == "prep"):
                     for p in (c for c in prep.children if c.dep_ == "pobj"):
                         tail = noun_phrase_label(p, include_det) if p.pos_ in {"NOUN","PROPN"} else p.text
-                        triples.append((v, f"prep_{prep.text.lower()}", tail))
+                        triples.add((v, f"prep_{prep.text.lower()}", tail))
 
         # Case B: Regular VERB predicates (non-passive)
         elif tok.pos_ == "VERB" and tok.i not in processed_aux:
@@ -180,18 +189,18 @@ def sentence_relations(sentence, include_det=False):
             subs = subjects_for(tok)
             for s in subs:
                 subj = noun_phrase_label(s if s.pos_ in {"NOUN", "PROPN"} else s.head, include_det)
-                triples.append((subj, "subj", v))
+                triples.add((subj, "subj", v))
 
             # objects
             for o in (c for c in tok.children if c.dep_ in OBJ_DEPS):
                 tail = noun_phrase_label(o, include_det) if o.pos_ in {"NOUN", "PROPN"} else o.text
-                triples.append((v, "obj", tail))
+                triples.add((v, "obj", tail))
 
             # preps
             for prep in (c for c in tok.children if c.dep_ == "prep"):
                 for p in (c for c in prep.children if c.dep_ == "pobj"):
                     tail = noun_phrase_label(p, include_det) if p.pos_ in {"NOUN", "PROPN"} else p.text
-                    triples.append((v, f"prep_{prep.text.lower()}", tail))
+                    triples.add((v, f"prep_{prep.text.lower()}", tail))
 
         # Case C: Handle mis-tagged "NOUN" roots after auxiliaries
         elif tok.pos_ == "NOUN" and tok.dep_ == "ROOT":
@@ -203,7 +212,7 @@ def sentence_relations(sentence, include_det=False):
                     for s in subs:
                         subj = noun_phrase_label(s, include_det)
                         pred = noun_phrase_label(tok, include_det)
-                        triples.append((subj, "isa", pred))
+                        triples.add((subj, "isa", pred))
 
                 # Case 2: aux + verb mis-tagged as NOUN ("Does ... stretch")
                 else:
@@ -212,11 +221,11 @@ def sentence_relations(sentence, include_det=False):
                         v = f"not {v}"
                     subs = subjects_for(tok)
                     for s in subs:
-                        triples.append((noun_phrase_label(s, include_det), "subj", v))
+                        triples.add((noun_phrase_label(s, include_det), "subj", v))
                     for prep in (c for c in tok.children if c.dep_ == "prep"):
                         for p in (c for c in prep.children if c.dep_ == "pobj"):
                             tail = noun_phrase_label(p, include_det)
-                            triples.append((v, f"prep_{prep.text.lower()}", tail))
+                            triples.add((v, f"prep_{prep.text.lower()}", tail))
 
         # Case D: Copular nominal predicates: "X is a Y" → (X, isa, Y)
         elif tok.pos_ == "NOUN" and has_copula(tok):
@@ -224,7 +233,7 @@ def sentence_relations(sentence, include_det=False):
             for s in subs:
                 subj = noun_phrase_label(s if s.pos_ in {"NOUN","PROPN"} else s.head, include_det)
                 pred = noun_phrase_label(tok, include_det)
-                triples.append((subj, "isa", pred))
+                triples.add((subj, "isa", pred))
 
         # Case E: Copular adjectival predicates: "X is located …"
         elif tok.pos_ == "ADJ" and has_copula(tok):
@@ -232,12 +241,12 @@ def sentence_relations(sentence, include_det=False):
             subs = subjects_for(tok)
             for s in subs:
                 subj = noun_phrase_label(s if s.pos_ in {"NOUN","PROPN"} else s.head, include_det)
-                triples.append((subj, "subj", v))
+                triples.add((subj, "subj", v))
             # keep prepositional modifiers anchored to the adjective
             for prep in (c for c in tok.children if c.dep_ == "prep"):
                 for p in (c for c in prep.children if c.dep_ == "pobj"):
                     tail = noun_phrase_label(p, include_det) if p.pos_ in {"NOUN","PROPN"} else p.text
-                    triples.append((v, f"prep_{prep.text.lower()}", tail))
+                    triples.add((v, f"prep_{prep.text.lower()}", tail))
 
     return triples
 
