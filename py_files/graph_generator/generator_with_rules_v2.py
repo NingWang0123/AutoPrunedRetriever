@@ -140,6 +140,34 @@ def sentence_relations(sentence, include_det=False):
 
                         break
 
+        # Special case for "be + adjective + preposition" constructions
+        if (len(doc) > 3 and
+                doc[0].text.lower() == "is" and
+                doc[0].pos_ == "AUX" and
+                any(t.pos_ == "ADJ" and t.dep_ == "acomp" for t in doc)):
+
+            # Get the adjective (e.g., "visible")
+            adj = next(t for t in doc if t.pos_ == "ADJ" and t.dep_ == "acomp")
+
+            # Get the subject (e.g., "the Great Wall")
+            subject = next((t for t in doc if t.dep_ in SUBJ_DEPS), None)
+
+            if subject and adj:
+                subj_text = noun_phrase_label(subject, include_det)
+                adj_text = adj.text
+
+                # Handle prepositional phrases attached to the adjective
+                for prep in [c for c in adj.children if c.dep_ == "prep"]:
+                    pobj = next((c for c in prep.children if c.dep_ == "pobj"), None)
+                    if pobj:
+                        loc_text = noun_phrase_label(pobj, include_det)
+                        triples.add((subj_text, "property", f"{adj_text} {prep.text} {loc_text}"))
+                        return triples
+
+                # Fallback if no preposition found
+                triples.add((subj_text, "property", adj_text))
+                return triples
+
         # Case F (NEW): Handle AUX as ROOT for IsA questions like "Is X Y?"
         if tok.i == tok.head.i and tok.pos_ == "AUX" and tok.lemma_ == "be":
             subjects = [c for c in tok.children if c.dep_ in SUBJ_DEPS]
@@ -280,6 +308,7 @@ if __name__ == "__main__":
         "Is the Great Wall an UNESCO World Heritage Site?",
         "Does the Great Wall stretch across the northern China?",
         "Are millions of tourists visiting the Great Wall annually?"
+        "Is the Great Wall visible from low Earth orbit?"
     ]
 
     for s in questions:
