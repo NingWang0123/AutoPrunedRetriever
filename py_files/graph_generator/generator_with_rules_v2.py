@@ -460,7 +460,7 @@ if __name__ == "__main__":
         msg1 = make_codebook_message(codebook)  # send once
 
         edges = edges_from_triples(triples, ent2id, rel2id)
-        msg2 = make_edges_message(codebook["sid"], edges)  # send many times
+        msg2 = make_edges_message(codebook["sid"], edges)  # send many times or once
 
         print(msg1)
         print(msg2)
