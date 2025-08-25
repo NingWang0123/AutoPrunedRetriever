@@ -3,6 +3,8 @@ import spacy
 import networkx as nx
 import matplotlib.pyplot as plt
 import re
+import json, hashlib
+from typing import List, Tuple, Dict, Optional
 
 nlp = spacy.load("en_core_web_sm")
 
@@ -295,26 +297,179 @@ def plot_graph(G, title=None):
     if title: plt.title(title)
     plt.tight_layout(); plt.show()
 
+
+# ---------- ) JSON with ID + Dictionary ----------
+def triples_to_id_dictionary(triples,tasks = 'answer the questions'):
+    """
+    triples: set or list of (head, rel, tail)
+    Return:
+      {
+        "entity_dict": [...],        # index = entity_id
+        "relation_dict": [...],      # index = relation_id
+        "edges": [[e_id, r_id, e_id], ...],
+        "tasks":'answer the questions'
+      }
+    """
+    ent2id, rel2id = {}, {}
+    entity_dict, relation_dict = [], []
+    edges = []
+
+    def _eid(x):
+        if x not in ent2id:
+            ent2id[x] = len(entity_dict)
+            entity_dict.append(x)
+        return ent2id[x]
+
+    def _rid(x):
+        if x not in rel2id:
+            rel2id[x] = len(relation_dict)
+            relation_dict.append(x)
+        return rel2id[x]
+
+    for h, r, t in triples:
+        h_id = _eid(h)
+        r_id = _rid(r)
+        t_id = _eid(t)
+        edges.append([h_id, r_id, t_id])
+
+    return {"entity_dict": entity_dict, "relation_dict": relation_dict, "edges": edges,"tasks":tasks}
+
+
+# ---------- Utility ----------
+def json_dump_str(obj, indent=0):
+    """Return compact JSON string by default; pretty-print if indent>0."""
+    if indent:
+        return json.dumps(obj, ensure_ascii=False, indent=indent)
+    return json.dumps(obj, ensure_ascii=False, separators=(",", ":"))
+
+
+
+# ---------- ) Codebook ----------
+
+def build_codebook_from_triples(
+    triples: List[Tuple[str, str, str]],
+    legend: str = "Relations are used verbatim (e.g., prep_in, prep_over, prep_of, prep_during).",
+    rule: str = "Reply with a Y/N/? string in order only; no explanations."
+):
+    ent2id: Dict[str, int] = {}
+    rel2id: Dict[str, int] = {}
+
+    entities: List[str] = []
+    relations: List[str] = []
+
+    def _eid(x: str) -> int:
+        if x not in ent2id:
+            ent2id[x] = len(entities)
+            entities.append(x)
+        return ent2id[x]
+
+    def _rid(x: str) -> int:
+        if x not in rel2id:
+            rel2id[x] = len(relations)
+            relations.append(x)
+        return rel2id[x]
+
+    # Touch all nodes/relations to populate dictionaries
+    for h, r, t in triples:
+        _eid(h); _rid(r); _eid(t)
+
+    # Stable short id for this codebook
+    sid_src = json_dump_str({"e": entities, "r": relations})
+    sid = hashlib.sha1(sid_src.encode("utf-8")).hexdigest()[:10]
+
+    codebook = {
+        "sid": sid,
+        "e": entities,   # entity dictionary 
+        "r": relations,  # relation dictionary 
+        # "legend": legend,
+        "rule": rule
+    }
+    return codebook, ent2id, rel2id
+
+# ---------- Edges from triples using the codebook ----------
+def edges_from_triples(
+    triples: List[Tuple[str, str, str]],
+    ent2id: Dict[str, int],
+    rel2id: Dict[str, int],
+) -> List[List[int]]:
+    g = []
+    for h, r, t in triples:
+        g.append([ent2id[h], rel2id[r], ent2id[t]])
+    return g
+
+# ---------- Message builders ----------
+def make_codebook_message(codebook: dict) -> str:
+    # Send once at session start (or when the codebook changes)
+    return json_dump_str(codebook)
+
+def make_edges_message(sid: str, edges: List[List[int]]) -> str:
+    # Send repeatedly; tiny payload (ids only)
+    return json_dump_str({"sid": sid, "g": edges})
+
+# ---------- Deltas for new entities/relations (no aliasing) ----------
+def compute_deltas_for_new_triples(
+    new_triples: List[Tuple[str, str, str]],
+    ent2id: Dict[str, int],
+    rel2id: Dict[str, int],
+):
+    add_e: List[str] = []
+    add_r: List[str] = []
+    for h, r, t in new_triples:
+        if h not in ent2id:
+            ent2id[h] = len(ent2id); add_e.append(h)
+        if r not in rel2id:
+            rel2id[r] = len(rel2id); add_r.append(r)
+        if t not in ent2id:
+            ent2id[t] = len(ent2id); add_e.append(t)
+    delta = {}
+    if add_e: delta["add_e"] = add_e
+    if add_r: delta["add_r"] = add_r
+    return delta
+
+def make_delta_message(sid: str, delta: dict) -> Optional[str]:
+    if not delta: return None
+    out = {"sid": sid}
+    out.update(delta)
+    return json_dump_str(out)
+
 # ---------------- tests ----------------
 if __name__ == "__main__":
     questions = [
-        "Is the Great Wall of China located in China?",
-        "Does the Great Wall span over 13000 miles?",
-        "Was the Great Wall built during the Ming Dynasty?",
-        "Can the Great Wall be seen from space?",
-        "Is the Great Wall made of stone and brick?",
-        "Does the Great Wall have watchtowers?",
-        "Was the Great Wall constructed over 2000 years?",
-        "Is the Great Wall an UNESCO World Heritage Site?",
-        "Does the Great Wall stretch across the northern China?",
-        "Are millions of tourists visiting the Great Wall annually?"
-        "Is the Great Wall visible from low Earth orbit?"
+        # "Is the Great Wall of China located in China?",
+        # "Does the Great Wall span over 13000 miles?",
+        # "Was the Great Wall built during the Ming Dynasty?",
+        # "Can the Great Wall be seen from space?",
+        # "Is the Great Wall made of stone and brick?",
+        # "Does the Great Wall have watchtowers?",
+        # "Was the Great Wall constructed over 2000 years?",
+        # "Is the Great Wall an UNESCO World Heritage Site?",
+        # "Does the Great Wall stretch across the northern China?",
+        # "Are millions of tourists visiting the Great Wall annually?"
+        # "Is the Great Wall visible from low Earth orbit?"
+        "Is the Great Wall of China located in China? Does the Great Wall span over 13000 miles? Was the Great Wall built during the Ming Dynasty? Can the Great Wall be seen from space? Is the Great Wall made of stone and brick?"
     ]
 
     for s in questions:
         triples = sentence_relations(s, include_det=False)
+
+        print('id_json')
+        id_json = triples_to_id_dictionary(triples)
+        print(json_dump_str(id_json, indent=2))
+        print('code book method')
+        codebook, ent2id, rel2id = build_codebook_from_triples(triples)
+        msg1 = make_codebook_message(codebook)  # send once
+
+        edges = edges_from_triples(triples, ent2id, rel2id)
+        msg2 = make_edges_message(codebook["sid"], edges)  # send many times
+
+        print(msg1)
+        print(msg2)
         print(s, "->")
         for t in triples:
             print("   ", t)
         G = build_graph(triples)
         plot_graph(G, s)
+
+
+
+# python py_files/graph_generator/generator_with_rules_v2.py
