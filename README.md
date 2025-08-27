@@ -18,4 +18,6 @@ python3 -m venv venv_rgl
 source venv_rgl/bin/activate
 
 pip install -r requirements.txt
+
+python py_files/workflow.py 
 ```
