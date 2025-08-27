@@ -457,7 +457,7 @@ def make_edges_message(sid: str, edges: List[List[int]],use_full_edges:bool = Tr
     if use_full_edges:
         json_msg = json_dump_str({"sid": sid,'questions([e,r,e])':all_chains_no_subchains(edges,use_full_edges)})
     else:
-        json_msg = json_dump_str({"sid": sid, "edges([e,r,e])": edges,'questions(edges index)':all_chains_no_subchains(edges,use_full_edges)})
+        json_msg = json_dump_str({"sid": sid, "edges([e,r,e])": edges,'questions(edges[i])':all_chains_no_subchains(edges,use_full_edges)})
 
     return json_msg
 
