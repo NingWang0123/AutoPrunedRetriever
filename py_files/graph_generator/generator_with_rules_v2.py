@@ -4,7 +4,8 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import re
 import json, hashlib
-from typing import List, Tuple, Dict, Optional
+from typing import List, Tuple, Dict, Optional,Iterable
+import itertools
 
 nlp = spacy.load("en_core_web_sm")
 
@@ -404,7 +405,7 @@ def make_codebook_message(codebook: dict) -> str:
 
 def make_edges_message(sid: str, edges: List[List[int]]) -> str:
     # Send repeatedly; tiny payload (ids only)
-    return json_dump_str({"sid": sid, "g": edges})
+    return json_dump_str({"sid": sid, "edges": edges})
 
 # ---------- Deltas for new entities/relations (no aliasing) ----------
 def compute_deltas_for_new_triples(
@@ -432,6 +433,151 @@ def make_delta_message(sid: str, delta: dict) -> Optional[str]:
     out.update(delta)
     return json_dump_str(out)
 
+
+
+#### new (with example and detailed rules)
+
+# ---------- Codebook ----------
+def json_dump_str(obj) -> str:
+    return json.dumps(obj, ensure_ascii=False, separators=(",", ":"))
+
+def build_codebook_from_triples(
+    triples: Iterable[Tuple[str, str, str]],
+    # legend: str = "Relations are used verbatim (e.g., prep_in, prep_over, prep_of, prep_during). Avoid abbreviations.",  # add or not 
+    rule: str = "Reply with a Y/N/? string in order only; no explanations."
+):
+    # ---- normalize to a stable, indexable sequence ----
+    if isinstance(triples, set):
+        # Sort for determinism (tuples compare lexicographically)
+        triples_seq: List[Tuple[str, str, str]] = sorted(triples)
+    elif isinstance(triples, list):
+        triples_seq = triples
+    else:
+        triples_seq = list(triples)
+
+    ent2id: Dict[str, int] = {}
+    rel2id: Dict[str, int] = {}
+    entities: List[str] = []
+    relations: List[str] = []
+
+    def _eid(x: str) -> int:
+        if x not in ent2id:
+            ent2id[x] = len(entities)
+            entities.append(x)
+        return ent2id[x]
+
+    def _rid(x: str) -> int:
+        if x not in rel2id:
+            rel2id[x] = len(relations)
+            relations.append(x)
+        return rel2id[x]
+
+    # Populate dictionaries in the (now) stable order
+    for h, r, t in triples_seq:
+        _eid(h); _rid(r); _eid(t)
+
+    # Stable short id for this codebook
+    sid_src = json_dump_str({"e": entities, "r": relations})
+    sid = hashlib.sha1(sid_src.encode("utf-8")).hexdigest()[:10]
+
+    # Tiny readable anchor for small models (first up to 2 triples)
+    example_decoded: List[List[str]] = []
+    for h, r, t in itertools.islice(triples_seq, 2):
+        example_decoded.append([h, r, t])
+
+    example_encoded: List[List[int]] = [
+        [ent2id[h], rel2id[r], ent2id[t]]
+        for h, r, t in example_decoded
+    ]
+
+    codebook = {
+        "sid": sid,
+        "e": entities,
+        "r": relations,
+        # "legend": legend,  # add or not
+        "schema": (
+            "Edges are triples of integer ids: [head_id, relation_id, tail_id]. "
+            "'e'[i] gives the entity string for i; 'r'[j] gives the relation string for j. "
+            "Decoded form is ( e[head_id], r[relation_id], e[tail_id] )."
+        ),
+        "example": {
+            "decoded_triples": example_decoded,
+            "encoded_edges": example_encoded
+        },
+        "rule": rule
+    }
+    return codebook, ent2id, rel2id
+
+def edges_from_triples(
+    triples: Iterable[Tuple[str, str, str]],
+    ent2id: Dict[str, int],
+    rel2id: Dict[str, int],
+) -> List[List[int]]:
+    # Accept set/list/iterable; preserve determinism by sorting if set.
+    if isinstance(triples, set):
+        triples_seq = sorted(triples)
+    elif isinstance(triples, list):
+        triples_seq = triples
+    else:
+        triples_seq = list(triples)
+
+    g: List[List[int]] = []
+    for h, r, t in triples_seq:
+        g.append([ent2id[h], rel2id[r], ent2id[t]])
+    return g
+
+# ---------- Decoding helpers (for readable layer) ----------
+def decode_edges(
+    edges: List[List[int]],
+    entities: List[str],
+    relations: List[str]
+) -> List[List[str]]:
+    """
+    Decodes [[h_id, r_id, t_id], ...] -> [[head, relation, tail], ...]
+    """
+    out = []
+    for h_id, r_id, t_id in edges:
+        out.append([entities[h_id], relations[r_id], entities[t_id]])
+    return out
+
+# ---------- Message builders ----------
+def make_codebook_message(codebook: dict) -> str:
+    """
+    Send this once per session or whenever the codebook changes.
+    Includes legend + schema + concrete example to help small models.
+    """
+    return json_dump_str(codebook)
+
+def make_edges_message(
+    sid: str,
+    edges: List[List[int]],
+    entities: List[str],
+    relations: List[str],
+    include_readable: bool = True,
+    preview_k: int = 3
+) -> str:
+    """
+    Repeated payload. To support small models, we optionally include
+    a readable mirror of the first few edges and an explicit reminder
+    of how to decode.
+    """
+    msg = {
+        "sid": sid,
+        # Keep BOTH keys for compatibility: compact "g" and explicit "edges".
+        "g": edges,
+        "edges": edges
+    }
+    if include_readable:
+        preview = edges[:preview_k]
+        msg["decoded_preview"] = decode_edges(preview, entities, relations)
+        msg["how_to_read"] = (
+            "Each edge [h,r,t] means ( e[h], r[r], e[t] ). "
+            "Use the codebook 'e' and 'r' arrays to map ids to strings."
+        )
+    return json_dump_str(msg)
+
+
+
 # ---------------- tests ----------------
 if __name__ == "__main__":
     questions = [
@@ -453,14 +599,21 @@ if __name__ == "__main__":
         triples = sentence_relations(s, include_det=False)
 
         print('id_json')
-        id_json = triples_to_id_dictionary(triples)
-        print(json_dump_str(id_json, indent=2))
+        # id_json = triples_to_id_dictionary(triples)
+        # print(json_dump_str(id_json, indent=2))
         print('code book method')
         codebook, ent2id, rel2id = build_codebook_from_triples(triples)
         msg1 = make_codebook_message(codebook)  # send once
 
         edges = edges_from_triples(triples, ent2id, rel2id)
-        msg2 = make_edges_message(codebook["sid"], edges)  # send many times or once
+        # msg2 = make_edges_message(codebook["sid"], edges)  # send many times or once
+
+        msg2 = make_edges_message(
+            codebook["sid"],
+            edges,
+            codebook["e"],   # entities
+            codebook["r"]    # relations
+        )
 
         print(msg1)
         print(msg2)
