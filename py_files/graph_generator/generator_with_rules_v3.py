@@ -454,7 +454,12 @@ def make_codebook_message(codebook: dict) -> str:
 
 def make_edges_message(sid: str, edges: List[List[int]],use_full_edges:bool = True) -> str:
     # Send repeatedly; tiny payload (ids only)
-    return json_dump_str({"sid": sid, "edges": edges,'questions':all_chains_no_subchains(edges,use_full_edges)})
+    if use_full_edges:
+        json_msg = json_dump_str({"sid": sid,'questions':all_chains_no_subchains(edges,use_full_edges)})
+    else:
+        json_msg = json_dump_str({"sid": sid, "edges": edges,'questions(edges index)':all_chains_no_subchains(edges,use_full_edges)})
+
+    return json_msg
 
 # ---------- Deltas for new entities/relations (no aliasing) ----------
 def compute_deltas_for_new_triples(
