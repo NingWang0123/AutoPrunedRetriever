@@ -501,7 +501,7 @@ def build_codebook_from_triples(
             "Decoded form is ( e[head_id], r[relation_id], e[tail_id] )."
         ),
         "example": {
-            "decoded_triples": example_decoded,
+            # "decoded_triples": example_decoded,
             "encoded_edges": example_encoded
         },
         "rule": rule
@@ -564,7 +564,6 @@ def make_edges_message(
     msg = {
         "sid": sid,
         # Keep BOTH keys for compatibility: compact "g" and explicit "edges".
-        "g": edges,
         "edges": edges
     }
     if include_readable:
@@ -612,7 +611,9 @@ if __name__ == "__main__":
             codebook["sid"],
             edges,
             codebook["e"],   # entities
-            codebook["r"]    # relations
+            codebook["r"],    # relations
+            include_readable = False
+
         )
 
         print(msg1)
