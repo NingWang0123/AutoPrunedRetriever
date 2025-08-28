@@ -122,7 +122,7 @@ def sentence_relations(sentence, include_det=False):
     processed_aux = set()
 
     for i, tok in enumerate(doc):
-        print(tok, " - ", tok.pos_, " - ", tok.dep_)
+        # print(tok, " - ", tok.pos_, " - ", tok.dep_)
         # --- Special fix for "do/does/did" questions mis-parsed ---
         if tok.lemma_ in {"do", "does", "did"} and tok.dep_ == "ROOT":
             for child in tok.children:
@@ -490,7 +490,6 @@ def make_delta_message(sid: str, delta: dict) -> Optional[str]:
 
 def get_js_msgs_use_triples(question_prompt):
     triples = sentence_relations(question_prompt, include_det=False)
-    print('code book method')
     codebook, ent2id, rel2id = build_codebook_from_triples(triples)
     msg1 = make_codebook_message(codebook)  # send once
 
