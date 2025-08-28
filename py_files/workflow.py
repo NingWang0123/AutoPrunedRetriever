@@ -1,5 +1,4 @@
 import networkx as nx
-from linearization_utils import *
 
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
@@ -497,7 +496,6 @@ def batch_measure(
                     question=q,
                     gen_pipe=gen_pipe,
                     tokenizer=tokenizer,
-                    parser=parser,
                     faiss_db=faiss_db,
                     label=cfg.get("label")
                 )
