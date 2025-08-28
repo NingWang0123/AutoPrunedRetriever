@@ -306,7 +306,7 @@ def build_relationship_text(
             if json_style == "v3":
                 v3_obj = _build_unified_v3(
                     triples,
-                    rule="",
+                    rule="Reply with a Y/N/? string in order only; no explanations.",
                     include_sid=False,                         
                     edge_key="questions([[e,r,e], ...])",    
                 )
@@ -314,6 +314,34 @@ def build_relationship_text(
             elif json_style == "codebook_edges":
                 codebook, edges = _build_codebook_v2(triples)
                 json_piece = _json_dump(codebook, json_pretty) + "\n" + _json_dump({"sid": codebook["sid"], "g": edges}, json_pretty)
+
+            elif json_style == "v3_indexed": # edge indexed
+                ents, rels = [], []
+                ent2id, rel2id = {}, {}
+                def _eid(x: str) -> int:
+                    if x not in ent2id:
+                        ent2id[x] = len(ents); ents.append(x)
+                    return ent2id[x]
+                def _rid(x: str) -> int:
+                    if x not in rel2id:
+                        rel2id[x] = len(rels); rels.append(x)
+                    return rel2id[x]
+
+                edges = []
+                for h, r, t in triples:
+                    edges.append([_eid(h), _rid(r), _eid(t)])
+
+                questions_idx = list(range(len(edges)))
+
+                v3i = {
+                    "e": ents,
+                    "r": rels,
+                    "rule": "Reply with a Y/N/? string in order only; no explanations.",
+                    "edges": edges,
+                    "questions": questions_idx
+                }
+                json_piece = _json_dump(v3i, json_pretty)
+
             else:  # "id_dict"
                 id_dict = _triples_to_id_dictionary_v1(triples)
                 json_piece = _json_dump(id_dict, json_pretty)
