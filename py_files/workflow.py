@@ -16,7 +16,7 @@ import pandas as pd
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
 
 # Your JSON prompt helper (must be on PYTHONPATH)
-from graph_generator.generator_with_json import get_js_msgs_use_triples
+from graph_generator.generator_with_json import get_js_msgs_use_triples,get_merged_message
 
 try:
     from transformers import set_seed  # Utility for reproducibility
@@ -135,9 +135,15 @@ def make_json_qa_prompt(question: str) -> str:
     """
     sections = []
     if CONFIG.get("include_current_triples", True):
-        msg1, msg2 = get_js_msgs_use_triples(question)
-        sections.append(msg1)
-        sections.append(msg2)
+        # msg1, msg2 = get_js_msgs_use_triples(question)
+        # print(msg1)
+        # print(msg2)
+        # msg1.update(msg2)
+        # msg1.pop('sid', None)
+        # sections.append(msg1)
+
+        msg = get_merged_message(question)
+        sections.append(msg)
     else:
         sections.append(f"Q: {question}\nAnswer YES or NO:")
     return "\n\n".join(sections)
@@ -433,11 +439,11 @@ if __name__ == "__main__":
     gen_pipe, tokenizer = load_llm_pipeline()
 
     # Quick sanity check
-    try:
-        print("Sanity:", answer_with_llm("Is the Earth round?", gen_pipe))
-    except Exception as e:
-        print("Sanity generation failed:", e)
-        raise
+    # try:
+    #     print("Sanity:", answer_with_llm("Is the Earth round?", gen_pipe))
+    # except Exception as e:
+    #     print("Sanity generation failed:", e)
+    #     raise
 
     for q in questions:
         try:

@@ -499,5 +499,24 @@ def get_js_msgs_use_triples(question_prompt):
     return msg1,msg2
 
 
+def get_merged_message(question_prompt,use_full_edges = True):
+    triples = sentence_relations(question_prompt, include_det=False)
+
+    codebook, ent2id, rel2id = build_codebook_from_triples(triples)
+
+    edges = edges_from_triples(triples, ent2id, rel2id)
+
+    if use_full_edges:
+        dict_2 =  {'questions([[e,r,e], ...])':all_chains_no_subchains(edges,use_full_edges)}
+    else:
+        dict_2 = {"edges([e,r,e])": edges,'questions(edges[i])':all_chains_no_subchains(edges,use_full_edges)}
+
+    codebook.update(dict_2)
+
+    codebook.pop('sid') 
+
+    return json_dump_str(codebook)
+
+
 # python py_files/graph_generator/generator_with_json.py
 # check usage in generator_with_rules_v3.py
