@@ -439,11 +439,19 @@ if __name__ == "__main__":
         print("Sanity generation failed:", e)
         raise
 
-    df = batch_measure(questions, gen_pipe, tokenizer)
-    print(df.head())
+    for q in questions:
+        try:
+            print("Sanity:", answer_with_llm(q, gen_pipe))
+        except Exception as e:
+            print("Sanity generation failed:", e)
+            raise
 
-    print("\n=== Summary ===")
-    summarize_cost(df, base_label="no_ctx", target_label="with_both")
+
+    # df = batch_measure(questions, gen_pipe, tokenizer)
+    # print(df.head())
+
+    # print("\n=== Summary ===")
+    # summarize_cost(df, base_label="no_ctx", target_label="with_both")
 
     # df_gold = attach_gold(df, GOLD_LABELS)
     # _ = evaluate_accuracy(df_gold)
