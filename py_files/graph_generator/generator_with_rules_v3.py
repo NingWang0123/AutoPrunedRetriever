@@ -115,7 +115,7 @@ def subjects_for(pred):
 
 # -------- extraction --------
 def sentence_relations(sentence, include_det=False):
-    doc = nlp(sentence)
+    doc = nlp(sentence.strip())
     triples = set()
 
     # Track processed auxiliaries to avoid double-processing
