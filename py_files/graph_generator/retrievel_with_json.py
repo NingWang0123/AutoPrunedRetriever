@@ -738,8 +738,8 @@ def decode_question(question, codebook_main, fmt='words'):
             "e": [str, ...],
             "r": [str, ...],
             "edge_matrix": [[e_idx, r_idx, e_idx], ...],  # list or np.ndarray
-            "e_embeddings": [vec, ...],  # optional
-            "r_embeddings": [vec, ...],  # optional
+            "e_embeddings": [vec, ...], 
+            "r_embeddings": [vec, ...], 
         }
     fmt: 'words' -> [[e, r, e], ...]
          'embeddings' -> [[e_vec, r_vec, e_vec], ...]
