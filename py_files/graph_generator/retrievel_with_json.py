@@ -643,7 +643,7 @@ def merging_codebook(codebook_main,codebook_sub):
         lst_questions_main = codebook_main['questions_lst']
 
         edge_mat_needs_merged = codebook_sub['edges([e,r,e])']
-        edge_mat_main = codebook_main['edges([e,r,e])']
+        edge_mat_main = codebook_main['edge_matrix']
 
         # get new index and updated index for main codebook and sub codebook
 
@@ -682,9 +682,6 @@ def merging_codebook(codebook_main,codebook_sub):
         }
 
     return final_codebook
-
-
-
 
 
 
