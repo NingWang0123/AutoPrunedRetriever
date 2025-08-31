@@ -211,7 +211,7 @@ def _build_unified_v3(
         "e": e,
         "r": r,
         #"rule": rule,
-        edge_key: q_edges,
+        #edge_key: q_edges,
     }
 
     if include_sid:
@@ -219,7 +219,7 @@ def _build_unified_v3(
         sid_src = _json_dump({"e": e, "r": r}, pretty=False)
         out["sid"] = hashlib.sha1(sid_src.encode("utf-8")).hexdigest()[:10]
 
-    return out
+    return out, q_edges
 
 
 
@@ -236,7 +236,7 @@ def build_relationship_text(
     include_json_block: bool = True,     # append JSON representation
     json_style: str = "v3",              # NEW DEFAULT: "v3" | "id_dict" | "codebook_edges"
     json_pretty: bool = False,           # pretty-print JSON if True
-) -> str:
+) -> tuple:
     """
     Unified construction of text for embedding:
     - [QUESTION] Original question (optional)
@@ -246,6 +246,8 @@ def build_relationship_text(
     - [JSON]     Graph-as-JSON ('v3' unified object, or 'id_dict', or 'codebook_edges')
     """
     parts: List[str] = []
+    edges = ""
+    questions_idx = ""
 
     if include_question and question:
         parts.append(f"[QUESTION] {question}")
@@ -304,18 +306,17 @@ def build_relationship_text(
             parts.append("__EMPTY_JSON__")
         else:
             if json_style == "v3":
-                v3_obj = _build_unified_v3(
+                v3_obj, questions_idx = _build_unified_v3(
                     triples,
-                    rule="Reply with a Y/N/? string in order only; no explanations.",
                     include_sid=False,                         
-                    edge_key="questions([[e,r,e], ...])",    
+                    #edge_key="questions([[e,r,e], ...])",    
                 )
                 json_piece = _json_dump(v3_obj, json_pretty)
             elif json_style == "codebook_edges":
                 codebook, edges = _build_codebook_v2(triples)
                 json_piece = _json_dump(codebook, json_pretty) + "\n" + _json_dump({"sid": codebook["sid"], "g": edges}, json_pretty)
 
-            elif json_style == "v3_indexed": # edge indexed
+            elif json_style == "v3_indexed":
                 ents, rels = [], []
                 ent2id, rel2id = {}, {}
                 def _eid(x: str) -> int:
@@ -327,7 +328,7 @@ def build_relationship_text(
                         rel2id[x] = len(rels); rels.append(x)
                     return rel2id[x]
 
-                edges = []
+                edges: List[List[int]] = []
                 for h, r, t in triples:
                     edges.append([_eid(h), _rid(r), _eid(t)])
 
@@ -336,9 +337,6 @@ def build_relationship_text(
                 v3i = {
                     "e": ents,
                     "r": rels,
-                    "rule": "Reply with a Y/N/? string in order only; no explanations.",
-                    "edges": edges,
-                    "questions": questions_idx
                 }
                 json_piece = _json_dump(v3i, json_pretty)
 
@@ -347,4 +345,4 @@ def build_relationship_text(
                 json_piece = _json_dump(id_dict, json_pretty)
             parts.append(json_piece)
 
-    return ",".join(parts)
+    return ",".join(parts), edges, questions_idx
