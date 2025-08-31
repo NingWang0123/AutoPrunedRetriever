@@ -8,6 +8,10 @@ from typing import List, Tuple, Dict, Optional,Iterable
 import itertools
 from collections import defaultdict
 import numpy as np
+from gensim.models import KeyedVectors
+import numpy as np
+import re
+from langchain.embeddings.base import Embeddings
 
 nlp = spacy.load("en_core_web_sm")
 
@@ -496,6 +500,36 @@ def get_merged_message(question_prompt,use_full_edges = True):
 
 ########### Aug 30-31,2025: merging code book method
 
+
+class WordAvgEmbeddings(Embeddings):
+    def __init__(self, model_path: str = "gensim-data/glove-wiki-gigaword-100/glove-wiki-gigaword-100.model.vectors.npy"):
+        self.kv = KeyedVectors.load(model_path, mmap='r')
+        self.dim = self.kv.vector_size
+        self.token_pat = re.compile(r"[A-Za-z]+")
+
+    def _embed_text(self, text: str) -> np.ndarray:
+        toks = [t.lower() for t in self.token_pat.findall(text)]
+        vecs = [self.kv[w] for w in toks if w in self.kv]
+        if not vecs:
+            return np.zeros(self.dim, dtype=np.float32)
+        return np.mean(vecs, axis=0).astype(np.float32)
+
+word_emb = WordAvgEmbeddings(model_path="gensim-data/glove-wiki-gigaword-100/glove-wiki-gigaword-100.model")
+
+
+def get_word_embeddings(list_of_text,word_emb):
+    """
+    list_of_text: ['str1 str2 ...',]
+    word_emb: embedding model
+
+    list_of_text_embeddings:  [embedding_vals,...]
+    """
+
+    list_of_text_embeddings = [word_emb._embed_text(text) for text in list_of_text]
+
+
+    return list_of_text_embeddings
+
 def get_code_book(question_prompt):
     triples = sentence_relations(question_prompt, include_det=False)
 
@@ -519,6 +553,7 @@ def update_the_index(codebook_main,codebook_sub,select_feature):
     index_item_main = {val: idx for idx, val in enumerate(codebook_main[select_feature])}
     total_item_num = len(items_main)
     new_index_replacement_for_sub = {}
+    new_added_items = []
 
     for item_sub in items_needs_merged:
         if item_sub in items_main:
@@ -528,8 +563,9 @@ def update_the_index(codebook_main,codebook_sub,select_feature):
             total_item_num+=1
             new_index_replacement_for_sub[index_item_sub[item_sub]] = total_item_num
             index_item_main[item_sub] = total_item_num
+            new_added_items.append(item_sub)
 
-    return new_index_replacement_for_sub,index_item_main
+    return new_index_replacement_for_sub,index_item_main,new_added_items
 
 
 
@@ -633,7 +669,7 @@ def remap_question_indices(questions, idx_map, max_dense_size=10_000_000):
     return out
 
 
-def merging_codebook(codebook_main,codebook_sub):
+def merging_codebook(codebook_main,codebook_sub,word_emb=word_emb):
 
     if codebook_main:
         # get the ents and rs needs to be merged in to codebook_main
@@ -647,9 +683,15 @@ def merging_codebook(codebook_main,codebook_sub):
 
         # get new index and updated index for main codebook and sub codebook
 
-        new_index_replacement_for_ent_sub,index_ent_main = update_the_index(codebook_main,codebook_sub,'e')
+        new_index_replacement_for_ent_sub,index_ent_main,new_added_ents = update_the_index(codebook_main,codebook_sub,'e')
 
-        new_index_replacement_for_r_sub,index_r_main = update_the_index(codebook_main,codebook_sub,'r')
+        new_index_replacement_for_r_sub,index_r_main,new_added_rs = update_the_index(codebook_main,codebook_sub,'r')
+
+        # get newly added entities word embeddings
+        new_ent_embeds = get_word_embeddings(new_added_ents,word_emb)
+
+        # get newly added relations word embeddings
+        new_r_embeds = get_word_embeddings(new_added_rs,word_emb)
 
         # update the edges matrix needs to be merged
         edge_mat_needs_merged_remapped = remap_edges_matrix(edge_mat_needs_merged, new_index_replacement_for_ent_sub, new_index_replacement_for_r_sub)
@@ -669,7 +711,9 @@ def merging_codebook(codebook_main,codebook_sub):
             "r": index_r_main.keys(),  # relation dictionary 
             'edge_matrix':index_edges_main.keys(),
             "questions_lst":lst_questions_main,
-            "rule": rule
+            "rule": rule,
+            "e_embeddings": codebook_main['e_embeddings']+new_ent_embeds,   # add the new ent embeds
+            "r_embeddings": codebook_main['r_embeddings']+new_r_embeds,  # add the new r embeds
         }
     else:
         # main codebook is empty
@@ -678,10 +722,49 @@ def merging_codebook(codebook_main,codebook_sub):
             "r": codebook_sub['r'],  
             'edge_matrix':codebook_sub['edges([e,r,e])'],
             "questions_lst":[codebook_sub['questions(edges[i])']],
-            "rule": codebook_sub['rule']
+            "rule": codebook_sub['rule'],
+            "e_embeddings": get_word_embeddings(codebook_sub['e'],word_emb),  
+            "r_embeddings": get_word_embeddings(codebook_sub['r'],word_emb),  
         }
 
     return final_codebook
+
+
+def decode_question(question, codebook_main, fmt='words'):
+    """
+    question: list[int] of edge indices
+    codebook_main:
+        {
+            "e": [str, ...],
+            "r": [str, ...],
+            "edge_matrix": [[e_idx, r_idx, e_idx], ...],  # list or np.ndarray
+            "e_embeddings": [vec, ...],  # optional
+            "r_embeddings": [vec, ...],  # optional
+        }
+    fmt: 'words' -> [[e, r, e], ...]
+         'embeddings' -> [[e_vec, r_vec, e_vec], ...]
+    """
+    edges = codebook_main["edge_matrix"]
+
+    idxs = list(question)
+
+    def get_edge(i):
+        # works for both list and numpy array
+        return edges[i]
+
+    if fmt == 'words':
+        E, R = codebook_main["e"], codebook_main["r"]
+        decoded = [[E[h], R[r], E[t]] for (h, r, t) in (get_edge(i) for i in idxs)]
+    elif fmt == 'embeddings':
+        Ee = codebook_main.get("e_embeddings")
+        Re = codebook_main.get("r_embeddings")
+        if Ee is None or Re is None:
+            raise KeyError("e_embeddings and r_embeddings are required for fmt='embeddings'.")
+        decoded = [[Ee[h], Re[r], Ee[t]] for (h, r, t) in (get_edge(i) for i in idxs)]
+    else:
+        raise ValueError("fmt must be 'words' or 'embeddings'.")
+
+    return decoded
 
 
 
