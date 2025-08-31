@@ -690,17 +690,4 @@ def merging_codebook(codebook_main,codebook_sub):
 
 
 
-
-
-
-
-
-
-
-    #
-
-    return 0
-
-
-
 # python py_files/graph_generator/retrievel_with_json.py
