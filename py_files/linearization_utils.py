@@ -1,348 +1,192 @@
-from typing import List, Dict, Optional, Iterable, Tuple
-import networkx as nx
+# linearization_utils.py
+# Adapter-style utilities that reuse functions from retrievel_with_json.py
+
+from typing import List, Dict, Optional, Tuple
+import json
 import re
-import json, hashlib
+import networkx as nx
 
-def _sanitize(text: str) -> str:
-    """Clean up newlines/multiple spaces to ensure stable vectorization."""
-    s = re.sub(r'\s+', ' ', str(text)).strip()
-    return s
+# === Dependency: reuse functions from retrievel_with_json.py ===
+# Make sure the import path matches your project structure
+from graph_generator.retrievel_with_json import (
+    # extract triples (syntax → relations)
+    sentence_relations,
 
-def _pick_relation(data: Dict) -> str:
-    """Pick the relation name from common keys, fallback by priority."""
-    for key in ("causal_type", "relation", "label", "type", "rel"):
-        if key in data and data[key]:
-            return _sanitize(data[key])
-    return "related_to"
+    # v1: id-dict utilities
+    triples_to_id_dictionary,
 
-def linearize_graph(
-    G: nx.Graph,
-    *,
-    undirected_mode: str = "single",  # ["single", "both"]
-    default_rel: str = "related_to"
-) -> str:
-    """
-    Serialize any graph (directed/undirected) into multi-line triples, one edge per line:
-    Format: HEAD:<u>  REL:<rel>  TAIL:<v>
-    - Directed graph: output once along edge direction
-    - Undirected graph: single=output once (u,v), both=output in two directions
-    """
-    lines: List[str] = []
+    # v2: codebook/edges utilities
+    build_codebook_from_triples,
+    edges_from_triples,
 
-    is_directed = G.is_directed()
+    # v3 merged messages (support full edges / index questions)
+    get_merged_message,          # use_full_edges=True/False
+    get_code_book,               # another shortcut for v1 semantics
+)
 
-    iterator = G.edges(data=True) if not isinstance(G, (nx.MultiGraph, nx.MultiDiGraph)) \
-        else G.edges(keys=True, data=True)
-
-    for e in iterator:
-        if isinstance(G, (nx.MultiGraph, nx.MultiDiGraph)):
-            u, v, k, data = e
-        else:
-            u, v, data = e
-
-        u_str = _sanitize(u)
-        v_str = _sanitize(v)
-        rel = _pick_relation(data) if data else default_rel
-
-        if is_directed:
-            lines.append(f"HEAD:{u_str}  REL:{rel}  TAIL:{v_str}")
-        else:
-            if undirected_mode == "both":
-                lines.append(f"HEAD:{u_str}  REL:{rel}  TAIL:{v_str}")
-                lines.append(f"HEAD:{v_str}  REL:{rel}  TAIL:{u_str}")
-            else:
-                h, t = (u_str, v_str) if u_str <= v_str else (v_str, u_str)
-                lines.append(f"HEAD:{h}  REL:{rel}  TAIL:{t}")
-
-    lines = sorted(set(lines))
-    return "\n".join(lines)
-
-def _needs_article(s: str) -> bool:
-    w = s.strip()
-    return not w[:1].isupper() and not w.lower().startswith(("the ", "a ", "an "))
-
-def _with_article(s: str) -> str:
-    s = s.strip()
-    return f"the {s}" if _needs_article(s) else s
-
-def _edge_to_nl(h: str, rel: str, t: str) -> str:
-    r = (rel or "").lower()
-    h2, t2 = h.strip(), t.strip()
-
-    if r == "isa":
-        return f"{h2} is a {t2}"
-    if r == "property":
-        return f"{h2} is {t2}"
-    if r.startswith("prep_"):
-        p = r.replace("prep_", "")
-        if p == "in":      return f"{h2} is located in {_with_article(t2)}"
-        if p == "of":      return f"{h2} is about {_with_article(t2)}"
-        if p == "during":  return f"{h2} is during {_with_article(t2)}"
-        if p == "on":      return f"{h2} is on {_with_article(t2)}"
-        if p == "at":      return f"{h2} is at {_with_article(t2)}"
-        return f"{h2} {p} {_with_article(t2)}"
-
-    if r in ("classify", "classified", "classify_as", "classified_as"):
-        return f"{h2} is classified as {t2}"
-    if r in ("consider", "considered"):
-        return f"{h2} is considered {t2}"
-    if r in ("locate", "located"):
-        return f"{h2} is located in {_with_article(t2)}"
-
-    if r in ("subj", "obj"):
-        return f"{h2} relates to {t2}"
-
-    return f"{h2} {r.replace('_',' ')} {t2}"
-
-def linearize_graph_nl(G: nx.Graph) -> str:
-    lines = []
-    iterator = G.edges(data=True) if not isinstance(G, (nx.MultiGraph, nx.MultiDiGraph)) \
-        else G.edges(keys=True, data=True)
-    for e in iterator:
-        if isinstance(G, (nx.MultiGraph, nx.MultiDiGraph)):
-            u, v, k, d = e
-        else:
-            u, v, d = e
-        rel = (d or {}).get("rel") or (d or {}).get("label") or (d or {}).get("causal_type")
-        lines.append(_edge_to_nl(str(u), str(rel or "related_to"), str(v)))
-    lines = sorted(set(s.strip() for s in lines if s and s.strip()))
-    return ",".join(lines) if lines else "__EMPTY_NL__"
-
-# ---------------- v3 helpers (unified JSON) ----------------
+# -----------------------------
+# Utility: simple JSON dump
+# -----------------------------
 def _json_dump(obj, pretty: bool = False) -> str:
-    if pretty:
-        return json.dumps(obj, ensure_ascii=False, indent=2)
-    return json.dumps(obj, ensure_ascii=False, separators=(",", ":"))
+    return json.dumps(
+        obj,
+        ensure_ascii=False,
+        indent=2 if pretty else None,
+        separators=None if pretty else (",", ":")
+    )
 
-def _triples_from_inputs(g: nx.Graph, rels: Optional[List[Dict]]) -> List[Tuple[str, str, str]]:
-    """Prefer triples from 'relations' if they have tail; otherwise derive from graph edges."""
+# -----------------------------
+# Normalize input into triples
+# -----------------------------
+def _triples_from_graph_or_relations(
+    G: Optional[nx.Graph],
+    relations: Optional[List[Dict]],
+) -> List[Tuple[str, str, str]]:
+    """
+    Prefer triples from `relations` if they contain tail entities,
+    otherwise fall back to graph edges (relation taken from rel/label/causal_type).
+    """
     triples: List[Tuple[str, str, str]] = []
-    if rels:
-        for r in rels:
-            head = r.get('cause') or r.get('head') or r.get('source')
-            rel  = r.get('causal_type') or r.get('rel')  or r.get('relation') or "related_to"
-            tail = r.get('effect') or r.get('tail') or r.get('target')
-            if head and tail:
-                triples.append((str(head), str(rel), str(tail)))
-    if not triples and g is not None:
-        for u, v, d in g.edges(data=True):
+
+    if relations:
+        for r in relations:
+            h = r.get("cause") or r.get("head") or r.get("source")
+            rel = r.get("causal_type") or r.get("rel") or r.get("relation") or "related_to"
+            t = r.get("effect") or r.get("tail") or r.get("target")
+            if h and t:
+                triples.append((str(h), str(rel), str(t)))
+
+    if not triples and G is not None:
+        iterator = (
+            G.edges(data=True) if not isinstance(G, (nx.MultiGraph, nx.MultiDiGraph))
+            else G.edges(keys=True, data=True)
+        )
+        for e in iterator:
+            if isinstance(G, (nx.MultiGraph, nx.MultiDiGraph)):
+                u, v, k, d = e
+            else:
+                u, v, d = e
             rel = (d or {}).get("rel") or (d or {}).get("label") or (d or {}).get("causal_type") or "related_to"
             triples.append((str(u), str(rel), str(v)))
+
     return triples
 
-def _triples_to_id_dictionary_v1(tris: List[Tuple[str, str, str]]) -> Dict:
-    """v1: {entity_dict, relation_dict, edges}"""
-    ent2id: Dict[str, int] = {}
-    rel2id: Dict[str, int] = {}
-    entity_dict: List[str] = []
-    relation_dict: List[str] = []
-    edges: List[List[int]] = []
-    def _eid(x: str) -> int:
-        if x not in ent2id:
-            ent2id[x] = len(entity_dict); entity_dict.append(x)
-        return ent2id[x]
-    def _rid(x: str) -> int:
-        if x not in rel2id:
-            rel2id[x] = len(relation_dict); relation_dict.append(x)
-        return rel2id[x]
-    for h, r, t in tris:
-        edges.append([_eid(h), _rid(r), _eid(t)])
-    return {"entity_dict": entity_dict, "relation_dict": relation_dict, "edges": edges}
+# -----------------------------
+# v1 / v2 / v3 / v3_indexed unified entry (based on retrievel_with_json)
+# -----------------------------
+def to_json_v1_from_sentence(question: str) -> Dict:
+    """
+    v1: {entity_dict, relation_dict, edges}
+    Uses sentence_relations + triples_to_id_dictionary (from retrievel_with_json).
+    """
+    triples = sentence_relations(question, include_det=False)
+    return triples_to_id_dictionary(triples, tasks="answer the questions")
 
-def _build_codebook_v2(tris: List[Tuple[str, str, str]], rule: str = "Reply with a Y/N/? string in order only; no explanations."):
-    """v2: (codebook, edges) where codebook has {sid, e, r, rule} and edges is [[h,r,t], ...]."""
-    ent2id: Dict[str, int] = {}
-    rel2id: Dict[str, int] = {}
-    e: List[str] = []
-    r: List[str] = []
-    def _eid(x: str) -> int:
-        if x not in ent2id:
-            ent2id[x] = len(e); e.append(x)
-        return ent2id[x]
-    def _rid(x: str) -> int:
-        if x not in rel2id:
-            rel2id[x] = len(r); r.append(x)
-        return rel2id[x]
-    for h, rel, t in tris:
-        _eid(h); _rid(rel); _eid(t)
-    sid_src = _json_dump({"e": e, "r": r}, pretty=False)
-    sid = hashlib.sha1(sid_src.encode("utf-8")).hexdigest()[:10]
-    codebook = {"sid": sid, "e": e, "r": r, "rule": rule}
-    edges = [[ent2id[h], rel2id[rel], ent2id[t]] for (h, rel, t) in tris]
+def to_v2_codebook_from_triples(triples: List[Tuple[str, str, str]]):
+    """
+    v2: return (codebook, edges)
+    codebook: {sid, e, r, rule}, edges: [[h,r,t], ...]
+    """
+    codebook, ent2id, rel2id = build_codebook_from_triples(list(triples))
+    edges = edges_from_triples(list(triples), ent2id, rel2id)
     return codebook, edges
 
-def _build_unified_v3(
-    tris: List[Tuple[str, str, str]],
-    *,
-    rule: str = "Reply with a Y/N/? string in order only; no explanations.",
-    include_sid: bool = False,  # 你示例里没有 sid，默认关闭；需要可打开
-    edge_key: str = "questions([[e,r,e], ...])"  # 按你要求的键名
-) -> Dict:
+def to_v3_from_sentence(question: str, include_rule: bool = False) -> Tuple[Dict, List[List[int]]]:
     """
-    v3 unified object (your desired shape):
-    {
-      "e": [...],                # entities
-      "r": [...],                # relations
-      "rule": "<instruction>",   # rule string
-      "questions([[e,r,e], ...])": [[h_id, r_id, t_id], ...],
-      # "sid": "<stable-id>"     # optional if include_sid=True
-    }
+    v3 ("merged" form): returns (lite_obj, questions_edges)
+    - lite_obj only contains {"e","r"} (optionally with "rule")
+    - questions_edges: [[e,r,e], ...] (full triples in id form)
+
+    Reuses get_merged_message(use_full_edges=True) (from retrievel_with_json),
+    which usually returns:
+      {"e": [...], "r": [...], "rule": "...", "questions([[e,r,e], ...])": [[...], ...]}
     """
-    ent2id: Dict[str, int] = {}
-    rel2id: Dict[str, int] = {}
-    e: List[str] = []
-    r: List[str] = []
-    q_edges: List[List[int]] = []
+    merged = get_merged_message(question, use_full_edges=True)
+    q_key = "questions([[e,r,e], ...])"
+    q_edges = merged.get(q_key) or merged.get("questions") or []
+    lite = {"e": merged["e"], "r": merged["r"]}
+    if include_rule and "rule" in merged:
+        lite["rule"] = merged["rule"]
+    return lite, q_edges
 
-    def _eid(x: str) -> int:
-        if x not in ent2id:
-            ent2id[x] = len(e); e.append(x)
-        return ent2id[x]
+def to_v3_indexed_from_sentence(question: str, include_rule: bool = False) -> Tuple[Dict, List[List[int]], List[int]]:
+    """
+    v3_indexed: returns (lite_obj, edges, questions_idx)
+    - lite_obj only contains {"e","r"} (optionally with "rule")
+    - edges: [[e,r,e], ...]
+    - questions_idx: [[edge_idx, ...], ...] or flattened list (depending on retrievel implementation)
 
-    def _rid(x: str) -> int:
-        if x not in rel2id:
-            rel2id[x] = len(r); r.append(x)
-        return rel2id[x]
+    Reuses get_merged_message(use_full_edges=False) (from retrievel_with_json),
+    which usually returns:
+      {
+        "e": [...], "r": [...], "rule": "...",
+        "edges([e,r,e])": [[...], ...],
+        "questions(edges[i])": [[...], ...]
+      }
+    """
+    merged = get_merged_message(question, use_full_edges=False)
+    edges = merged.get("edges([e,r,e])") or merged.get("edges") or []
+    q_idx = merged.get("questions(edges[i])") or merged.get("questions") or []
+    lite = {"e": merged["e"], "r": merged["r"]}
+    if include_rule and "rule" in merged:
+        lite["rule"] = merged["rule"]
+    return lite, edges, q_idx
 
-    for h, rel, t in tris:
-        q_edges.append([_eid(h), _rid(rel), _eid(t)])
-
-    out = {
-        "e": e,
-        "r": r,
-        #"rule": rule,
-        #edge_key: q_edges,
-    }
-
-    if include_sid:
-        # 与之前一致的稳定短ID算法（基于 e/r）
-        sid_src = _json_dump({"e": e, "r": r}, pretty=False)
-        out["sid"] = hashlib.sha1(sid_src.encode("utf-8")).hexdigest()[:10]
-
-    return out, q_edges
-
-
-
-# Graph representation structure of page content in document
+# -----------------------------
+# Backward compatibility: build_relationship_text
+# -----------------------------
 def build_relationship_text(
     question: str,
-    G: nx.Graph,
+    G: Optional[nx.Graph] = None,
     relations: Optional[List[Dict]] = None,
     *,
-    include_question: bool = False,
-    include_graph_block: bool = False,
-    include_relations_block: bool = False,
-    include_nl_relation: bool = False,   # natural-language linearization
-    include_json_block: bool = True,     # append JSON representation
-    json_style: str = "v3",              # NEW DEFAULT: "v3" | "id_dict" | "codebook_edges"
-    json_pretty: bool = False,           # pretty-print JSON if True
-) -> tuple:
+    include_json_block: bool = True,      # whether to output JSON (usually True)
+    json_style: str = "v3",               # "v3" | "v3_indexed" | "id_dict" | "codebook_edges"
+    json_pretty: bool = False,            # whether to pretty-print JSON
+) -> Tuple[str, List[List[int]], List[int]]:
     """
-    Unified construction of text for embedding:
-    - [QUESTION] Original question (optional)
-    - [GRAPH]    Linearized triples (symbolic)
-    - [TRIPLES]  Serialized triples (symbolic, controlled by include_relations_block)
-    - [NL]       Natural-language relation sentences (controlled by include_nl_relation)
-    - [JSON]     Graph-as-JSON ('v3' unified object, or 'id_dict', or 'codebook_edges')
+    Unified return:
+      - page_content_str: JSON string (according to json_style)
+      - edges: [[e,r,e], ...]               (only valid for v3_indexed; empty for v3)
+      - questions_idx: [[edge_idx,...], ...] (only valid for v3_indexed; empty for v3)
+
+    Note: To maximize reuse of retrievel_with_json,
+          this function prefers "parse sentence question directly".
+          Only when you explicitly provide relations/G will it use them
+          (mainly for v1/v2). For v3 it is recommended to parse from sentence.
     """
-    parts: List[str] = []
-    edges = ""
-    questions_idx = ""
+    if not include_json_block:
+        # In old logic, multiple blocks were concatenated; here we only reuse JSON.
+        return "", [], []
 
-    if include_question and question:
-        parts.append(f"[QUESTION] {question}")
+    # If relations/G are provided, allow generating directly (mainly supports v1/v2).
+    triples: List[Tuple[str, str, str]] = _triples_from_graph_or_relations(G, relations)
 
-    def _linearize_from_graph_edges(g: nx.Graph) -> str:
-        lines = []
-        iterator = g.edges(data=True) if not isinstance(g, (nx.MultiGraph, nx.MultiDiGraph)) \
-            else g.edges(keys=True, data=True)
-        for e in iterator:
-            if isinstance(g, (nx.MultiGraph, nx.MultiDiGraph)):
-                u, v, k, data = e
-            else:
-                u, v, data = e
-            rel = (data or {}).get("rel") or (data or {}).get("label") or (data or {}).get("causal_type") or "related_to"
-            lines.append(f"HEAD:{_sanitize(u)}  REL:{_sanitize(rel)}  TAIL:{_sanitize(v)}")
-        return ",".join(sorted(set(lines))) if lines else "__EMPTY_GRAPH__"
-
-    # [GRAPH]
-    if include_graph_block:
-        parts.append(_linearize_from_graph_edges(G))
-
-    # [NL]
-    if include_nl_relation:
-        nl_text = linearize_graph_nl(G)
-        parts.append(nl_text if nl_text.strip() else "__EMPTY_NL__")
-
-    # [TRIPLES]
-    if include_relations_block:
-        triples_text = ""
-        if relations:
-            def _has_tail(r: Dict) -> bool:
-                return bool(r.get('effect') or r.get('tail') or r.get('target'))
-            if all(_has_tail(r) for r in relations):
-                def _one(r: Dict) -> str:
-                    head = r.get('cause') or r.get('head') or r.get('source') or '?'
-                    rel  = r.get('causal_type') or r.get('rel') or r.get('relation') or 'related_to'
-                    tail = r.get('effect') or r.get('tail') or r.get('target') or '?'
-                    return f"{_sanitize(head)} -> {_sanitize(rel)} -> {_sanitize(tail)}"
-                triples_text = ",".join(_one(r) for r in relations)
-            else:
-                triples_text = ",".join(
-                    f"{_sanitize(u)} -> {_sanitize((d or {}).get('rel') or (d or {}).get('label') or (d or {}).get('causal_type') or 'related_to')} -> {_sanitize(v)}"
-                    for u, v, d in G.edges(data=True)
-                )
+    if json_style == "id_dict":
+        # v1: if we have triples, don't re-parse
+        if triples:
+            obj = triples_to_id_dictionary(triples, tasks="answer the questions")
         else:
-            triples_text = ",".join(
-                f"{_sanitize(u)} -> {_sanitize((d or {}).get('rel') or (d or {}).get('label') or (d or {}).get('causal_type') or 'related_to')} -> {_sanitize(v)}"
-                for u, v, d in G.edges(data=True)
-            )
-        parts.append(triples_text if triples_text.strip() else "__EMPTY_TRIPLES__")
+            obj = to_json_v1_from_sentence(question)
+        return _json_dump(obj, json_pretty), [], []
 
-    # [JSON] v3 / v1 / v2
-    if include_json_block:
-        triples = _triples_from_inputs(G, relations)
+    if json_style == "codebook_edges":
+        # v2: return codebook + edges (page_content only outputs codebook; edges go into metadata)
         if not triples:
-            parts.append("__EMPTY_JSON__")
-        else:
-            if json_style == "v3":
-                v3_obj, questions_idx = _build_unified_v3(
-                    triples,
-                    include_sid=False,                         
-                    #edge_key="questions([[e,r,e], ...])",    
-                )
-                json_piece = _json_dump(v3_obj, json_pretty)
-            elif json_style == "codebook_edges":
-                codebook, edges = _build_codebook_v2(triples)
-                json_piece = _json_dump(codebook, json_pretty) + "\n" + _json_dump({"sid": codebook["sid"], "g": edges}, json_pretty)
+            triples = list(sentence_relations(question, include_det=False))
+        codebook, edges = to_v2_codebook_from_triples(triples)
+        return _json_dump(codebook, json_pretty), edges, list(range(len(edges)))
 
-            elif json_style == "v3_indexed":
-                ents, rels = [], []
-                ent2id, rel2id = {}, {}
-                def _eid(x: str) -> int:
-                    if x not in ent2id:
-                        ent2id[x] = len(ents); ents.append(x)
-                    return ent2id[x]
-                def _rid(x: str) -> int:
-                    if x not in rel2id:
-                        rel2id[x] = len(rels); rels.append(x)
-                    return rel2id[x]
+    if json_style == "v3":
+        # v3: return {"e","r"} object; questions returned separately
+        lite, q_edges = to_v3_from_sentence(question, include_rule=False)
+        return _json_dump(lite, json_pretty), [], q_edges
 
-                edges: List[List[int]] = []
-                for h, r, t in triples:
-                    edges.append([_eid(h), _rid(r), _eid(t)])
+    if json_style == "v3_indexed":
+        # v3_indexed: return {"e","r"} + metadata edges/questions_idx
+        lite, edges, q_idx = to_v3_indexed_from_sentence(question, include_rule=False)
+        return _json_dump(lite, json_pretty), edges, q_idx
 
-                questions_idx = list(range(len(edges)))
-
-                v3i = {
-                    "e": ents,
-                    "r": rels,
-                }
-                json_piece = _json_dump(v3i, json_pretty)
-
-            else:  # "id_dict"
-                id_dict = _triples_to_id_dictionary_v1(triples)
-                json_piece = _json_dump(id_dict, json_pretty)
-            parts.append(json_piece)
-
-    return ",".join(parts), edges, questions_idx
+    # default fallback: v3
+    lite, q_edges = to_v3_from_sentence(question, include_rule=False)
+    return _json_dump(lite, json_pretty), [], q_edges
