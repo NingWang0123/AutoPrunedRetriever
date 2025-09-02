@@ -1101,10 +1101,38 @@ def rerank_with_sentence_embeddings(
     return results
 
 
-def coarse_filter():
+def coarse_filter(
+    questions: List[List[int]],
+    codebook_main: Dict[str, Any],
+    emb: HuggingFaceEmbeddings,                 # ← move before defaults
+    top_k: int = 3,                             # word-embedding candidates
+    question_batch_size: int = 1,               # query batch size
+    questions_db_batch_size: int = 1,           # DB batch size
+    top_m: int = 1,                             # sentence-embedding rerank
+    custom_linearizer: Optional[Callable[[List[List[str]]], str]] = None):
+
+    # doing the word embedding pre-filter 
+
+    coarse_top_k = get_topk_word_embedding_batched(
+    questions,
+    codebook_main,
+    top_k,
+    question_batch_size,         # number of query questions processed per time
+    questions_db_batch_size,     # number of db questions processed per time
+    )
+
+    # doing the sentence embedding filter 
+
+    top_m_results = rerank_with_sentence_embeddings(
+    questions,
+    codebook_main,
+    coarse_top_k,
+    emb,
+    top_m,
+    custom_linearizer)
 
 
-    return 0
+    return top_m_results
 
 
 # python py_files/graph_generator/retrievel_with_json.py
