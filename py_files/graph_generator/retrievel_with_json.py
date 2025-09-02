@@ -794,6 +794,7 @@ def decode_question(question, codebook_main, fmt='words'):
         }
     fmt: 'words' -> [[e, r, e], ...]
          'embeddings' -> [[e_vec, r_vec, e_vec], ...]
+         'edges' -> [[e index, r index, e index], ...]
     """
     edges = codebook_main["edge_matrix"]
 
@@ -812,8 +813,11 @@ def decode_question(question, codebook_main, fmt='words'):
         if Ee is None or Re is None:
             raise KeyError("e_embeddings and r_embeddings are required for fmt='embeddings'.")
         decoded = [[Ee[h], Re[r], Ee[t]] for (h, r, t) in (get_edge(i) for i in idxs)]
+    elif fmt == 'edges':
+        decoded = [[h,r,t] for (h, r, t) in (get_edge(i) for i in idxs)]
+
     else:
-        raise ValueError("fmt must be 'words' or 'embeddings'.")
+        raise ValueError("fmt must be 'words', 'embeddings' or 'edges'.")
 
     return decoded
 
