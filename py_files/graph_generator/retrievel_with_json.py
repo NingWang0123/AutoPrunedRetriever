@@ -4,7 +4,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import re
 import json, hashlib
-from typing import List, Tuple, Dict, Optional,Iterable
+from typing import List, Tuple, Dict, Optional,Iterable,Any,Callable
 import itertools
 from collections import defaultdict
 import numpy as np
@@ -12,6 +12,8 @@ from gensim.models import KeyedVectors
 import numpy as np
 import re
 from langchain.embeddings.base import Embeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
 
 nlp = spacy.load("en_core_web_sm")
 
@@ -789,6 +791,7 @@ def decode_question(question, codebook_main, fmt='words'):
             "e": [str, ...],
             "r": [str, ...],
             "edge_matrix": [[e_idx, r_idx, e_idx], ...],  # list or np.ndarray
+            "questions_lst": [[[edges index,...],...],...]
             "e_embeddings": [vec, ...], 
             "r_embeddings": [vec, ...], 
         }
@@ -823,6 +826,285 @@ def decode_question(question, codebook_main, fmt='words'):
 
 
 
+
+
+##### word embedding top k search
+def _to_vec(x):
+    return x if isinstance(x, np.ndarray) else np.asarray(x, dtype=np.float32)
+
+def _avg_vec_from_decoded(decoded_q, dim: int) -> np.ndarray:
+    """
+    decoded_q: [[e_vec, r_vec, e_vec], ...] where each vec is list[float] or np.ndarray
+    Returns one vector (float32) = mean over all component vectors across all edges.
+    If no vectors found, returns a zero vector of length `dim`.
+    """
+    parts = []
+    for triple in decoded_q:
+        for v in triple:
+            if v is not None:
+                vv = _to_vec(v)
+                if vv.size:
+                    parts.append(vv.astype(np.float32, copy=False))
+    if not parts:
+        return np.zeros(dim, dtype=np.float32)
+    return np.mean(np.stack(parts, axis=0), axis=0)
+
+def _embed_questions_with_decode(
+    questions_batch: List[List[int]],
+    codebook_main: Dict[str, Any],
+    dim: int
+) -> np.ndarray:
+    """
+    Use decode_question(..., fmt='embeddings') for each question in the batch,
+    then reduce to a single vector via averaging components.
+    Returns (B, d) float32 matrix.
+    """
+    out = np.zeros((len(questions_batch), dim), dtype=np.float32)
+    for i, q_edges in enumerate(questions_batch):
+        decoded = decode_question(q_edges, codebook_main, fmt='embeddings')
+        out[i] = _avg_vec_from_decoded(decoded, dim)
+    return out
+
+def _cosine_sim(A: np.ndarray, B: np.ndarray) -> np.ndarray:
+    """
+    A: (n, d), B: (m, d) -> (n, m) cosine similarity matrix.
+    """
+    A = A.astype(np.float32, copy=False)
+    B = B.astype(np.float32, copy=False)
+    A_norm = A / (np.linalg.norm(A, axis=1, keepdims=True) + 1e-12)
+    B_norm = B / (np.linalg.norm(B, axis=1, keepdims=True) + 1e-12)
+    return A_norm @ B_norm.T
+
+def _topk_merge(existing_scores: np.ndarray, existing_cols: np.ndarray,
+                batch_scores: np.ndarray, batch_cols: np.ndarray, k: int):
+    """
+    Merge two top-k candidate sets (scores/cols) -> keep best k, sorted desc.
+    """
+    if existing_scores.size == 0:
+        if batch_scores.size <= k:
+            order = np.argsort(-batch_scores)
+            return batch_scores[order], batch_cols[order]
+        top_idx = np.argpartition(-batch_scores, k - 1)[:k]
+        order = np.argsort(-batch_scores[top_idx])
+        top_idx = top_idx[order]
+        return batch_scores[top_idx], batch_cols[top_idx]
+
+    cand_scores = np.concatenate([existing_scores, batch_scores], axis=0)
+    cand_cols   = np.concatenate([existing_cols,   batch_cols],   axis=0)
+    if cand_scores.shape[0] <= k:
+        order = np.argsort(-cand_scores)
+        return cand_scores[order], cand_cols[order]
+    top_idx = np.argpartition(-cand_scores, k - 1)[:k]
+    order = np.argsort(-cand_scores[top_idx])
+    top_idx = top_idx[order]
+    return cand_scores[top_idx], cand_cols[top_idx]
+
+def get_topk_word_embedding_batched(
+    questions: List[List[int]],
+    codebook_main: Dict[str, Any],
+    top_k: int = 3,
+    question_batch_size: int = 1,         # number of query questions processed per time
+    questions_db_batch_size: int = 1,     # number of db questions processed per time
+) -> Dict[int, List[Dict[str, Any]]]:
+    """
+    Top-k similarity with **decode_question(..., fmt='embeddings')** in two-way batches.
+
+    Returns:
+      {query_idx: [{"score": float, "questions_index": int, "question_index": int}, ...], ...}
+    """
+    # infer embedding dim from e_embeddings (fallback to r if needed)
+    if "e_embeddings" in codebook_main and len(codebook_main["e_embeddings"]) > 0:
+        dim = len(codebook_main["e_embeddings"][0])
+    elif "r_embeddings" in codebook_main and len(codebook_main["r_embeddings"]) > 0:
+        dim = len(codebook_main["r_embeddings"][0])
+    else:
+        raise ValueError("Cannot infer embedding dimension from codebook_main.")
+
+    # Flatten DB questions and keep a map to (questions_index, question_index)
+    questions_lst = codebook_main["questions_lst"]
+    db_questions: List[List[int]] = []
+    db_qi: List[int] = []
+    db_qj: List[int] = []
+    for qi, group in enumerate(questions_lst):
+        for qj, q_edges in enumerate(group):
+            db_questions.append(q_edges)
+            db_qi.append(qi)
+            db_qj.append(qj)
+
+    N_total = len(questions)
+    M_total = len(db_questions)
+    results: Dict[int, List[Dict[str, Any]]] = {i: [] for i in range(N_total)}
+    if N_total == 0 or M_total == 0:
+        return results
+
+    db_qi = np.asarray(db_qi, dtype=np.int32)
+    db_qj = np.asarray(db_qj, dtype=np.int32)
+
+    # Process queries in batches
+    for q_start in range(0, N_total, question_batch_size):
+        q_end = min(q_start + question_batch_size, N_total)
+        q_batch_idx = list(range(q_start, q_end))
+        q_batch_lists = [questions[i] for i in q_batch_idx]
+
+        # --- embed current query batch via decode_question ---
+        q_mat = _embed_questions_with_decode(q_batch_lists, codebook_main, dim)  # (Qb, d)
+        Qb = q_mat.shape[0]
+
+        # running top-k for this query batch
+        best_scores = [np.array([], dtype=np.float32) for _ in range(Qb)]
+        best_cols   = [np.array([], dtype=np.int32)   for _ in range(Qb)]
+
+        # Stream over DB in batches
+        for db_start in range(0, M_total, questions_db_batch_size):
+            db_end = min(db_start + questions_db_batch_size, M_total)
+            db_batch_lists = db_questions[db_start:db_end]
+
+            # --- embed current DB batch via decode_question ---
+            db_mat = _embed_questions_with_decode(db_batch_lists, codebook_main, dim)  # (Db, d)
+            Db = db_mat.shape[0]
+            if Db == 0:
+                continue
+
+            # similarities (Qb x Db)
+            sims = _cosine_sim(q_mat, db_mat)
+            k_local = min(top_k, Db)
+
+            # Merge batch top-k per query
+            for i in range(Qb):
+                row = sims[i]
+                # choose top-k indices within this batch
+                cand_idx = np.argpartition(-row, k_local - 1)[:k_local]
+                cand_idx = cand_idx[np.argsort(-row[cand_idx])]  # sort by score desc
+                batch_scores = row[cand_idx]
+                batch_cols   = cand_idx + db_start  # map to global DB index
+                merged_scores, merged_cols = _topk_merge(
+                    best_scores[i], best_cols[i], batch_scores, batch_cols, top_k
+                )
+                best_scores[i] = merged_scores
+                best_cols[i]   = merged_cols
+
+        # Commit this query batch to final results
+        for local_i, global_q_idx in enumerate(q_batch_idx):
+            cols = best_cols[local_i]
+            scs  = best_scores[local_i]
+            keep = (cols >= 0) 
+            cols, scs = cols[keep], scs[keep]
+            entries = []
+            for col, sc in zip(cols, scs):
+                entries.append({
+                    "score": float(sc),
+                    "questions_index": int(db_qi[col]),
+                    "question_index": int(db_qj[col]),
+                })
+            results[global_q_idx] = entries
+
+    return results
+
+
+##### getting the best sentence embedding results from the top k word embedding results
+
+def _linearize_words_triples(triples: List[List[str]]) -> str:
+    """
+    Simple, robust fallback linearizer:
+      [[h, r, t], ...]  -> "h r t ; h r t ; ..."
+    """
+    parts = []
+    for h, r, t in triples:
+        parts.append(f"{h} {r} {t}")
+    return " ; ".join(parts)
+
+def make_question_text(
+    q_edges: List[int],
+    codebook_main: Dict[str, Any],
+    custom_linearizer: Optional[Callable[[List[List[str]]], str]] = None,
+) -> str:
+    """
+    Decode with words and turn into a short sentence-ish string for sentence embedding.
+    Optionally pass a custom linearizer; otherwise use a simple fallback.
+    """
+    decoded_words = decode_question(q_edges, codebook_main, fmt='words')  # [[h,r,t], ...]
+    if custom_linearizer is not None:
+        return custom_linearizer(decoded_words)
+    return _linearize_words_triples(decoded_words)
+
+
+def rerank_with_sentence_embeddings(
+    questions: List[List[int]],
+    codebook_main: Dict[str, Any],
+    coarse_topk: Dict[int, List[Dict[str, Any]]],
+    emb: HuggingFaceEmbeddings,
+    top_m: int = 1,
+    custom_linearizer: Optional[Callable[[List[List[str]]], str]] = None,
+) -> Dict[int, List[Dict[str, Any]]]:
+    """
+    For each query i:
+      - Build a small FAISS index over its coarse_topk candidates (converted to text)
+      - Embed the query as text and retrieve best `top_m`
+      - Return {"score": <faiss_score>, "questions_index": qi, "question_index": qj, "text": candidate_text}
+
+    Notes:
+      * FAISS scores from LangChain are distances (smaller is better).
+      * `top_m` can be <= len(coarse_topk[i]); if bigger, it's clipped.
+    """
+    # Flatten DB pointers for convenience
+    questions_lst = codebook_main["questions_lst"]
+
+    results: Dict[int, List[Dict[str, Any]]] = {}
+    for i, q_edges in enumerate(questions):
+        cand = coarse_topk.get(i, [])
+        if not cand:
+            results[i] = []
+            continue
+
+        # Deduplicate (qi, qj) while preserving order
+        seen = set()
+        kept_meta = []
+        kept_texts = []
+        for item in cand:
+            qi = int(item["questions_index"])
+            qj = int(item["question_index"])
+            key = (qi, qj)
+            if key in seen:
+                continue
+            seen.add(key)
+            db_edges = questions_lst[qi][qj]
+            text = make_question_text(db_edges, codebook_main, custom_linearizer)
+            kept_meta.append({"questions_index": qi, "question_index": qj, "text": text})
+            kept_texts.append(text)
+
+        if not kept_texts:
+            results[i] = []
+            continue
+
+        # Build a per-query FAISS index over the candidate texts
+        vs = FAISS.from_texts(kept_texts, embedding=emb, metadatas=kept_meta)
+
+        # Query text (use same linearization as candidates)
+        query_text = make_question_text(q_edges, codebook_main, custom_linearizer)
+
+        # Retrieve top_m (clip to number of candidates)
+        m = min(top_m, len(kept_texts))
+        docs_scores = vs.similarity_search_with_score(query_text, k=m)
+
+        # Convert to output format (note: score is distance; smaller = better)
+        ranked = []
+        for doc, score in docs_scores:
+            md = doc.metadata
+            ranked.append({
+                "score": float(score),
+                "questions_index": int(md["questions_index"]),
+                "question_index": int(md["question_index"]),
+                "text": md["text"],
+            })
+        results[i] = ranked
+
+    return results
+
+
+def coarse_filter():
+
+
+    return 0
 
 
 # python py_files/graph_generator/retrievel_with_json.py
