@@ -1135,4 +1135,174 @@ def coarse_filter(
     return top_m_results
 
 
+
+
+#### rag workflow
+
+class RG_RAG:
+
+    def __init__(
+        self,
+        word_emb: Any,
+        *,
+        sent_emb: Optional[HuggingFaceEmbeddings] = None,
+        codebook_main: Optional[Dict[str, Any]] = None,
+        # defaults for coarse filtering
+        top_k: int = 3,
+        top_m: int = 1,
+        question_batch_size: int = 1,
+        questions_db_batch_size: int = 1,
+        custom_linearizer: Optional[Callable[[List[List[str]]], str]] = None,
+    ):
+        """
+        Parameters
+        ----------
+        word_emb : Any
+            Word-level embedding model used by merging_codebook / word-candidate stage.
+        sent_emb : HuggingFaceEmbeddings, optional
+            Sentence-level embedding model for reranking.
+        codebook_main : dict, optional
+            Initial codebook; if None, it will be created/expanded via update_meta_json().
+        top_k, top_m, question_batch_size, questions_db_batch_size, custom_linearizer
+            Defaults for coarse_filter(); can be overridden per-call.
+        """
+        self.word_emb = word_emb
+        self.sent_emb = sent_emb
+        self.codebook_main: Dict[str, Any] = codebook_main or {}
+        self.default_top_k = top_k
+        self.default_top_m = top_m
+        self.default_q_batch = question_batch_size
+        self.default_db_batch = questions_db_batch_size
+        self.default_linearizer = custom_linearizer
+
+    # ----------------------------
+    # Metadata / codebook updates
+    # ----------------------------
+    def update_meta_json(self, question_prompt: str) -> Dict[str, Any]:
+        """
+        Build a sub-codebook from the prompt and merge it into self.codebook_main.
+
+        Returns
+        -------
+        dict
+            The updated codebook_main.
+        """
+        codebook_sub = get_code_book(question_prompt)
+        # If codebook is empty, allow merging function to handle initialization.
+        self.codebook_main = merging_codebook(
+            self.codebook_main, codebook_sub, word_emb=self.word_emb
+        )
+        return self.codebook_main
+
+    # ---------------------------------------
+    # Retrieval + Rerank (coarse, then refine)
+    # ---------------------------------------
+    def coarse_filter(
+        self,
+        questions: List[List[int]],
+        *,
+        top_k: Optional[int] = None,
+        question_batch_size: Optional[int] = None,
+        questions_db_batch_size: Optional[int] = None,
+        sent_emb: Optional[HuggingFaceEmbeddings] = None,
+        top_m: Optional[int] = None,
+        custom_linearizer: Optional[Callable[[List[List[str]]], str]] = None,
+    ):
+        """
+        Two-stage candidate selection:
+          1) Word-embedding candidate mining (top_k)
+          2) Sentence-embedding reranking (top_m)
+
+        Returns
+        -------
+        Any
+            Whatever `rerank_with_sentence_embeddings` returns (e.g., IDs, scores, etc.)
+        """
+        if not self.codebook_main:
+            raise RuntimeError(
+                "codebook_main is empty. Call `update_meta_json(...)` first."
+            )
+
+        # Resolve per-call overrides → defaults
+        top_k = self.default_top_k if top_k is None else top_k
+        top_m = self.default_top_m if top_m is None else top_m
+        q_batch = self.default_q_batch if question_batch_size is None else question_batch_size
+        db_batch = self.default_db_batch if questions_db_batch_size is None else questions_db_batch_size
+        emb = sent_emb or self.sent_emb
+        if emb is None:
+            raise ValueError("Sentence embedder is required for reranking. Pass `sent_emb` or set it in __init__().")
+        
+
+        # doing the word embedding pre-filter 
+
+        coarse_top_k = get_topk_word_embedding_batched(
+            questions,
+            self.codebook_main,
+            top_k,
+            q_batch,
+            db_batch,
+        )
+
+        # doing the sentence embedding filter 
+
+        top_m_results = rerank_with_sentence_embeddings(
+            questions,
+            self.codebook_main,
+            coarse_top_k,
+            emb,
+            top_m,
+            custom_linearizer or self.default_linearizer,
+        )
+        return top_m_results
+    
+    def convert_question_prompt_into_code_book(question_prompt: str,rule: str = "Reply with a Y/N/? string in order only; no explanations.") -> str:
+        """
+        Build the JSON-style prompt.
+        """
+        triples = sentence_relations(question_prompt, include_det=False)
+
+        codebook, ent2id, rel2id = build_codebook_from_triples(triples,rule)
+
+        edges = edges_from_triples(triples, ent2id, rel2id)
+
+        # if use_full_edges:
+        #     dict_2 =  {'questions([[e,r,e], ...])':all_chains_no_subchains(edges,use_full_edges)}
+
+        dict_2 = {"edges([e,r,e])": edges,'questions(edges[i])':all_chains_no_subchains(edges,True)}
+
+        codebook.update(dict_2)
+
+        codebook.pop('sid') 
+
+        return codebook
+    
+
+    def store_codebook_and_generate_prompt(self, question_prompt: str,rule: str = "Reply with a Y/N/? string in order only; no explanations."):
+
+        current_codebook = self.convert_question_prompt_into_code_book(question_prompt,rule)
+
+        # If codebook is empty, allow merging function to handle initialization.
+        self.codebook_main = merging_codebook(
+            self.codebook_main, current_codebook, word_emb=self.word_emb
+        )
+
+        # convert quetions in small tokens codebook format for prompt
+        current_codebook.pop("edges([e,r,e])")
+        current_codebook["questions([[e,r,e], ...])"] = decode_question(current_codebook["questions(edges[i])"],
+                                                                         current_codebook, fmt='edges')
+        current_codebook.pop("questions(edges[i])")
+
+
+        return current_codebook
+        
+
+
+
+
+
+
+
+
+
+
 # python py_files/graph_generator/retrievel_with_json.py
