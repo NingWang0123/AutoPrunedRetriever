@@ -610,27 +610,27 @@ def get_code_book(prompt,type = 'questions'):
     return codebook
 
 
-def update_the_index(codebook_main,codebook_sub,select_feature):
-    items_needs_merged = codebook_sub[select_feature]
-    items_main = codebook_main[select_feature]
-    index_item_sub = {val: idx for idx, val in enumerate(codebook_sub[select_feature])}
-    index_item_main = {val: idx for idx, val in enumerate(codebook_main[select_feature])}
-    total_item_num = len(items_main)
+def update_the_index(codebook_main, codebook_sub, select_feature):
+    items_needs_merged = codebook_sub[select_feature]   # list of strings
+    items_main = codebook_main[select_feature]          # list of strings
+
+    index_item_sub  = {val: idx for idx, val in enumerate(items_needs_merged)}
+    index_item_main = {val: idx for idx, val in enumerate(items_main)}
+
+    next_idx = len(items_main)  
     new_index_replacement_for_sub = {}
     new_added_items = []
 
     for item_sub in items_needs_merged:
-        if item_sub in items_main:
+        if item_sub in index_item_main:
             new_index_replacement_for_sub[index_item_sub[item_sub]] = index_item_main[item_sub]
         else:
-            # update the index_item_main by adding at total_item_num+1 space
-            total_item_num+=1
-            new_index_replacement_for_sub[index_item_sub[item_sub]] = total_item_num
-            index_item_main[item_sub] = total_item_num
+            new_index_replacement_for_sub[index_item_sub[item_sub]] = next_idx
+            index_item_main[item_sub] = next_idx
             new_added_items.append(item_sub)
+            next_idx += 1
 
-    return new_index_replacement_for_sub,index_item_main,new_added_items
-
+    return new_index_replacement_for_sub, index_item_main, new_added_items
 
 
 def remap_edges_matrix(edges_matrix, ent_map, rel_map):
@@ -663,23 +663,26 @@ def remap_edges_matrix(edges_matrix, ent_map, rel_map):
     return arr.tolist()
 
 
-def combine_updated_edges(edges_main,edges_sub):
-    index_item_sub = {val: idx for idx, val in enumerate(edges_sub)}
-    index_item_main = {val: idx for idx, val in enumerate(edges_main)}
-
-    total_item_num = len(edges_main)
+def combine_updated_edges(edges_main, edges_sub):
+    index_item_main = {tuple(val): idx for idx, val in enumerate(edges_main)}
     new_index_replacement_for_sub = {}
 
-    for item_sub in index_item_sub:
-        if item_sub in total_item_num:
-            new_index_replacement_for_sub[index_item_sub[item_sub]] = index_item_main[item_sub]
+    next_idx = len(edges_main)
+    for idx_sub, item in enumerate(edges_sub):
+        key = tuple(item)
+        if key in index_item_main:
+            new_index_replacement_for_sub[idx_sub] = index_item_main[key]
         else:
-            # update the index_item_main by adding at total_item_num+1 space
-            total_item_num+=1
-            new_index_replacement_for_sub[index_item_sub[item_sub]] = total_item_num
-            index_item_main[item_sub] = total_item_num
+            index_item_main[key] = next_idx
+            new_index_replacement_for_sub[idx_sub] = next_idx
+            next_idx += 1
 
-    return new_index_replacement_for_sub,index_item_main
+    edges_main_out = [None] * len(index_item_main)
+    for k, v in index_item_main.items():
+        edges_main_out[v] = list(k)
+
+    return new_index_replacement_for_sub, edges_main_out
+
 
 
 def remap_question_indices(questions, idx_map, max_dense_size=10_000_000):
@@ -788,16 +791,21 @@ def merging_codebook(codebook_main,codebook_sub,type='questions',word_emb=word_e
         ### add the knowledge graph and it's related index
 
 
+        # 用索引映射重建有序列表
+        e_list = _list_from_index_map(index_ent_main)
+        r_list = _list_from_index_map(index_r_main)
+
         final_codebook = {
-            "e": index_ent_main.keys(),   # entity dictionary 
-            "r": index_r_main.keys(),  # relation dictionary 
-            'edge_matrix':index_edges_main.keys(),
-            main_feat_name:lst_questions_main,
-            unupdated_feat_name:lst_unupdated_feat,
+            "e": e_list,                         
+            "r": r_list,                          
+            "edge_matrix": index_edges_main,     
+            main_feat_name: lst_questions_main,   
+            unupdated_feat_name: lst_unupdated_feat,
             "rule": rule,
-            "e_embeddings": codebook_main['e_embeddings']+new_ent_embeds,   # add the new ent embeds
-            "r_embeddings": codebook_main['r_embeddings']+new_r_embeds,  # add the new r embeds
+            "e_embeddings": codebook_main['e_embeddings'] + new_ent_embeds,
+            "r_embeddings": codebook_main['r_embeddings'] + new_r_embeds,
         }
+
     else:
         # main codebook is empty
         final_codebook = {
@@ -935,28 +943,70 @@ def _topk_merge(existing_scores: np.ndarray, existing_cols: np.ndarray,
     top_idx = top_idx[order]
     return cand_scores[top_idx], cand_cols[top_idx]
 
+def _ensure_embeddings_in_codebook(codebook_main, dim_fallback: int = 64):
+    """
+    Ensure codebook_main has e_embeddings and r_embeddings.
+    Priority:
+      1) Use global `word_emb` + get_word_embeddings if available
+      2) Fallback to stable random embeddings with fixed dim (dim_fallback)
+    """
+    import random
+
+    def _hash_embed(tokens, dim=64):
+        out = []
+        for t in tokens:
+            rnd = random.Random(hash(t) & 0xffffffff)
+            out.append([rnd.uniform(-1, 1) for _ in range(dim)])
+        return out
+
+    # --- entities ---
+    if "e_embeddings" not in codebook_main or not codebook_main["e_embeddings"]:
+        if "e" not in codebook_main:
+            raise ValueError("codebook_main missing key 'e' to compute e_embeddings.")
+        try:
+            # try your word_emb pipeline
+            codebook_main["e_embeddings"] = get_word_embeddings(codebook_main["e"], word_emb)
+        except Exception:
+            # fallback stable random
+            codebook_main["e_embeddings"] = _hash_embed(codebook_main["e"], dim=dim_fallback)
+
+    # --- relations ---
+    if "r_embeddings" not in codebook_main or not codebook_main["r_embeddings"]:
+        if "r" not in codebook_main:
+            raise ValueError("codebook_main missing key 'r' to compute r_embeddings.")
+        try:
+            codebook_main["r_embeddings"] = get_word_embeddings(codebook_main["r"], word_emb)
+        except Exception:
+            codebook_main["r_embeddings"] = _hash_embed(codebook_main["r"], dim=dim_fallback)
+            
 def get_topk_word_embedding_batched(
     questions: List[List[int]],
     codebook_main: Dict[str, Any],
     top_k: int = 3,
-    question_batch_size: int = 1,         # number of query questions processed per time
-    questions_db_batch_size: int = 1,     # number of db questions processed per time
+    question_batch_size: int = 1,
+    questions_db_batch_size: int = 1,
 ) -> Dict[int, List[Dict[str, Any]]]:
     """
     Top-k similarity with **decode_question(..., fmt='embeddings')** in two-way batches.
 
-    Returns:
-      {query_idx: [{"score": float, "questions_index": int, "question_index": int}, ...], ...}
+    Now auto-build e/r embeddings if missing in codebook_main.
     """
-    # infer embedding dim from e_embeddings (fallback to r if needed)
+    # 0) ensure embeddings are present (compute on-the-fly if absent)
+    _ensure_embeddings_in_codebook(codebook_main, dim_fallback=64)
+
+    # 1) infer embedding dim
     if "e_embeddings" in codebook_main and len(codebook_main["e_embeddings"]) > 0:
         dim = len(codebook_main["e_embeddings"][0])
     elif "r_embeddings" in codebook_main and len(codebook_main["r_embeddings"]) > 0:
         dim = len(codebook_main["r_embeddings"][0])
     else:
+        # This should not happen thanks to _ensure_embeddings_in_codebook
         raise ValueError("Cannot infer embedding dimension from codebook_main.")
 
-    # Flatten DB questions and keep a map to (questions_index, question_index)
+    # 2) get DB questions
+    if "questions_lst" not in codebook_main:
+        raise ValueError("codebook_main missing 'questions_lst' for retrieval DB.")
+
     questions_lst = codebook_main["questions_lst"]
     db_questions: List[List[int]] = []
     db_qi: List[int] = []
@@ -976,54 +1026,49 @@ def get_topk_word_embedding_batched(
     db_qi = np.asarray(db_qi, dtype=np.int32)
     db_qj = np.asarray(db_qj, dtype=np.int32)
 
-    # Process queries in batches
+    # 3) process query batches
     for q_start in range(0, N_total, question_batch_size):
         q_end = min(q_start + question_batch_size, N_total)
         q_batch_idx = list(range(q_start, q_end))
         q_batch_lists = [questions[i] for i in q_batch_idx]
 
-        # --- embed current query batch via decode_question ---
+        # embed query batch
         q_mat = _embed_questions_with_decode(q_batch_lists, codebook_main, dim)  # (Qb, d)
         Qb = q_mat.shape[0]
 
-        # running top-k for this query batch
         best_scores = [np.array([], dtype=np.float32) for _ in range(Qb)]
         best_cols   = [np.array([], dtype=np.int32)   for _ in range(Qb)]
 
-        # Stream over DB in batches
+        # 4) stream DB in batches
         for db_start in range(0, M_total, questions_db_batch_size):
             db_end = min(db_start + questions_db_batch_size, M_total)
             db_batch_lists = db_questions[db_start:db_end]
 
-            # --- embed current DB batch via decode_question ---
             db_mat = _embed_questions_with_decode(db_batch_lists, codebook_main, dim)  # (Db, d)
             Db = db_mat.shape[0]
             if Db == 0:
                 continue
 
-            # similarities (Qb x Db)
-            sims = _cosine_sim(q_mat, db_mat)
+            sims = _cosine_sim(q_mat, db_mat)  # (Qb, Db)
             k_local = min(top_k, Db)
 
-            # Merge batch top-k per query
             for i in range(Qb):
                 row = sims[i]
-                # choose top-k indices within this batch
                 cand_idx = np.argpartition(-row, k_local - 1)[:k_local]
-                cand_idx = cand_idx[np.argsort(-row[cand_idx])]  # sort by score desc
+                cand_idx = cand_idx[np.argsort(-row[cand_idx])]
                 batch_scores = row[cand_idx]
-                batch_cols   = cand_idx + db_start  # map to global DB index
+                batch_cols   = cand_idx + db_start
                 merged_scores, merged_cols = _topk_merge(
                     best_scores[i], best_cols[i], batch_scores, batch_cols, top_k
                 )
                 best_scores[i] = merged_scores
                 best_cols[i]   = merged_cols
 
-        # Commit this query batch to final results
+        # 5) collect results
         for local_i, global_q_idx in enumerate(q_batch_idx):
             cols = best_cols[local_i]
             scs  = best_scores[local_i]
-            keep = (cols >= 0) 
+            keep = (cols >= 0)
             cols, scs = cols[keep], scs[keep]
             entries = []
             for col, sc in zip(cols, scs):
@@ -1035,7 +1080,6 @@ def get_topk_word_embedding_batched(
             results[global_q_idx] = entries
 
     return results
-
 
 ##### getting the best sentence embedding results from the top k word embedding results
 
@@ -1180,7 +1224,7 @@ def add_answers_to_filtered_lst(top_m_results,codebook_main):
         for m in matches:
             q_idx = m["questions_index"]
             m_with_feat = m.copy()
-            m_with_feat['answers(edges[i])'] = codebook_main['answers(edges[i])'][q_idx]
+            m_with_feat['answers(edges[i])'] = codebook_main['answers_lst'][q_idx]
             result[qid].append(m_with_feat)
 
     return result
@@ -1234,3 +1278,274 @@ def find_overlapped_answers(answers_lsts):
     flat_answers_lsts = [[x for group in bucket for x in (group if isinstance(group, (list, tuple)) else [group])] for bucket in answers_lsts]
 
     return common_contiguous_overlaps(flat_answers_lsts,2)
+
+def _list_from_index_map(index_map: Dict[str, int]) -> List[str]:
+    """把 {item -> idx} 映射还原为按 idx 排序的列表"""
+    out = [None] * len(index_map)
+    for item, idx in index_map.items():
+        out[idx] = item
+    return out
+
+def decode_chain_to_text(edge_idx_chain: List[int], codebook_main: Dict[str, Any]) -> str:
+    """
+    把一条 answers 的边索引链解码成可读文本（用与问题相同的线性化逻辑）。
+    """
+    return make_question_text(edge_idx_chain, codebook_main)
+
+def decode_answers_bucket_to_texts(answers_bucket, codebook_main: Dict[str, Any]) -> List[str]:
+    """
+    answers_bucket 的结构来源于 add_answers_to_filtered_lst 组装的
+    item['answers(edges[i])']：通常是一个“答案候选集合”，内部是多条“边索引链”。
+    这个函数把它统一解码成一批可读短句，便于展示。
+    """
+    texts = []
+    # answers_bucket 可能是 List[List[int]]（多条链），也可能包含更深的嵌套
+    # 这里尽量稳健地拍平一层
+    if isinstance(answers_bucket, (list, tuple)):
+        for maybe_chain in answers_bucket:
+            if isinstance(maybe_chain, (list, tuple)) and len(maybe_chain) > 0 and isinstance(maybe_chain[0], int):
+                # 单条边索引链
+                texts.append(decode_chain_to_text(maybe_chain, codebook_main))
+            elif isinstance(maybe_chain, (list, tuple)):
+                # 可能是更深一层的嵌套
+                for chain in maybe_chain:
+                    if isinstance(chain, (list, tuple)) and len(chain) > 0 and isinstance(chain[0], int):
+                        texts.append(decode_chain_to_text(chain, codebook_main))
+    return texts
+
+
+# =========================
+# END-TO-END TEST HARNESS
+# =========================
+if __name__ == "__main__":
+    import random
+    from typing import Sequence
+
+    print("\n========== Graph/Codebook E2E Test ==========")
+
+    # ---------- 0) Embedding fallbacks ----------
+    class TinyRandomEmbeddings(Embeddings):
+        """
+        A stable random embedder (deterministic): hash(text) -> seed -> vector
+        Used as a fallback when external models are unavailable.
+        """
+        def __init__(self, dim: int = 64):
+            self.dim = dim
+
+        def _vec(self, text: str) -> list[float]:
+            rnd = random.Random(hash(text) & 0xffffffff)
+            return [rnd.uniform(-1, 1) for _ in range(self.dim)]
+
+        def embed_documents(self, texts: Sequence[str]) -> list[list[float]]:
+            return [self._vec(t) for t in texts]
+
+        def embed_query(self, text: str) -> list[float]:
+            return self._vec(text)
+
+    # Ensure word_emb is usable; otherwise replace with TinyRandomEmbeddings
+    try:
+        _ = word_emb.dim
+    except Exception:
+        print("[WARN] GloVe KeyedVectors not ready. Using TinyRandomEmbeddings as word embedding fallback.")
+        word_emb = TinyRandomEmbeddings(dim=64)
+
+    # Prepare sentence embedder for rerank; fallback if model can't be loaded
+    try:
+        sent_emb = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+        _ = sent_emb.embed_query("hello")
+        print("[OK] Using HuggingFaceEmbeddings: sentence-transformers/all-MiniLM-L6-v2")
+    except Exception as e:
+        print(f"[WARN] Cannot load HuggingFaceEmbeddings ({e}). Using TinyRandomEmbeddings fallback.")
+        sent_emb = TinyRandomEmbeddings(dim=64)
+
+    # ---------- 1) Build question & answer codebooks from raw text ----------
+    # Multi-sentence to trigger diverse extraction paths (passive / copular ADJ / VERB)
+    questions_text = (
+        "Is the Great Wall of China visible from space? "
+        "Frankenstein was written by Mary Shelley in 1818. "
+        "The novel inspired many films."
+    )
+    answers_text_1 = (
+        "The Great Wall is not visible from space with the naked eye. "
+        "Mary Shelley wrote Frankenstein in 1818."
+    )
+    answers_text_2 = (
+        "From low Earth orbit, the Great Wall cannot be seen unaided. "
+        "Frankenstein is a novel authored by Mary Shelley."
+    )
+    answers_text_3 = (
+    "Frankenstein was published in 1818 by Mary Shelley. "
+    "The Great Wall cannot be seen with unaided eyes from orbit."
+)
+
+    # Build separate codebooks (questions / answers)
+    codebook_q = get_code_book(questions_text, type='questions')   
+    codebook_a1 = get_code_book(answers_text_1, type='answers')
+    codebook_a2 = get_code_book(answers_text_2, type='answers')
+    codebook_a3 = get_code_book(answers_text_3, type='answers')
+
+    print("\n== Sample codebook (questions) ==")
+    print(json_dump_str({
+        "e": codebook_q["e"][:8],
+        "r": codebook_q["r"][:8],
+        "edges_sample": codebook_q["edges([e,r,e])"][:6],
+        "#edges": len(codebook_q["edges([e,r,e])"]),
+        "#q_chains": len(codebook_q["questions(edges[i])"]),
+    }, indent=2))
+
+    print("\n== Sample codebook (answers 1) ==")
+    print(json_dump_str({
+        "e": codebook_a1["e"][:8],
+        "r": codebook_a1["r"][:8],
+        "edges_sample": codebook_a1["edges([e,r,e])"][:6],
+        "#edges": len(codebook_a1["edges([e,r,e])"]),
+        "#a_chains": len(codebook_a1["answers(edges[i])"]),
+    }, indent=2))
+
+    # ---------- 2) Initialize main codebook & merge Q/A ----------
+    # Start with empty -> merge questions -> merge answers_1 -> merge answers_2
+    codebook_main = merging_codebook(None, codebook_q, type='questions', word_emb=word_emb)
+    codebook_main = merging_codebook(codebook_main, codebook_a1, type='answers',   word_emb=word_emb)
+    codebook_main = merging_codebook(codebook_main, codebook_a2, type='answers',   word_emb=word_emb)
+    codebook_main = merging_codebook(codebook_main, codebook_a3, type='answers',   word_emb=word_emb)
+
+    print("\n== Codebook (main) stats after merges ==")
+    print(json_dump_str({
+        "#entities": len(codebook_main["e"]),
+        "#relations": len(codebook_main["r"]),
+        "#edges": len(codebook_main["edge_matrix"]),
+        "#questions_buckets": len(codebook_main["questions_lst"]),
+        "#answers_buckets": len(codebook_main["answers_lst"]),
+        "rule": codebook_main["rule"],
+    }, indent=2))
+
+    # ---------- 3) Pull some question chains & test decode ----------
+    if not codebook_main["questions_lst"] or not codebook_main["questions_lst"][0]:
+        raise RuntimeError("No question chains produced; try a different input sentence.")
+
+    all_q_chains = codebook_main["questions_lst"][0]
+    query_chains = all_q_chains[: min(3, len(all_q_chains))]  # take a few
+
+    print("\n== Query chains (edge indices) ==")
+    for i, ch in enumerate(query_chains):
+        print(f"Q{i}: {ch}")
+
+    # Test decode_question on: single int, single chain, batch chains (by yourself)
+    # Single edge index (if available)
+    if query_chains and query_chains[0]:
+        edge_idx = query_chains[0][0]
+        print("\n-- decode_question(single int, words) --")
+        print(decode_question([edge_idx], codebook_main, fmt='words'))  # wrap into list to keep API consistent
+
+    # Single chain
+    print("\n-- decode_question(single chain, edges/words/embeddings) --")
+    one_chain = query_chains[0]
+    print("edges:",       decode_question(one_chain, codebook_main, fmt='edges'))
+    print("words:",       decode_question(one_chain, codebook_main, fmt='words'))
+    print("embeddings: [#triples, dims?] ->", len(decode_question(one_chain, codebook_main, fmt='embeddings')), "triples")
+
+    # ---------- 4) Word-embedding coarse top-k over whole DB ----------
+    coarse_topk = get_topk_word_embedding_batched(
+        questions=query_chains,
+        codebook_main=codebook_main,
+        top_k=3,
+        question_batch_size=2,
+        questions_db_batch_size=8,
+    )
+    print("\n== Coarse Top-K (word embeddings) ==")
+    for qi, lst in coarse_topk.items():
+        print(f"Q{qi} → {lst}")
+
+    # ---------- 5) Sentence-embedding rerank ----------
+    reranked = rerank_with_sentence_embeddings(
+        questions=query_chains,
+        codebook_main=codebook_main,
+        coarse_topk=coarse_topk,
+        emb=sent_emb,
+        top_m=3,  # keep top-2 to show list
+    )
+    print("\n== Reranked (sentence embeddings) ==")
+    for qi, lst in reranked.items():
+        print(f"Q{qi} → {lst}")
+
+    # ---------- 6) One-call coarse+fine wrapper ----------
+    print("\n== Coarse+Fine (wrapper: coarse_filter) ==")
+    wrapper_res = coarse_filter(
+        questions=query_chains,
+        codebook_main=codebook_main,
+        emb=sent_emb,
+        top_k=3,
+        question_batch_size=2,
+        questions_db_batch_size=8,
+        top_m=2,
+    )
+    for qi, lst in wrapper_res.items():
+        print(f"Q{qi} → {lst}")
+
+    # ---------- 7) Attach answers to top-m results ----------
+    topm_with_answers = add_answers_to_filtered_lst(wrapper_res, codebook_main)
+    print("\n== Top-m with attached answers (edge-index chains) ==")
+    for qi, lst in topm_with_answers.items():
+        print(f"\nQ{qi}:")
+        for item in lst:
+            print(json_dump_str(item, indent=2))
+
+    # ---------- 8) Decode & show final top-1 per query ----------
+    print("\n== Final decode (top-1 per query) ==")
+    for qi, lst in wrapper_res.items():
+        if not lst:
+            print(f"Q{qi}: <no candidate>")
+            continue
+        best = lst[0]
+        qi_db = best["questions_index"]
+        qj_db = best["question_index"]
+        best_edges_idx_chain = codebook_main["questions_lst"][qi_db][qj_db]
+
+        decoded_edges = decode_question(best_edges_idx_chain, codebook_main, fmt='edges')
+        decoded_words = decode_question(best_edges_idx_chain, codebook_main, fmt='words')
+        decoded_vecs  = decode_question(best_edges_idx_chain, codebook_main, fmt='embeddings')
+
+        print(f"\nQ{qi} top-1:")
+        print("- edges indices:", decoded_edges)
+        print("- words triples:", decoded_words)
+        print("- embeddings triples: count =", len(decoded_vecs))
+
+    # ---------- 9) Find overlapped answer snippets (contiguous runs) + BEFORE/AFTER texts ----------
+    print("\n== Overlapped contiguous answer runs among selected candidates (with BEFORE/AFTER text) ==")
+
+    for qi, lst in topm_with_answers.items():
+        if not lst:
+            print(f"\nQ{qi}: <no candidate with answers>")
+            continue
+
+        # 1) BEFORE：显示每个候选的“原始答案文本”（把其 answers(edge-index chains) 各链解码为文本）
+        print(f"\nQ{qi} — BEFORE (raw candidate answer texts):")
+        per_candidate_answers_texts = []  # 每个候选 -> List[str]（多条链对应多段文本）
+        for rank, item in enumerate(lst):
+            answers_bucket = item['answers(edges[i])']  # 该候选关联的一组答案“边索引链”
+            texts = decode_answers_bucket_to_texts(answers_bucket, codebook_main)
+            per_candidate_answers_texts.append(texts)
+            # 展示：同一个候选内部多条链的文本，用 " | " 拼接
+            joined = " | ".join(texts) if texts else "<empty>"
+            print(f"  - cand#{rank}: {joined}")
+
+        # 2) 计算“合并后”的公共连续片段（基于 edge-index 运行 find_overlapped_answers）
+        #    注意：find_overlapped_answers 的输入是“多个候选的 answers（edge 索引序列）集合”
+        answers_buckets_for_overlap = []
+        for item in lst:
+            answers_buckets_for_overlap.append(item['answers(edges[i])'])
+
+        overlaps = find_overlapped_answers(answers_buckets_for_overlap)
+
+        # 3) AFTER：把 overlaps（edge-index 的连续片段）解码为可读文本并展示
+        if overlaps:
+            print(f"Q{qi} — AFTER (merged/common segments):")
+            for seg_id, edge_run in enumerate(overlaps):
+                # edge_run 是一段“公共连续的边索引序列”
+                # 直接当作一条“链”解码为文本
+                text_after = decode_chain_to_text(edge_run, codebook_main)
+                print(f"  * segment#{seg_id}: {text_after}   [edges: {edge_run}]")
+        else:
+            print(f"Q{qi} — AFTER: <no common contiguous runs found>")
+
+    print("\n========== Test completed. ==========\n")
