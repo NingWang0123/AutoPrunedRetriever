@@ -738,7 +738,6 @@ def remap_question_indices(questions, idx_map, max_dense_size=10_000_000):
 
 
 #### making the merging codebook also able to merge the answer code book
-
 def merging_codebook(codebook_main,codebook_sub,type='questions',word_emb=word_emb):
 
     feat_name = type+'(edges[i])'
@@ -978,7 +977,7 @@ def _ensure_embeddings_in_codebook(codebook_main, dim_fallback: int = 64):
             codebook_main["r_embeddings"] = get_word_embeddings(codebook_main["r"], word_emb)
         except Exception:
             codebook_main["r_embeddings"] = _hash_embed(codebook_main["r"], dim=dim_fallback)
-            
+
 def get_topk_word_embedding_batched(
     questions: List[List[int]],
     codebook_main: Dict[str, Any],
@@ -992,7 +991,6 @@ def get_topk_word_embedding_batched(
     Now auto-build e/r embeddings if missing in codebook_main.
     """
     # 0) ensure embeddings are present (compute on-the-fly if absent)
-    _ensure_embeddings_in_codebook(codebook_main, dim_fallback=64)
 
     # 1) infer embedding dim
     if "e_embeddings" in codebook_main and len(codebook_main["e_embeddings"]) > 0:
@@ -1000,8 +998,7 @@ def get_topk_word_embedding_batched(
     elif "r_embeddings" in codebook_main and len(codebook_main["r_embeddings"]) > 0:
         dim = len(codebook_main["r_embeddings"][0])
     else:
-        # This should not happen thanks to _ensure_embeddings_in_codebook
-        raise ValueError("Cannot infer embedding dimension from codebook_main.")
+        _ensure_embeddings_in_codebook(codebook_main, dim_fallback=64)
 
     # 2) get DB questions
     if "questions_lst" not in codebook_main:
@@ -1408,6 +1405,7 @@ if __name__ == "__main__":
     codebook_main = merging_codebook(codebook_main, codebook_a1, type='answers',   word_emb=word_emb)
     codebook_main = merging_codebook(codebook_main, codebook_a2, type='answers',   word_emb=word_emb)
     codebook_main = merging_codebook(codebook_main, codebook_a3, type='answers',   word_emb=word_emb)
+    print("---------", codebook_main)
 
     print("\n== Codebook (main) stats after merges ==")
     print(json_dump_str({
@@ -1518,31 +1516,28 @@ if __name__ == "__main__":
             print(f"\nQ{qi}: <no candidate with answers>")
             continue
 
-        # 1) BEFORE：显示每个候选的“原始答案文本”（把其 answers(edge-index chains) 各链解码为文本）
         print(f"\nQ{qi} — BEFORE (raw candidate answer texts):")
-        per_candidate_answers_texts = []  # 每个候选 -> List[str]（多条链对应多段文本）
+        per_candidate_answers_texts = []  
         for rank, item in enumerate(lst):
-            answers_bucket = item['answers(edges[i])']  # 该候选关联的一组答案“边索引链”
+            answers_bucket = item['answers(edges[i])']  
             texts = decode_answers_bucket_to_texts(answers_bucket, codebook_main)
             per_candidate_answers_texts.append(texts)
-            # 展示：同一个候选内部多条链的文本，用 " | " 拼接
+    
             joined = " | ".join(texts) if texts else "<empty>"
             print(f"  - cand#{rank}: {joined}")
 
-        # 2) 计算“合并后”的公共连续片段（基于 edge-index 运行 find_overlapped_answers）
-        #    注意：find_overlapped_answers 的输入是“多个候选的 answers（edge 索引序列）集合”
+    
         answers_buckets_for_overlap = []
         for item in lst:
             answers_buckets_for_overlap.append(item['answers(edges[i])'])
 
         overlaps = find_overlapped_answers(answers_buckets_for_overlap)
 
-        # 3) AFTER：把 overlaps（edge-index 的连续片段）解码为可读文本并展示
+        print("----------",overlaps)
         if overlaps:
             print(f"Q{qi} — AFTER (merged/common segments):")
             for seg_id, edge_run in enumerate(overlaps):
-                # edge_run 是一段“公共连续的边索引序列”
-                # 直接当作一条“链”解码为文本
+    
                 text_after = decode_chain_to_text(edge_run, codebook_main)
                 print(f"  * segment#{seg_id}: {text_after}   [edges: {edge_run}]")
         else:
