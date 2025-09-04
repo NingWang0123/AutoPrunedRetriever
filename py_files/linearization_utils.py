@@ -5,25 +5,9 @@ from typing import List, Dict, Optional, Tuple
 import json
 import re
 import networkx as nx
-from graph_generator.retrievel_with_json import *
+from rag_workflow_v1 import *
 
-# === Dependency: reuse functions from retrievel_with_json.py ===
-# Make sure the import path matches your project structure
-from graph_generator.retrievel_with_json import (
-    # extract triples (syntax → relations)
-    sentence_relations,
-
-    # v1: id-dict utilities
-    triples_to_id_dictionary,
-
-    # v2: codebook/edges utilities
-    build_codebook_from_triples,
-    edges_from_triples,
-
-    # v3 merged messages (support full edges / index questions)
-    get_merged_message,          # use_full_edges=True/False
-    get_code_book,               # another shortcut for v1 semantics
-)
+ 
 
 # -----------------------------
 # Utility: simple JSON dump
@@ -142,7 +126,7 @@ def build_relationship_text(
     relations: Optional[List[Dict]] = None,
     *,
     include_json_block: bool = True,      # whether to output JSON (usually True)
-    json_style: str = "codebook",               # "v3" | "v3_indexed" | "id_dict" | "codebook"
+    json_style: str = "codebook_main",               # "v3" | "v3_indexed" | "id_dict" | "codebook"
     json_pretty: bool = False,            # whether to pretty-print JSON
 ) -> Tuple[str, List[List[int]], List[int]]:
     """
@@ -179,6 +163,11 @@ def build_relationship_text(
                         "r": codebook['r']
                         }
         return str(codebook_main), codebook["edge_matrix"], codebook["questions_lst"]
+    
+    if json_style == "codebook_main":
+        codebook_sub = get_code_book(question)
+        codebook_main = merging_codebook(None, codebook_sub, word_emb=word_emb)
+        return codebook_main
 
     if json_style == "v3":
         # v3: return {"e","r"} object; questions returned separately
