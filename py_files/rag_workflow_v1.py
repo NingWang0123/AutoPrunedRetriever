@@ -811,7 +811,7 @@ def merging_codebook(codebook_main,codebook_sub,type='questions',word_emb=word_e
             "e": codebook_sub['e'],  
             "r": codebook_sub['r'],  
             'edge_matrix':codebook_sub['edges([e,r,e])'],
-            main_feat_name:[codebook_sub['questions(edges[i])']],
+            main_feat_name:[codebook_sub[feat_name]],
             unupdated_feat_name:[],
             "rule": codebook_sub['rule'],
             "e_embeddings": get_word_embeddings(codebook_sub['e'],word_emb),  
@@ -837,7 +837,7 @@ def decode_question(question, codebook_main, fmt='words'):
             "e": [str, ...],
             "r": [str, ...],
             "edge_matrix": [[e_idx, r_idx, e_idx], ...],  # list or np.ndarray
-            "questions_lst": [[[edges index,...],...],...]
+            "questions": [[edges index,...],...]
             "e_embeddings": [vec, ...], 
             "r_embeddings": [vec, ...], 
         }
@@ -1398,13 +1398,14 @@ def get_unique_knowledge(overlapped_answers,flat_answers_lsts):
     return {'assignments': assignments, 'out_answers': out_answers}
 
 # get the entities from codebook_main
-def get_ent_r_from_codebook_main(flat_answers_lsts,codebook_main,codebook_sub_q):
+def get_json_with_given_knowledge(flat_answers_lsts,codebook_main,codebook_sub_q,decode = True):
+    # used flat here since trying to flat answers for each answers trunk to get longer overlapp
+    # if change the answers here also change the format for other func related
+
     # get all unique edges
     all_unique_edges_mat_indexes = list(set([x for sublist in flat_answers_lsts for x in sublist]))
 
     # find all unique entities and r
-    info_dict = {'entities':[],'relations':[]}
-
     entitie_set = []
     r_set = []
     entitie_index_set = []
@@ -1440,12 +1441,12 @@ def get_ent_r_from_codebook_main(flat_answers_lsts,codebook_main,codebook_sub_q)
 
     for ent_index in entitie_index_set:
 
-        entitie_set.append(codebook_main['entities'][ent_index])
+        entitie_set.append(codebook_main['e'][ent_index])
         entitie_index_dict[ent_index] = new_ent_index
         new_ent_index+=1
 
     for r_index in r_index_set:
-        r_set.append(codebook_main['relations'][r_index])
+        r_set.append(codebook_main['r'][r_index])
         r_index_dict[r_index] = new_r_index
         new_r_index+=1
 
@@ -1478,12 +1479,84 @@ def get_ent_r_from_codebook_main(flat_answers_lsts,codebook_main,codebook_sub_q)
     
     edge_matrix_sub = remap_edges(edge_matrix_sub, entitie_index_dict, r_index_dict)
 
-
+    entitie_index_dict_q = {}
+    r_index_dict_q = {}
+    entitie_set_len = len(entitie_set)
+    r_set_len = len(r_set)
     # do the samilar steps for combine the sub codebook and sub q codebook
 
     # update the entities index and relation index for questions and combine the entities lst and relations lst
 
-    return 0
+    # update the entities index
+    ent_pos = 0
+    for ent in codebook_sub_q['e']:
+        # check the ent in entities_lst or not
+        if ent in entitie_set:
+            new_ent_pos = entitie_set.index(ent)
+        else:
+            entitie_set_len+=1
+            new_ent_pos = entitie_set_len
+            entitie_set.append(ent)
+
+        entitie_index_dict_q[ent_pos] = new_ent_pos
+
+    # update relation index
+    r_pos = 0
+    for r in codebook_sub_q['r']:
+        if r in r_set:
+            new_r_pos = r_set.index(r)
+        else:
+            r_set_len+=1
+            new_r_pos = r_set_len
+            r_set.append(r)
+        r_index_dict_q[r_pos] = new_r_pos
+
+    # map the q edge matrix
+    edge_mat_for_q_sub = remap_edges(codebook_sub_q['edge_matrix'], entitie_index_dict_q, r_index_dict_q)
+
+    # update the edges
+    edge_matrix_sub_len = len(edge_matrix_sub)
+    edge_pos = 0
+    edge_mat_for_q_sub_dict = {}
+
+    for edge in edge_mat_for_q_sub:
+        if edge in edge_matrix_sub:
+            new_edge_pos = edge_matrix_sub.index(edge)
+        else:
+            edge_matrix_sub_len+=1
+            new_edge_pos = edge_matrix_sub_len
+            edge_matrix_sub.append(edge)
+
+        edge_mat_for_q_sub_dict[edge_pos] = new_edge_pos
+
+
+    # update the questions
+    questions = [edge_mat_for_q_sub_dict.get(x, x) for x in codebook_sub_q['questions(edges[i])']]
+
+
+    # get the final merged json
+
+       
+    final_merged_json = {
+        'e':entitie_set,
+        'r':r_set,
+        'edge_matrix':edge_matrix_sub,
+        'questions(edges[i])':questions,
+        'given knowledge(edges[i])': flat_answers_lsts,
+        'rule':codebook_sub_q['rule']
+    }
+
+    if decode:
+        final_merged_json = {
+            'e':entitie_set,
+            'r':r_set,
+            'edge_matrix':edge_matrix_sub,
+            'questions([[e,r,e], ...])':decode_question(questions, final_merged_json, 'edges'),
+            'given knowledge([[e,r,e], ...])': decode_question(flat_answers_lsts, final_merged_json, 'edges'),
+            'rule':codebook_sub_q['rule']
+
+        }
+    return final_merged_json
 
 # =========================
 # END-TO-END TEST HARNESS
