@@ -1271,9 +1271,14 @@ def common_contiguous_overlaps(answers_lst, min_len=2):
     return [list(t) for t in sorted(maximal, key=lambda t: (-len(t), t))]
 
 
-def find_overlapped_answers(answers_lsts):
-    flat_answers_lsts = [[x for group in bucket for x in (group if isinstance(group, (list, tuple)) else [group])] for bucket in answers_lsts]
 
+def get_flat_answers_lsts(answers_lsts):    
+    return [[x for group in bucket for x in (group if isinstance(group, (list, tuple)) else [group])] for bucket in answers_lsts]
+
+def find_overlapped_answers(answers_lsts):
+    flat_answers_lsts = get_flat_answers_lsts(answers_lsts)
+
+    # default 2 for the overlap
     return common_contiguous_overlaps(flat_answers_lsts,2)
 
 def _list_from_index_map(index_map: Dict[str, int]) -> List[str]:
@@ -1310,6 +1315,140 @@ def decode_answers_bucket_to_texts(answers_bucket, codebook_main: Dict[str, Any]
                         texts.append(decode_chain_to_text(chain, codebook_main))
     return texts
 
+
+#### get the all unique knowledge
+
+def get_unique_knowledge(overlapped_answers,flat_answers_lsts):
+    """
+    For each overlap run in overlapped_answers['overlaps'], keep that run only
+    in the 'owner' sequence (the one with the longest continuation after the run),
+    and remove the run from all other sequences where it appears.
+
+    Inputs:
+    overlapped_answers: {'overlaps': [[edges_index, edges_index,...],...]}
+
+    flat_answers_lsts: [[edges_index,...],...] ; get from get_flat_answers_lsts(answers_lsts)
+    """
+
+    # Normalize inputs 
+    out_answers: List[List[int]] = [list(map(int, seq)) for seq in flat_answers_lsts]
+    runs: List[List[int]] = [list(map(int, run)) for run in overlapped_answers.get("overlaps", [])]
+
+    def find_run_positions(run: List[int], seq: List[int]) -> List[int]:
+        L = len(run)
+        if L == 0 or L > len(seq):
+            return []
+        return [i for i in range(len(seq) - L + 1) if seq[i:i + L] == run]
+
+    def remove_all_runs(seq: List[int], run: List[int]) -> List[int]:
+        """Remove all non-overlapping occurrences of run from seq (greedy left-to-right)."""
+        res: List[int] = []
+        i = 0
+        L = len(run)
+        n = len(seq)
+        while i <= n - L:
+            if seq[i:i+L] == run:
+                i += L  # skip the run
+            else:
+                res.append(seq[i])
+                i += 1
+        # append trailing tail
+        res.extend(seq[i:])
+        return res
+
+    # Process longer overlaps first to avoid smaller runs interfering
+    runs_sorted = sorted(runs, key=len, reverse=True)
+
+    assignments = []
+    for run in runs_sorted:
+        # Find occurrences in each sequence
+        occs: Dict[int, List[int]] = {idx: find_run_positions(run, seq) for idx, seq in enumerate(out_answers)}
+        present = {i: pos for i, pos in occs.items() if pos}
+        if not present:
+            continue  # this run doesn't appear anywhere
+
+        # Choose owner: sequence with the maximum tail length after the best occurrence
+        L = len(run)
+        owner = None
+        best_tail = -1
+        best_total_len = -1
+        for i, positions in present.items():
+            for pos in positions:
+                tail_len = len(out_answers[i]) - (pos + L)
+                # Tie-breakers: longer total sequence length, then smaller index
+                if (tail_len > best_tail or
+                    (tail_len == best_tail and len(out_answers[i]) > best_total_len) or
+                    (tail_len == best_tail and len(out_answers[i]) == best_total_len and (owner is None or i < owner))):
+                    owner = i
+                    best_tail = tail_len
+                    best_total_len = len(out_answers[i])
+
+        # Remove this run from all non-owner sequences where it occurs
+        for j in range(len(out_answers)):
+            if j != owner and occs.get(j):
+                out_answers[j] = remove_all_runs(out_answers[j], run)
+
+        assignments.append({
+            'run': run,
+            'owner': owner,
+            'occurrences': {i: occs[i] for i in present}
+        })
+
+
+    return {'assignments': assignments, 'out_answers': out_answers}
+
+# get the entities from codebook_main
+def get_ent_r_from_codebook_main(flat_answers_lsts,codebook_main,codebook_sub_q):
+    # get all unique edges
+    all_unique_edges_mat_indexes = list(set([x for sublist in flat_answers_lsts for x in sublist]))
+
+    # find all unique entities and r
+    info_dict = {'entities':[],'relations':[]}
+
+    entitie_set = []
+    r_set = []
+    entitie_index_set = []
+    r_index_set = []
+    entitie_index_dict = {}
+    r_index_dict = {}
+    edge_matrix_sub = []
+
+
+
+    for edge_mat_index in all_unique_edges_mat_indexes:
+        edge = codebook_main['edge_matrix'][edge_mat_index]
+        e_index1,r_index,e_index2 = edge
+        entitie_index_set.append(e_index1)
+        entitie_index_set.append(e_index2)
+        r_index_set.append(r_index)
+        edge_matrix_sub.append(edge)
+
+    entitie_index_set = list(set(entitie_index_set))
+    r_index_set = list(set(r_index_set))
+
+    new_ent_index = 0
+    new_r_index = 0
+
+    for ent_index in entitie_index_set:
+
+        entitie_set.append(codebook_main['entities'][ent_index])
+        entitie_index_dict[ent_index] = new_ent_index
+        new_ent_index+=1
+
+    for r_index in r_index_set:
+        r_set.append(codebook_main['relations'][r_index])
+        r_index_dict[r_index] = new_r_index
+        new_r_index+=1
+
+
+    # convert 
+
+
+
+    
+
+
+    return 0
 
 # =========================
 # END-TO-END TEST HARNESS
