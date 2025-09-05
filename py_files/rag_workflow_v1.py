@@ -1412,9 +1412,11 @@ def get_ent_r_from_codebook_main(flat_answers_lsts,codebook_main,codebook_sub_q)
     entitie_index_dict = {}
     r_index_dict = {}
     edge_matrix_sub = []
+    edge_mat_index_dict = {}
 
-
-
+    new_edge_mat_index = 0 
+    
+    # build new edge_mat_index
     for edge_mat_index in all_unique_edges_mat_indexes:
         edge = codebook_main['edge_matrix'][edge_mat_index]
         e_index1,r_index,e_index2 = edge
@@ -1422,6 +1424,13 @@ def get_ent_r_from_codebook_main(flat_answers_lsts,codebook_main,codebook_sub_q)
         entitie_index_set.append(e_index2)
         r_index_set.append(r_index)
         edge_matrix_sub.append(edge)
+        edge_mat_index_dict[edge_mat_index] = new_edge_mat_index
+        new_edge_mat_index+=1
+
+    # update edge index in flat_answers_lsts
+    flat_answers_lsts = [[edge_mat_index_dict.get(x, x) for x in sublist] for sublist in flat_answers_lsts]
+
+    # build new entities index and relations index
 
     entitie_index_set = list(set(entitie_index_set))
     r_index_set = list(set(r_index_set))
@@ -1440,13 +1449,39 @@ def get_ent_r_from_codebook_main(flat_answers_lsts,codebook_main,codebook_sub_q)
         r_index_dict[r_index] = new_r_index
         new_r_index+=1
 
+    # update ent index and r index for the edge_matrix_sub
+    def remap_edges(edges: List[List[int]], e_dict: Dict[int, int], r_dict: Dict[int, int]) -> List[List[int]]:
+        """
+        Remap edges of format [[e, r, e], ...] using given entity and relation mappings.
 
-    # convert 
+        Parameters
+        ----------
+        edges : List[List[int]]
+            List of edges in format [entity1, relation, entity2].
+        e_dict : Dict[int, int]
+            Mapping dictionary for entity indices (applies to positions 0 and 2).
+        r_dict : Dict[int, int]
+            Mapping dictionary for relation indices (applies to position 1).
 
-
-
+        Returns
+        -------
+        List[List[int]]
+            New edges with remapped indices.
+        """
+        mapped_edges = []
+        for e1, r, e2 in edges:
+            new_e1 = e_dict.get(e1, e1)  
+            new_r  = r_dict.get(r, r)
+            new_e2 = e_dict.get(e2, e2)
+            mapped_edges.append([new_e1, new_r, new_e2])
+        return mapped_edges
     
+    edge_matrix_sub = remap_edges(edge_matrix_sub, entitie_index_dict, r_index_dict)
 
+
+    # do the samilar steps for combine the sub codebook and sub q codebook
+
+    # update the entities index and relation index for questions and combine the entities lst and relations lst
 
     return 0
 
