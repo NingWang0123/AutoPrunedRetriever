@@ -1564,6 +1564,7 @@ def get_json_with_given_knowledge(flat_answers_lsts,codebook_main,codebook_sub_q
 def combine_ents(codebook_main: Dict[str, Any],
                  min_exp_num: int = 2, # expected min numbers of candidates in each cluster
                  max_exp_num: int = 20, # expected max numbers of candidates in each cluster
+                 use_thinking = True,
                  random_state: int = 0):
 
     E = codebook_main['e']
@@ -1659,11 +1660,41 @@ def combine_ents(codebook_main: Dict[str, Any],
 
 
     # update the edges matrix indexes again
-    final_mapped_edges = []
+    new_mapped_edges = []
     for e1, r, e2 in codebook_main['edge_matrix']:
         new_e1 = ent_pos_dict.get(e1, e1)  
         new_e2 = ent_pos_dict.get(e2, e2)
-        final_mapped_edges.append([new_e1, r, new_e2]) 
+        new_mapped_edges.append([new_e1, r, new_e2]) 
+
+
+    # update the edges matrix indices for questions, answers
+
+    # remove the reptitive edges
+    edges_index_dict = {}
+    final_mapped_edges = []
+    edges_index = 0
+    new_edges_index = 0
+    for edge in final_mapped_edges:
+        if edge not in final_mapped_edges:
+            final_mapped_edges.append(edge)
+            edges_index_dict[edges_index] = new_edges_index
+            new_edges_index+=1
+        edges_index+=1
+
+    # update for questions_lst
+    def update_indexing_qat(struct, mapping):
+        if isinstance(struct, list):
+            return [update_indexing_qat(x, mapping) for x in struct]
+        return mapping.get(struct, struct)
+    
+    if codebook_main['questions_lst']:
+        codebook_main['questions_lst'] = update_indexing_qat(codebook_main['questions_lst'],edges_index_dict)
+
+    if codebook_main['answers_lst']:
+        codebook_main['answers_lst'] = update_indexing_qat(codebook_main['answers_lst'],edges_index_dict)
+
+    if use_thinking & codebook_main['thinkings_lst']:
+        codebook_main['thinkings_lst'] = update_indexing_qat(codebook_main['thinkings_lst'],edges_index_dict)
 
 
     # update the final edges matrix, entities and entities embeddings for code bookmain
