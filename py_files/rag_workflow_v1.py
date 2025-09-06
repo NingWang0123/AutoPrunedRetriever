@@ -13,6 +13,8 @@ import re
 from langchain.embeddings.base import Embeddings
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
 
 nlp = spacy.load("en_core_web_sm")
 
@@ -1557,6 +1559,120 @@ def get_json_with_given_knowledge(flat_answers_lsts,codebook_main,codebook_sub_q
 
         }
     return final_merged_json
+
+
+def combine_ents(codebook_main: Dict[str, Any],
+                 min_exp_num: int = 2, # expected min numbers of candidates in each cluster
+                 max_exp_num: int = 20, # expected max numbers of candidates in each cluster
+                 random_state: int = 0):
+
+    E = codebook_main['e']
+    X = np.asarray(codebook_main['e_embeddings'])
+    assert X.ndim == 2 and len(E) == X.shape[0], "Mismatch between 'e' and 'e_embeddings' sizes."
+
+    n = X.shape[0]
+    # Nothing to merge if 0/1/2 entities
+    if n <= 2:
+        return codebook_main, {i: i for i in range(n)}, {i: [i] for i in range(n)}
+
+    # L2 normalize to make KMeans distance closer to cosine behavior
+    X_norm = X / (np.linalg.norm(X, axis=1, keepdims=True) + 1e-12)
+
+    # Choose k via silhouette (primary) + elbow (secondary)
+    num_ents = len(E)
+    k_min = num_ents/max_exp_num
+    k_max = num_ents/min_exp_num
+
+    k_low = max(k_min, 2)
+    k_high = max(min(k_max, n - 1), k_low)
+    cand_ks = list(range(k_low, k_high + 1))
+
+    best_k = None
+    best_sil = -1.0
+    inertia_by_k = {}
+    sil_by_k = {}
+
+    for k in cand_ks:
+        km = KMeans(n_clusters=k, n_init=10, random_state=random_state)
+        labels = km.fit_predict(X_norm)
+        # Silhouette requires at least 2 clusters and less than n samples per cluster is fine
+        sil = silhouette_score(X_norm, labels, metric='euclidean')
+        inertia_by_k[k] = km.inertia_
+        sil_by_k[k] = sil
+        if sil > best_sil:
+            best_sil = sil
+            best_k = k
+        elif np.isclose(sil, best_sil, rtol=0, atol=1e-6):
+            # tie-breaker: lower inertia (better elbow)
+            if inertia_by_k[k] < inertia_by_k.get(best_k, np.inf):
+                best_k = k
+
+    # Final fit with best_k
+    km = KMeans(n_clusters=best_k, n_init=10, random_state=random_state)
+    labels = km.fit_predict(X_norm)
+    centroids = km.cluster_centers_  # in normalized space
+
+    # find in each cluster which candidate is nearest to the centroids
+    map_dict = {}
+    for cluster_id in range(best_k):
+        # indices of points in this cluster
+        cluster_points_idx = np.where(labels == cluster_id)[0]
+        cluster_points = X[cluster_points_idx]
+
+        # compute distances to centroid
+        distances = np.linalg.norm(cluster_points - centroids[cluster_id], axis=1)
+
+        # nearest point
+        nearest_idx = cluster_points_idx[np.argmin(distances)]
+
+        # update map_dict
+        for idx in cluster_points_idx:
+          if idx != nearest_idx:
+            map_dict[idx] = nearest_idx
+
+    # update the edges matrix index
+    mapped_edges = []
+    for e1, r, e2 in codebook_main['edge_matrix']:
+        new_e1 = map_dict.get(e1, e1)  
+        new_e2 = map_dict.get(e2, e2)
+        mapped_edges.append([new_e1, r, new_e2])
+
+    codebook_main['edge_matrix'] = mapped_edges
+
+    # remove the merged index
+    merged_indexes = map_dict.values()
+
+    # update the entities index and entities embeddings 
+    new_ent_pos = 0
+    ent_pos_dict = {}
+
+    for ent_pos in range(num_ents):
+
+      if ent_pos not in merged_indexes:
+        ent_pos_dict[ent_pos] = new_ent_pos
+        new_ent_pos += 1
+        
+        
+    kept_indexes = list(ent_pos_dict.keys())
+    new_ent = np.array(codebook_main['e'])[kept_indexes]
+    new_ent_embeddings = np.array(codebook_main['e_embeddings'])[kept_indexes]
+
+
+    # update the edges matrix indexes again
+    final_mapped_edges = []
+    for e1, r, e2 in codebook_main['edge_matrix']:
+        new_e1 = ent_pos_dict.get(e1, e1)  
+        new_e2 = ent_pos_dict.get(e2, e2)
+        final_mapped_edges.append([new_e1, r, new_e2]) 
+
+
+    # update the final edges matrix, entities and entities embeddings for code bookmain
+    codebook_main['e'] = new_ent
+    codebook_main['e_embeddings'] = new_ent_embeddings
+    codebook_main['edge_matrix'] = final_mapped_edges
+
+
+    return codebook_main
 
 # =========================
 # END-TO-END TEST HARNESS
