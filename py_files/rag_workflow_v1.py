@@ -850,7 +850,7 @@ def merging_codebook(codebook_main,codebook_sub,type='questions',word_emb=word_e
 def merge_questions_and_answers_code_book(codebook_main,codebook_sub_q,codebook_sub_a):
     codebook_with_q = merging_codebook(codebook_main,codebook_sub_q,type='questions')
     final_codebook = merging_codebook(codebook_with_q,codebook_sub_a,type='answers')
-    
+
     return final_codebook
 
 ## merging questions,thinkings and answers codebook in the main code book
@@ -1260,6 +1260,14 @@ def add_answers_to_filtered_lst(top_m_results,codebook_main):
 
     return result
 
+def get_answers_lst_from_results(result):
+    # this will return the answers list and it's relative indicies
+    all_q_indices = [d['questions_index'] for v in result.values() for d in v]
+    all_answers = [d['answers(edges[i])'] for v in result.values() for d in v]
+
+    return all_answers,all_q_indices
+
+
 
 ## instead of using all top m answers, find the overlapped texts
 def _all_contiguous_subseqs(seq, min_len=2):
@@ -1309,11 +1317,29 @@ def common_contiguous_overlaps(answers_lst, min_len=2):
 def get_flat_answers_lsts(answers_lsts):    
     return [[x for group in bucket for x in (group if isinstance(group, (list, tuple)) else [group])] for bucket in answers_lsts]
 
+
 def find_overlapped_answers(answers_lsts):
     flat_answers_lsts = get_flat_answers_lsts(answers_lsts)
-
     # default 2 for the overlap
-    return common_contiguous_overlaps(flat_answers_lsts,2)
+    final_flat_answers_lsts = common_contiguous_overlaps(flat_answers_lsts,2)
+    return final_flat_answers_lsts
+
+
+def find_overlapped_thinkings(all_q_indices,codebook_main):
+    # from q indices to get answers
+
+    selected_thinkings_lsts = []
+    questions_to_thinkings_dict = codebook_main['questions_to_thinkings']
+
+    for q_index in all_q_indices:
+        if q_index in questions_to_thinkings_dict.keys():
+            selected_thinkings_lsts.append(codebook_main['thinkings_lst'][questions_to_thinkings_dict[q_index]])
+
+
+    flat_thinkings_lsts = get_flat_answers_lsts(selected_thinkings_lsts)
+    # default 2 for the overlap
+    final_flat_thinkings_lsts = common_contiguous_overlaps(flat_thinkings_lsts,2)
+    return final_flat_thinkings_lsts
 
 def _list_from_index_map(index_map: Dict[str, int]) -> List[str]:
     """把 {item -> idx} 映射还原为按 idx 排序的列表"""
@@ -1437,6 +1463,7 @@ def get_json_with_given_knowledge(flat_answers_lsts,codebook_main,codebook_sub_q
     # if change the answers here also change the format for other func related
 
     # get all unique edges
+
     all_unique_edges_mat_indexes = list(set([x for sublist in flat_answers_lsts for x in sublist]))
 
     # find all unique entities and r
@@ -1590,6 +1617,176 @@ def get_json_with_given_knowledge(flat_answers_lsts,codebook_main,codebook_sub_q
             'rule':codebook_sub_q['rule']
 
         }
+
+    return final_merged_json
+
+
+#### get_json_with_given_knowledge with thinkings
+
+def get_json_with_given_knowledge_and_thinkings(flat_answers_lsts,flat_thinkings_lsts,codebook_main,codebook_sub_q,decode = True):
+    # used flat here since trying to flat answers for each answers trunk to get longer overlapp
+    # if change the answers here also change the format for other func related
+
+    # get all unique edges
+
+    all_unique_edges_mat_indexes = list(set([x for sublist in flat_answers_lsts for x in sublist]+[x for sublist in flat_thinkings_lsts for x in sublist]))
+
+    # find all unique entities and r
+    entitie_set = []
+    r_set = []
+    entitie_index_set = []
+    r_index_set = []
+    entitie_index_dict = {}
+    r_index_dict = {}
+    edge_matrix_sub = []
+    edge_mat_index_dict = {}
+
+    new_edge_mat_index = 0 
+    
+    # build new edge_mat_index
+    for edge_mat_index in all_unique_edges_mat_indexes:
+        edge = codebook_main['edge_matrix'][edge_mat_index]
+        e_index1,r_index,e_index2 = edge
+        entitie_index_set.append(e_index1)
+        entitie_index_set.append(e_index2)
+        r_index_set.append(r_index)
+        edge_matrix_sub.append(edge)
+        edge_mat_index_dict[edge_mat_index] = new_edge_mat_index
+        new_edge_mat_index+=1
+
+    # update edge index in flat_answers_lsts
+    flat_answers_lsts = [[edge_mat_index_dict.get(x, x) for x in sublist] for sublist in flat_answers_lsts]
+    flat_thinkings_lsts = [[edge_mat_index_dict.get(x, x) for x in sublist] for sublist in flat_thinkings_lsts]
+
+    # build new entities index and relations index
+
+    entitie_index_set = list(set(entitie_index_set))
+    r_index_set = list(set(r_index_set))
+
+    new_ent_index = 0
+    new_r_index = 0
+
+    for ent_index in entitie_index_set:
+
+        entitie_set.append(codebook_main['e'][ent_index])
+        entitie_index_dict[ent_index] = new_ent_index
+        new_ent_index+=1
+
+    for r_index in r_index_set:
+        r_set.append(codebook_main['r'][r_index])
+        r_index_dict[r_index] = new_r_index
+        new_r_index+=1
+
+    # update ent index and r index for the edge_matrix_sub
+    def remap_edges(edges: List[List[int]], e_dict: Dict[int, int], r_dict: Dict[int, int]) -> List[List[int]]:
+        """
+        Remap edges of format [[e, r, e], ...] using given entity and relation mappings.
+
+        Parameters
+        ----------
+        edges : List[List[int]]
+            List of edges in format [entity1, relation, entity2].
+        e_dict : Dict[int, int]
+            Mapping dictionary for entity indices (applies to positions 0 and 2).
+        r_dict : Dict[int, int]
+            Mapping dictionary for relation indices (applies to position 1).
+
+        Returns
+        -------
+        List[List[int]]
+            New edges with remapped indices.
+        """
+        mapped_edges = []
+        for e1, r, e2 in edges:
+            new_e1 = e_dict.get(e1, e1)  
+            new_r  = r_dict.get(r, r)
+            new_e2 = e_dict.get(e2, e2)
+            mapped_edges.append([new_e1, new_r, new_e2])
+        return mapped_edges
+    
+    edge_matrix_sub = remap_edges(edge_matrix_sub, entitie_index_dict, r_index_dict)
+
+    entitie_index_dict_q = {}
+    r_index_dict_q = {}
+    entitie_set_len = len(entitie_set)
+    r_set_len = len(r_set)
+    # do the samilar steps for combine the sub codebook and sub q codebook
+
+    # update the entities index and relation index for questions and combine the entities lst and relations lst
+
+    # update the entities index
+    ent_pos = 0
+    for ent in codebook_sub_q['e']:
+        # check the ent in entities_lst or not
+        if ent in entitie_set:
+            new_ent_pos = entitie_set.index(ent)
+        else:
+            entitie_set_len+=1
+            new_ent_pos = entitie_set_len
+            entitie_set.append(ent)
+
+        entitie_index_dict_q[ent_pos] = new_ent_pos
+
+    # update relation index
+    r_pos = 0
+    for r in codebook_sub_q['r']:
+        if r in r_set:
+            new_r_pos = r_set.index(r)
+        else:
+            r_set_len+=1
+            new_r_pos = r_set_len
+            r_set.append(r)
+        r_index_dict_q[r_pos] = new_r_pos
+
+    # map the q edge matrix
+    edge_mat_for_q_sub = remap_edges(codebook_sub_q['edge_matrix'], entitie_index_dict_q, r_index_dict_q)
+
+    # update the edges
+    edge_matrix_sub_len = len(edge_matrix_sub)
+    edge_pos = 0
+    edge_mat_for_q_sub_dict = {}
+
+    for edge in edge_mat_for_q_sub:
+        if edge in edge_matrix_sub:
+            new_edge_pos = edge_matrix_sub.index(edge)
+        else:
+            edge_matrix_sub_len+=1
+            new_edge_pos = edge_matrix_sub_len
+            edge_matrix_sub.append(edge)
+
+        edge_mat_for_q_sub_dict[edge_pos] = new_edge_pos
+
+
+    # update the questions
+    questions = [edge_mat_for_q_sub_dict.get(x, x) for x in codebook_sub_q['questions(edges[i])']]
+
+
+    # get the final merged json
+
+       
+    final_merged_json = {
+        'e':entitie_set,
+        'r':r_set,
+        'edge_matrix':edge_matrix_sub,
+        'questions(edges[i])':questions,
+        'given knowledge(edges[i])': flat_answers_lsts,
+        'start thinking with(edges[i])':flat_thinkings_lsts,
+        'rule':codebook_sub_q['rule']
+    }
+
+    if decode:
+        final_merged_json = {
+            'e':entitie_set,
+            'r':r_set,
+            'edge_matrix':edge_matrix_sub,
+            'questions([[e,r,e], ...])':decode_question(questions, final_merged_json, 'edges'),
+            'given knowledge([[e,r,e], ...])': decode_question(flat_answers_lsts, final_merged_json, 'edges'),
+            'start thinking with(edges[i])':decode_question(flat_thinkings_lsts,final_merged_json,'edges'),
+            'rule':codebook_sub_q['rule']
+
+        }
+
+
     return final_merged_json
 
 
