@@ -740,26 +740,31 @@ def remap_question_indices(questions, idx_map, max_dense_size=10_000_000):
 
 
 #### making the merging codebook also able to merge the answer code book
-def merging_codebook(codebook_main,codebook_sub,type='questions',word_emb=word_emb):
+def merging_codebook(codebook_main,codebook_sub,type='questions',word_emb=word_emb,use_thinkings = True):
 
     feat_name = type+'(edges[i])'
 
     if type=='questions':
         main_feat_name = 'questions_lst'
-        unupdated_feat_name = 'answers_lst'
+        unupdated_feat_name1 = 'answers_lst'
+        unupdated_feat_name2 = 'thinkings_lst'
 
     elif type == 'answers':
         main_feat_name = 'answers_lst'
-        unupdated_feat_name = 'questions_lst'
+        unupdated_feat_name1 = 'questions_lst'
+        unupdated_feat_name2 = 'thinkings_lst'
+
+    elif type == 'thinkings':
+        main_feat_name = 'thinkings_lst'
+        unupdated_feat_name1 = 'questions_lst'
+        unupdated_feat_name2 = 'answers_lst'
+
 
 
     if codebook_main:
         # get the ents and rs needs to be merged in to codebook_main
-        rule = codebook_main['rule']
-
         questions_needs_merged = codebook_sub[feat_name]
         lst_questions_main = codebook_main[main_feat_name]
-        lst_unupdated_feat = codebook_main[unupdated_feat_name]
 
         edge_mat_needs_merged = codebook_sub['edges([e,r,e])']
         edge_mat_main = codebook_main['edge_matrix']
@@ -796,39 +801,66 @@ def merging_codebook(codebook_main,codebook_sub,type='questions',word_emb=word_e
         e_list = _list_from_index_map(index_ent_main)
         r_list = _list_from_index_map(index_r_main)
 
-        final_codebook = {
-            "e": e_list,                         
-            "r": r_list,                          
-            "edge_matrix": index_edges_main,     
-            main_feat_name: lst_questions_main,   
-            unupdated_feat_name: lst_unupdated_feat,
-            "rule": rule,
-            "e_embeddings": codebook_main['e_embeddings'] + new_ent_embeds,
-            "r_embeddings": codebook_main['r_embeddings'] + new_r_embeds,
-        }
+        codebook_main["e"] = e_list
+        codebook_main["r"] = r_list
+        codebook_main["edge_matrix"] = index_edges_main
+        codebook_main[main_feat_name] = lst_questions_main
+        codebook_main["e_embeddings"] = codebook_main['e_embeddings'] + new_ent_embeds
+        codebook_main["r_embeddings"] = codebook_main['r_embeddings'] + new_r_embeds
+
+        # final_codebook = {
+        #     "e": e_list,                         
+        #     "r": r_list,                          
+        #     "edge_matrix": index_edges_main,     
+        #     main_feat_name: lst_questions_main,   
+        #     unupdated_feat_name: lst_unupdated_feat,
+        #     "rule": rule,
+        #     "e_embeddings": codebook_main['e_embeddings'] + new_ent_embeds,
+        #     "r_embeddings": codebook_main['r_embeddings'] + new_r_embeds,
+        # }
+
+        if type == 'thinkings':
+            codebook_main['questions_to_thinkings'][len(codebook_main['questions_lst'])-1] = len(codebook_main[main_feat_name])-1
+
 
     else:
         # main codebook is empty
-        final_codebook = {
+        codebook_main = {
             "e": codebook_sub['e'],  
             "r": codebook_sub['r'],  
             'edge_matrix':codebook_sub['edges([e,r,e])'],
             main_feat_name:[codebook_sub[feat_name]],
-            unupdated_feat_name:[],
+            unupdated_feat_name1:[],
             "rule": codebook_sub['rule'],
             "e_embeddings": get_word_embeddings(codebook_sub['e'],word_emb),  
             "r_embeddings": get_word_embeddings(codebook_sub['r'],word_emb),  
         }
 
-    return final_codebook
+        if use_thinkings:
+            codebook_main[unupdated_feat_name2] = []
+            codebook_main['questions_to_thinkings'] = {}
 
 
-## merging questions and answers codebook in the main code book 
+    return codebook_main
+
+
+#### for the merging functions only use when the codebook_sub are not empty
+
+## merging questions and answers codebook in the main code book (questions and answers only, no thinkings)
 def merge_questions_and_answers_code_book(codebook_main,codebook_sub_q,codebook_sub_a):
     codebook_with_q = merging_codebook(codebook_main,codebook_sub_q,type='questions')
     final_codebook = merging_codebook(codebook_with_q,codebook_sub_a,type='answers')
+    
+    return final_codebook
+
+## merging questions,thinkings and answers codebook in the main code book
+def merge_all_code_book(codebook_main,codebook_sub_q,codebook_sub_a,codebook_sub_t):
+    codebook_with_q = merging_codebook(codebook_main,codebook_sub_q,type='questions')
+    codebook_with_qa = merging_codebook(codebook_with_q,codebook_sub_a,type='answers')
+    final_codebook = merging_codebook(codebook_with_qa,codebook_sub_t,type='answers')
 
     return final_codebook
+
 
 
 def decode_question(question, codebook_main, fmt='words'):
