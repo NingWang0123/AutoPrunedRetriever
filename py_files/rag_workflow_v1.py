@@ -1928,8 +1928,9 @@ def combine_ents(codebook_main: Dict[str, Any],
     if codebook_main['answers_lst']:
         codebook_main['answers_lst'] = update_indexing_qat(codebook_main['answers_lst'],edges_index_dict)
 
-    if use_thinking & codebook_main['thinkings_lst']:
-        codebook_main['thinkings_lst'] = update_indexing_qat(codebook_main['thinkings_lst'],edges_index_dict)
+    if use_thinking:
+        if codebook_main['thinkings_lst']:
+            codebook_main['thinkings_lst'] = update_indexing_qat(codebook_main['thinkings_lst'],edges_index_dict)
 
 
     # update the final edges matrix, entities and entities embeddings for code bookmain
