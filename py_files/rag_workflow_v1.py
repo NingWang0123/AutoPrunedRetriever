@@ -1819,8 +1819,8 @@ def combine_ents(codebook_main: Dict[str, Any],
     k_min = num_ents/max_exp_num
     k_max = num_ents/min_exp_num
 
-    k_low = max(k_min, 2)
-    k_high = max(min(k_max, n - 1), k_low)
+    k_low = int(max(k_min, 2))
+    k_high = int(max(min(k_max, n - 1), k_low))
     cand_ks = list(range(k_low, k_high + 1))
 
     best_k = None
