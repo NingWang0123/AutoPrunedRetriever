@@ -1596,7 +1596,7 @@ def get_json_with_given_knowledge(flat_answers_lsts,codebook_main,codebook_sub_q
 
 
     # update the questions
-    questions = [edge_mat_for_q_sub_dict.get(x, x) for x in codebook_sub_q['questions(edges[i])']]
+    questions = [edge_mat_for_q_sub_dict.get(x[0], x[0]) for x in codebook_sub_q['questions(edges[i])']]
 
 
     # get the final merged json
@@ -1762,7 +1762,7 @@ def get_json_with_given_knowledge_and_thinkings(flat_answers_lsts,flat_thinkings
 
 
     # update the questions
-    questions = [edge_mat_for_q_sub_dict.get(x, x) for x in codebook_sub_q['questions(edges[i])']]
+    questions = [edge_mat_for_q_sub_dict.get(x[0], x[0]) for x in codebook_sub_q['questions(edges[i])']]
 
 
     # get the final merged json
