@@ -1336,9 +1336,13 @@ def find_overlapped_thinkings(all_q_indices,codebook_main):
             selected_thinkings_lsts.append(codebook_main['thinkings_lst'][questions_to_thinkings_dict[q_index]])
 
 
-    flat_thinkings_lsts = get_flat_answers_lsts(selected_thinkings_lsts)
-    # default 2 for the overlap
-    final_flat_thinkings_lsts = common_contiguous_overlaps(flat_thinkings_lsts,2)
+    if selected_thinkings_lsts:
+        flat_thinkings_lsts = get_flat_answers_lsts(selected_thinkings_lsts)
+        # default 2 for the overlap
+        final_flat_thinkings_lsts = common_contiguous_overlaps(flat_thinkings_lsts,2)
+    else:
+        final_flat_thinkings_lsts = selected_thinkings_lsts
+
     return final_flat_thinkings_lsts
 
 def _list_from_index_map(index_map: Dict[str, int]) -> List[str]:
