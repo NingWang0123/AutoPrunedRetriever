@@ -1795,149 +1795,106 @@ def get_json_with_given_knowledge_and_thinkings(flat_answers_lsts,flat_thinkings
 
     return final_merged_json
 
-
 def combine_ents(codebook_main: Dict[str, Any],
-                 min_exp_num: int = 2, # expected min numbers of candidates in each cluster
-                 max_exp_num: int = 20, # expected max numbers of candidates in each cluster
-                 use_thinking = True,
-                 random_state: int = 0):
+                 min_exp_num: int = 2,   # 每个簇期望最少候选数
+                 max_exp_num: int = 20,  # 每个簇期望最多候选数
+                 use_thinking: bool = True,
+                 random_state: int = 0) -> Dict[str, Any]:
 
-    E = codebook_main['e']
-    X = np.asarray(codebook_main['e_embeddings'])
-    assert len(E) == len(codebook_main['e_embeddings']), "Mismatch between 'e' and 'e_embeddings' sizes."
+    E = list(codebook_main.get('e', []))
+    X = np.asarray(codebook_main.get('e_embeddings', []), dtype=np.float32)
 
     n = X.shape[0]
-    # Nothing to merge if 0/1/2 entities
+    # 没有可并的情况
     if n <= 2:
-        return codebook_main, {i: i for i in range(n)}, {i: [i] for i in range(n)}
+        # 防止类型跑偏：统一成 list
+        codebook_main['e'] = list(E)
+        codebook_main['e_embeddings'] = [np.asarray(v, dtype=np.float32) for v in X]
+        codebook_main['edge_matrix'] = [list(map(int, e)) for e in codebook_main.get('edge_matrix', [])]
+        return codebook_main
 
-    # L2 normalize to make KMeans distance closer to cosine behavior
+    # L2 归一化（与 KMeans 质心空间一致）
     X_norm = X / (np.linalg.norm(X, axis=1, keepdims=True) + 1e-12)
 
-    # Choose k via silhouette (primary) + elbow (secondary)
-    num_ents = len(E)
-    k_min = num_ents/max_exp_num
-    k_max = num_ents/min_exp_num
-
-    k_low = int(max(k_min, 2))
-    k_high = int(max(min(k_max, n - 1), k_low))
+    # 选择聚类数 k（合理边界+silhouette 优先、elbow 次之）
+    k_low  = max(2, int(np.ceil(n / max_exp_num)))
+    k_high = max(2, min(n - 1, int(np.floor(n / min_exp_num))))
+    if k_low > k_high:  # 极端情况下兜底
+        k_low, k_high = 2, max(2, min(n - 1, 5))
     cand_ks = list(range(k_low, k_high + 1))
 
-    best_k = None
-    best_sil = -1.0
-    inertia_by_k = {}
-    sil_by_k = {}
-
+    best_k, best_sil, inertia_by_k = None, -1.0, {}
     for k in cand_ks:
         km = KMeans(n_clusters=k, n_init=10, random_state=random_state)
         labels = km.fit_predict(X_norm)
-        # Silhouette requires at least 2 clusters and less than n samples per cluster is fine
         sil = silhouette_score(X_norm, labels, metric='euclidean')
         inertia_by_k[k] = km.inertia_
-        sil_by_k[k] = sil
-        if sil > best_sil:
-            best_sil = sil
-            best_k = k
-        elif np.isclose(sil, best_sil, rtol=0, atol=1e-6):
-            # tie-breaker: lower inertia (better elbow)
-            if inertia_by_k[k] < inertia_by_k.get(best_k, np.inf):
-                best_k = k
+        if (sil > best_sil) or (np.isclose(sil, best_sil) and inertia_by_k[k] < inertia_by_k.get(best_k, np.inf)):
+            best_sil, best_k = sil, k
 
-    # Final fit with best_k
+    # 最终聚类
     km = KMeans(n_clusters=best_k, n_init=10, random_state=random_state)
     labels = km.fit_predict(X_norm)
-    centroids = km.cluster_centers_  # in normalized space
+    centroids = km.cluster_centers_  # 与 X_norm 一致的空间
 
-    # find in each cluster which candidate is nearest to the centroids
-    map_dict = {}
-    for cluster_id in range(best_k):
-        # indices of points in this cluster
-        cluster_points_idx = np.where(labels == cluster_id)[0]
-        cluster_points = X[cluster_points_idx]
+    # 为每个簇选一个代表（与质心最近，使用归一化空间）
+    rep_set = set()
+    old_to_rep: Dict[int, int] = {}
+    for c in range(best_k):
+        idxs = np.where(labels == c)[0]
+        pts  = X_norm[idxs]
+        d    = np.linalg.norm(pts - centroids[c], axis=1)
+        rep  = idxs[int(np.argmin(d))]
+        rep_set.add(rep)
+        for i in idxs:
+            old_to_rep[i] = rep
 
-        # compute distances to centroid
-        distances = np.linalg.norm(cluster_points - centroids[cluster_id], axis=1)
+    # 新实体下标重排（仅保留代表）
+    kept_indices = sorted(rep_set)
+    rep_to_new: Dict[int, int] = {old: new for new, old in enumerate(kept_indices)}
+    # 每个旧实体映射到新实体下标
+    old_ent_to_new: Dict[int, int] = {i: rep_to_new[old_to_rep[i]] for i in range(n)}
 
-        # nearest point
-        nearest_idx = cluster_points_idx[np.argmin(distances)]
+    # 生成新的实体与向量（保持 list 类型）
+    new_e = [E[i] for i in kept_indices]
+    new_e_emb = [np.asarray(codebook_main['e_embeddings'][i], dtype=np.float32) for i in kept_indices]
 
-        # update map_dict
-        for idx in cluster_points_idx:
-          if idx != nearest_idx:
-            map_dict[idx] = nearest_idx
+    # 处理边：按新实体映射，并去重，同时记录 旧边idx→新边idx 的映射
+    old_edges = [list(map(int, e)) for e in codebook_main.get('edge_matrix', [])]
+    tuple_to_new_edge_idx: Dict[Tuple[int,int,int], int] = {}
+    new_edges: List[List[int]] = []
+    old_edge_to_new_edge: Dict[int, int] = {}
 
-    # update the edges matrix index
-    mapped_edges = []
-    for e1, r, e2 in codebook_main['edge_matrix']:
-        new_e1 = map_dict.get(e1, e1)  
-        new_e2 = map_dict.get(e2, e2)
-        mapped_edges.append([new_e1, r, new_e2])
+    for old_idx, (e1, r, e2) in enumerate(old_edges):
+        ne1 = old_ent_to_new.get(e1, e1)
+        ne2 = old_ent_to_new.get(e2, e2)
+        tup = (ne1, int(r), ne2)
+        if tup not in tuple_to_new_edge_idx:
+            tuple_to_new_edge_idx[tup] = len(new_edges)
+            new_edges.append([ne1, int(r), ne2])
+        old_edge_to_new_edge[old_idx] = tuple_to_new_edge_idx[tup]
 
-    codebook_main['edge_matrix'] = mapped_edges
-
-    # remove the merged index
-    merged_indexes = map_dict.values()
-
-    # update the entities index and entities embeddings 
-    new_ent_pos = 0
-    ent_pos_dict = {}
-
-    for ent_pos in range(num_ents):
-
-      if ent_pos not in merged_indexes:
-        ent_pos_dict[ent_pos] = new_ent_pos
-        new_ent_pos += 1
-        
-        
-    kept_indexes = list(ent_pos_dict.keys())
-    new_ent = np.array(codebook_main['e'])[kept_indexes]
-    new_ent_embeddings = np.array(codebook_main['e_embeddings'])[kept_indexes]
-
-
-    # update the edges matrix indexes again
-    new_mapped_edges = []
-    for e1, r, e2 in codebook_main['edge_matrix']:
-        new_e1 = ent_pos_dict.get(e1, e1)  
-        new_e2 = ent_pos_dict.get(e2, e2)
-        new_mapped_edges.append([new_e1, r, new_e2]) 
-
-
-    # update the edges matrix indices for questions, answers
-
-    # remove the reptitive edges
-    edges_index_dict = {}
-    final_mapped_edges = []
-    edges_index = 0
-    new_edges_index = 0
-    for edge in final_mapped_edges:
-        if edge not in final_mapped_edges:
-            final_mapped_edges.append(edge)
-            edges_index_dict[edges_index] = new_edges_index
-            new_edges_index+=1
-        edges_index+=1
-
-    # update for questions_lst
-    def update_indexing_qat(struct, mapping):
+    # 重写 questions/answers/thinkings 的边索引
+    def remap_edge_indices(struct):
         if isinstance(struct, list):
-            return [update_indexing_qat(x, mapping) for x in struct]
-        return mapping.get(struct, struct)
-    
-    if codebook_main['questions_lst']:
-        codebook_main['questions_lst'] = update_indexing_qat(codebook_main['questions_lst'],edges_index_dict)
+            return [remap_edge_indices(x) for x in struct]
+        # 叶子：认为是 int 的旧边下标
+        try:
+            return old_edge_to_new_edge.get(int(struct), int(struct))
+        except (ValueError, TypeError):
+            return struct
 
-    if codebook_main['answers_lst']:
-        codebook_main['answers_lst'] = update_indexing_qat(codebook_main['answers_lst'],edges_index_dict)
+    if codebook_main.get('questions_lst') is not None:
+        codebook_main['questions_lst'] = remap_edge_indices(codebook_main['questions_lst'])
+    if codebook_main.get('answers_lst') is not None:
+        codebook_main['answers_lst'] = remap_edge_indices(codebook_main['answers_lst'])
+    if use_thinking and codebook_main.get('thinkings_lst') is not None:
+        codebook_main['thinkings_lst'] = remap_edge_indices(codebook_main['thinkings_lst'])
 
-    if use_thinking:
-        if codebook_main['thinkings_lst']:
-            codebook_main['thinkings_lst'] = update_indexing_qat(codebook_main['thinkings_lst'],edges_index_dict)
-
-
-    # update the final edges matrix, entities and entities embeddings for code bookmain
-    codebook_main['e'] = new_ent
-    codebook_main['e_embeddings'] = new_ent_embeddings
-    codebook_main['edge_matrix'] = final_mapped_edges
-
+    # 回写（统一成 list）
+    codebook_main['e'] = list(new_e)
+    codebook_main['e_embeddings'] = list(new_e_emb)
+    codebook_main['edge_matrix'] = [list(map(int, e)) for e in new_edges]
 
     return codebook_main
 
@@ -2173,4 +2130,149 @@ if __name__ == "__main__":
         else:
             print(f"Q{qi} — AFTER: <no common contiguous runs found>")
 
+    print("\n== 10) Manual answers buckets for overlap test ==")
+
+    # 1) Helper: decode each edge into a readable short string
+    def _edge_words(i):
+        h, r, t = decode_question([i], codebook_main, fmt='words')[0]
+        return f"{h} {r} {t}"
+
+    all_edge_texts = [_edge_words(i) for i in range(len(codebook_main["edge_matrix"]))]
+
+    def find_edge_idx(keyword_like: str) -> int:
+        """
+        Fuzzy find an edge index by substring match.
+        Example:
+          find_edge_idx("Mary Shelley subj write")
+          find_edge_idx("write obj Frankenstein")
+        """
+        key = keyword_like.lower().strip()
+        for i, s in enumerate(all_edge_texts):
+            if key in s.lower():
+                return i
+        raise ValueError(
+            f"Edge not found for key ~{keyword_like}~ ; "
+            f"available samples:\n" + "\n".join(all_edge_texts[:12])
+        )
+
+    # 2) Pick some edges of interest
+    idx_MS_subj_write     = find_edge_idx("Mary Shelley subj write")
+    idx_write_obj_Franken = find_edge_idx("write obj Frankenstein")
+    idx_write_in_1818     = find_edge_idx("write prep_in 1818")
+    try:
+        idx_wall_visible  = find_edge_idx("Great Wall property visible")
+    except Exception:
+        idx_wall_visible  = find_edge_idx("Great Wall isa visible")
+
+    # 3) Manually define two candidate answer buckets (lists of edge-index chains)
+    manual_answers_buckets = {
+        0: [
+            [idx_MS_subj_write, idx_write_obj_Franken],
+            [idx_write_in_1818],
+        ],
+        1: [
+            [idx_MS_subj_write, idx_write_obj_Franken],
+            [idx_write_in_1818, idx_wall_visible],
+        ],
+    }
+
+    # 4) Build a fake retrieval result wrapper with two candidates
+    manual_topm_with_answers = {
+        0: [
+            {
+                "score": 0.0,
+                "questions_index": 0,
+                "question_index": 0,
+                "text": "<manual-cand-0>",
+                "answers(edges[i])": manual_answers_buckets[0],
+            },
+            {
+                "score": 0.0,
+                "questions_index": 0,
+                "question_index": 1,
+                "text": "<manual-cand-1>",
+                "answers(edges[i])": manual_answers_buckets[1],
+            },
+        ]
+    }
+
+    # 5) BEFORE/AFTER merge demonstration
+    print("\n== 10.A BEFORE/AFTER using manual answers_buckets ==")
+    for qi, lst in manual_topm_with_answers.items():
+        print(f"\nQ{qi} — BEFORE (raw candidate answer texts):")
+        for rank, item in enumerate(lst):
+            answers_bucket = item['answers(edges[i])']
+            texts = decode_answers_bucket_to_texts(answers_bucket, codebook_main)
+            joined = " | ".join(texts) if texts else "<empty>"
+            print(f"  - cand#{rank}: {joined}")
+
+        overlaps = find_overlapped_answers([it['answers(edges[i])'] for it in lst])
+        if overlaps:
+            print(f"Q{qi} — AFTER (merged/common segments):")
+            for seg_id, edge_run in enumerate(overlaps):
+                text_after = decode_chain_to_text(edge_run, codebook_main)
+                print(f"  * segment#{seg_id}: {text_after}   [edges: {edge_run}]")
+        else:
+            print(f"Q{qi} — AFTER: <no common contiguous runs found>")
+
+    # ========= 11) Unique knowledge assignment =========
+    print("\n== 11) Unique Knowledge assignment ==")
+    flat_lists = get_flat_answers_lsts([it['answers(edges[i])'] for it in manual_topm_with_answers[0]])
+    overlaps   = common_contiguous_overlaps(flat_lists, min_len=2)
+    uniq_res   = get_unique_knowledge({'overlaps': overlaps}, flat_lists)
+
+    print("Assignments (which run kept by which owner):")
+    for x in uniq_res['assignments']:
+        readable = decode_chain_to_text(x['run'], codebook_main)
+        print(f"  run: {readable}  kept_by: cand#{x['owner']}  occurrences: {x['occurrences']}")
+
+    print("\nOut answers (unique knowledge per candidate):")
+    for i, seq in enumerate(uniq_res['out_answers']):
+        readable = decode_chain_to_text(seq, codebook_main)
+        print(f"  cand#{i}: {readable}   [edges: {seq}]")
+
+    # ========= 12) Build compact JSON with given knowledge =========
+    print("\n== 12) Build compact JSON with given knowledge ==")
+    print("-----------------------------------")
+    print(uniq_res['out_answers'])
+    print(codebook_main)
+    print({
+            'e': codebook_main['e'],
+            'r': codebook_main['r'],
+            'edge_matrix': codebook_main['edge_matrix'],
+            'questions(edges[i])': query_chains, 
+            'rule': codebook_main.get('rule', ''),
+        })
+    print("-----------------------------------")
+    compact_json = get_json_with_given_knowledge(
+        flat_answers_lsts = uniq_res['out_answers'],
+        codebook_main     = codebook_main,
+        codebook_sub_q    = {
+            'e': codebook_main['e'],
+            'r': codebook_main['r'],
+            'edge_matrix': codebook_main['edge_matrix'],
+            'questions(edges[i])': query_chains,
+            'rule': codebook_main['rule'],
+        },
+        decode = True
+    )
+    print(json_dump_str({
+        'e[:5]': compact_json['e'][:5],
+        'r[:5]': compact_json['r'][:5],
+        '#edges': len(compact_json['edge_matrix']),
+        '#questions_triples_preview': len(compact_json['questions([[e,r,e], ...])'][:1]),
+        '#knowledge_triples_preview': len(compact_json['given knowledge([[e,r,e], ...])'][:1]),
+    }, indent=2))
+
+
+    print("\n== 13) Entity clustering & merge (fixed) ==")
+    print(codebook_main)
+    merged_cb = combine_ents(codebook_main, min_exp_num=2, max_exp_num=8, random_state=0, use_thinking=False)
+    print(json_dump_str({
+        "entities_before": len(codebook_main['e']),
+        "entities_after":  len(merged_cb['e']),
+        "edges_before":    len(codebook_main['edge_matrix']),
+        "edges_after":     len(merged_cb['edge_matrix']),
+    }, indent=2))
+    print(merged_cb)
     print("\n========== Test completed. ==========\n")
