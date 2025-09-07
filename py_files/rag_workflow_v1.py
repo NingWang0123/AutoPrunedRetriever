@@ -1804,7 +1804,7 @@ def combine_ents(codebook_main: Dict[str, Any],
 
     E = codebook_main['e']
     X = np.asarray(codebook_main['e_embeddings'])
-    assert X.ndim == 2 and len(E) == X.shape[0], "Mismatch between 'e' and 'e_embeddings' sizes."
+    assert len(E) == len(codebook_main['e_embeddings']), "Mismatch between 'e' and 'e_embeddings' sizes."
 
     n = X.shape[0]
     # Nothing to merge if 0/1/2 entities
