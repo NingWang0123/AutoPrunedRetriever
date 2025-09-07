@@ -904,6 +904,15 @@ def decode_question(question, codebook_main, fmt='words'):
 
     return decoded
 
+def decode_questions(questions, codebook_main, fmt='words'):
+    """
+    Decode a list of questions using decode_question.
+    
+    questions: list of list[int]
+        Each inner list is a sequence of edge indices.
+    """
+    return [decode_question(q, codebook_main, fmt=fmt) for q in questions]
+
 
 ##### word embedding top k search
 def _to_vec(x):
@@ -1588,15 +1597,18 @@ def get_json_with_given_knowledge(flat_answers_lsts,codebook_main,codebook_sub_q
         if edge in edge_matrix_sub:
             new_edge_pos = edge_matrix_sub.index(edge)
         else:
-            edge_matrix_sub_len+=1
             new_edge_pos = edge_matrix_sub_len
             edge_matrix_sub.append(edge)
+            edge_matrix_sub_len+=1
 
         edge_mat_for_q_sub_dict[edge_pos] = new_edge_pos
 
 
     # update the questions
-    questions = [edge_mat_for_q_sub_dict.get(x[0], x[0]) for x in codebook_sub_q['questions(edges[i])']]
+    questions = [
+        [edge_mat_for_q_sub_dict.get(val, val) for val in inner]
+        for inner in codebook_sub_q['questions(edges[i])']
+    ]
 
 
     # get the final merged json
@@ -1616,8 +1628,8 @@ def get_json_with_given_knowledge(flat_answers_lsts,codebook_main,codebook_sub_q
             'e':entitie_set,
             'r':r_set,
             'edge_matrix':edge_matrix_sub,
-            'questions([[e,r,e], ...])':decode_question(questions, final_merged_json, 'edges'),
-            'given knowledge([[e,r,e], ...])': decode_question(flat_answers_lsts, final_merged_json, 'edges'),
+            'questions([[e,r,e], ...])':decode_questions(questions, final_merged_json, 'edges'),
+            'given knowledge([[e,r,e], ...])': decode_questions(flat_answers_lsts, final_merged_json, 'edges'),
             'rule':codebook_sub_q['rule']
 
         }
@@ -1725,9 +1737,9 @@ def get_json_with_given_knowledge_and_thinkings(flat_answers_lsts,flat_thinkings
         if ent in entitie_set:
             new_ent_pos = entitie_set.index(ent)
         else:
-            entitie_set_len+=1
             new_ent_pos = entitie_set_len
             entitie_set.append(ent)
+            edge_matrix_sub_len+=1
 
         entitie_index_dict_q[ent_pos] = new_ent_pos
 
@@ -1762,7 +1774,10 @@ def get_json_with_given_knowledge_and_thinkings(flat_answers_lsts,flat_thinkings
 
 
     # update the questions
-    questions = [edge_mat_for_q_sub_dict.get(x[0], x[0]) for x in codebook_sub_q['questions(edges[i])']]
+    questions = [
+        [edge_mat_for_q_sub_dict.get(val, val) for val in inner]
+        for inner in codebook_sub_q['questions(edges[i])']
+    ]
 
 
     # get the final merged json
@@ -1783,9 +1798,9 @@ def get_json_with_given_knowledge_and_thinkings(flat_answers_lsts,flat_thinkings
             'e':entitie_set,
             'r':r_set,
             'edge_matrix':edge_matrix_sub,
-            'questions([[e,r,e], ...])':decode_question(questions, final_merged_json, 'edges'),
-            'given knowledge([[e,r,e], ...])': decode_question(flat_answers_lsts, final_merged_json, 'edges'),
-            'start thinking with(edges[i])':decode_question(flat_thinkings_lsts,final_merged_json,'edges'),
+            'questions([[e,r,e], ...])':decode_questions(questions, final_merged_json, 'edges'),
+            'given knowledge([[e,r,e], ...])': decode_questions(flat_answers_lsts, final_merged_json, 'edges'),
+            'start thinking with(edges[i])':decode_questions(flat_thinkings_lsts,final_merged_json,'edges'),
             'rule':codebook_sub_q['rule']
 
         }
