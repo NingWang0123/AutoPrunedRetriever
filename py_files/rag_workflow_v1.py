@@ -740,7 +740,7 @@ def remap_question_indices(questions, idx_map, max_dense_size=10_000_000):
 
 
 #### making the merging codebook also able to merge the answer code book
-def merging_codebook(codebook_main,codebook_sub,type='questions',word_emb=word_emb,use_thinkings = True):
+def merging_codebook(codebook_main,codebook_sub,type='questions',word_emb=word_emb,use_thinkings = False):
 
     feat_name = type+'(edges[i])'
 
@@ -797,27 +797,14 @@ def merging_codebook(codebook_main,codebook_sub,type='questions',word_emb=word_e
         ### add the knowledge graph and it's related index
 
 
-        # 用索引映射重建有序列表
-        e_list = _list_from_index_map(index_ent_main)
-        r_list = _list_from_index_map(index_r_main)
-
-        codebook_main["e"] = e_list
-        codebook_main["r"] = r_list
+        codebook_main["e"].extend(new_added_ents)
+        codebook_main["r"].extend(new_added_rs)
         codebook_main["edge_matrix"] = index_edges_main
         codebook_main[main_feat_name] = lst_questions_main
         codebook_main["e_embeddings"] = codebook_main['e_embeddings'] + new_ent_embeds
         codebook_main["r_embeddings"] = codebook_main['r_embeddings'] + new_r_embeds
 
-        # final_codebook = {
-        #     "e": e_list,                         
-        #     "r": r_list,                          
-        #     "edge_matrix": index_edges_main,     
-        #     main_feat_name: lst_questions_main,   
-        #     unupdated_feat_name: lst_unupdated_feat,
-        #     "rule": rule,
-        #     "e_embeddings": codebook_main['e_embeddings'] + new_ent_embeds,
-        #     "r_embeddings": codebook_main['r_embeddings'] + new_r_embeds,
-        # }
+
 
         if type == 'thinkings':
             codebook_main['questions_to_thinkings'][len(codebook_main['questions_lst'])-1] = len(codebook_main[main_feat_name])-1
