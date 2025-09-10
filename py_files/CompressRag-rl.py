@@ -1901,6 +1901,7 @@ def combine_ents(codebook_main: Dict[str, Any],
 class CompressRag:
     def __init__(
         self,
+        ini_meta_codebook = {},
         sentence_emb: Optional[Embeddings] = None,
         word_emb: Optional[Embeddings] = None,
         include_thinkings = True,
@@ -1909,13 +1910,13 @@ class CompressRag:
 
         # meta
         # start with empty codebook
-        self.meta_codebook = {}
+        self.meta_codebook = ini_meta_codebook
         self.include_thinkings = include_thinkings
         self.llm = llm
 
         # Embeddings
         self.sentence_emb = sentence_emb 
-        self.word_emb = word_emb or WordAvgEmbeddings()
+        self.word_emb = word_emb 
 
         #coarse filter params
         self.top_k = 10
