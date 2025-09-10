@@ -592,14 +592,14 @@ def get_word_embeddings(list_of_text,word_emb):
 
 
 ### edit codebook to also take the answers
-def get_code_book(prompt,type = 'questions'):
+def get_code_book(prompt,type = 'questions',rule = "Answer questions."):
     """
     prompt:str
     type: one of 'questions', 'answers', and 'thinkings'
     """
     triples = sentence_relations(prompt, include_det=False)
 
-    codebook, ent2id, rel2id = build_codebook_from_triples(triples)
+    codebook, ent2id, rel2id = build_codebook_from_triples(triples,rule)
 
     edges = edges_from_triples(triples, ent2id, rel2id)
 
@@ -1936,9 +1936,9 @@ class CompressRag:
         self.max_exp_num = 10
 
 
-    def encode_question(self,q_prompt):
+    def encode_question(self,q_prompt,rule):
 
-        return get_code_book(q_prompt,type = 'questions')
+        return get_code_book(q_prompt,'questions',rule)
     
     def retrieve(self,q_json):
         # needs to be fixed
@@ -2084,8 +2084,8 @@ class CompressRag:
                  self.include_thinkings) 
         
 
-    def run_work_flow(self,q_prompt):
-        q_json = self.encode_question(q_prompt)
+    def run_work_flow(self,q_prompt,rule = "Answer questions"):
+        q_json = self.encode_question(q_prompt,rule)
 
         # check the meta code book is not empty
 
