@@ -1211,7 +1211,7 @@ def rerank_with_sentence_embeddings(
 def coarse_filter(
     questions: List[List[int]],
     codebook_main: Dict[str, Any],
-    emb: HuggingFaceEmbeddings,                 # ← move before defaults
+    sentence_emb: HuggingFaceEmbeddings,        # ← move before defaults
     top_k: int = 3,                             # word-embedding candidates
     question_batch_size: int = 1,               # query batch size
     questions_db_batch_size: int = 1,           # DB batch size
@@ -1234,7 +1234,7 @@ def coarse_filter(
     questions,
     codebook_main,
     coarse_top_k,
-    emb,
+    sentence_emb,
     top_m,
     custom_linearizer)
 
@@ -1930,18 +1930,6 @@ class CompressRag:
         self.max_exp_num = 10
 
 
-        # LLM pipeline
-        self.gen_pipe = None
-        self.tokenizer = None
-
-        # FAISS stores (user can manage externally, too)
-        self.text_db: Optional[FAISS] = None
-        self.graph_db: Optional[FAISS] = None
-
-        # Query caches
-        self._QVEC_CACHE: Dict[str, np.ndarray] = {}
-        self._GRAPH_QVEC_CACHE: Dict[str, np.ndarray] = {}
-
     def encode_question(q_prompt):
 
         return get_code_book(q_prompt,type = 'questions')
@@ -1953,7 +1941,7 @@ class CompressRag:
         top_m_results = coarse_filter(
                         questions_edges_index,
                         self.meta_codebook,
-                        self.word_emb,                 # ← move before defaults
+                        self.sentence_emb,                 # ← move before defaults
                         self.top_k,                             # word-embedding candidates
                         self.question_batch_size,               # query batch size
                         self.questions_db_batch_size,           # DB batch size
