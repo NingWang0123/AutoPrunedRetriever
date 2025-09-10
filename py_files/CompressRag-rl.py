@@ -1914,7 +1914,7 @@ class CompressRag:
         self.llm = llm
 
         # Embeddings
-        self.sentence_emb = sentence_emb or HuggingFaceEmbeddings(model_name=self.config["embedding_model"])
+        self.sentence_emb = sentence_emb 
         self.word_emb = word_emb or WordAvgEmbeddings()
 
         #coarse filter params
@@ -2053,6 +2053,7 @@ class CompressRag:
         self.combine_ents_func()
 
         # return answer
+
         return new_result_lst[0]
 
         
