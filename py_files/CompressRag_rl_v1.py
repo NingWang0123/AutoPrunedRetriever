@@ -571,8 +571,10 @@ class WordAvgEmbeddings(Embeddings):
     # ---- LangChain 抽象方法：单查询 ----
     def embed_query(self, text: str) -> List[float]:
         return self._embed_text(text).tolist()
+    
+# change back to your own path
 
-word_emb = WordAvgEmbeddings(model_path="gensim-data/glove-wiki-gigaword-100/glove-wiki-gigaword-100.model")
+word_emb = WordAvgEmbeddings(model_path="/Users/wangning/desktop/gensim-data/glove-wiki-gigaword-100/glove-wiki-gigaword-100.model")
 
 
 def get_word_embeddings(list_of_text,word_emb):
@@ -1576,7 +1578,7 @@ def get_json_with_given_knowledge(flat_answers_lsts,codebook_main,codebook_sub_q
         r_index_dict_q[r_pos] = new_r_pos
 
     # map the q edge matrix
-    edge_mat_for_q_sub = remap_edges(codebook_sub_q['edge_matrix'], entitie_index_dict_q, r_index_dict_q)
+    edge_mat_for_q_sub = remap_edges(codebook_sub_q['edges([e,r,e])'], entitie_index_dict_q, r_index_dict_q)
 
     # update the edges
     edge_matrix_sub_len = len(edge_matrix_sub)
@@ -1745,7 +1747,7 @@ def get_json_with_given_knowledge_and_thinkings(flat_answers_lsts,flat_thinkings
         r_index_dict_q[r_pos] = new_r_pos
 
     # map the q edge matrix
-    edge_mat_for_q_sub = remap_edges(codebook_sub_q['edge_matrix'], entitie_index_dict_q, r_index_dict_q)
+    edge_mat_for_q_sub = remap_edges(codebook_sub_q['edges([e,r,e])'], entitie_index_dict_q, r_index_dict_q)
 
     # update the edges
     edge_matrix_sub_len = len(edge_matrix_sub)
@@ -1934,7 +1936,7 @@ class CompressRag:
         self.max_exp_num = 10
 
 
-    def encode_question(q_prompt):
+    def encode_question(self,q_prompt):
 
         return get_code_book(q_prompt,type = 'questions')
     
@@ -1976,9 +1978,14 @@ class CompressRag:
 
         domain_knowledge_lst = []
 
+        # this will automatically flatten answers
         overlapped_answers = find_overlapped_answers(all_answers)
 
-        unique_knowledge_dict = get_unique_knowledge(overlapped_answers,all_answers)
+        flat_answers = get_flat_answers_lsts(all_answers)
+
+        overlapped_answers_dict = {'overlaps': overlapped_answers}
+
+        unique_knowledge_dict = get_unique_knowledge(overlapped_answers_dict,flat_answers)
 
         unique_knowledge = unique_knowledge_dict['out_answers']
 
@@ -2007,25 +2014,48 @@ class CompressRag:
 
         return final_merged_json
     
-    def collect_results(self,final_merged_json):
+    # def collect_results(self,final_merged_json):
+    #     llm_class = self.llm
+    #     llm = llm_class(final_merged_json)
+    #     new_result_lst = []
+
+    #     if self.include_thinkings:
+    #         llm(final_merged_json)
+    #         a_new,t_new = llm.take_questions()
+
+    #         a_new_json = get_code_book(a_new,type = 'answers')
+    #         t_new_json = get_code_book(t_new,type = 'thinkings')
+
+    #         new_result_lst.append(a_new_json)
+    #         new_result_lst.append(t_new_json)
+    #     else:
+    #         llm(final_merged_json)
+    #         a_new= llm.take_questions()
+    #         a_new_json = get_code_book(a_new,type = 'answers')
+    #         new_result_lst.append(a_new_json)
+
+    #     return new_result_lst
+    
+    def collect_results(self, final_merged_json):
         llm = self.llm
-        new_result_lst = []
-
-        if self.include_thinkings:
+        if callable(llm):
             llm(final_merged_json)
-            a_new,t_new = llm.take_questions()
-
-            a_new_json = get_code_book(a_new,type = 'answers')
-            t_new_json = get_code_book(t_new,type = 'thinkings')
-
-            new_result_lst.append(a_new_json)
-            new_result_lst.append(t_new_json)
+        elif hasattr(llm, "set_q"):
+            llm.set_q(final_merged_json)
         else:
-            llm(final_merged_json)
-            a_new= llm.take_questions()
-            a_new_json = get_code_book(a_new,type = 'answers')
-            new_result_lst.append(a_new_json)
+            llm.q = final_merged_json  # last resort
 
+        new_result_lst = []
+        if self.include_thinkings:
+            a_new, t_new = llm.take_questions()
+            a_new_json = get_code_book(a_new, type='answers')
+            t_new_json = get_code_book(t_new, type='thinkings')
+            new_result_lst.extend([a_new_json, t_new_json])
+        else:
+            print(final_merged_json)
+            a_new = llm.take_questions()
+            a_new_json = get_code_book(a_new, type='answers')
+            new_result_lst.append(a_new_json)
         return new_result_lst
     
     def update_meta(self,codebook_sub_q,new_result_lst):
