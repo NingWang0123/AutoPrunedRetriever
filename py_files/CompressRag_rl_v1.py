@@ -2045,18 +2045,21 @@ class CompressRag:
         else:
             llm.q = final_merged_json  # last resort
 
+        new_json_lst = []
         new_result_lst = []
+
         if self.include_thinkings:
             a_new, t_new = llm.take_questions()
+            new_result_lst.extend([a_new, t_new])
             a_new_json = get_code_book(a_new, type='answers')
             t_new_json = get_code_book(t_new, type='thinkings')
-            new_result_lst.extend([a_new_json, t_new_json])
+            new_json_lst.extend([a_new_json, t_new_json])
         else:
-            print(final_merged_json)
             a_new = llm.take_questions()
+            new_result_lst.append(a_new)
             a_new_json = get_code_book(a_new, type='answers')
-            new_result_lst.append(a_new_json)
-        return new_result_lst
+            new_json_lst.append(a_new_json)
+        return new_result_lst,new_json_lst
     
     def update_meta(self,codebook_sub_q,new_result_lst):
 
@@ -2095,15 +2098,15 @@ class CompressRag:
             final_merged_json = q_json.copy()
 
 
-        new_result_lst = self.collect_results(final_merged_json)
+        new_result_lst,new_json_lst = self.collect_results(final_merged_json)
 
-        self.update_meta(q_json,new_result_lst)
+        self.update_meta(q_json,new_json_lst)
 
         self.combine_ents_func()
 
         # return answer
 
-        return new_result_lst[0]
+        return new_result_lst
 
         
 
