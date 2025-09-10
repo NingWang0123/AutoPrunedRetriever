@@ -891,14 +891,16 @@ def decode_question(question, codebook_main, fmt='words'):
 
     return decoded
 
-def decode_questions(questions, codebook_main, fmt='words'):
+def decode_questions(questions, questions_source_codebook, fmt='words'):
+
     """
+    questions_source_codebook must be the codebook that contain the questions
     Decode a list of questions using decode_question.
     
     questions: list of list[int]
         Each inner list is a sequence of edge indices.
     """
-    return [decode_question(q, codebook_main, fmt=fmt) for q in questions]
+    return [decode_question(q, questions_source_codebook, fmt=fmt) for q in questions]
 
 
 ##### word embedding top k search
@@ -1033,8 +1035,9 @@ def get_topk_word_embedding_batched(
     # 2) get DB questions
     if "questions_lst" not in codebook_main:
         raise ValueError("codebook_main missing 'questions_lst' for retrieval DB.")
-
-    questions_lst = codebook_main["questions_lst"]
+    
+    # don't search the last one, the last one is being updated as the current question
+    questions_lst = codebook_main["questions_lst"][:-1]
     db_questions: List[List[int]] = []
     db_qi: List[int] = []
     db_qj: List[int] = []
@@ -1906,9 +1909,6 @@ class CompressRag:
         word_emb: Optional[Embeddings] = None,
         include_thinkings = True,
         llm = None,
-        answer_extraction_function = None,
-        thinking_extraction_function = None,
-        combining_ents_fucntion = None
     ):
 
         # meta
@@ -1939,9 +1939,22 @@ class CompressRag:
         return get_code_book(q_prompt,type = 'questions')
     
     def retrieve(self,q_json):
+        # needs to be fixed
+
         # questions queries: list of edge indices
 
-        questions_edges_index = decode_questions(q_json['edges([e,r,e])'], {}, fmt='edges')
+        # change question edges index to the edges in codebook main first
+
+        # now the problem is that q_json's 'edges([e,r,e])' is the from q_json's (e, r, e) index
+
+        # merge with meta code book first
+
+        self.meta_codebook = merging_codebook(self.meta_codebook,q_json,'questions',self.word_emb,True)
+
+        # take the last one 
+
+        questions_edges_index = self.meta_codebook['questions_lst'][-1]
+
         top_m_results = coarse_filter(
                         questions_edges_index,
                         self.meta_codebook,
@@ -2074,5 +2087,5 @@ class LLMRepeat:
         self.q = q
 
     def take_questions(self):
-        return self.q
+        return 'abcdefg'
     
