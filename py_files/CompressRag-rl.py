@@ -15,8 +15,10 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
+import os
 
 nlp = spacy.load("en_core_web_sm")
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 SUBJ_DEPS = {"nsubj", "nsubjpass", "csubj", "csubjpass"}
 OBJ_DEPS  = {"dobj", "obj", "attr", "oprd", "dative"}
@@ -1901,25 +1903,21 @@ def combine_ents(codebook_main: Dict[str, Any],
 class CompressRag:
     def __init__(
         self,
-        ini_meta_codebook = {},
         sentence_emb: Optional[Embeddings] = None,
         word_emb: Optional[Embeddings] = None,
         include_thinkings = True,
-        llm = None,
-        answer_extraction_function = None,
-        thinking_extraction_function = None,
-        combining_ents_fucntion = None
+        llm = None
     ):
 
         # meta
         # start with empty codebook
-        self.meta_codebook = ini_meta_codebook
+        self.meta_codebook = {}
         self.include_thinkings = include_thinkings
         self.llm = llm
 
         # Embeddings
         self.sentence_emb = sentence_emb 
-        self.word_emb = word_emb 
+        self.word_emb = word_emb or WordAvgEmbeddings()
 
         #coarse filter params
         self.top_k = 10
@@ -1934,16 +1932,18 @@ class CompressRag:
         self.max_exp_num = 10
 
 
-    def encode_question(q_prompt):
+    def encode_question(self, q_prompt):
 
         return get_code_book(q_prompt,type = 'questions')
     
     def retrieve(self,q_json):
         # questions queries: list of edge indices
 
-        questions_edges_index = decode_questions(q_json['edges([e,r,e])'], {}, fmt='edges')
+        questions_edges_index = decode_questions(q_json['edges([e,r,e])'], self.meta_codebook, fmt='edges')
+        flat_questions_edges_index = [item for sublist in questions_edges_index for item in sublist]
+        print("questions_edges_index", flat_questions_edges_index)
         top_m_results = coarse_filter(
-                        questions_edges_index,
+                        flat_questions_edges_index,
                         self.meta_codebook,
                         self.sentence_emb,                 # ← move before defaults
                         self.top_k,                             # word-embedding candidates
@@ -1960,12 +1960,14 @@ class CompressRag:
     
 
     def find_related_knowledge(self,all_answers,all_q_indices):
-
+        all_answers = get_flat_answers_lsts(all_answers)
         domain_knowledge_lst = []
 
         overlapped_answers = find_overlapped_answers(all_answers)
+        print("overlapped_answers", overlapped_answers)
 
         unique_knowledge_dict = get_unique_knowledge(overlapped_answers,all_answers)
+        print("unique_knowledge_dict", unique_knowledge_dict)
 
         unique_knowledge = unique_knowledge_dict['out_answers']
 
@@ -1994,13 +1996,14 @@ class CompressRag:
 
         return final_merged_json
     
-    def collect_results(self,final_merged_json):
+    def collect_results(self,final_merged_json, question):
         llm = self.llm
         new_result_lst = []
 
         if self.include_thinkings:
-            llm(final_merged_json)
-            a_new,t_new = llm.take_questions()
+            a_new,t_new = llm.take_questions(final_merged_json, question)
+            print("------------ANS:", a_new)
+            print("------------THK:", t_new)
 
             a_new_json = get_code_book(a_new,type = 'answers')
             t_new_json = get_code_book(t_new,type = 'thinkings')
@@ -2008,8 +2011,8 @@ class CompressRag:
             new_result_lst.append(a_new_json)
             new_result_lst.append(t_new_json)
         else:
-            llm(final_merged_json)
-            a_new= llm.take_questions()
+            a_new= llm.take_questions(final_merged_json, question)
+            print("------------ANS", a_new)
             a_new_json = get_code_book(a_new,type = 'answers')
             new_result_lst.append(a_new_json)
 
@@ -2042,37 +2045,242 @@ class CompressRag:
         q_json = self.encode_question(q_prompt)
 
         # check the meta code book is not empty
-
         if self.meta_codebook:
-            all_answers,all_q_indices = self.retrieve(q_json)
+            print("self.meta_codebook:",self.meta_codebook)
+            all_answers, all_q_indices = self.retrieve(q_json)
+            print("all_answers:",all_answers)
+            print("all_q_indices:",all_q_indices)
             domain_knowledge_lst= self.find_related_knowledge(all_answers,all_q_indices)
             final_merged_json = self.compact_indicies_for_prompt(q_json,domain_knowledge_lst)
+            print("meta_codebook final_merged_json", final_merged_json)
 
         else:
+            print("self.meta_codebook:",self.meta_codebook)
             final_merged_json = q_json.copy()
+            print("q copy final_merged_json", final_merged_json)
 
-
-        new_result_lst = self.collect_results(final_merged_json)
+        new_result_lst = self.collect_results(final_merged_json, q_prompt)
+        print("new_result_lst", new_result_lst)
 
         self.update_meta(q_json,new_result_lst)
 
         self.combine_ents_func()
 
         # return answer
-
         return new_result_lst[0]
+    
+if __name__ == "__main__":
+    import torch
+    from transformers import AutoTokenizer, AutoModelForCausalLM
 
+    class Phi4MiniReasoningLLM:
+        def __init__(self, include_thinkings: bool = True,
+                    model_name: str = "microsoft/Phi-4-mini-reasoning",
+                    max_new_tokens: int = 256,
+                    temperature: float = 0.3,
+                    top_p: float = 0.95):
+            self.include_thinkings = include_thinkings
+            self.max_new_tokens = max_new_tokens
+            self.temperature = temperature
+            self.top_p = top_p
+
+            self.tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
+            self.model = AutoModelForCausalLM.from_pretrained(
+                model_name,
+                torch_dtype=torch.bfloat16,
+                device_map="auto",
+                trust_remote_code=True,
+            )
+            # 一些模型需要 chat 模板；Phi-4-mini-reasoning 支持 messages
+            if not hasattr(self.tokenizer, "apply_chat_template"):
+                # 兜底：后面直接拼接纯文本
+                self._use_chat_template = False
+            else:
+                self._use_chat_template = True
+
+        def _linearize_triples_block(self, triples):
+            # triples: [[h, r, t], ...]  -> "h r t. h r t. ..."
+            if not triples:
+                return "None."
+            return " ".join([f"{h} {r} {t}." for h, r, t in triples])
+
+        def _build_prompt(self, final_merged_json, question):
+            """
+            把 compact 后的 JSON（含 questions / given knowledge / 可选 thinkings）转换成提示词。
+            轻量说明：我们希望模型输出两个段落，便于后续规则抽取。
+            """
+            user_msg = ""
+            print("final_merged_json", final_merged_json)
+            qs = final_merged_json.get("questions([[e,r,e], ...])", [])
+            gk = final_merged_json.get("given knowledge([[e,r,e], ...])", [])
+            st = final_merged_json.get("start thinking with(edges[i])", [])  # 已解码版本可能叫这个或空
+
+            # 只拿第一组作为信号（可以按需扩展为多组）
+            q_txt  = self._linearize_triples_block(qs[0] if qs else [])
+            gk_txt = self._linearize_triples_block(gk[0] if gk else [])
+            st_txt = self._linearize_triples_block(st[0] if st else [])
+
+            system_msg = (
+                "You are a precise QA agent that answers by expressing facts as short, "
+                "plain English statements. Keep outputs concise and factual."
+            )
+
+            user_msg += ("<<<RETRIEVED_CONTEXT_START>>>\n"
+                        "The system searched for a related question in the database. Below are related question's graph triples and its prior answer as reference. "
+                        "You don't have to follow it completely, just use it as a reference.\n"
+                        f"[RELATED QUESTION'S GRAPH TRIPLES]:\n{q_txt}\n"
+                        f"[RELATED QUESTION'S ANSWER]: {gk_txt}\n"
+                        "<<<RETRIEVED_CONTEXT_END>>>")
+            
+            user_msg += (
+                f"[CURRENT QUESTION]: {question} \n"
+                "[TASK]: You are a QA assistant for open-ended questions.\n"
+                f"- Give a short, direct answer in 2–3 sentences."
+                "- Do NOT restrict to yes/no.\n"
+                "[FORMAT]: Write complete sentences (not a single word)."
+                "Avoid starting with just 'Yes.' or 'No.'; if the question is yes/no-style, state the conclusion AND 1–2 short reasons.\n"
+                "[ANSWER]: "
+            )
+
+            print(user_msg)
+            return system_msg, user_msg
+
+        @torch.no_grad()
+        def _generate(self, system_msg: str, user_msg: str) -> str:
+            if self._use_chat_template:
+                messages = [
+                    {"role": "system", "content": system_msg},
+                    {"role": "user",   "content": user_msg},
+                ]
+                prompt = self.tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+            else:
+                prompt = f"<|system|>\n{system_msg}\n<|user|>\n{user_msg}\n<|assistant|>\n"
+
+            inputs = self.tokenizer(prompt, return_tensors="pt").to(self.model.device)
+            outputs = self.model.generate(
+                **inputs,
+                max_new_tokens=self.max_new_tokens,
+                do_sample=(self.temperature > 0),
+                temperature=self.temperature,
+                top_p=self.top_p,
+                pad_token_id=self.tokenizer.eos_token_id,
+            )
+            text = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+            cut = text.rfind(user_msg)
+            return text[cut + len(user_msg):].strip() if cut != -1 else text.strip()
         
+        def strip_think(self, s: str) -> Tuple[str, List[str]]:
+            """Remove <think>...</think> blocks; also handle dangling <think> at EOF."""
+            if not s:
+                return "", []
+            s_lower = s.lower()
+            thinks: List[str] = []
+            spans: List[Tuple[int, int]] = []
 
-    
-#### usage
+            for m in re.finditer(r"<think>(.*?)</think>", s, flags=re.S | re.I):
+                thinks.append(m.group(1).strip())
+                spans.append((m.start(), m.end()))
 
-# define one llm class that has take_questions to generate answers and thinkings
+            last_open = s_lower.rfind("<think>")
+            if last_open != -1 and s_lower.find("</think>", last_open) == -1:
+                content_start = last_open + len("<think>")
+                dangling_text = s[content_start:].strip()
+                if dangling_text:
+                    thinks.append(dangling_text)
+                spans.append((last_open, len(s)))
 
-class LLMRepeat:
-    def __init__(self, q):
-        self.q = q
+            if spans:
+                spans.sort()
+                merged = []
+                cur_s, cur_e = spans[0]
+                for st, en in spans[1:]:
+                    if st <= cur_e:
+                        cur_e = max(cur_e, en)
+                    else:
+                        merged.append((cur_s, cur_e))
+                        cur_s, cur_e = st, en
+                merged.append((cur_s, cur_e))
+            else:
+                merged = []
 
-    def take_questions(self):
-        return self.q
-    
+            parts = []
+            prev = 0
+            for st, en in merged:
+                if prev < st:
+                    parts.append(s[prev:st])
+                prev = en
+            if prev < len(s):
+                parts.append(s[prev:])
+
+            clean = "".join(parts)
+            clean = re.sub(r"(?:^|\n)\s*(Okay,|Let’s|Let's|Step by step|Thought:).*", "", clean, flags=re.I)
+            return clean.strip(), thinks
+            
+        def take_questions(self, final_merged_json, question, *, max_regen: int = 3):
+            def _clean_answer(s: str, limit=4):
+                parts = [p.strip() for p in re.split(r'(?<=[.!?])\s+', s) if p.strip()]
+                if not parts:
+                    return ""
+                return " ".join(parts[:limit])
+
+            last_thinks: List[str] = []
+            ans_clean = ""
+
+            for attempt in range(max_regen):
+                sys_msg, usr_msg = self._build_prompt(final_merged_json, question)
+                out = self._generate(sys_msg, usr_msg)
+                print(f"-------------RAW[{attempt+1}/{max_regen}]:", out)
+
+                raw = out.strip()
+                m = re.search(r"\[answers\](.*?)(?:\[thinkings\]|\Z)", raw, flags=re.S | re.I)
+                ans_region = m.group(1).strip() if m else raw
+
+                # 1) 提取并移除 <think>...</think>，保留原文
+                ans_no_think, thinks = self.strip_think(ans_region)
+                last_thinks = thinks  # 原文 list[str]
+
+                # 2) 答案清理（不影响 think 原文）
+                ans_clean = _clean_answer(ans_no_think, 4).strip()
+                if ans_clean:
+                    break
+
+            if not ans_clean:
+                ans_clean = "No answer."
+
+            if self.include_thinkings:
+                # 合并成一个字符串，原文不缩略：用空行分隔各个 <think> 块
+                thinks_str = "\n\n".join(t.strip() for t in last_thinks if t.strip())
+                return ans_clean, thinks_str
+            else:
+                return ans_clean
+
+
+    sentence_emb = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+    phi_llm = Phi4MiniReasoningLLM(
+        include_thinkings=True,                 
+        model_name="microsoft/Phi-4-mini-reasoning",
+        max_new_tokens=512,
+        temperature=0.2,
+        top_p=0.9
+    )
+
+    rag = CompressRag(
+        sentence_emb=sentence_emb,
+        word_emb=word_emb,
+        include_thinkings=True,
+        llm=phi_llm
+    )
+
+    rag.top_k = 5
+    rag.top_m = 2
+    rag.question_batch_size = 2
+    rag.questions_db_batch_size = 16
+
+    queries = [
+        "Is the Great Wall visible from space?",
+        "Where is the Great Wall located in China?",
+    ]
+    for q in queries:
+        print("\nQ:", q)
+        a_json = rag.run_work_flow(q)
+        print("Answer edges:", len(a_json.get("edges([e,r,e])", [])))
