@@ -2060,3 +2060,6 @@ class CompressRag:
         
 
     
+#### usage
+
+# define one llm class that has take_questions to generate answers and thinkings
