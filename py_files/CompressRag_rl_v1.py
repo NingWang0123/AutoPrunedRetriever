@@ -2038,40 +2038,34 @@ class CompressRag:
     
     def collect_results(self, final_merged_json):
         llm = self.llm
-        if callable(llm):
-            llm(final_merged_json)
-        elif hasattr(llm, "set_q"):
-            llm.set_q(final_merged_json)
-        else:
-            llm.q = final_merged_json  # last resort
 
         new_json_lst = []
-        new_result_lst = []
+        new_result = None
 
         if self.include_thinkings:
-            a_new, t_new = llm.take_questions()
-            new_result_lst.extend([a_new, t_new])
+            a_new, t_new = llm.take_questions(final_merged_json)
+            new_result = a_new
             a_new_json = get_code_book(a_new, type='answers')
             t_new_json = get_code_book(t_new, type='thinkings')
             new_json_lst.extend([a_new_json, t_new_json])
         else:
-            a_new = llm.take_questions()
-            new_result_lst.append(a_new)
+            a_new = llm.take_questions(final_merged_json)
+            new_result = a_new
             a_new_json = get_code_book(a_new, type='answers')
             new_json_lst.append(a_new_json)
-        return new_result_lst,new_json_lst
+        return new_result,new_json_lst
     
-    def update_meta(self,codebook_sub_q,new_result_lst):
+    def update_meta(self,codebook_sub_q,new_json_lst):
 
         if self.include_thinkings:
-            codebook_sub_a,codebook_sub_t = new_result_lst
+            codebook_sub_a,codebook_sub_t = new_json_lst
 
             self.meta_codebook = merging_codebook(self.meta_codebook,codebook_sub_q,'questions',self.word_emb,True)
             self.meta_codebook = merging_codebook(self.meta_codebook,codebook_sub_a,'answers',self.word_emb,True)
             self.meta_codebook = merging_codebook(self.meta_codebook,codebook_sub_t,'thinkings',self.word_emb,True)
 
         else:
-            codebook_sub_a = new_result_lst[0]
+            codebook_sub_a = new_json_lst[0]
             self.meta_codebook = merging_codebook(self.meta_codebook,codebook_sub_q,'questions',self.word_emb,True)
             self.meta_codebook = merging_codebook(self.meta_codebook,codebook_sub_a,'answers',self.word_emb,True)
 
@@ -2098,7 +2092,7 @@ class CompressRag:
             final_merged_json = q_json.copy()
 
 
-        new_result_lst,new_json_lst = self.collect_results(final_merged_json)
+        new_result,new_json_lst = self.collect_results(final_merged_json)
 
         self.update_meta(q_json,new_json_lst)
 
@@ -2106,7 +2100,7 @@ class CompressRag:
 
         # return answer
 
-        return new_result_lst
+        return new_result
 
         
 
