@@ -21,7 +21,7 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
 from collections import defaultdict
-import time, os, math
+import time, os, json
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
@@ -280,23 +280,57 @@ class RAGWorkflow:
 
         G = merge_graph_nodes_by_canonical(G, normalizer=normalize_text, merge_edge_attrs=("relation",))
         return G, rels
+    
+    def _edges_to_triples(self, e_list, r_list, edge_matrix, edge_idx_list):
+        triples = []
+        for i in edge_idx_list or []:
+            if 0 <= i < len(edge_matrix):
+                s, r, o = edge_matrix[i]
+                try:
+                    s_txt = str(e_list[s])
+                    r_txt = str(r_list[r])
+                    o_txt = str(e_list[o])
+                    triples.append(f"[{i}] {s_txt}  {r_txt}  {o_txt}")
+                except Exception:
+                    # 索引越界或脏数据时跳过
+                    pass
+        return triples
 
     # ---------- Prompt builders ----------
     def make_text_qa_prompt(self, question: str, retrieved_docs=None) -> str:
         cfg = self.config
         sections = []
+
         if retrieved_docs and cfg.get("include_retrieved_context", True):
             doc0, _ = retrieved_docs[0]
             related_q_txt = doc0.page_content.strip()
             related_answer = (doc0.metadata or {}).get("llm_answer", "")
-            sections.append(
-                "<<<RETRIEVED_CONTEXT_START>>>\n"
+
+            ctx_facts = []
+            top_k = cfg.get("faiss_search_k", 3)
+            for rank, pair in enumerate(retrieved_docs[:top_k], start=1):
+                d = pair[0] if isinstance(pair, (list, tuple)) else pair
+                meta = d.metadata or {}
+                if "llm_answer" not in meta or not str(meta.get("llm_answer", "")).strip():
+                    src = str(meta.get("source", "")).strip()
+                    cid = meta.get("chunk_id")
+                    tag = f"{src}#{cid}" if src or cid is not None else ""
+                    txt = re.sub(r"\s+", " ", (d.page_content or "").strip())[:400]
+                    ctx_facts.append(f"({rank}) {tag}: {txt}" if tag else f"({rank}) {txt}")
+
+            block_lines = [
+                "<<<RETRIEVED_CONTEXT_START>>>",
                 "The system searched for a related question in the database. Below are related question's graph triples and its prior answer as reference. "
-                "You don't have to follow it completely, just use it as a reference.\n"
-                f"[RELATED QUESTION TEXT]:\n{related_q_txt}\n"
-                f"[RELATED ANSWER]: {related_answer}\n"
-                "<<<RETRIEVED_CONTEXT_END>>>"
-            )
+                "You don't have to follow it completely, just use it as a reference.",
+                f"[RELATED QUESTION TEXT]:\n{related_q_txt}\n",
+                f"[RELATED ANSWER]: {related_answer}\n",
+            ]
+
+            if ctx_facts:
+                block_lines.append("[RELATED CONTEXT OF FACT]: " + ", ".join(ctx_facts))
+
+            block_lines.append("<<<RETRIEVED_CONTEXT_END>>>")
+            sections.append("\n".join(block_lines))
 
         sections.append(f"[CURRENT QUESTION]: {question}")
 
@@ -346,6 +380,9 @@ class RAGWorkflow:
             doc0, _ = retrieved_docs[0]
             metadata = doc0.metadata or {}
             codebook_main = (metadata.get("codebook_main") or {})
+
+            if "edge_matrix" not in codebook_main and "edges([e,r,e])" in codebook_main:
+                codebook_main["edge_matrix"] = codebook_main["edges([e,r,e])"]
 
             query_chains = []
             for group_idx, group in enumerate(codebook_main.get("questions_lst", [])):
@@ -403,15 +440,39 @@ class RAGWorkflow:
 
 
             related_answer  = (doc0.metadata or {}).get("llm_answer", "")
-            if related_triples != "__EMPTY_JSON__":
-                sections.append(
-                    "<<<RETRIEVED_CONTEXT_START>>>\n"
-                    "The system searched for a related question in the database. Below are related question's graph triples and its prior answer as reference. "
-                    "You don't have to follow it completely, just use it as a reference.\n"
-                    f"[RELATED QUESTION'S GRAPH TRIPLES]:\n{related_triples}\n"
-                    f"[RELATED QUESTION'S ANSWER]: {related_answer}\n"
-                    "<<<RETRIEVED_CONTEXT_END>>>"
+
+            if not query_chains and (codebook_main.get("answers(edges[i])")):
+                e_list  = codebook_main.get("e", [])
+                r_list  = codebook_main.get("r", [])
+                ematrix = codebook_main.get("edge_matrix", [])
+                ans_idx = []
+                # answers(edges[i]) 既可能是 [2,3,...] 也可能是 [[2,3], [7], ...]
+                for item in codebook_main.get("answers(edges[i])", []):
+                    if isinstance(item, list):
+                        ans_idx.extend(item)
+                    else:
+                        ans_idx.append(item)
+                triples_text = self._edges_to_triples(e_list, r_list, ematrix, ans_idx)
+
+            if related_triples != "__EMPTY_JSON__" or (triples_text and len(triples_text) > 0):
+                block = ["<<<RETRIEVED_CONTEXT_START>>>"]
+                block.append(
+                    "The system searched for related material in the database. "
+                    "Below are either related question's graph triples with its prior answer, "
+                    "and/or background factual triples from context. "
+                    "Use them as reference; you don't have to follow them strictly.\n"
                 )
+                if related_triples != "__EMPTY_JSON__":
+                    block.append("[RELATED QUESTION'S GRAPH TRIPLES]:")
+                    block.append(str(related_triples))
+                    block.append(f"[RELATED QUESTION'S ANSWER]: {related_answer}\n")
+
+                if triples_text:
+                    block.append("[RELATED CONTEXT OF FACT]:")
+                    block.append(",".join(triples_text))  
+                    block.append("")
+                block.append("<<<RETRIEVED_CONTEXT_END>>>")
+                sections.append("\n".join(block))
 
         sections.append(f"[CURRENT QUESTION]: {question}")
 
@@ -1173,6 +1234,87 @@ class RAGWorkflow:
             self.graph_db = faiss_db
         return faiss_db
     
+    @staticmethod
+    def _chunk_text(text: str, *, chunk_chars: int = 800, overlap: int = 120) -> List[str]:
+        text = (text or "").strip()
+        if not text:
+            return []
+        chunks = []
+        n = len(text)
+        step = max(1, chunk_chars - overlap)
+        i = 0
+        while i < n:
+            j = min(n, i + chunk_chars)
+            chunk = text[i:j].strip()
+            if chunk:
+                chunks.append(chunk)
+            if j == n:
+                break
+            i += step
+        return chunks
+
+    def ingest_context_json(
+        self,
+        json_path: str,
+        *,
+        chunk_chars: int = 800,
+        overlap: int = 120,
+        metadata_extra: Optional[Dict[str, Any]] = None,
+        to_graph: bool = False
+    ) -> Tuple[Optional[FAISS], Optional[FAISS], int]:
+        with open(json_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        items = data if isinstance(data, list) else [data]
+
+        total_chunks = 0
+        for item_id, item in enumerate(items, start=1):
+            corpus = (item.get("corpus_name") or "Unknown").strip()
+            ctx = (item.get("context") or "").strip()
+            if not ctx:
+                continue
+
+            chunks = self._chunk_text(ctx, chunk_chars=chunk_chars, overlap=overlap)
+            total_chunks += len(chunks)
+
+            if not to_graph:
+                docs = []
+                for cid, ch in enumerate(chunks, start=1):
+                    meta = {
+                        "source": corpus,
+                        "chunk_id": cid,
+                        "chunk_chars": chunk_chars,
+                        "chunk_overlap": overlap,
+                        "created_at": int(time.time()),
+                        "doc_kind": "context"   
+                    }
+                    if metadata_extra:
+                        meta.update(metadata_extra)
+                    docs.append(Document(page_content=ch, metadata=meta))
+                #print(docs)
+                self.text_db = self.upsert_text_docs_into_faiss(
+                    docs, emb=self.sentence_emb, text_db=self.text_db
+                )
+            else:
+                graph_docs = []
+                for cid, ch in enumerate(chunks, start=1):
+                    codebook = get_code_book(ch, type="answers")  
+                    er = {"e": codebook.get("e", []), "r": codebook.get("r", [])}
+                    meta = {
+                        "source": corpus,
+                        "chunk_id": cid,
+                        "created_at": int(time.time()),
+                        "codebook_main": codebook,  
+                        "doc_kind": "context"   
+                    }
+                    graph_docs.append(Document(page_content=str(er), metadata=meta))
+                #print(graph_docs[0])
+                self.graph_db = self.upsert_graph_docs_into_faiss(
+                    graph_docs, emb_model=self.word_emb, faiss_db=self.graph_db
+                )
+
+        return self.text_db, self.graph_db, total_chunks
+    
     def _num_tokens(self, s: str) -> int:
         if not s: return 0
         if self.gen_pipe is None: self.set_llm()
@@ -1272,29 +1414,41 @@ class RAGWorkflow:
 # =========================
 if __name__ == "__main__":
     rag = RAGWorkflow(
-        config={
-            "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
-            "llm_model_id": "microsoft/Phi-4-mini-reasoning",
-            "answer_mode": "short",
-            "faiss_search_k": 3,
-            "use_cached_text_embeddings": True,
-            "use_cached_graph_embeddings": True,
-        },
-        verbose=True
+    config={
+        "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
+        "llm_model_id": "microsoft/Phi-4-mini-reasoning",
+        "answer_mode": "short",
+        "faiss_search_k": 3,
+        "use_cached_text_embeddings": True,
+        "use_cached_graph_embeddings": True,
+    },
+    verbose=True
     )
+    
+    medical_path = "context/medical.json"
+    rag.ingest_context_json(medical_path, chunk_chars=900, overlap=150, to_graph=True)
+    rag.ingest_context_json(medical_path, chunk_chars=900, overlap=150, to_graph=False)
+
+    novel_path = "context/novel.json"
+    rag.ingest_context_json(novel_path,  chunk_chars=900, overlap=150, to_graph=True)
+    rag.ingest_context_json(novel_path,  chunk_chars=900, overlap=150, to_graph=False)
+
+    rag.save_index_and_report_size(db="graph", out_dir="faiss_graph_idx")
+    rag.save_index_and_report_size(db="text",  out_dir="faiss_text_idx")
+
     questions = [
-        "Is the Earth, which orbits the Sun, generally considered round?",
-        "Given Earth’s rotation, does the Sun rise in the east?",
+        "What is the most common type of skin cancer?",
+        "From which cell type does basal cell carcinoma arise?",
     ]
 
     rag.set_llm()
 
-    text_db, last_q_vec = rag.build_textdb_with_answers(questions, add_prompt_snapshot=False)
+    text_db, last_q_vec = rag.build_textdb_with_answers(questions, bootstrap_db=rag.text_db)
     rag.save_index_and_report_size(db="text", out_dir="faiss_text_idx")
     rag.report_cost(kind="text", avg=True)   
 
     parser = RelationshipGraphParser()  
-    graph_db = rag.build_graphdb_with_answer(questions, parser, faiss_db=None)
+    graph_db = rag.build_graphdb_with_answer(questions, parser, faiss_db=rag.graph_db)
     rag.save_index_and_report_size(db="graph", out_dir="faiss_graph_idx")
     rag.report_cost(kind="graph", avg=True)   
 
