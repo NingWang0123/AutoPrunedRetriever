@@ -1905,7 +1905,10 @@ class CompressRag:
         sentence_emb: Optional[Embeddings] = None,
         word_emb: Optional[Embeddings] = None,
         include_thinkings = True,
-        llm = None
+        llm = None,
+        answer_extraction_function = None,
+        thinking_extraction_function = None,
+        combining_ents_fucntion = None
     ):
 
         # meta
@@ -1996,7 +1999,8 @@ class CompressRag:
         new_result_lst = []
 
         if self.include_thinkings:
-            a_new,t_new = llm.take_questions(final_merged_json)
+            llm(final_merged_json)
+            a_new,t_new = llm.take_questions()
 
             a_new_json = get_code_book(a_new,type = 'answers')
             t_new_json = get_code_book(t_new,type = 'thinkings')
@@ -2004,7 +2008,8 @@ class CompressRag:
             new_result_lst.append(a_new_json)
             new_result_lst.append(t_new_json)
         else:
-            a_new= llm.take_questions(final_merged_json)
+            llm(final_merged_json)
+            a_new= llm.take_questions()
             a_new_json = get_code_book(a_new,type = 'answers')
             new_result_lst.append(a_new_json)
 
@@ -2063,3 +2068,11 @@ class CompressRag:
 #### usage
 
 # define one llm class that has take_questions to generate answers and thinkings
+
+class LLMRepeat:
+    def __init__(self, q):
+        self.q = q
+
+    def take_questions(self):
+        return self.q
+    
