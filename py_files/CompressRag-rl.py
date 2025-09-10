@@ -2030,6 +2030,30 @@ class CompressRag:
                  self.min_exp_num,  
                  self.max_exp_num,  
                  self.include_thinkings) 
+        
+
+    def run_work_flow(self,q_prompt):
+        q_json = self.encode_question(q_prompt)
+
+        # check the meta code book is not empty
+
+        if self.meta_codebook:
+            all_answers,all_q_indices = self.retrieve(q_json)
+            domain_knowledge_lst= self.find_related_knowledge(all_answers,all_q_indices)
+            final_merged_json = self.compact_indicies_for_prompt(q_json,domain_knowledge_lst)
+
+        else:
+            final_merged_json = q_json.copy()
+
+
+        new_result_lst = self.collect_results(final_merged_json)
+
+        self.update_meta(q_json,new_result_lst)
+
+        self.combine_ents_func()
+
+        # return answer
+        return new_result_lst[0]
 
         
 
