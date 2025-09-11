@@ -1462,6 +1462,44 @@ def get_unique_knowledge(overlapped_answers,flat_answers_lsts):
 
     return {'assignments': assignments, 'out_answers': out_answers}
 
+def find_unique_thinkings(all_q_indices,codebook_main):
+    # from q indices to get answers
+
+    selected_thinkings_lsts = []
+    questions_to_thinkings_dict = codebook_main['questions_to_thinkings']
+
+    for q_index in all_q_indices:
+        if q_index in questions_to_thinkings_dict.keys():
+            selected_thinkings_lsts.append(codebook_main['thinkings_lst'][questions_to_thinkings_dict[q_index]])
+
+
+    if selected_thinkings_lsts:
+        flat_thinkings_lsts = get_flat_answers_lsts(selected_thinkings_lsts)
+        # default 2 for the overlap
+        overlapped_answers = common_contiguous_overlaps(flat_thinkings_lsts,2)
+
+        unique_dict = get_unique_knowledge(overlapped_answers,flat_thinkings_lsts)
+
+        uniqie_thinkings = unique_dict['out_answers']
+    else:
+        uniqie_thinkings = selected_thinkings_lsts
+
+    return uniqie_thinkings
+
+
+# add find unique answers
+
+def find_unique_answers(answers_lsts):
+    flat_answers_lsts = get_flat_answers_lsts(answers_lsts)
+    # default 2 for the overlap
+    overlapped_answers = common_contiguous_overlaps(flat_answers_lsts,2)
+
+    unique_dict = get_unique_knowledge(overlapped_answers,flat_answers_lsts)
+
+    uniqie_answers = unique_dict['out_answers']
+
+    return uniqie_answers
+
 # get the entities from codebook_main
 def get_json_with_given_knowledge(flat_answers_lsts,codebook_main,codebook_sub_q,decode = True):
     # used flat here since trying to flat answers for each answers trunk to get longer overlapp
@@ -1800,6 +1838,173 @@ def get_json_with_given_knowledge_and_thinkings(flat_answers_lsts,flat_thinkings
 
     return final_merged_json
 
+
+def get_json_with_given_thinkings(flat_thinkings_lsts,codebook_main,codebook_sub_q,decode = True):
+    # used flat here since trying to flat answers for each answers trunk to get longer overlapp
+    # if change the answers here also change the format for other func related
+
+    # get all unique edges
+
+    all_unique_edges_mat_indexes = list(set([x for sublist in flat_thinkings_lsts for x in sublist]))
+
+    # find all unique entities and r
+    entitie_set = []
+    r_set = []
+    entitie_index_set = []
+    r_index_set = []
+    entitie_index_dict = {}
+    r_index_dict = {}
+    edge_matrix_sub = []
+    edge_mat_index_dict = {}
+
+    new_edge_mat_index = 0 
+    
+    # build new edge_mat_index
+    for edge_mat_index in all_unique_edges_mat_indexes:
+        edge = codebook_main['edge_matrix'][edge_mat_index]
+        e_index1,r_index,e_index2 = edge
+        entitie_index_set.append(e_index1)
+        entitie_index_set.append(e_index2)
+        r_index_set.append(r_index)
+        edge_matrix_sub.append(edge)
+        edge_mat_index_dict[edge_mat_index] = new_edge_mat_index
+        new_edge_mat_index+=1
+
+    # update edge index in flat_thinkings_lsts
+    flat_thinkings_lsts = [[edge_mat_index_dict.get(x, x) for x in sublist] for sublist in flat_thinkings_lsts]
+
+    # build new entities index and relations index
+
+    entitie_index_set = list(set(entitie_index_set))
+    r_index_set = list(set(r_index_set))
+
+    new_ent_index = 0
+    new_r_index = 0
+
+    for ent_index in entitie_index_set:
+
+        entitie_set.append(codebook_main['e'][ent_index])
+        entitie_index_dict[ent_index] = new_ent_index
+        new_ent_index+=1
+
+    for r_index in r_index_set:
+        r_set.append(codebook_main['r'][r_index])
+        r_index_dict[r_index] = new_r_index
+        new_r_index+=1
+
+    # update ent index and r index for the edge_matrix_sub
+    def remap_edges(edges: List[List[int]], e_dict: Dict[int, int], r_dict: Dict[int, int]) -> List[List[int]]:
+        """
+        Remap edges of format [[e, r, e], ...] using given entity and relation mappings.
+
+        Parameters
+        ----------
+        edges : List[List[int]]
+            List of edges in format [entity1, relation, entity2].
+        e_dict : Dict[int, int]
+            Mapping dictionary for entity indices (applies to positions 0 and 2).
+        r_dict : Dict[int, int]
+            Mapping dictionary for relation indices (applies to position 1).
+
+        Returns
+        -------
+        List[List[int]]
+            New edges with remapped indices.
+        """
+        mapped_edges = []
+        for e1, r, e2 in edges:
+            new_e1 = e_dict.get(e1, e1)  
+            new_r  = r_dict.get(r, r)
+            new_e2 = e_dict.get(e2, e2)
+            mapped_edges.append([new_e1, new_r, new_e2])
+        return mapped_edges
+    
+    edge_matrix_sub = remap_edges(edge_matrix_sub, entitie_index_dict, r_index_dict)
+
+    entitie_index_dict_q = {}
+    r_index_dict_q = {}
+    entitie_set_len = len(entitie_set)
+    r_set_len = len(r_set)
+    # do the samilar steps for combine the sub codebook and sub q codebook
+
+    # update the entities index and relation index for questions and combine the entities lst and relations lst
+
+    # update the entities index
+    ent_pos = 0
+    for ent in codebook_sub_q['e']:
+        # check the ent in entities_lst or not
+        if ent in entitie_set:
+            new_ent_pos = entitie_set.index(ent)
+        else:
+            new_ent_pos = entitie_set_len
+            entitie_set.append(ent)
+            edge_matrix_sub_len+=1
+
+        entitie_index_dict_q[ent_pos] = new_ent_pos
+
+    # update relation index
+    r_pos = 0
+    for r in codebook_sub_q['r']:
+        if r in r_set:
+            new_r_pos = r_set.index(r)
+        else:
+            r_set_len+=1
+            new_r_pos = r_set_len
+            r_set.append(r)
+        r_index_dict_q[r_pos] = new_r_pos
+
+    # map the q edge matrix
+    edge_mat_for_q_sub = remap_edges(codebook_sub_q['edges([e,r,e])'], entitie_index_dict_q, r_index_dict_q)
+
+    # update the edges
+    edge_matrix_sub_len = len(edge_matrix_sub)
+    edge_pos = 0
+    edge_mat_for_q_sub_dict = {}
+
+    for edge in edge_mat_for_q_sub:
+        if edge in edge_matrix_sub:
+            new_edge_pos = edge_matrix_sub.index(edge)
+        else:
+            edge_matrix_sub_len+=1
+            new_edge_pos = edge_matrix_sub_len
+            edge_matrix_sub.append(edge)
+
+        edge_mat_for_q_sub_dict[edge_pos] = new_edge_pos
+
+
+    # update the questions
+    questions = [
+        [edge_mat_for_q_sub_dict.get(val, val) for val in inner]
+        for inner in codebook_sub_q['questions(edges[i])']
+    ]
+
+
+    # get the final merged json
+
+       
+    final_merged_json = {
+        'e':entitie_set,
+        'r':r_set,
+        'edge_matrix':edge_matrix_sub,
+        'questions(edges[i])':questions,
+        'start thinking with(edges[i])':flat_thinkings_lsts,
+        'rule':codebook_sub_q['rule']
+    }
+
+    if decode:
+        final_merged_json = {
+            'e':entitie_set,
+            'r':r_set,
+            'edge_matrix':edge_matrix_sub,
+            'questions([[e,r,e], ...])':decode_questions(questions, final_merged_json, 'edges'),
+            'start thinking with(edges[i])':decode_questions(flat_thinkings_lsts,final_merged_json,'edges'),
+            'rule':codebook_sub_q['rule']
+
+        }
+
+
+    return final_merged_json
+
 def combine_ents(codebook_main: Dict[str, Any],
                  min_exp_num: int = 2,   # 每个簇期望最少候选数
                  max_exp_num: int = 20,  # 每个簇期望最多候选数
@@ -2097,14 +2302,21 @@ class CompressRag_rl:
         ini_meta_codebook = {},
         sentence_emb: Optional[Embeddings] = None,
         word_emb: Optional[Embeddings] = None,
-        include_thinkings = True,
         llm = None,
+        combine_ents_rounds = 1, # params to control the combine ents
+        thinkings_choice = 'not_include',
+        answers_choice = 'overlap'
     ):
+        """
+        thinkings_choice and answers_choice must be one of 'overlap','unique','not_include'
+        combine_ents_rounds must be interger-> how many rounds after combine ents
+
+        
+        """
 
         # meta
         # start with empty codebook
         self.meta_codebook = ini_meta_codebook
-        self.include_thinkings = include_thinkings
         self.llm = llm
 
         # Embeddings
@@ -2122,6 +2334,35 @@ class CompressRag_rl:
         # combine ents
         self.min_exp_num =2
         self.max_exp_num = 10
+
+
+        # params for dpo
+        ### ents param
+        self.combine_ents_rounds = combine_ents_rounds
+        self.round = 1
+
+        ### thinkings param
+        if thinkings_choice == "not_include":
+            self.include_thinkings = False
+        else:
+            self.include_thinkings = True
+            if thinkings_choice == "overlap":
+                self.thinking_extract_function = find_overlapped_thinkings
+            elif thinkings_choice == "unique":
+                self.thinking_extract_function = find_unique_thinkings
+
+
+        ### answers param
+        if answers_choice == "not_include":
+            self.include_answers = False
+        else:
+            self.include_answers = True
+            if answers_choice == "overlap":
+                self.answers_extract_function = find_overlapped_answers
+            elif answers_choice == "unique":
+                self.answers_extract_function = find_unique_answers
+
+
 
 
     def encode_question(self,q_prompt,rule):
@@ -2157,21 +2398,13 @@ class CompressRag_rl:
 
         domain_knowledge_lst = []
 
-        # this will automatically flatten answers
-        overlapped_answers = find_overlapped_answers(all_answers)
+        if self.include_answers:
+            final_flat_answers_lsts = self.answers_extract_function(all_answers)
+            domain_knowledge_lst.append(final_flat_answers_lsts)
 
-        flat_answers = get_flat_answers_lsts(all_answers)
-
-        overlapped_answers_dict = {'overlaps': overlapped_answers}
-
-        unique_knowledge_dict = get_unique_knowledge(overlapped_answers_dict,flat_answers)
-
-        unique_knowledge = unique_knowledge_dict['out_answers']
-
-        domain_knowledge_lst.append(unique_knowledge)
 
         if self.include_thinkings:
-            final_flat_thinkings_lsts =find_overlapped_thinkings(all_q_indices,self.meta_codebook)
+            final_flat_thinkings_lsts = self.think_extract_function(all_q_indices,self.meta_codebook)
             domain_knowledge_lst.append(final_flat_thinkings_lsts)
 
 
@@ -2181,18 +2414,32 @@ class CompressRag_rl:
 
     def compact_indicies_for_prompt(self,codebook_sub_q,domain_knowledge_lst):
 
-        if self.include_thinkings:
+        # contain both thinkings and answers
+        if self.include_thinkings and self.include_answers:
             flat_answers_lsts,flat_thinkings_lsts = domain_knowledge_lst
             final_merged_json= get_json_with_given_knowledge_and_thinkings(flat_answers_lsts,flat_thinkings_lsts,
                                                                            self.meta_codebook,codebook_sub_q)
-
-        else:
+            
+        # contain answers only
+        elif self.include_answers:
             flat_answers_lsts = domain_knowledge_lst[0]
             final_merged_json = get_json_with_given_knowledge(flat_answers_lsts,self.meta_codebook,codebook_sub_q)
+
+        # contain thinkings only
+        elif self.include_thinkings:
+            flat_thinkings_lsts = domain_knowledge_lst[0]
+            final_merged_json = get_json_with_given_thinkings(flat_thinkings_lsts,self.meta_codebook,codebook_sub_q)
+
+        # only questions
+        else:
+            final_merged_json = codebook_sub_q.copy()
+
 
 
         return final_merged_json
     
+
+    # might also change these functions,now keep always merge with answers json, and only merge with thinking json if use thinkings
     
     def collect_results(self, final_merged_json):
         llm = self.llm
@@ -2254,7 +2501,11 @@ class CompressRag_rl:
 
         self.update_meta(q_json,new_json_lst)
 
-        self.combine_ents_func()
+        # only combine per k round
+        if self.round % self.combine_ents_rounds ==0:
+            self.combine_ents_func()
+
+        self.round += 1
 
         # return answer
 
