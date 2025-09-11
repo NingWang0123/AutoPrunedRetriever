@@ -2014,27 +2014,185 @@ class CompressRag:
 
         return final_merged_json
     
-    # def collect_results(self,final_merged_json):
-    #     llm_class = self.llm
-    #     llm = llm_class(final_merged_json)
-    #     new_result_lst = []
+    
+    def collect_results(self, final_merged_json):
+        llm = self.llm
 
-    #     if self.include_thinkings:
-    #         llm(final_merged_json)
-    #         a_new,t_new = llm.take_questions()
+        new_json_lst = []
+        new_result = None
 
-    #         a_new_json = get_code_book(a_new,type = 'answers')
-    #         t_new_json = get_code_book(t_new,type = 'thinkings')
+        if self.include_thinkings:
+            a_new, t_new = llm.take_questions(final_merged_json)
+            new_result = a_new
+            a_new_json = get_code_book(a_new, type='answers')
+            t_new_json = get_code_book(t_new, type='thinkings')
+            new_json_lst.extend([a_new_json, t_new_json])
+        else:
+            a_new = llm.take_questions(final_merged_json)
+            new_result = a_new
+            a_new_json = get_code_book(a_new, type='answers')
+            new_json_lst.append(a_new_json)
+        return new_result,new_json_lst
+    
+    def update_meta(self,codebook_sub_q,new_json_lst):
 
-    #         new_result_lst.append(a_new_json)
-    #         new_result_lst.append(t_new_json)
-    #     else:
-    #         llm(final_merged_json)
-    #         a_new= llm.take_questions()
-    #         a_new_json = get_code_book(a_new,type = 'answers')
-    #         new_result_lst.append(a_new_json)
+        if self.include_thinkings:
+            codebook_sub_a,codebook_sub_t = new_json_lst
 
-    #     return new_result_lst
+            self.meta_codebook = merging_codebook(self.meta_codebook,codebook_sub_q,'questions',self.word_emb,True)
+            self.meta_codebook = merging_codebook(self.meta_codebook,codebook_sub_a,'answers',self.word_emb,True)
+            self.meta_codebook = merging_codebook(self.meta_codebook,codebook_sub_t,'thinkings',self.word_emb,True)
+
+        else:
+            codebook_sub_a = new_json_lst[0]
+            self.meta_codebook = merging_codebook(self.meta_codebook,codebook_sub_q,'questions',self.word_emb,True)
+            self.meta_codebook = merging_codebook(self.meta_codebook,codebook_sub_a,'answers',self.word_emb,True)
+
+
+    def combine_ents_func(self):
+
+        self.meta_codebook = combine_ents(self.meta_codebook,
+                 self.min_exp_num,  
+                 self.max_exp_num,  
+                 self.include_thinkings) 
+        
+
+    def run_work_flow(self,q_prompt,rule = "Answer questions"):
+        q_json = self.encode_question(q_prompt,rule)
+
+        # check the meta code book is not empty
+
+        if self.meta_codebook:
+            all_answers,all_q_indices = self.retrieve(q_json)
+            domain_knowledge_lst= self.find_related_knowledge(all_answers,all_q_indices)
+            final_merged_json = self.compact_indicies_for_prompt(q_json,domain_knowledge_lst)
+
+        else:
+            final_merged_json = q_json.copy()
+
+
+        new_result,new_json_lst = self.collect_results(final_merged_json)
+
+        self.update_meta(q_json,new_json_lst)
+
+        self.combine_ents_func()
+
+        # return answer
+
+        return new_result
+    
+
+### CompressRag RL version
+
+# thinkings extraction choice: keep the overlap(default), not include the thinking, keep the unique thinking
+# answers extraction choice: keep the unique (default), not include the answers, keep the overlap
+# combine ents choice: not combine, combine per round, combine per 3 round
+thinkings_choice = ['overlap','unique','not_include']
+answers_choice = ['overlap','unique','not_include']
+combine_ents_choice = [0,1,2]
+
+class CompressRag_rl:
+    def __init__(
+        self,
+        ini_meta_codebook = {},
+        sentence_emb: Optional[Embeddings] = None,
+        word_emb: Optional[Embeddings] = None,
+        include_thinkings = True,
+        llm = None,
+    ):
+
+        # meta
+        # start with empty codebook
+        self.meta_codebook = ini_meta_codebook
+        self.include_thinkings = include_thinkings
+        self.llm = llm
+
+        # Embeddings
+        self.sentence_emb = sentence_emb 
+        self.word_emb = word_emb 
+
+        #coarse filter params
+        self.top_k = 10
+        self.top_m = 2
+        self.question_batch_size = 1
+        self.questions_db_batch_size = 1
+        self.custom_linearizer = None
+
+
+        # combine ents
+        self.min_exp_num =2
+        self.max_exp_num = 10
+
+
+    def encode_question(self,q_prompt,rule):
+
+        return get_code_book(q_prompt,'questions',rule)
+    
+    def retrieve(self,q_json):
+
+        self.meta_codebook = merging_codebook(self.meta_codebook,q_json,'questions',self.word_emb,True)
+
+        # take the last one 
+
+        questions_edges_index = self.meta_codebook['questions_lst'][-1]
+
+        top_m_results = coarse_filter(
+                        questions_edges_index,
+                        self.meta_codebook,
+                        self.sentence_emb,                 # ← move before defaults
+                        self.top_k,                             # word-embedding candidates
+                        self.question_batch_size,               # query batch size
+                        self.questions_db_batch_size,           # DB batch size
+                        self.top_m,                             # sentence-embedding rerank
+                        self.custom_linearizer)
+        
+        result = add_answers_to_filtered_lst(top_m_results,self.meta_codebook)
+
+        all_answers,all_q_indices = get_answers_lst_from_results(result)
+
+        return all_answers,all_q_indices
+    
+
+    def find_related_knowledge(self,all_answers,all_q_indices):
+
+        domain_knowledge_lst = []
+
+        # this will automatically flatten answers
+        overlapped_answers = find_overlapped_answers(all_answers)
+
+        flat_answers = get_flat_answers_lsts(all_answers)
+
+        overlapped_answers_dict = {'overlaps': overlapped_answers}
+
+        unique_knowledge_dict = get_unique_knowledge(overlapped_answers_dict,flat_answers)
+
+        unique_knowledge = unique_knowledge_dict['out_answers']
+
+        domain_knowledge_lst.append(unique_knowledge)
+
+        if self.include_thinkings:
+            final_flat_thinkings_lsts =find_overlapped_thinkings(all_q_indices,self.meta_codebook)
+            domain_knowledge_lst.append(final_flat_thinkings_lsts)
+
+
+
+        return domain_knowledge_lst
+    
+
+    def compact_indicies_for_prompt(self,codebook_sub_q,domain_knowledge_lst):
+
+        if self.include_thinkings:
+            flat_answers_lsts,flat_thinkings_lsts = domain_knowledge_lst
+            final_merged_json= get_json_with_given_knowledge_and_thinkings(flat_answers_lsts,flat_thinkings_lsts,
+                                                                           self.meta_codebook,codebook_sub_q)
+
+        else:
+            flat_answers_lsts = domain_knowledge_lst[0]
+            final_merged_json = get_json_with_given_knowledge(flat_answers_lsts,self.meta_codebook,codebook_sub_q)
+
+
+        return final_merged_json
+    
     
     def collect_results(self, final_merged_json):
         llm = self.llm
@@ -2105,14 +2263,5 @@ class CompressRag:
         
 
     
-#### usage
+#### see usage on test_for_compressrag.py
 
-# define one llm class that has take_questions to generate answers and thinkings
-
-class LLMRepeat:
-    def __init__(self, q):
-        self.q = q
-
-    def take_questions(self):
-        return 'abcdefg'
-    
