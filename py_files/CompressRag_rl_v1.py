@@ -22,6 +22,84 @@ SUBJ_DEPS = {"nsubj", "nsubjpass", "csubj", "csubjpass"}
 OBJ_DEPS  = {"dobj", "obj", "attr", "oprd", "dative"}
 NEG_DEPS  = {"neg"}
 
+
+def ingest_context_json(
+    json_path: str,
+    *,
+    chunk_chars: int = 800,
+    overlap: int = 120,
+) -> Tuple[Optional[FAISS], Optional[FAISS], int]:
+    with open(json_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    def _chunk_text(text: str, *, chunk_chars: int = 800, overlap: int = 120) -> List[str]:
+        text = (text or "").strip()
+        if not text:
+            return []
+        chunks = []
+        n = len(text)
+        step = max(1, chunk_chars - overlap)
+        i = 0
+        while i < n:
+            j = min(n, i + chunk_chars)
+            chunk = text[i:j].strip()
+            if chunk:
+                chunks.append(chunk)
+            if j == n:
+                break
+            i += step
+        return chunks
+
+    items = data if isinstance(data, list) else [data]
+
+    for item_id, item in enumerate(items, start=1):
+        corpus = (item.get("corpus_name") or "Unknown").strip()
+        ctx = (item.get("context") or "").strip()
+        if not ctx:
+            continue
+
+        chunks = _chunk_text(ctx, chunk_chars=chunk_chars, overlap=overlap)
+        total_chunks += len(chunks)
+
+        graph_docs = []
+        for cid, ch in enumerate(chunks, start=1):
+            codebook = get_code_book(ch, type="fact")  
+    return codebook
+
+def get_context(final_merged_json):
+    def _triples_to_words(triples, cb):
+        E, R = cb["e"], cb["r"]
+        return [[E[h], R[r], E[t]] for (h, r, t) in triples]
+    
+    def _decode_block(block, cb):
+        if not block:
+            return []
+        if isinstance(block[0], (list, tuple)) and len(block[0]) == 3 and all(isinstance(x, int) for x in block[0]):
+            return _triples_to_words(block, cb)
+        if isinstance(block[0], int):
+            edges = cb["edge_matrix"]
+            triples = [edges[i] for i in block]
+            return _triples_to_words(triples, cb)
+        return []
+    def _linearize_triples_block(triples, sep=", ", end=""):
+        if not triples:
+            return "None."
+        return sep.join(f"{h} {r} {t}{end}" for h, r, t in triples)
+    
+    qs_groups = final_merged_json.get("questions([[e,r,e], ...])", [])
+    gk_groups = final_merged_json.get("given knowledge([[e,r,e], ...])", [])
+    st_groups = final_merged_json.get("start thinking with(edges[i])", [])
+
+    qs_words = _decode_block(qs_groups[0], final_merged_json) if qs_groups else []
+    gk_words = _decode_block(gk_groups[0], final_merged_json) if gk_groups else []
+    st_words = _decode_block(st_groups[0], final_merged_json) if st_groups else []
+
+    q_txt  = _linearize_triples_block(qs_words)
+    gk_txt = _linearize_triples_block(gk_words)
+    st_txt = _linearize_triples_block(st_words)
+    
+    return q_txt, gk_txt, st_txt
+
 # -------- node labels --------
 def noun_phrase_label(head, include_det=False, use_ents=True):
     # 1) prefer named entities (incl. FAC)
@@ -1462,24 +1540,21 @@ def get_unique_knowledge(overlapped_answers,flat_answers_lsts):
 
     return {'assignments': assignments, 'out_answers': out_answers}
 
-def find_unique_thinkings(all_q_indices,codebook_main):
-    # from q indices to get answers
-
+def find_unique_thinkings(all_q_indices, codebook_main):
     selected_thinkings_lsts = []
     questions_to_thinkings_dict = codebook_main['questions_to_thinkings']
 
     for q_index in all_q_indices:
         if q_index in questions_to_thinkings_dict.keys():
-            selected_thinkings_lsts.append(codebook_main['thinkings_lst'][questions_to_thinkings_dict[q_index]])
-
+            selected_thinkings_lsts.append(
+                codebook_main['thinkings_lst'][questions_to_thinkings_dict[q_index]]
+            )
 
     if selected_thinkings_lsts:
         flat_thinkings_lsts = get_flat_answers_lsts(selected_thinkings_lsts)
-        # default 2 for the overlap
-        overlapped_answers = common_contiguous_overlaps(flat_thinkings_lsts,2)
-
-        unique_dict = get_unique_knowledge(overlapped_answers,flat_thinkings_lsts)
-
+        overlapped_runs = common_contiguous_overlaps(flat_thinkings_lsts, 2)  # list
+        unique_dict = get_unique_knowledge({'overlaps': overlapped_runs},     # ✅ wrap
+                                           flat_thinkings_lsts)
         uniqie_thinkings = unique_dict['out_answers']
     else:
         uniqie_thinkings = selected_thinkings_lsts
@@ -1491,14 +1566,12 @@ def find_unique_thinkings(all_q_indices,codebook_main):
 
 def find_unique_answers(answers_lsts):
     flat_answers_lsts = get_flat_answers_lsts(answers_lsts)
-    # default 2 for the overlap
-    overlapped_answers = common_contiguous_overlaps(flat_answers_lsts,2)
-
-    unique_dict = get_unique_knowledge(overlapped_answers,flat_answers_lsts)
-
+    overlapped_runs = common_contiguous_overlaps(flat_answers_lsts, 2)   # list[list[int]]
+    unique_dict = get_unique_knowledge({'overlaps': overlapped_runs},    # ✅ wrap
+                                       flat_answers_lsts)
     uniqie_answers = unique_dict['out_answers']
-
     return uniqie_answers
+
 
 # get the entities from codebook_main
 def get_json_with_given_knowledge(flat_answers_lsts,codebook_main,codebook_sub_q,decode = True):
@@ -1763,25 +1836,22 @@ def get_json_with_given_knowledge_and_thinkings(flat_answers_lsts,flat_thinkings
     # update the entities index
     ent_pos = 0
     edge_matrix_sub_len = len(edge_matrix_sub)
-    for ent in codebook_sub_q['e']:
-        # check the ent in entities_lst or not
+    entitie_index_dict_q = {}
+    for ent_pos, ent in enumerate(codebook_sub_q['e']):
         if ent in entitie_set:
             new_ent_pos = entitie_set.index(ent)
         else:
-            new_ent_pos = entitie_set_len
-            entitie_set_len += 1 # ✅ edge_matrix_sub_len += 1
-            edge_matrix_sub_len+=1
-
+            new_ent_pos = len(entitie_set)   # ← 用当前长度作为新索引
+            entitie_set.append(ent)          # ← 再 append
         entitie_index_dict_q[ent_pos] = new_ent_pos
 
     # update relation index
-    r_pos = 0
-    for r in codebook_sub_q['r']:
+    r_index_dict_q = {}
+    for r_pos, r in enumerate(codebook_sub_q['r']):
         if r in r_set:
             new_r_pos = r_set.index(r)
         else:
-            r_set_len+=1
-            new_r_pos = r_set_len
+            new_r_pos = len(r_set)
             r_set.append(r)
         r_index_dict_q[r_pos] = new_r_pos
 
@@ -1962,15 +2032,13 @@ def get_json_with_given_thinkings(flat_thinkings_lsts,codebook_main,codebook_sub
     edge_matrix_sub_len = len(edge_matrix_sub)
     edge_pos = 0
     edge_mat_for_q_sub_dict = {}
-
-    for edge in edge_mat_for_q_sub:
+    for edge_pos, edge in enumerate(edge_mat_for_q_sub):
         if edge in edge_matrix_sub:
             new_edge_pos = edge_matrix_sub.index(edge)
         else:
-            edge_matrix_sub_len+=1
             new_edge_pos = edge_matrix_sub_len
             edge_matrix_sub.append(edge)
-
+            edge_matrix_sub_len += 1
         edge_mat_for_q_sub_dict[edge_pos] = new_edge_pos
 
 
@@ -2406,7 +2474,7 @@ class CompressRag_rl:
 
 
         if self.include_thinkings:
-            final_flat_thinkings_lsts = self.think_extract_function(all_q_indices,self.meta_codebook)
+            final_flat_thinkings_lsts = self.thinking_extract_function(all_q_indices,self.meta_codebook)
             domain_knowledge_lst.append(final_flat_thinkings_lsts)
 
 
@@ -2443,20 +2511,20 @@ class CompressRag_rl:
 
     # might also change these functions,now keep always merge with answers json, and only merge with thinking json if use thinkings
     
-    def collect_results(self, final_merged_json):
+    def collect_results(self, final_merged_json, questions):
         llm = self.llm
 
         new_json_lst = []
         new_result = None
 
         if self.include_thinkings:
-            a_new, t_new = llm.take_questions(final_merged_json)
+            a_new, t_new = llm.take_questions(final_merged_json, questions)
             new_result = a_new
             a_new_json = get_code_book(a_new, type='answers')
             t_new_json = get_code_book(t_new, type='thinkings')
             new_json_lst.extend([a_new_json, t_new_json])
         else:
-            a_new = llm.take_questions(final_merged_json)
+            a_new = llm.take_questions(final_merged_json, questions)
             new_result = a_new
             a_new_json = get_code_book(a_new, type='answers')
             new_json_lst.append(a_new_json)
@@ -2499,7 +2567,7 @@ class CompressRag_rl:
             final_merged_json = q_json.copy()
 
 
-        new_result,new_json_lst = self.collect_results(final_merged_json)
+        new_result,new_json_lst = self.collect_results(final_merged_json, questions=q_prompt)
 
         self.update_meta(q_json,new_json_lst)
 
@@ -2512,8 +2580,6 @@ class CompressRag_rl:
         # return answer
 
         return new_result
-
-        
 
     
 #### see usage on test_for_compressrag.py
