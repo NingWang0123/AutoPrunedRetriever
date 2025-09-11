@@ -574,7 +574,7 @@ class WordAvgEmbeddings(Embeddings):
     
 # change back to your own path
 
-word_emb = WordAvgEmbeddings(model_path="/Users/wangning/desktop/gensim-data/glove-wiki-gigaword-100/glove-wiki-gigaword-100.model")
+word_emb = WordAvgEmbeddings(model_path="gensim-data/glove-wiki-gigaword-100/glove-wiki-gigaword-100.model")
 
 
 def get_word_embeddings(list_of_text,word_emb):
@@ -846,7 +846,7 @@ def merge_questions_and_answers_code_book(codebook_main,codebook_sub_q,codebook_
 def merge_all_code_book(codebook_main,codebook_sub_q,codebook_sub_a,codebook_sub_t):
     codebook_with_q = merging_codebook(codebook_main,codebook_sub_q,type='questions')
     codebook_with_qa = merging_codebook(codebook_with_q,codebook_sub_a,type='answers')
-    final_codebook = merging_codebook(codebook_with_qa,codebook_sub_t,type='answers')
+    final_codebook = merging_codebook(codebook_with_qa,codebook_sub_t,type='thinkings')
 
     return final_codebook
 
@@ -1762,13 +1762,14 @@ def get_json_with_given_knowledge_and_thinkings(flat_answers_lsts,flat_thinkings
 
     # update the entities index
     ent_pos = 0
+    edge_matrix_sub_len = len(edge_matrix_sub)
     for ent in codebook_sub_q['e']:
         # check the ent in entities_lst or not
         if ent in entitie_set:
             new_ent_pos = entitie_set.index(ent)
         else:
             new_ent_pos = entitie_set_len
-            entitie_set.append(ent)
+            entitie_set_len += 1 # ✅ edge_matrix_sub_len += 1
             edge_matrix_sub_len+=1
 
         entitie_index_dict_q[ent_pos] = new_ent_pos
@@ -1792,15 +1793,16 @@ def get_json_with_given_knowledge_and_thinkings(flat_answers_lsts,flat_thinkings
     edge_pos = 0
     edge_mat_for_q_sub_dict = {}
 
+    edge_matrix_sub_len = len(edge_matrix_sub)
     for edge in edge_mat_for_q_sub:
         if edge in edge_matrix_sub:
             new_edge_pos = edge_matrix_sub.index(edge)
         else:
-            edge_matrix_sub_len+=1
-            new_edge_pos = edge_matrix_sub_len
-            edge_matrix_sub.append(edge)
-
+            new_edge_pos = edge_matrix_sub_len    # ✅ 先用当前长度作为新索引
+            edge_matrix_sub.append(edge)          # ✅ 再 append
+            edge_matrix_sub_len += 1              # ✅ 最后长度+1
         edge_mat_for_q_sub_dict[edge_pos] = new_edge_pos
+        edge_pos += 1
 
 
     # update the questions
@@ -1938,7 +1940,7 @@ def get_json_with_given_thinkings(flat_thinkings_lsts,codebook_main,codebook_sub
         else:
             new_ent_pos = entitie_set_len
             entitie_set.append(ent)
-            edge_matrix_sub_len+=1
+            entitie_set_len += 1  ## edge_matrix_sub_len += 1
 
         entitie_index_dict_q[ent_pos] = new_ent_pos
 
@@ -2220,20 +2222,20 @@ class CompressRag:
         return final_merged_json
     
     
-    def collect_results(self, final_merged_json):
+    def collect_results(self, final_merged_json, question):
         llm = self.llm
 
         new_json_lst = []
         new_result = None
 
         if self.include_thinkings:
-            a_new, t_new = llm.take_questions(final_merged_json)
+            a_new, t_new = llm.take_questions(final_merged_json, question)
             new_result = a_new
             a_new_json = get_code_book(a_new, type='answers')
             t_new_json = get_code_book(t_new, type='thinkings')
             new_json_lst.extend([a_new_json, t_new_json])
         else:
-            a_new = llm.take_questions(final_merged_json)
+            a_new = llm.take_questions(final_merged_json, question)
             new_result = a_new
             a_new_json = get_code_book(a_new, type='answers')
             new_json_lst.append(a_new_json)
@@ -2276,7 +2278,7 @@ class CompressRag:
             final_merged_json = q_json.copy()
 
 
-        new_result,new_json_lst = self.collect_results(final_merged_json)
+        new_result,new_json_lst = self.collect_results(final_merged_json, question=q_prompt)
 
         self.update_meta(q_json,new_json_lst)
 
