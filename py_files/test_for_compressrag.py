@@ -1,4 +1,4 @@
-from CompressRag_rl_v1 import CompressRag,WordAvgEmbeddings,decode_questions
+from CompressRag_rl_v1 import CompressRag_rl,WordAvgEmbeddings,decode_questions, get_context
 from langchain.embeddings.base import Embeddings
 from langchain_community.embeddings import HuggingFaceEmbeddings
 import torch
@@ -62,6 +62,8 @@ def self_decode_questions(questions, questions_source_codebook, fmt='words'):
     """
     return [self_decode_question(q, questions_source_codebook, fmt=fmt) for q in questions]
 
+
+
 class Phi4MiniReasoningLLM:
     def __init__(self, include_thinkings: bool = True,
                 model_name: str = "microsoft/Phi-4-mini-reasoning",
@@ -80,47 +82,36 @@ class Phi4MiniReasoningLLM:
             device_map="auto",
             trust_remote_code=True,
         )
-        # 一些模型需要 chat 模板；Phi-4-mini-reasoning 支持 messages
         if not hasattr(self.tokenizer, "apply_chat_template"):
-            # 兜底：后面直接拼接纯文本
             self._use_chat_template = False
         else:
             self._use_chat_template = True
 
-    def _linearize_triples_block(self, triples):
-        # triples: [[h, r, t], ...]  -> "h r t. h r t. ..."
-        if not triples:
-            return "None."
-        return " ".join([f"{h} {r} {t}." for h, r, t in triples])
 
     def _build_prompt(self, final_merged_json, question):
-        """
-        把 compact 后的 JSON（含 questions / given knowledge / 可选 thinkings）转换成提示词。
-        轻量说明：我们希望模型输出两个段落，便于后续规则抽取。
-        """
+        q_txt, gk_txt, st_txt = get_context(final_merged_json)
         user_msg = ""
-        print("final_merged_json", final_merged_json)
-        qs = final_merged_json.get("questions([[e,r,e], ...])", [])
-        gk = final_merged_json.get("given knowledge([[e,r,e], ...])", [])
-        st = final_merged_json.get("start thinking with(edges[i])", [])  # 已解码版本可能叫这个或空
-
-        # 只拿第一组作为信号（可以按需扩展为多组）
-        q_txt  = self._linearize_triples_block(qs[0] if qs else [])
-        gk_txt = self._linearize_triples_block(gk[0] if gk else [])
-        st_txt = self._linearize_triples_block(st[0] if st else [])
 
         system_msg = (
             "You are a precise QA agent that answers by expressing facts as short, "
             "plain English statements. Keep outputs concise and factual."
         )
 
-        user_msg += ("<<<RETRIEVED_CONTEXT_START>>>\n"
-                    "The system searched for a related question in the database. Below are related question's graph triples and its prior answer as reference. "
-                    "You don't have to follow it completely, just use it as a reference.\n"
-                    f"[RELATED QUESTION'S GRAPH TRIPLES]:\n{q_txt}\n"
-                    f"[RELATED QUESTION'S ANSWER]: {gk_txt}\n"
-                    "<<<RETRIEVED_CONTEXT_END>>>")
+        ctx_lines = [
+            "<<<RETRIEVED_CONTEXT_START>>>",
+            "The system searched for a related question in the database. Below are related question's graph triples and its prior answer as reference. You don't have to follow it completely, just use it as a reference.",
+            "[RELATED QUESTION'S GRAPH TRIPLES]:",
+            q_txt,
+            f"[RELATED QUESTION'S ANSWER]: {gk_txt}",
+        ]
         
+        if st_txt.strip().lower() != "none.":
+            ctx_lines.append(f"[RELATED QUESTION'S THINKING]: {st_txt}")
+
+        ctx_lines.append("<<<RETRIEVED_CONTEXT_END>>>")
+
+        user_msg += "\n".join(ctx_lines) + "\n"
+
         user_msg += (
             f"[CURRENT QUESTION]: {question} \n"
             "[TASK]: You are a QA assistant for open-ended questions.\n"
@@ -224,11 +215,9 @@ class Phi4MiniReasoningLLM:
             m = re.search(r"\[answers\](.*?)(?:\[thinkings\]|\Z)", raw, flags=re.S | re.I)
             ans_region = m.group(1).strip() if m else raw
 
-            # 1) 提取并移除 <think>...</think>，保留原文
             ans_no_think, thinks = self.strip_think(ans_region)
-            last_thinks = thinks  # 原文 list[str]
+            last_thinks = thinks  
 
-            # 2) 答案清理（不影响 think 原文）
             ans_clean = _clean_answer(ans_no_think, 4).strip()
             if ans_clean:
                 break
@@ -237,7 +226,6 @@ class Phi4MiniReasoningLLM:
             ans_clean = "No answer."
 
         if self.include_thinkings:
-            # 合并成一个字符串，原文不缩略：用空行分隔各个 <think> 块
             thinks_str = "\n\n".join(t.strip() for t in last_thinks if t.strip())
             return ans_clean, thinks_str
         else:
@@ -256,11 +244,13 @@ phi_llm = Phi4MiniReasoningLLM(
     top_p=0.9
 )
 
-rag = CompressRag(
+rag = CompressRag_rl(
     sentence_emb=sentence_emb,
     word_emb=word_emb,
-    include_thinkings=include_thinking,
     llm=phi_llm,
+    combine_ents_rounds=1,        
+    thinkings_choice='overlap',  
+    answers_choice='unique'       
 )
 
 rag.top_k = 5
@@ -277,7 +267,7 @@ i = 0
 for q in questions:
     print(f'q {i}')
     print(rag.run_work_flow(q))
-    # print(cr.meta_codebook)
+    print(rag.meta_codebook)
     i+=1
     
 # python py_files/test_for_compressrag.py
