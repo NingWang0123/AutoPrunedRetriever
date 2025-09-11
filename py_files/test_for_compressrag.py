@@ -60,15 +60,10 @@ class LLMRepeat:
     def __init__(self):
         self.q = None
 
-    def __call__(self, prompt_json):
-        # store the merged prompt so take_questions can decode from it
-        self.q = prompt_json
-        return self
-
-    def take_questions(self):
+    def take_questions(self,q):
         # assumes prompt_json contains 'questions_lst'
-        q = self.q
-        q_item = next((s for s in q.keys() if "question" in s.lower()), None)
+        # q = self.q
+        # q_item = next((s for s in q.keys() if "question" in s.lower()), None)
         return 'dog sit on mat'
 
     
