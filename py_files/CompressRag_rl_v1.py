@@ -1756,9 +1756,9 @@ def get_json_with_given_knowledge(flat_answers_lsts,codebook_main,codebook_sub_q
         if ent in entitie_set:
             new_ent_pos = entitie_set.index(ent)
         else:
-            entitie_set_len+=1
             new_ent_pos = entitie_set_len
             entitie_set.append(ent)
+            entitie_set_len+=1
 
         entitie_index_dict_q[ent_pos] = new_ent_pos
 
