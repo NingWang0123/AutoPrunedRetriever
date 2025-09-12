@@ -160,7 +160,7 @@ def get_context(final_merged_json):
         if isinstance(block[0], (list, tuple)) and len(block[0]) == 3 and all(isinstance(x, int) for x in block[0]):
             return _triples_to_words(block, cb)
         if isinstance(block[0], int):
-            edges = cb["edge_matrix"]
+            edges = cb["edges([e,r,e])"]
             triples = [edges[i] for i in block]
             return _triples_to_words(triples, cb)
         if isinstance(block[0], (list, tuple)) and isinstance(block[0][0], str):
