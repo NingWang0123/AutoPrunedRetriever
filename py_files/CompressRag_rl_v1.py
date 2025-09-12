@@ -2550,7 +2550,7 @@ class CompressRag_rl:
 
     def combine_ents_func(self):
 
-        self.meta_codebook = combine_ents(self.meta_codebook,
+        self.meta_codebook = combine_ents_auto(self.meta_codebook,
                  self.min_exp_num,  
                  self.max_exp_num,  
                  self.include_thinkings) 
