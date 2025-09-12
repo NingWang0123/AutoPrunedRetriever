@@ -89,7 +89,7 @@ class Phi4MiniReasoningLLM:
 
 
     def _build_prompt(self, final_merged_json, question):
-        q_txt, gk_txt, st_txt = get_context(final_merged_json)
+        q_txt, gk_txt, st_txt, ft_txt = get_context(final_merged_json)
         user_msg = ""
 
         system_msg = (
@@ -102,11 +102,14 @@ class Phi4MiniReasoningLLM:
             "The system searched for a related question in the database. Below are related question's graph triples and its prior answer as reference. You don't have to follow it completely, just use it as a reference.",
             "[RELATED QUESTION'S GRAPH TRIPLES]:",
             q_txt,
-            f"[RELATED QUESTION'S ANSWER]: {gk_txt}",
+            f"[RELATED QUESTION'S ANSWER TRIPLES]: {gk_txt}",
         ]
         
         if st_txt.strip().lower() != "none.":
-            ctx_lines.append(f"[RELATED QUESTION'S THINKING]: {st_txt}")
+            ctx_lines.append(f"[RELATED THINKING“S TRIPLES]: {st_txt}")
+
+        if ft_txt.strip().lower() != "none.":
+            ctx_lines.append(f"[RELATED FACTS'S TRIPLES]: {ft_txt}")
 
         ctx_lines.append("<<<RETRIEVED_CONTEXT_END>>>")
 
@@ -124,6 +127,7 @@ class Phi4MiniReasoningLLM:
 
         print(user_msg)
         return system_msg, user_msg
+
 
     @torch.no_grad()
     def _generate(self, system_msg: str, user_msg: str) -> str:
@@ -259,15 +263,33 @@ rag.question_batch_size = 2
 rag.questions_db_batch_size = 16
 
 questions = [
-    "Is the Great Wall visible from space?",
-    "Where is the Great Wall located in China?",
+    "From which cell type does basal cell carcinoma arise?",
+    "From which cell type does basal cell carcinoma arise?",
 ]
+import json
+import numpy as np
+
+def to_serializable(obj):
+    if isinstance(obj, np.ndarray):
+        return obj.tolist()   # ndarray -> list
+    if isinstance(obj, (np.int32, np.int64)):
+        return int(obj)       # numpy int -> int
+    if isinstance(obj, (np.float32, np.float64)):
+        return float(obj)     # numpy float -> float
+    raise TypeError(f"Type {type(obj)} not serializable")
 
 i = 0
 for q in questions:
     print(f'q {i}')
-    print(rag.run_work_flow(q))
-    print(rag.meta_codebook)
-    i+=1
+    result = rag.run_work_flow(q, facts_json_path=["context/novel copy.json", "context/medical copy.json"])
+    #print(result)
+
+    #with open(f"meta_codebook_{i}.json", "w", encoding="utf-8") as f:
+    #    json.dump(rag.meta_codebook, f, ensure_ascii=False, indent=2, default=to_serializable)
+    i += 1
+
+
+
+
+
     
-# python py_files/test_for_compressrag.py

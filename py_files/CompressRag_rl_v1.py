@@ -151,9 +151,6 @@ def get_json_with_given_facts(facts_cb, codebook_sub_q, decode: bool = True):
 
 def get_context(final_merged_json):
     def _triples_to_words(triples, cb):
-        print(f'triples: {triples}')
-        print(f'cb: {cb}')
-        
         E, R = cb["e"], cb["r"]
         return [[E[h], R[r], E[t]] for (h, r, t) in triples]
     
@@ -163,7 +160,7 @@ def get_context(final_merged_json):
         if isinstance(block[0], (list, tuple)) and len(block[0]) == 3 and all(isinstance(x, int) for x in block[0]):
             return _triples_to_words(block, cb)
         if isinstance(block[0], int):
-            edges = cb["edges([e,r,e])"]
+            edges = cb.get("edges([e,r,e])", cb.get("edge_matrix"))
             triples = [edges[i] for i in block]
             return _triples_to_words(triples, cb)
         if isinstance(block[0], (list, tuple)) and isinstance(block[0][0], str):
@@ -179,8 +176,12 @@ def get_context(final_merged_json):
         for k in keys:
             groups = final_merged_json.get(k, [])
             if groups:
-                words = _decode_block(groups[0], final_merged_json)
-                return _linearize_triples_block(words)
+                all_words = []
+                for g in groups:
+                    words = _decode_block(g, final_merged_json)
+                    if words:
+                        all_words.append(_linearize_triples_block(words))
+                return " | ".join(all_words) if all_words else "None."
         return "None."
 
     q_txt  = _extract_txt(["questions([[e,r,e], ...])", "questions(edges[i])"])
@@ -1185,14 +1186,8 @@ def get_topk_word_embedding_batched(
     question_batch_size: int = 1,
     questions_db_batch_size: int = 1,
 ) -> Dict[int, List[Dict[str, Any]]]:
-    """
-    Top-k similarity with **decode_question(..., fmt='embeddings')** in two-way batches.
 
-    Now auto-build e/r embeddings if missing in codebook_main.
-    """
-    # 0) ensure embeddings are present (compute on-the-fly if absent)
-
-    # 1) infer embedding dim
+    # 0) ensure embeddings...
     if "e_embeddings" in codebook_main and len(codebook_main["e_embeddings"]) > 0:
         dim = len(codebook_main["e_embeddings"][0])
     elif "r_embeddings" in codebook_main and len(codebook_main["r_embeddings"]) > 0:
@@ -1200,16 +1195,24 @@ def get_topk_word_embedding_batched(
     else:
         _ensure_embeddings_in_codebook(codebook_main, dim_fallback=64)
 
-    # 2) get DB questions
-    if "questions_lst" not in codebook_main:
-        raise ValueError("codebook_main missing 'questions_lst' for retrieval DB.")
-    
-    # don't search the last one, the last one is being updated as the current question
-    questions_lst = codebook_main["questions_lst"][:-1]
+    # === 1) 选择候选库：优先历史 questions；若没有，则回退到 answers ===
+    results: Dict[int, List[Dict[str, Any]]] = {i: [] for i in range(len(questions))}
+
+    q_groups_hist = codebook_main.get("questions_lst", [])[:-1]  # 历史 questions
+    use_answers_db = not any(len(g) > 0 for g in q_groups_hist)
+
+    if use_answers_db:
+        groups_for_db = codebook_main.get("answers_lst", [])
+        db_source = "answers"
+    else:
+        groups_for_db = q_groups_hist
+        db_source = "questions"
+
+    # 把候选库拍平成若干 “问题/答案链”
     db_questions: List[List[int]] = []
     db_qi: List[int] = []
     db_qj: List[int] = []
-    for qi, group in enumerate(questions_lst):
+    for qi, group in enumerate(groups_for_db):
         for qj, q_edges in enumerate(group):
             db_questions.append(q_edges)
             db_qi.append(qi)
@@ -1217,40 +1220,28 @@ def get_topk_word_embedding_batched(
 
     N_total = len(questions)
     M_total = len(db_questions)
-    results: Dict[int, List[Dict[str, Any]]] = {i: [] for i in range(N_total)}
     if N_total == 0 or M_total == 0:
         return results
 
     db_qi = np.asarray(db_qi, dtype=np.int32)
     db_qj = np.asarray(db_qj, dtype=np.int32)
 
-    # 3) process query batches
+    # === 2) 下面逻辑不变；唯一变化：把 db_source 放进候选里，方便下一步重排使用 ===
     for q_start in range(0, N_total, question_batch_size):
         q_end = min(q_start + question_batch_size, N_total)
         q_batch_idx = list(range(q_start, q_end))
-        q_batch_lists = [questions[i] for i in q_batch_idx]
+        q_mat = _embed_questions_with_decode([questions[i] for i in q_batch_idx], codebook_main, dim)
 
-        # embed query batch
-        q_mat = _embed_questions_with_decode(q_batch_lists, codebook_main, dim)  # (Qb, d)
-        Qb = q_mat.shape[0]
+        best_scores = [np.array([], dtype=np.float32) for _ in q_batch_idx]
+        best_cols   = [np.array([], dtype=np.int32)   for _ in q_batch_idx]
 
-        best_scores = [np.array([], dtype=np.float32) for _ in range(Qb)]
-        best_cols   = [np.array([], dtype=np.int32)   for _ in range(Qb)]
-
-        # 4) stream DB in batches
         for db_start in range(0, M_total, questions_db_batch_size):
             db_end = min(db_start + questions_db_batch_size, M_total)
-            db_batch_lists = db_questions[db_start:db_end]
+            db_mat = _embed_questions_with_decode(db_questions[db_start:db_end], codebook_main, dim)
 
-            db_mat = _embed_questions_with_decode(db_batch_lists, codebook_main, dim)  # (Db, d)
-            Db = db_mat.shape[0]
-            if Db == 0:
-                continue
-
-            sims = _cosine_sim(q_mat, db_mat)  # (Qb, Db)
-            k_local = min(top_k, Db)
-
-            for i in range(Qb):
+            sims = _cosine_sim(q_mat, db_mat)
+            k_local = min(top_k, db_end - db_start)
+            for i in range(len(q_batch_idx)):
                 row = sims[i]
                 cand_idx = np.argpartition(-row, k_local - 1)[:k_local]
                 cand_idx = cand_idx[np.argsort(-row[cand_idx])]
@@ -1259,13 +1250,10 @@ def get_topk_word_embedding_batched(
                 merged_scores, merged_cols = _topk_merge(
                     best_scores[i], best_cols[i], batch_scores, batch_cols, top_k
                 )
-                best_scores[i] = merged_scores
-                best_cols[i]   = merged_cols
+                best_scores[i], best_cols[i] = merged_scores, merged_cols
 
-        # 5) collect results
-        for local_i, global_q_idx in enumerate(q_batch_idx):
-            cols = best_cols[local_i]
-            scs  = best_scores[local_i]
+        for loc_i, gq_idx in enumerate(q_batch_idx):
+            cols = best_cols[loc_i]; scs = best_scores[loc_i]
             keep = (cols >= 0)
             cols, scs = cols[keep], scs[keep]
             entries = []
@@ -1274,10 +1262,12 @@ def get_topk_word_embedding_batched(
                     "score": float(sc),
                     "questions_index": int(db_qi[col]),
                     "question_index": int(db_qj[col]),
+                    "db_source": db_source,                 # ← 关键：标注候选来自 questions 还是 answers
                 })
-            results[global_q_idx] = entries
+            results[gq_idx] = entries
 
     return results
+
 
 ##### getting the best sentence embedding results from the top k word embedding results
 
@@ -1314,18 +1304,6 @@ def rerank_with_sentence_embeddings(
     top_m: int = 1,
     custom_linearizer: Optional[Callable[[List[List[str]]], str]] = None,
 ) -> Dict[int, List[Dict[str, Any]]]:
-    """
-    For each query i:
-      - Build a small FAISS index over its coarse_topk candidates (converted to text)
-      - Embed the query as text and retrieve best `top_m`
-      - Return {"score": <faiss_score>, "questions_index": qi, "question_index": qj, "text": candidate_text}
-
-    Notes:
-      * FAISS scores from LangChain are distances (smaller is better).
-      * `top_m` can be <= len(coarse_topk[i]); if bigger, it's clipped.
-    """
-    # Flatten DB pointers for convenience
-    questions_lst = codebook_main["questions_lst"]
 
     results: Dict[int, List[Dict[str, Any]]] = {}
     for i, q_edges in enumerate(questions):
@@ -1334,37 +1312,37 @@ def rerank_with_sentence_embeddings(
             results[i] = []
             continue
 
-        # Deduplicate (qi, qj) while preserving order
         seen = set()
         kept_meta = []
         kept_texts = []
+
         for item in cand:
             qi = int(item["questions_index"])
             qj = int(item["question_index"])
-            key = (qi, qj)
+            src = item.get("db_source", "questions")   # ← 看候选来自哪里
+
+            key = (qi, qj, src)
             if key in seen:
                 continue
             seen.add(key)
-            db_edges = questions_lst[qi][qj]
+
+            groups = codebook_main["questions_lst"] if src == "questions" else codebook_main["answers_lst"]
+            db_edges = groups[qi][qj]  # 统一都是“边索引链”
             text = make_question_text(db_edges, codebook_main, custom_linearizer)
-            kept_meta.append({"questions_index": qi, "question_index": qj, "text": text})
+
+            md = {"questions_index": qi, "question_index": qj, "text": text, "db_source": src}
+            kept_meta.append(md)
             kept_texts.append(text)
 
         if not kept_texts:
             results[i] = []
             continue
 
-        # Build a per-query FAISS index over the candidate texts
         vs = FAISS.from_texts(kept_texts, embedding=emb, metadatas=kept_meta)
-
-        # Query text (use same linearization as candidates)
         query_text = make_question_text(q_edges, codebook_main, custom_linearizer)
-
-        # Retrieve top_m (clip to number of candidates)
         m = min(top_m, len(kept_texts))
         docs_scores = vs.similarity_search_with_score(query_text, k=m)
 
-        # Convert to output format (note: score is distance; smaller = better)
         ranked = []
         for doc, score in docs_scores:
             md = doc.metadata
@@ -1373,6 +1351,7 @@ def rerank_with_sentence_embeddings(
                 "questions_index": int(md["questions_index"]),
                 "question_index": int(md["question_index"]),
                 "text": md["text"],
+                "db_source": md.get("db_source", "questions"),
             })
         results[i] = ranked
 
@@ -1417,9 +1396,6 @@ def coarse_filter(
 def add_answers_to_filtered_lst(top_m_results,codebook_main):
 
     result = {}
-    print(f'hinima: {len(codebook_main["answers_lst"])==len(codebook_main["questions_lst"])}')
-    print(f'wonima: {codebook_main["answers_lst"]}')
-    print(f'rinima: {codebook_main["questions_lst"]}')
                                  
     for qid, matches in top_m_results.items():
         
@@ -1428,10 +1404,6 @@ def add_answers_to_filtered_lst(top_m_results,codebook_main):
         for m in matches:
             q_idx = m["questions_index"]
             m_with_feat = m.copy()
-            print("*"*60)
-            print(f'q_idx: {q_idx}')
-            print("*"*60)
-            print(len(codebook_main['answers_lst']))
             m_with_feat['answers(edges[i])'] = codebook_main['answers_lst'][q_idx]
             result[qid].append(m_with_feat)
 
@@ -2630,29 +2602,23 @@ class CompressRag_rl:
         return [(int(i), float(sims[i])) for i in idx]  
 
     def _flatten_facts(self, meta):
-        """
-        返回:
-        flat_facts: List[List[int]]   # 每个元素是一条 fact 的边索引链
-        map_idx:    List[Tuple[int,int]]  # (facts_lst 的组号, 该组内索引)
-        """
         flat, map_idx = [], []
         for gi, group in enumerate(meta.get('facts_lst', [])):
             for fj, run in enumerate(group):
-                # run 可能还有一层；这里做个稳健拍平：只要是 [int,...] 就当作一条
                 if run and isinstance(run, (list, tuple)) and isinstance(run[0], int):
                     flat.append(run)
-                    map_idx.append((gi, fj))
+                    map_idx.append([gi, fj])        # ← 用列表
                 elif isinstance(run, (list, tuple)):
                     for r2 in run:
                         if r2 and isinstance(r2, (list, tuple)) and isinstance(r2[0], int):
                             flat.append(r2)
-                            map_idx.append((gi, fj))
+                            map_idx.append([gi, fj])  # ← 用列表
         return flat, map_idx
+
 
     def retrieve(self,q_json):
 
         self.meta_codebook = merging_codebook(self.meta_codebook,q_json,'questions',self.word_emb,True)
-
         # take the last one 
 
         questions_edges_index = self.meta_codebook['questions_lst'][-1]
@@ -2696,6 +2662,7 @@ class CompressRag_rl:
                 pass
         return facts_lsts
 
+
     def find_related_knowledge(self,all_answers,all_q_indices, all_f_indices):
 
         domain_knowledge_lst = []
@@ -2717,7 +2684,6 @@ class CompressRag_rl:
             domain_knowledge_lst.append(final_flat_facts_lsts)   
 
         return domain_knowledge_lst
-    
 
     def compact_indicies_for_prompt(self, codebook_sub_q, domain_knowledge_lst):
         # unpack
@@ -2732,7 +2698,7 @@ class CompressRag_rl:
         if self.include_thinkings:
             flat_thinkings_lsts = domain_knowledge_lst[ptr]
             ptr += 1
-        if getattr(self, "include_facts", False):  
+        if getattr(self, "include_facts", True):  
             flat_facts_lsts = domain_knowledge_lst[ptr]
             ptr += 1
 
@@ -2756,10 +2722,55 @@ class CompressRag_rl:
         else:
             final_merged_json = codebook_sub_q.copy()
 
-        if flat_facts_lsts is not None:
-            final_merged_json["given facts(edges[i])"] = flat_facts_lsts
-            final_merged_json["given facts([[e,r,e], ...])"] = decode_questions(
-                flat_facts_lsts, final_merged_json, 'edges'
+        if flat_facts_lsts:
+            em_final = final_merged_json['edge_matrix']
+            E_final = final_merged_json['e']
+            R_final = final_merged_json['r']
+
+            e_name2idx = {name: i for i, name in enumerate(E_final)}
+            r_name2idx = {name: i for i, name in enumerate(R_final)}
+
+            tuple2idx = {tuple(e): i for i, e in enumerate(em_final)}
+
+            def _ensure_ent_from_meta(old_e_idx: int) -> int:
+                name = self.meta_codebook['e'][old_e_idx]
+                idx = e_name2idx.get(name)
+                if idx is None:
+                    idx = len(E_final)
+                    E_final.append(name)
+                    e_name2idx[name] = idx
+                return idx
+
+            def _ensure_rel_from_meta(old_r_idx: int) -> int:
+                name = self.meta_codebook['r'][old_r_idx]
+                idx = r_name2idx.get(name)
+                if idx is None:
+                    idx = len(R_final)
+                    R_final.append(name)
+                    r_name2idx[name] = idx
+                return idx
+
+            def ensure_edge_from_meta(meta_edge_idx: int) -> int:
+                e1_old, r_old, e2_old = self.meta_codebook['edge_matrix'][meta_edge_idx]
+                h = _ensure_ent_from_meta(e1_old)
+                r = _ensure_rel_from_meta(r_old)
+                t = _ensure_ent_from_meta(e2_old)
+                tup = (h, r, t)
+                idx = tuple2idx.get(tup)
+                if idx is None:
+                    idx = len(em_final)
+                    em_final.append([h, r, t])
+                    tuple2idx[tup] = idx
+                return idx
+
+            remapped_facts = [[ensure_edge_from_meta(i) for i in run] for run in flat_facts_lsts]
+
+            final_merged_json['e'] = E_final
+            final_merged_json['r'] = R_final
+            final_merged_json['edge_matrix'] = em_final
+            final_merged_json['facts(edges[i])'] = remapped_facts
+            final_merged_json['facts([[e,r,e], ...])'] = decode_questions(
+                remapped_facts, final_merged_json, 'edges'
             )
 
         return final_merged_json
@@ -2794,9 +2805,10 @@ class CompressRag_rl:
             codebook_sub_a = new_json_lst[0]
             self.meta_codebook = merging_codebook(self.meta_codebook, codebook_sub_a, 'answers',   self.word_emb, True)
 
-        if facts_cb:
+        if facts_cb is not None:
             print("----------fact is loaded------")
             self.meta_codebook = merging_codebook(self.meta_codebook, facts_cb, 'facts', self.word_emb, False)
+            self._facts_preloaded = True
 
 
     def combine_ents_func(self):
@@ -2807,35 +2819,58 @@ class CompressRag_rl:
                  self.include_thinkings) 
         
 
+    def load_and_merge_facts(self, facts_json_path, chunk_chars=800, overlap=120):
+        if not facts_json_path:
+            return None
+        if isinstance(facts_json_path, (list, tuple)):
+            paths = [p for p in facts_json_path if p]
+        else:
+            paths = [facts_json_path]
+
+        combined_facts_cb = None
+        for p in paths:
+            cb = self.preload_context_json(p, chunk_chars, overlap)
+            if not cb:
+                continue
+            if combined_facts_cb is None:
+                combined_facts_cb = cb
+            else:
+                combined_facts_cb = merging_codebook(
+                    combined_facts_cb, cb, 'facts', self.word_emb, False
+                )
+        return combined_facts_cb
+
     def run_work_flow(self, q_prompt, rule="Answer questions", facts_json_path: str = None, chunk_chars: int = 800, overlap: int = 120):
         q_json = self.encode_question(q_prompt, rule)
   
-        temp_facts_cb = None
-        if not self.meta_codebook and facts_json_path:
-            temp_facts_cb = self.preload_context_json(facts_json_path, chunk_chars, overlap)
+        combined_facts_cb = None
+        if not getattr(self, "_facts_preloaded", False) and facts_json_path:
+            combined_facts_cb = self.load_and_merge_facts(facts_json_path, chunk_chars, overlap)
+            if combined_facts_cb:
+                self.meta_codebook = merging_codebook(
+                    self.meta_codebook, combined_facts_cb, 'facts', self.word_emb, False
+                )
+                self._facts_preloaded = True
 
         if self.meta_codebook:
             all_answers, all_q_indices, all_f_indices = self.retrieve(q_json)
+            print("all_answers", all_answers)
+            print("all_q_indices", all_q_indices)
             print("all_f_indices", all_f_indices)
             domain_knowledge_lst = self.find_related_knowledge(all_answers, all_q_indices, all_f_indices)
             print("domain_knowledge_lst", domain_knowledge_lst)
             final_merged_json = self.compact_indicies_for_prompt(q_json, domain_knowledge_lst)
-            print("final_merged_json", final_merged_json)
+            print("facts(edges[i])", final_merged_json['facts(edges[i])'])
+            print("facts([[e,r,e], ...])", final_merged_json['facts([[e,r,e], ...])'])
         else:
-            if temp_facts_cb:
-                final_merged_json = temp_facts_cb
-            else:
-                final_merged_json = q_json.copy()
-
+            final_merged_json = combined_facts_cb if combined_facts_cb else q_json.copy()
         new_result, new_json_lst = self.collect_results(final_merged_json, questions=q_prompt)
-        print("new_result", new_result)
-        print("new_json_lst", new_json_lst)
 
-        self.update_meta(new_json_lst, facts_cb=temp_facts_cb)
+        self.update_meta(new_json_lst, facts_cb=combined_facts_cb)
 
-        if self.round % self.combine_ents_rounds == 0:
-            self.combine_ents_func()
-        self.round += 1
+        #if self.round % self.combine_ents_rounds == 0:
+        #    self.combine_ents_func()
+        #self.round += 1
 
         return new_result
 

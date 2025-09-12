@@ -468,7 +468,6 @@ class Phi4MiniReasoningLLM:
 
 
     def _build_prompt(self, final_merged_json, question):
-
         q_txt, gk_txt, st_txt, ft_txt = get_context(final_merged_json)
         user_msg = ""
 
@@ -482,11 +481,14 @@ class Phi4MiniReasoningLLM:
             "The system searched for a related question in the database. Below are related question's graph triples and its prior answer as reference. You don't have to follow it completely, just use it as a reference.",
             "[RELATED QUESTION'S GRAPH TRIPLES]:",
             q_txt,
-            f"[RELATED QUESTION'S ANSWER]: {gk_txt}",
+            f"[RELATED QUESTION'S ANSWER TRIPLES]: {gk_txt}",
         ]
         
         if st_txt.strip().lower() != "none.":
-            ctx_lines.append(f"[RELATED QUESTION'S THINKING]: {st_txt}")
+            ctx_lines.append(f"[RELATED THINKING“S TRIPLES]: {st_txt}")
+
+        if ft_txt.strip().lower() != "none.":
+            ctx_lines.append(f"[RELATED FACTS'S TRIPLES]: {ft_txt}")
 
         ctx_lines.append("<<<RETRIEVED_CONTEXT_END>>>")
 
