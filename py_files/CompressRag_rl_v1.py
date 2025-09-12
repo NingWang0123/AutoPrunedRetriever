@@ -15,6 +15,7 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
+from optimize_combine_ent import combine_ents_auto
 
 nlp = spacy.load("en_core_web_sm")
 
@@ -2326,7 +2327,9 @@ class CompressRag:
 
     def combine_ents_func(self):
 
-        self.meta_codebook = combine_ents(self.meta_codebook,
+        # update to the fast version(automatically find gpu to boosts)
+
+        self.meta_codebook = combine_ents_auto(self.meta_codebook,
                  self.min_exp_num,  
                  self.max_exp_num,  
                  self.include_thinkings) 

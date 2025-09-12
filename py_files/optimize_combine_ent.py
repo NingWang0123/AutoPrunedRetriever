@@ -547,7 +547,7 @@ def combine_ents_auto(codebook_main: Dict[str, Any],
                      random_state: int = 0,
                      sample_size_prop: float = 0.2, #
                      k_grid_size: int = 8,
-                     scoring: str = "db",
+                     scoring: str = "silhouette",
                      backend: str = 'auto') -> Dict[str, Any]:
     """
     GPU-accelerated entity clustering with automatic device selection.
@@ -1236,54 +1236,31 @@ def timed(fn, *args, **kwargs):
     out = fn(*args, **kwargs)
     t1 = time.perf_counter()
     return out, t1 - t0
-if __name__ == "__main__":
-    # Small demo (should finish quickly)
-    N_SMALL, D = 10000, 96
-    cb_small = make_codebook(N_SMALL, D, m_edges=50000, seed=42)
+# if __name__ == "__main__":
+#     # Small demo (should finish quickly)
+#     N_SMALL, D = 10000, 96
+#     cb_small = make_codebook(N_SMALL, D, m_edges=50000, seed=42)
 
-    print(f"\n=== SMALL DATASET: n={N_SMALL}, d={D} ===")
-    # fast
-    # cb_fast_s, t_fast_s = timed(combine_ents_fast, deepcopy(cb_small),
-    #                             min_exp_num=2, max_exp_num=20,
-    #                             random_state=0, sample_size=2000, k_grid_size=8, scoring="db")
-    # print(f"[fast]   time={t_fast_s:.2f}s, k={cb_fast_s['_chosen_k']}, |E'|={len(cb_fast_s['e'])}")
+#     print(f"\n=== SMALL DATASET: n={N_SMALL}, d={D} ===")
+#     # fast
+#     # cb_fast_s, t_fast_s = timed(combine_ents_fast, deepcopy(cb_small),
+#     #                             min_exp_num=2, max_exp_num=20,
+#     #                             random_state=0, sample_size=2000, k_grid_size=8, scoring="db")
+#     # print(f"[fast]   time={t_fast_s:.2f}s, k={cb_fast_s['_chosen_k']}, |E'|={len(cb_fast_s['e'])}")
 
-    cb_fast_s, t_fast_s = timed(combine_ents_auto, deepcopy(cb_small),
-                                min_exp_num=2, max_exp_num=20,
-                                backend='auto',scoring = 'silhouette')
-    print(f"[fast new]   time={t_fast_s:.2f}s, |E'|={len(cb_fast_s['e'])}")
-
-
-    config1 = ClusteringConfig(k_neighbors=10, similarity_threshold=0.2, ann_backend="auto")
-
-    cb_ann, t_ann = timed(combine_ents_ann_knn, deepcopy(cb_small),
-                                config=config1)
-    print(f"[fast new]   time={t_ann:.2f}s, |E'|={len(cb_ann['e'])}") 
+#     cb_fast_s, t_fast_s = timed(combine_ents_auto, deepcopy(cb_small),
+#                                 min_exp_num=2, max_exp_num=20,
+#                                 backend='auto',scoring = 'silhouette')
+#     print(f"[fast new]   time={t_fast_s:.2f}s, |E'|={len(cb_fast_s['e'])}")
 
 
+#     config1 = ClusteringConfig(k_neighbors=10, similarity_threshold=0.2, ann_backend="auto")
 
-# original (WARNING: still potentially heavy at 10k if the k-range is wide)
-# Consider temporarily tightening min/max to shrink the candidate k range.
-# cb_orig_s, t_orig_s = timed(combine_ents_original, deepcopy(cb_small),
-#                             min_exp_num=5, max_exp_num=10,  # narrowed to avoid very long run
-#                             random_state=0)
-# print(f"[orig]   time={t_orig_s:.2f}s, k={cb_orig_s['_chosen_k']}, |E'|={len(cb_orig_s['e'])}")
+#     cb_ann, t_ann = timed(combine_ents_ann_knn, deepcopy(cb_small),
+#                                 config=config1)
+#     print(f"[fast new]   time={t_ann:.2f}s, |E'|={len(cb_ann['e'])}") 
 
-# Larger demo (fast version only by default)
-# N_LARGE = 50_000
-# cb_large = make_codebook(N_LARGE, D, m_edges=300_000, seed=7)
 
-# print(f"\n=== LARGE DATASET: n={N_LARGE}, d={D} ===")
-# cb_fast_l, t_fast_l = timed(combine_ents_fast, deepcopy(cb_large),
-#                             min_exp_num=2, max_exp_num=20,
-#                             random_state=0, sample_size=4000, k_grid_size=8, scoring="db",
-#                             mbk_batch=16384, mbk_iters=120)
-# print(f"[fast]   time={t_fast_l:.2f}s, k={cb_fast_l['_chosen_k']}, |E'|={len(cb_fast_l['e'])}")
-
-# Uncomment at your own risk (this can take a very long time on 50k):
-# cb_orig_l, t_orig_l = timed(combine_ents_original, deepcopy(cb_large),
-#                             min_exp_num=2, max_exp_num=20, random_state=0)
-# print(f"[orig]   time={t_orig_l/60:.1f} min, k={cb_orig_l['_chosen_k']}, |E'|={len(cb_orig_l['e'])}")
 
 
 # python py_files/optimize_combine_ent.py
