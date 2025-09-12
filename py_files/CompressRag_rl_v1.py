@@ -2574,9 +2574,11 @@ class CompressRag_rl:
 
         self.update_meta(q_json,new_json_lst)
 
-        # only combine per k round
-        if self.round % self.combine_ents_rounds ==0:
-            self.combine_ents_func()
+        # set 0 for never use 
+        if self.combine_ents_rounds != 0:
+            # only combine per k round
+            if self.round % self.combine_ents_rounds ==0:
+                self.combine_ents_func()
 
         self.round += 1
 
