@@ -2868,9 +2868,9 @@ class CompressRag_rl:
 
         self.update_meta(new_json_lst, facts_cb=combined_facts_cb)
 
-        #if self.round % self.combine_ents_rounds == 0:
-        #    self.combine_ents_func()
-        #self.round += 1
+        if self.round % self.combine_ents_rounds == 0:
+            self.combine_ents_func()
+        self.round += 1
 
         return new_result
 
