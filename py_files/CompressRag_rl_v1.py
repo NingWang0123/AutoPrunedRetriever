@@ -24,48 +24,130 @@ OBJ_DEPS  = {"dobj", "obj", "attr", "oprd", "dative"}
 NEG_DEPS  = {"neg"}
 
 
-def ingest_context_json(
-    json_path: str,
-    *,
-    chunk_chars: int = 800,
-    overlap: int = 120,
-) -> Tuple[Optional[FAISS], Optional[FAISS], int]:
-    with open(json_path, "r", encoding="utf-8") as f:
-        data = json.load(f)
+def get_json_with_given_facts(facts_cb, codebook_sub_q, decode: bool = True):
 
-    def _chunk_text(text: str, *, chunk_chars: int = 800, overlap: int = 120) -> List[str]:
-        text = (text or "").strip()
-        if not text:
-            return []
-        chunks = []
-        n = len(text)
-        step = max(1, chunk_chars - overlap)
-        i = 0
-        while i < n:
-            j = min(n, i + chunk_chars)
-            chunk = text[i:j].strip()
-            if chunk:
-                chunks.append(chunk)
-            if j == n:
-                break
-            i += step
-        return chunks
+    fact_runs = facts_cb.get('facts(edges[i])', [])  # List[List[int]]
+    flat_facts = [[x for run in (r if isinstance(r, (list, tuple)) else [r]) for x in run] for r in fact_runs]
+    all_idx = sorted(set(x for sub in flat_facts for x in sub))
 
-    items = data if isinstance(data, list) else [data]
+    edge_mat_src = facts_cb['edge_matrix']
+    e_src = facts_cb['e']
+    r_src = facts_cb['r']
 
-    for item_id, item in enumerate(items, start=1):
-        corpus = (item.get("corpus_name") or "Unknown").strip()
-        ctx = (item.get("context") or "").strip()
-        if not ctx:
-            continue
+    uniq_e_idx, uniq_r_idx = set(), set()
+    edges_sub = []
+    for old_i in all_idx:
+        h, r, t = edge_mat_src[old_i]
+        uniq_e_idx.update([h, t])
+        uniq_r_idx.add(r)
+        edges_sub.append([h, r, t])
 
-        chunks = _chunk_text(ctx, chunk_chars=chunk_chars, overlap=overlap)
-        total_chunks += len(chunks)
+    e_old2new = {old: i for i, old in enumerate(sorted(uniq_e_idx))}
+    r_old2new = {old: i for i, old in enumerate(sorted(uniq_r_idx))}
+    def _remap_edges(edges):
+        out = []
+        for h, r, t in edges:
+            out.append([e_old2new[h], r_old2new[r], e_old2new[t]])
+        return out
 
-        graph_docs = []
-        for cid, ch in enumerate(chunks, start=1):
-            codebook = get_code_book(ch, type="fact")  
-    return codebook
+    edge_matrix_sub = _remap_edges(edges_sub)
+    e_list = [e_src[old] for old in sorted(uniq_e_idx)]
+    r_list = [r_src[old] for old in sorted(uniq_r_idx)]
+
+    old_edge_to_new = {}
+    for new_idx, (h, r, t) in enumerate(edge_matrix_sub):
+        old_edge = edges_sub[new_idx]  
+        old_edge_to_new[tuple(old_edge)] = new_idx
+
+    def _remap_facts_runs(runs):
+        out = []
+        for run in runs:
+            tmp = []
+            for old_edge_idx in run:
+                h, r, t = edge_mat_src[old_edge_idx]
+                new_idx = old_edge_to_new[(h, r, t)]
+                tmp.append(new_idx)
+            out.append(tmp)
+        return out
+
+    facts_runs_new = _remap_facts_runs(flat_facts)
+
+    ent2idx_q = {}
+    rel2idx_q = {}
+
+    for i, name in enumerate(e_list):
+        ent2idx_q[name] = i
+    for i, name in enumerate(r_list):
+        rel2idx_q[name] = i
+
+    def _ensure_ent(name):
+        if name in ent2idx_q:
+            return ent2idx_q[name]
+        ent2idx_q[name] = len(e_list)
+        e_list.append(name)
+        return ent2idx_q[name]
+    def _ensure_rel(name):
+        if name in rel2idx_q:
+            return rel2idx_q[name]
+        rel2idx_q[name] = len(r_list)
+        r_list.append(name)
+        return rel2idx_q[name]
+
+    edges_q_src = codebook_sub_q['edges([e,r,e])']
+    e_q = codebook_sub_q['e']
+    r_q = codebook_sub_q['r']
+
+
+    tuple2idx = {tuple(edge): idx for idx, edge in enumerate(edge_matrix_sub)}
+    def _ensure_edge(tup):
+        if tup in tuple2idx:
+            return tuple2idx[tup]
+        idx = len(tuple2idx)
+        tuple2idx[tup] = idx
+        return idx
+
+    new_edges_list = [None] * len(tuple2idx)
+    for tup, idx in tuple2idx.items():
+        new_edges_list[idx] = list(tup)
+
+    def _remap_q_edge(eh, rr, et):
+        h_name, r_name, t_name = e_q[eh], r_q[rr], e_q[et]
+        nh = _ensure_ent(h_name)
+        nr = _ensure_rel(r_name)
+        nt = _ensure_ent(t_name)
+        return _ensure_edge((nh, nr, nt))
+
+    q_runs = codebook_sub_q['questions(edges[i])']
+    q_runs_new = []
+    for run in q_runs:
+        new_run = []
+        for (eh, rr, et) in [edges_q_src[i] for i in run]:
+            new_idx = _remap_q_edge(eh, rr, et)
+            new_run.append(new_idx)
+        q_runs_new.append(new_run)
+
+    edge_matrix = []
+    for tup, idx in sorted(tuple2idx.items(), key=lambda x: x[1]):
+        edge_matrix.append(list(tup))
+
+    fin = {
+        'e': e_list,
+        'r': r_list,
+        'edge_matrix': edge_matrix,
+        'questions(edges[i])': q_runs_new,
+        'given knowledge(edges[i])': facts_runs_new,
+        'rule': codebook_sub_q.get('rule', 'Answer questions'),
+    }
+    if decode:
+        fin = {
+            'e': e_list,
+            'r': r_list,
+            'edge_matrix': edge_matrix,
+            'questions([[e,r,e], ...])': decode_questions(q_runs_new, fin, 'edges'),
+            'given knowledge([[e,r,e], ...])': decode_questions(facts_runs_new, fin, 'edges'),
+            'rule': codebook_sub_q.get('rule', 'Answer questions'),
+        }
+    return fin
 
 def get_context(final_merged_json):
     def _triples_to_words(triples, cb):
@@ -81,25 +163,29 @@ def get_context(final_merged_json):
             edges = cb["edge_matrix"]
             triples = [edges[i] for i in block]
             return _triples_to_words(triples, cb)
+        if isinstance(block[0], (list, tuple)) and isinstance(block[0][0], str):
+            return block
         return []
+
     def _linearize_triples_block(triples, sep=", ", end=""):
         if not triples:
             return "None."
         return sep.join(f"{h} {r} {t}{end}" for h, r, t in triples)
-    
-    qs_groups = final_merged_json.get("questions([[e,r,e], ...])", [])
-    gk_groups = final_merged_json.get("given knowledge([[e,r,e], ...])", [])
-    st_groups = final_merged_json.get("start thinking with(edges[i])", [])
 
-    qs_words = _decode_block(qs_groups[0], final_merged_json) if qs_groups else []
-    gk_words = _decode_block(gk_groups[0], final_merged_json) if gk_groups else []
-    st_words = _decode_block(st_groups[0], final_merged_json) if st_groups else []
+    def _extract_txt(keys):
+        for k in keys:
+            groups = final_merged_json.get(k, [])
+            if groups:
+                words = _decode_block(groups[0], final_merged_json)
+                return _linearize_triples_block(words)
+        return "None."
 
-    q_txt  = _linearize_triples_block(qs_words)
-    gk_txt = _linearize_triples_block(gk_words)
-    st_txt = _linearize_triples_block(st_words)
-    
-    return q_txt, gk_txt, st_txt
+    q_txt  = _extract_txt(["questions([[e,r,e], ...])", "questions(edges[i])"])
+    gk_txt = _extract_txt(["given knowledge([[e,r,e], ...])", "given knowledge(edges[i])"])
+    st_txt = _extract_txt(["start thinking with([[e,r,e], ...])", "start thinking with(edges[i])"])
+    ft_txt = _extract_txt(["facts([[e,r,e], ...])", "facts(edges[i])"])  
+
+    return q_txt, gk_txt, st_txt, ft_txt
 
 # -------- node labels --------
 def noun_phrase_label(head, include_det=False, use_ents=True):
@@ -671,25 +757,29 @@ def get_word_embeddings(list_of_text,word_emb):
 
 
 ### edit codebook to also take the answers
-def get_code_book(prompt,type = 'questions',rule = "Answer questions."):
+def get_code_book(prompt, type='questions', rule="Answer questions."):
     """
-    prompt:str
-    type: one of 'questions', 'answers', and 'thinkings'
+    prompt : str
+    type   : one of {'questions','answers','thinkings','facts'}
     """
+    valid_types = {'questions', 'answers', 'thinkings', 'facts'}
+    if type not in valid_types:
+        raise ValueError(f"type must be one of {valid_types}, got: {type}")
+
     triples = sentence_relations(prompt, include_det=False)
 
-    codebook, ent2id, rel2id = build_codebook_from_triples(triples,rule)
-
+    codebook, ent2id, rel2id = build_codebook_from_triples(triples, rule)
     edges = edges_from_triples(triples, ent2id, rel2id)
 
-    feat_name = type+'(edges[i])'
+    feat_name = f"{type}(edges[i])"  
 
-    dict_2 = {"edges([e,r,e])": edges,feat_name:all_chains_no_subchains(edges,False)}
+    dict_2 = {
+        "edges([e,r,e])": edges,
+        feat_name: all_chains_no_subchains(edges, False)
+    }
 
     codebook.update(dict_2)
-
-    codebook.pop('sid') 
-
+    codebook.pop('sid')
     return codebook
 
 
@@ -821,11 +911,13 @@ def remap_question_indices(questions, idx_map, max_dense_size=10_000_000):
 
 
 #### making the merging codebook also able to merge the answer code book
-def merging_codebook(codebook_main,codebook_sub,type='questions',word_emb=word_emb,use_thinkings = False):
+def merging_codebook(codebook_main, codebook_sub, type='questions', word_emb=word_emb, use_thinkings=False):
+    if type == 'fact':
+        type = 'facts'
 
-    feat_name = type+'(edges[i])'
+    feat_name = type + '(edges[i])'
 
-    if type=='questions':
+    if type == 'questions':
         main_feat_name = 'questions_lst'
         unupdated_feat_name1 = 'answers_lst'
         unupdated_feat_name2 = 'thinkings_lst'
@@ -840,44 +932,39 @@ def merging_codebook(codebook_main,codebook_sub,type='questions',word_emb=word_e
         unupdated_feat_name1 = 'questions_lst'
         unupdated_feat_name2 = 'answers_lst'
 
-
+    elif type == 'facts':             
+        main_feat_name = 'facts_lst'
+        unupdated_feat_name1 = 'questions_lst'
+        unupdated_feat_name2 = 'answers_lst'
 
     if codebook_main:
-        # get the ents and rs needs to be merged in to codebook_main
+        codebook_main.setdefault('answers_lst', [])
+        codebook_main.setdefault('thinkings_lst', [])
+        codebook_main.setdefault('questions_lst', [])
+        codebook_main.setdefault('facts_lst', [])
+        codebook_main.setdefault('questions_to_thinkings', {})
+
         questions_needs_merged = codebook_sub[feat_name]
         lst_questions_main = codebook_main[main_feat_name]
 
-        edge_mat_needs_merged = codebook_sub['edges([e,r,e])']
+        edge_mat_needs_merged = codebook_sub.get('edges([e,r,e])', codebook_sub.get('edge_matrix'))
         edge_mat_main = codebook_main['edge_matrix']
 
-        # get new index and updated index for main codebook and sub codebook
+        new_index_replacement_for_ent_sub, index_ent_main, new_added_ents = update_the_index(codebook_main, codebook_sub, 'e')
+        new_index_replacement_for_r_sub, index_r_main, new_added_rs = update_the_index(codebook_main, codebook_sub, 'r')
 
-        new_index_replacement_for_ent_sub,index_ent_main,new_added_ents = update_the_index(codebook_main,codebook_sub,'e')
+        new_ent_embeds = get_word_embeddings(new_added_ents, word_emb)
+        new_r_embeds = get_word_embeddings(new_added_rs, word_emb)
 
-        new_index_replacement_for_r_sub,index_r_main,new_added_rs = update_the_index(codebook_main,codebook_sub,'r')
-
-        # get newly added entities word embeddings
-        new_ent_embeds = get_word_embeddings(new_added_ents,word_emb)
-
-        # get newly added relations word embeddings
-        new_r_embeds = get_word_embeddings(new_added_rs,word_emb)
-
-        # update the edges matrix needs to be merged
         edge_mat_needs_merged_remapped = remap_edges_matrix(edge_mat_needs_merged, new_index_replacement_for_ent_sub, new_index_replacement_for_r_sub)
 
-        # combine the edges matrix and new index for edges_sub
-        new_index_replacement_for_edges_sub,index_edges_main = combine_updated_edges(edge_mat_main,edge_mat_needs_merged_remapped)
+        new_index_replacement_for_edges_sub, index_edges_main = combine_updated_edges(edge_mat_main, edge_mat_needs_merged_remapped)
 
-        # update the questions index 
         updated_questions_sub = remap_question_indices(questions_needs_merged, new_index_replacement_for_edges_sub)
 
-        # combine the questions
         lst_questions_main.append(updated_questions_sub)
 
-
         ### add the knowledge graph and it's related index
-
-
         codebook_main["e"].extend(new_added_ents)
         codebook_main["r"].extend(new_added_rs)
         codebook_main["edge_matrix"] = index_edges_main
@@ -885,31 +972,28 @@ def merging_codebook(codebook_main,codebook_sub,type='questions',word_emb=word_e
         codebook_main["e_embeddings"] = codebook_main['e_embeddings'] + new_ent_embeds
         codebook_main["r_embeddings"] = codebook_main['r_embeddings'] + new_r_embeds
 
-
-
         if type == 'thinkings':
-            codebook_main['questions_to_thinkings'][len(codebook_main['questions_lst'])-1] = len(codebook_main[main_feat_name])-1
-
+            codebook_main['questions_to_thinkings'][len(codebook_main['questions_lst']) - 1] = len(codebook_main[main_feat_name]) - 1
 
     else:
         # main codebook is empty
         codebook_main = {
-            "e": codebook_sub['e'],  
-            "r": codebook_sub['r'],  
-            'edge_matrix':codebook_sub['edges([e,r,e])'],
-            main_feat_name:[codebook_sub[feat_name]],
-            unupdated_feat_name1:[],
+            "e": codebook_sub['e'],
+            "r": codebook_sub['r'],
+            'edge_matrix': codebook_sub.get('edges([e,r,e])', codebook_sub.get('edge_matrix')),  # ← 同样兜底
+            main_feat_name: [codebook_sub[feat_name]],
+            unupdated_feat_name1: [],
             "rule": codebook_sub['rule'],
-            "e_embeddings": get_word_embeddings(codebook_sub['e'],word_emb),  
-            "r_embeddings": get_word_embeddings(codebook_sub['r'],word_emb),  
+            "e_embeddings": get_word_embeddings(codebook_sub['e'], word_emb),
+            "r_embeddings": get_word_embeddings(codebook_sub['r'], word_emb),
         }
 
         if use_thinkings:
             codebook_main[unupdated_feat_name2] = []
             codebook_main['questions_to_thinkings'] = {}
 
-
     return codebook_main
+
 
 
 #### for the merging functions only use when the codebook_sub are not empty
@@ -2327,9 +2411,7 @@ class CompressRag:
 
     def combine_ents_func(self):
 
-        # update to the fast version(automatically find gpu to boosts)
-
-        self.meta_codebook = combine_ents_auto(self.meta_codebook,
+        self.meta_codebook = combine_ents(self.meta_codebook,
                  self.min_exp_num,  
                  self.max_exp_num,  
                  self.include_thinkings) 
@@ -2424,7 +2506,7 @@ class CompressRag_rl:
             elif thinkings_choice == "unique":
                 self.thinking_extract_function = find_unique_thinkings
 
-
+        self.llm.include_thinkings = self.include_thinkings
         ### answers param
         if answers_choice == "not_include":
             self.include_answers = False
@@ -2435,13 +2517,125 @@ class CompressRag_rl:
             elif answers_choice == "unique":
                 self.answers_extract_function = find_unique_answers
 
+        ### context fact param
+        self.context_json_path = None  
+        self._facts_preloaded = False  
 
+
+    def preload_context_json(self, json_path: str, chunk_chars: int = 800, overlap: int = 120):
+        import json
+
+        with open(json_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        def _chunk_text(text: str, *, chunk_chars: int = 800, overlap: int = 120):
+            text = (text or "").strip()
+            if not text:
+                return []
+            chunks, n = [], len(text)
+            step = max(1, chunk_chars - overlap)
+            i = 0
+            while i < n:
+                j = min(n, i + chunk_chars)
+                chunk = text[i:j].strip()
+                if chunk:
+                    chunks.append(chunk)
+                if j == n:
+                    break
+                i += step
+            return chunks
+
+        items = data if isinstance(data, list) else [data]
+
+        combined = None  
+
+        for item in items:
+            ctx = (item.get("context") or "").strip()
+            if not ctx:
+                continue
+            for ch in _chunk_text(ctx, chunk_chars=chunk_chars, overlap=overlap):
+                fact_cb = get_code_book(ch, type='facts', rule="Store factual statements.")
+                if combined is None:
+                    combined = {
+                        "e": list(fact_cb["e"]),
+                        "r": list(fact_cb["r"]),
+                        "edge_matrix": list(fact_cb["edges([e,r,e])"]),
+                        "facts(edges[i])": [lst for lst in fact_cb["facts(edges[i])"]],
+                        "questions_lst": [],    
+                        "answers_lst": [],
+                        "thinkings_lst": [],
+                        "rule": fact_cb.get("rule", "Store factual statements."),
+                        "e_embeddings": [],
+                        "r_embeddings": [],
+                    }
+                else:
+                    ent_map, _, new_ents = update_the_index(combined, fact_cb, "e")
+                    rel_map, _, new_rels = update_the_index(combined, fact_cb, "r")
+
+                    edges_remapped = remap_edges_matrix(
+                        fact_cb["edges([e,r,e])"], ent_map, rel_map
+                    )
+
+                    edge_map, new_edge_matrix = combine_updated_edges(
+                        combined["edge_matrix"], edges_remapped
+                    )
+
+                    facts_runs = fact_cb["facts(edges[i])"]
+                    facts_runs_mapped = remap_question_indices(facts_runs, edge_map)
+                    combined["facts(edges[i])"].extend(facts_runs_mapped)
+
+                    combined["e"].extend(new_ents)
+                    combined["r"].extend(new_rels)
+                    combined["edge_matrix"] = new_edge_matrix
+
+        return combined
 
 
     def encode_question(self,q_prompt,rule):
 
         return get_code_book(q_prompt,'questions',rule)
-    
+
+    def _embed_edge_run(self, edge_run, codebook_main):
+        decoded = decode_question(edge_run, codebook_main, fmt='embeddings')
+        # 利用你已有的 _avg_vec_from_decoded
+        dim = len(codebook_main["e_embeddings"][0]) if codebook_main.get("e_embeddings") else 64
+        return _avg_vec_from_decoded(decoded, dim)
+
+    def _rank_facts_for_query(self, query_edges, facts_runs, codebook_main, top_m=2):
+        if not facts_runs:
+            return []
+        qv = self._embed_edge_run(query_edges, codebook_main).reshape(1, -1)
+
+        F = np.stack([self._embed_edge_run(run, codebook_main) for run in facts_runs], axis=0)
+
+        qn = qv / (np.linalg.norm(qv, axis=1, keepdims=True) + 1e-12)
+        fn = F  / (np.linalg.norm(F,  axis=1, keepdims=True)  + 1e-12)
+        sims = (qn @ fn.T).ravel()   
+        k = min(top_m, sims.shape[0])
+        idx = np.argpartition(-sims, k-1)[:k]
+        idx = idx[np.argsort(-sims[idx])]
+        return [(int(i), float(sims[i])) for i in idx]  
+
+    def _flatten_facts(self, meta):
+        """
+        返回:
+        flat_facts: List[List[int]]   # 每个元素是一条 fact 的边索引链
+        map_idx:    List[Tuple[int,int]]  # (facts_lst 的组号, 该组内索引)
+        """
+        flat, map_idx = [], []
+        for gi, group in enumerate(meta.get('facts_lst', [])):
+            for fj, run in enumerate(group):
+                # run 可能还有一层；这里做个稳健拍平：只要是 [int,...] 就当作一条
+                if run and isinstance(run, (list, tuple)) and isinstance(run[0], int):
+                    flat.append(run)
+                    map_idx.append((gi, fj))
+                elif isinstance(run, (list, tuple)):
+                    for r2 in run:
+                        if r2 and isinstance(r2, (list, tuple)) and isinstance(r2[0], int):
+                            flat.append(r2)
+                            map_idx.append((gi, fj))
+        return flat, map_idx
+
     def retrieve(self,q_json):
 
         self.meta_codebook = merging_codebook(self.meta_codebook,q_json,'questions',self.word_emb,True)
@@ -2463,11 +2657,33 @@ class CompressRag_rl:
         result = add_answers_to_filtered_lst(top_m_results,self.meta_codebook)
 
         all_answers,all_q_indices = get_answers_lst_from_results(result)
+        
 
-        return all_answers,all_q_indices
+        flat_facts, facts_map = self._flatten_facts(self.meta_codebook)  
+
+        all_facts = []
+        all_f_indices = []   
+
+        for q_edges in questions_edges_index:
+            ranked = self._rank_facts_for_query(q_edges, flat_facts, self.meta_codebook, top_m=self.top_m)
+            for fact_idx, _score in ranked:
+                all_facts.append(flat_facts[fact_idx])
+                all_f_indices.append(facts_map[fact_idx])
+
+        return all_answers, all_q_indices, all_f_indices
     
+    def _gather_facts_by_indices(self, all_f_indices, codebook_main):
+        facts_lsts = []
+        facts_store = codebook_main.get('facts_lst', [])
+        for fi, fj in all_f_indices or []:
+            try:
+                facts_lsts.append(facts_store[int(fi)][int(fj)])
+            except Exception:
+                # 越界或结构不符时跳过
+                pass
+        return facts_lsts
 
-    def find_related_knowledge(self,all_answers,all_q_indices):
+    def find_related_knowledge(self,all_answers,all_q_indices, all_f_indices):
 
         domain_knowledge_lst = []
 
@@ -2479,38 +2695,61 @@ class CompressRag_rl:
         if self.include_thinkings:
             final_flat_thinkings_lsts = self.thinking_extract_function(all_q_indices,self.meta_codebook)
             domain_knowledge_lst.append(final_flat_thinkings_lsts)
+        
+        if all_f_indices:
+            facts_lsts = self._gather_facts_by_indices(all_f_indices, self.meta_codebook)
 
-
+            final_flat_facts_lsts = self.answers_extract_function(facts_lsts) \
+                                    if self.include_answers else get_flat_answers_lsts(facts_lsts)
+            domain_knowledge_lst.append(final_flat_facts_lsts)   
 
         return domain_knowledge_lst
     
 
-    def compact_indicies_for_prompt(self,codebook_sub_q,domain_knowledge_lst):
+    def compact_indicies_for_prompt(self, codebook_sub_q, domain_knowledge_lst):
+        # unpack
+        flat_answers_lsts = None
+        flat_thinkings_lsts = None
+        flat_facts_lsts = None
 
-        # contain both thinkings and answers
-        if self.include_thinkings and self.include_answers:
-            flat_answers_lsts,flat_thinkings_lsts = domain_knowledge_lst
-            final_merged_json= get_json_with_given_knowledge_and_thinkings(flat_answers_lsts,flat_thinkings_lsts,
-                                                                           self.meta_codebook,codebook_sub_q)
-            
-        # contain answers only
+        ptr = 0
+        if self.include_answers:
+            flat_answers_lsts = domain_knowledge_lst[ptr]
+            ptr += 1
+        if self.include_thinkings:
+            flat_thinkings_lsts = domain_knowledge_lst[ptr]
+            ptr += 1
+        if getattr(self, "include_facts", False):  
+            flat_facts_lsts = domain_knowledge_lst[ptr]
+            ptr += 1
+
+        # cases
+        if self.include_answers and self.include_thinkings:
+            final_merged_json = get_json_with_given_knowledge_and_thinkings(
+                flat_answers_lsts, flat_thinkings_lsts,
+                self.meta_codebook, codebook_sub_q
+            )
+
         elif self.include_answers:
-            flat_answers_lsts = domain_knowledge_lst[0]
-            final_merged_json = get_json_with_given_knowledge(flat_answers_lsts,self.meta_codebook,codebook_sub_q)
+            final_merged_json = get_json_with_given_knowledge(
+                flat_answers_lsts, self.meta_codebook, codebook_sub_q
+            )
 
-        # contain thinkings only
         elif self.include_thinkings:
-            flat_thinkings_lsts = domain_knowledge_lst[0]
-            final_merged_json = get_json_with_given_thinkings(flat_thinkings_lsts,self.meta_codebook,codebook_sub_q)
+            final_merged_json = get_json_with_given_thinkings(
+                flat_thinkings_lsts, self.meta_codebook, codebook_sub_q
+            )
 
-        # only questions
         else:
             final_merged_json = codebook_sub_q.copy()
 
-
+        if flat_facts_lsts is not None:
+            final_merged_json["given facts(edges[i])"] = flat_facts_lsts
+            final_merged_json["given facts([[e,r,e], ...])"] = decode_questions(
+                flat_facts_lsts, final_merged_json, 'edges'
+            )
 
         return final_merged_json
-    
 
     # might also change these functions,now keep always merge with answers json, and only merge with thinking json if use thinkings
     
@@ -2533,19 +2772,20 @@ class CompressRag_rl:
             new_json_lst.append(a_new_json)
         return new_result,new_json_lst
     
-    def update_meta(self,codebook_sub_q,new_json_lst):
-
+    def update_meta(self, codebook_sub_q, new_json_lst, facts_cb=None):
         if self.include_thinkings:
-            codebook_sub_a,codebook_sub_t = new_json_lst
-
-            self.meta_codebook = merging_codebook(self.meta_codebook,codebook_sub_q,'questions',self.word_emb,True)
-            self.meta_codebook = merging_codebook(self.meta_codebook,codebook_sub_a,'answers',self.word_emb,True)
-            self.meta_codebook = merging_codebook(self.meta_codebook,codebook_sub_t,'thinkings',self.word_emb,True)
-
+            codebook_sub_a, codebook_sub_t = new_json_lst
+            self.meta_codebook = merging_codebook(self.meta_codebook, codebook_sub_q, 'questions', self.word_emb, True)
+            self.meta_codebook = merging_codebook(self.meta_codebook, codebook_sub_a, 'answers',   self.word_emb, True)
+            self.meta_codebook = merging_codebook(self.meta_codebook, codebook_sub_t, 'thinkings', self.word_emb, True)
         else:
             codebook_sub_a = new_json_lst[0]
-            self.meta_codebook = merging_codebook(self.meta_codebook,codebook_sub_q,'questions',self.word_emb,True)
-            self.meta_codebook = merging_codebook(self.meta_codebook,codebook_sub_a,'answers',self.word_emb,True)
+            self.meta_codebook = merging_codebook(self.meta_codebook, codebook_sub_q, 'questions', self.word_emb, True)
+            self.meta_codebook = merging_codebook(self.meta_codebook, codebook_sub_a, 'answers',   self.word_emb, True)
+
+        if facts_cb:
+            print("----------fact is loaded------")
+            self.meta_codebook = merging_codebook(self.meta_codebook, facts_cb, 'facts', self.word_emb, False)
 
 
     def combine_ents_func(self):
@@ -2556,35 +2796,38 @@ class CompressRag_rl:
                  self.include_thinkings) 
         
 
-    def run_work_flow(self,q_prompt,rule = "Answer questions"):
-        q_json = self.encode_question(q_prompt,rule)
-
-        # check the meta code book is not empty
+    def run_work_flow(self, q_prompt, rule="Answer questions", facts_json_path: str = None, chunk_chars: int = 800, overlap: int = 120):
+        q_json = self.encode_question(q_prompt, rule)
+  
+        temp_facts_cb = None
+        if not self.meta_codebook and facts_json_path:
+            temp_facts_cb = self.preload_context_json(facts_json_path, chunk_chars, overlap)
 
         if self.meta_codebook:
-            all_answers,all_q_indices = self.retrieve(q_json)
-            domain_knowledge_lst= self.find_related_knowledge(all_answers,all_q_indices)
-            final_merged_json = self.compact_indicies_for_prompt(q_json,domain_knowledge_lst)
-
+            all_answers, all_q_indices, all_f_indices = self.retrieve(q_json)
+            print("all_f_indices", all_f_indices)
+            domain_knowledge_lst = self.find_related_knowledge(all_answers, all_q_indices, all_f_indices)
+            print("domain_knowledge_lst", domain_knowledge_lst)
+            final_merged_json = self.compact_indicies_for_prompt(q_json, domain_knowledge_lst)
+            print("final_merged_json", final_merged_json)
         else:
-            final_merged_json = q_json.copy()
+            if temp_facts_cb:
+                final_merged_json = temp_facts_cb
+            else:
+                final_merged_json = q_json.copy()
 
+        new_result, new_json_lst = self.collect_results(final_merged_json, questions=q_prompt)
+        print("new_result", new_result)
+        print("new_json_lst", new_json_lst)
 
-        new_result,new_json_lst = self.collect_results(final_merged_json, questions=q_prompt)
+        self.update_meta(q_json, new_json_lst, facts_cb=temp_facts_cb)
 
-        self.update_meta(q_json,new_json_lst)
-
-        # set 0 for never use 
-        if self.combine_ents_rounds != 0:
-            # only combine per k round
-            if self.round % self.combine_ents_rounds ==0:
-                self.combine_ents_func()
-
+        if self.round % self.combine_ents_rounds == 0:
+            self.combine_ents_func()
         self.round += 1
 
-        # return answer
-
         return new_result
+
 
     
 #### see usage on test_for_compressrag.py
