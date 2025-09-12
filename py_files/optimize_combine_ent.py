@@ -544,6 +544,7 @@ def combine_ents_auto(codebook_main: Dict[str, Any],
                      min_exp_num: int = 2,
                      max_exp_num: int = 20,
                      use_thinking: bool = True,
+                     use_facts: bool = True,
                      random_state: int = 0,
                      sample_size_prop: float = 0.2, #
                      k_grid_size: int = 8,
@@ -703,6 +704,8 @@ def combine_ents_auto(codebook_main: Dict[str, Any],
         codebook_main['answers_lst'] = remap_edge_indices(codebook_main['answers_lst'])
     if use_thinking and codebook_main.get('thinkings_lst') is not None:
         codebook_main['thinkings_lst'] = remap_edge_indices(codebook_main['thinkings_lst'])
+    if use_facts and codebook_main.get('facts_lst') is not None:
+        codebook_main['facts_lst'] = remap_edge_indices(codebook_main['facts_lst'])
     
     codebook_main['e'] = list(new_e)
     codebook_main['e_embeddings'] = list(new_e_emb)
