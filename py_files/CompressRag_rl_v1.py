@@ -151,6 +151,9 @@ def get_json_with_given_facts(facts_cb, codebook_sub_q, decode: bool = True):
 
 def get_context(final_merged_json):
     def _triples_to_words(triples, cb):
+        print(f'triples: {triples}')
+        print(f'cb: {cb}')
+        
         E, R = cb["e"], cb["r"]
         return [[E[h], R[r], E[t]] for (h, r, t) in triples]
     
@@ -1414,11 +1417,21 @@ def coarse_filter(
 def add_answers_to_filtered_lst(top_m_results,codebook_main):
 
     result = {}
+    print(f'hinima: {len(codebook_main["answers_lst"])==len(codebook_main["questions_lst"])}')
+    print(f'wonima: {codebook_main["answers_lst"]}')
+    print(f'rinima: {codebook_main["questions_lst"]}')
+                                 
     for qid, matches in top_m_results.items():
+        
         result[qid] = []
+    
         for m in matches:
             q_idx = m["questions_index"]
             m_with_feat = m.copy()
+            print("*"*60)
+            print(f'q_idx: {q_idx}')
+            print("*"*60)
+            print(len(codebook_main['answers_lst']))
             m_with_feat['answers(edges[i])'] = codebook_main['answers_lst'][q_idx]
             result[qid].append(m_with_feat)
 
@@ -2772,15 +2785,13 @@ class CompressRag_rl:
             new_json_lst.append(a_new_json)
         return new_result,new_json_lst
     
-    def update_meta(self, codebook_sub_q, new_json_lst, facts_cb=None):
+    def update_meta(self, new_json_lst, facts_cb=None):
         if self.include_thinkings:
             codebook_sub_a, codebook_sub_t = new_json_lst
-            self.meta_codebook = merging_codebook(self.meta_codebook, codebook_sub_q, 'questions', self.word_emb, True)
             self.meta_codebook = merging_codebook(self.meta_codebook, codebook_sub_a, 'answers',   self.word_emb, True)
             self.meta_codebook = merging_codebook(self.meta_codebook, codebook_sub_t, 'thinkings', self.word_emb, True)
         else:
             codebook_sub_a = new_json_lst[0]
-            self.meta_codebook = merging_codebook(self.meta_codebook, codebook_sub_q, 'questions', self.word_emb, True)
             self.meta_codebook = merging_codebook(self.meta_codebook, codebook_sub_a, 'answers',   self.word_emb, True)
 
         if facts_cb:
@@ -2820,7 +2831,7 @@ class CompressRag_rl:
         print("new_result", new_result)
         print("new_json_lst", new_json_lst)
 
-        self.update_meta(q_json, new_json_lst, facts_cb=temp_facts_cb)
+        self.update_meta(new_json_lst, facts_cb=temp_facts_cb)
 
         if self.round % self.combine_ents_rounds == 0:
             self.combine_ents_func()

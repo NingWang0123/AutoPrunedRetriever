@@ -259,7 +259,7 @@ class StrategyPolicy2Head(nn.Module):
         h = self.ff(x)
         return self.ans(h), self.th(h)
 
-    @torch.no_grad()
+
     def log_prob(self, x, y):  # y: [B,2] longs
         la, lt = self.forward(x)
         logpa = F.log_softmax(la, dim=-1).gather(-1, y[:,0:1]).squeeze(-1)
@@ -384,7 +384,7 @@ class CombineScheduler:
 # ===============================
 @torch.no_grad()
 def select_ans_th(policy: StrategyPolicy2Head, cr, q: str, feature_dim: int = 384, greedy: bool = True):
-    x = torch.tensor(featurize_query(cr, q, dims=feature_dim), dtype=torch.float32).unsqueeze(0)
+    x = torch.tensor(featurize_query(cr, q, dims=feature_dim),dtype=torch.float32).unsqueeze(0).to(next(policy.parameters()).device)
     y = policy.sample(x, greedy=greedy)[0].cpu().numpy().tolist()
     ai, ti = int(y[0]), int(y[1])
     return (ANSWERS_CHOICES[ai], THINKINGS_CHOICES[ti])
@@ -468,7 +468,8 @@ class Phi4MiniReasoningLLM:
 
 
     def _build_prompt(self, final_merged_json, question):
-        q_txt, gk_txt, st_txt = get_context(final_merged_json)
+
+        q_txt, gk_txt, st_txt, ft_txt = get_context(final_merged_json)
         user_msg = ""
 
         system_msg = (
@@ -656,6 +657,9 @@ if __name__ == "__main__":
         "Define mitochondria.": "Organelle responsible for ATP production",
         "When was the UN founded?": "1945",
     }
+
+    # for q in train_questions:
+    #     cr.run_work_flow(q)
 
     examples = make_preference_dataset_2head(
         cr=cr,
