@@ -1768,9 +1768,9 @@ def get_json_with_given_knowledge(flat_answers_lsts,codebook_main,codebook_sub_q
         if r in r_set:
             new_r_pos = r_set.index(r)
         else:
-            r_set_len+=1
             new_r_pos = r_set_len
             r_set.append(r)
+            r_set_len+=1
         r_index_dict_q[r_pos] = new_r_pos
 
     # map the q edge matrix
