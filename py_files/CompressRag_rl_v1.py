@@ -2663,74 +2663,77 @@ class CompressRag_rl:
         return facts_lsts
 
 
-    def find_related_knowledge(self,all_answers,all_q_indices, all_f_indices):
-
+    def find_related_knowledge(self, all_answers, all_q_indices, all_f_indices=None):
         domain_knowledge_lst = []
 
+        # answers
         if self.include_answers:
             final_flat_answers_lsts = self.answers_extract_function(all_answers)
             domain_knowledge_lst.append(final_flat_answers_lsts)
 
-
+        # thinkings
         if self.include_thinkings:
-            final_flat_thinkings_lsts = self.thinking_extract_function(all_q_indices,self.meta_codebook)
+            final_flat_thinkings_lsts = self.thinking_extract_function(all_q_indices, self.meta_codebook)
             domain_knowledge_lst.append(final_flat_thinkings_lsts)
-        
+
         if all_f_indices:
             facts_lsts = self._gather_facts_by_indices(all_f_indices, self.meta_codebook)
-
-            final_flat_facts_lsts = self.answers_extract_function(facts_lsts) \
-                                    if self.include_answers else get_flat_answers_lsts(facts_lsts)
-            domain_knowledge_lst.append(final_flat_facts_lsts)   
+            final_flat_facts_lsts = (self.answers_extract_function(facts_lsts)
+                                    if self.include_answers else get_flat_answers_lsts(facts_lsts))
+            if final_flat_facts_lsts:                
+                domain_knowledge_lst.append(final_flat_facts_lsts)
 
         return domain_knowledge_lst
 
     def compact_indicies_for_prompt(self, codebook_sub_q, domain_knowledge_lst):
-        # unpack
-        flat_answers_lsts = None
-        flat_thinkings_lsts = None
-        flat_facts_lsts = None
+        flat_answers_lsts: Optional[list] = None
+        flat_thinkings_lsts: Optional[list] = None
+        flat_facts_lsts: Optional[list] = None
 
         ptr = 0
-        if self.include_answers:
+        if self.include_answers and ptr < len(domain_knowledge_lst):
             flat_answers_lsts = domain_knowledge_lst[ptr]
             ptr += 1
-        if self.include_thinkings:
+
+        if self.include_thinkings and ptr < len(domain_knowledge_lst):
             flat_thinkings_lsts = domain_knowledge_lst[ptr]
             ptr += 1
-        if getattr(self, "include_facts", True):  
+
+        include_facts = getattr(self, "include_facts", True)
+        if include_facts and ptr < len(domain_knowledge_lst):
             flat_facts_lsts = domain_knowledge_lst[ptr]
             ptr += 1
 
-        # cases
         if self.include_answers and self.include_thinkings:
             final_merged_json = get_json_with_given_knowledge_and_thinkings(
-                flat_answers_lsts, flat_thinkings_lsts,
-                self.meta_codebook, codebook_sub_q
+                flat_answers_lsts or [], 
+                flat_thinkings_lsts or [],
+                self.meta_codebook, 
+                codebook_sub_q
             )
-
         elif self.include_answers:
             final_merged_json = get_json_with_given_knowledge(
-                flat_answers_lsts, self.meta_codebook, codebook_sub_q
+                flat_answers_lsts or [], 
+                self.meta_codebook, 
+                codebook_sub_q
             )
-
         elif self.include_thinkings:
             final_merged_json = get_json_with_given_thinkings(
-                flat_thinkings_lsts, self.meta_codebook, codebook_sub_q
+                flat_thinkings_lsts or [], 
+                self.meta_codebook, 
+                codebook_sub_q
             )
-
         else:
             final_merged_json = codebook_sub_q.copy()
 
-        if flat_facts_lsts:
+        if include_facts and flat_facts_lsts:
             em_final = final_merged_json['edge_matrix']
-            E_final = final_merged_json['e']
-            R_final = final_merged_json['r']
+            E_final  = final_merged_json['e']
+            R_final  = final_merged_json['r']
 
             e_name2idx = {name: i for i, name in enumerate(E_final)}
             r_name2idx = {name: i for i, name in enumerate(R_final)}
-
-            tuple2idx = {tuple(e): i for i, e in enumerate(em_final)}
+            tuple2idx  = {tuple(e): i for i, e in enumerate(em_final)}
 
             def _ensure_ent_from_meta(old_e_idx: int) -> int:
                 name = self.meta_codebook['e'][old_e_idx]
@@ -2762,7 +2765,6 @@ class CompressRag_rl:
                     em_final.append([h, r, t])
                     tuple2idx[tup] = idx
                 return idx
-
             remapped_facts = [[ensure_edge_from_meta(i) for i in run] for run in flat_facts_lsts]
 
             final_merged_json['e'] = E_final
@@ -2774,6 +2776,7 @@ class CompressRag_rl:
             )
 
         return final_merged_json
+
 
     # might also change these functions,now keep always merge with answers json, and only merge with thinking json if use thinkings
     
@@ -2860,8 +2863,6 @@ class CompressRag_rl:
             domain_knowledge_lst = self.find_related_knowledge(all_answers, all_q_indices, all_f_indices)
             print("domain_knowledge_lst", domain_knowledge_lst)
             final_merged_json = self.compact_indicies_for_prompt(q_json, domain_knowledge_lst)
-            print("facts(edges[i])", final_merged_json['facts(edges[i])'])
-            print("facts([[e,r,e], ...])", final_merged_json['facts([[e,r,e], ...])'])
         else:
             final_merged_json = combined_facts_cb if combined_facts_cb else q_json.copy()
         new_result, new_json_lst = self.collect_results(final_merged_json, questions=q_prompt)
