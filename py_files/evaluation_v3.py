@@ -34,18 +34,20 @@ class _CostMixin:
         super().__init__(*a, **kw)
         self._metrics = {"graph": [], "text": []}
 
+    # ---------- cost bookkeeping ----------
     def _record_metric(self, kind: str, m: dict):
         self._metrics.setdefault(kind, []).append(m)
 
     def _avg(self, kind: str) -> dict:
         rows = self._metrics.get(kind, [])
-        keys = ["input_tokens","output_tokens","total_tokens",
-                "latency_sec","retrieval_latency_sec","gen_latency_sec",
-                "retrieved_count","peak_vram_MiB","prompt_chars"]
-        return {k: (sum(r.get(k,0) for r in rows)/len(rows) if rows else 0.0) for k in keys}
+        keys = ["input_tokens", "output_tokens", "total_tokens",
+                "latency_sec", "retrieval_latency_sec", "gen_latency_sec",
+                "retrieved_count", "peak_vram_MiB", "prompt_chars"]
+        return {k: (sum(r.get(k, 0) for r in rows) / len(rows) if rows else 0.0) for k in keys}
 
     def report_cost(self, *, kind: str = "graph", avg: bool = True) -> dict:
-        stats = self._avg(kind) if avg else (self._metrics.get(kind, [])[-1] if self._metrics.get(kind) else {})
+        stats = self._avg(kind) if avg else (self._metrics.get(kind, [])[-1]
+                                             if self._metrics.get(kind) else {})
         hdr = f"== Cost ({'avg' if avg else 'last'}) of {kind} RAG =="
         print(f"\n{hdr}" if stats else f"\n{hdr}\n  <no data>")
         for k, v in stats.items():
@@ -53,6 +55,51 @@ class _CostMixin:
                 s = f"{v:.2f}" if isinstance(v, float) and v != int(v) else f"{int(v)}"
                 print(f"{k:>22} {s}")
         return stats
+
+    # ---------- size helpers ----------
+    @staticmethod
+    def _dir_size_bytes(path: str) -> int:
+        total = 0
+        for root, _, files in os.walk(path):
+            for f in files:
+                try:
+                    total += os.path.getsize(os.path.join(root, f))
+                except OSError:
+                    pass
+        return total
+
+    @staticmethod
+    def _bytes_to_human(num: int) -> str:
+        for unit in ["B", "KiB", "MiB", "GiB", "TiB"]:
+            if num < 1024.0:
+                return f"{num:3.1f} {unit}"
+            num /= 1024.0
+        return f"{num:.1f} PiB"
+
+    # ---------- FAISS index persisting ----------
+    def save_index_and_report_size(self, *, db: str = "graph", out_dir: str | None = None):
+        if db not in {"graph", "text"}:
+            raise ValueError("db must be 'graph' or 'text'")
+        if out_dir is None:
+            out_dir = "faiss_graph_idx" if db == "graph" else "faiss_text_idx"
+
+        vs = self.graph_db if db == "graph" else self.text_db
+        if vs is None:
+            print(f"[Index size] {db}_rag = 0 B  ({out_dir})")
+            return 0
+
+        try:
+            vs.save_local(out_dir)
+        except Exception:
+            # older LangChain versions need the kw-name `folder_path`
+            vs.save_local(folder_path=out_dir)
+
+        size_b = self._dir_size_bytes(out_dir)
+        human  = self._bytes_to_human(size_b)
+        pad    = " " if db == "text" else ""
+        print(f"[Index size] {db}_rag = {human}  ({out_dir}){pad}")
+        return size_b
+
 
 class CompressRagRLWithCost(_CostMixin, CompressRag_rl):
     """CompressRag_rl + cost / size helpers (no other change)."""
