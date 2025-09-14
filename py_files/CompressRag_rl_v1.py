@@ -3153,7 +3153,7 @@ class CompressRag_rl:
                 )
         return combined_facts_cb
 
-    def run_work_flow(self, q_prompt, rule="Answer questions", facts_json_path: str = None, chunk_chars: int = 800, overlap: int = 120):
+    def run_work_flow(self, q_prompt, rule="Answer questions", facts_json_path: str = None, chunk_chars: int = 800, overlap: int = 120, warm_start = "knn"): #coarse
         q_json = self.encode_question(q_prompt, rule)
   
         combined_facts_cb = None
@@ -3181,7 +3181,7 @@ class CompressRag_rl:
 
         if self.round % self.combine_ents_rounds == 0:
             if self.round == 0:
-                self.combine_ents_func(mode="coarse") # knn
+                self.combine_ents_func(mode=warm_start) 
             else:
                 self.combine_ents_func(mode="auto")
         self.round += 1
