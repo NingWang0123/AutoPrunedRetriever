@@ -279,7 +279,7 @@ include_thinking = True
 phi_llm = Phi4MiniReasoningLLM(
     include_thinkings=include_thinking,                 
     model_name="microsoft/Phi-4-mini-reasoning",
-    max_new_tokens=1024,
+    max_new_tokens=256,
     temperature=0.2,
     top_p=0.9
 )
@@ -317,7 +317,7 @@ def to_serializable(obj):
 i = 0
 for q in questions:
     print(f'q {i}')
-    result = rag.run_work_flow(q, facts_json_path=["context/novel copy.json", "context/medical copy.json"])
+    result = rag.run_work_flow(q, facts_json_path=["context/novel copy.json", "context/medical copy.json"], warm_start="coarse")
     #print(result)
 
     #with open(f"meta_codebook_{i}.json", "w", encoding="utf-8") as f:
