@@ -88,43 +88,79 @@ class Phi4MiniReasoningLLM:
             self._use_chat_template = True
 
 
-    def _build_prompt(self, final_merged_json, question):
-        q_txt, gk_txt, st_txt, ft_txt = get_context(final_merged_json)
-        user_msg = ""
+    def _build_prompt(self, final_merged_json, question, decode = False):
+        if decode:
+            q_txt, gk_txt, st_txt, ft_txt = get_context(final_merged_json)
+            user_msg = ""
 
-        system_msg = (
-            "You are a precise QA agent that answers by expressing facts as short, "
-            "plain English statements. Keep outputs concise and factual."
+            system_msg = (
+                "You are a precise QA agent that answers by expressing facts as short, "
+                "plain English statements. Keep outputs concise and factual."
+            )
+
+            ctx_lines = [
+                "<<<RETRIEVED_CONTEXT_START>>>",
+                "The system searched for a related question in the database. Below are related question's graph triples and its prior answer as reference. You don't have to follow it completely, just use it as a reference.",
+                "[RELATED QUESTION'S GRAPH TRIPLES]:",
+                q_txt,
+                f"[RELATED QUESTION'S ANSWER TRIPLES]: {gk_txt}",
+            ]
+            
+            if st_txt.strip().lower() != "none.":
+                ctx_lines.append(f"[RELATED THINKING“S TRIPLES]: {st_txt}")
+
+            if ft_txt.strip().lower() != "none.":
+                ctx_lines.append(f"[RELATED FACTS'S TRIPLES]: {ft_txt}")
+
+            ctx_lines.append("<<<RETRIEVED_CONTEXT_END>>>")
+
+            user_msg += "\n".join(ctx_lines) + "\n"
+
+            user_msg += (
+                f"[CURRENT QUESTION]: {question} \n"
+                "[TASK]: You are a QA assistant for open-ended questions.\n"
+                f"- Give a short, direct answer in 2–3 sentences."
+                "- Do NOT restrict to yes/no.\n"
+                "[FORMAT]: Write complete sentences (not a single word)."
+                "Avoid starting with just 'Yes.' or 'No.'; if the question is yes/no-style, state the conclusion AND 1–2 short reasons.\n"
+                "[ANSWER]: "
+            )
+        else:
+            user_msg = ""
+            SYSTEM_PROMPT = """
+            ---Role---
+            You are a helpful assistant responding to user queries.
+
+            ---Goal---
+            Generate direct and concise answers based strictly on the provided Knowledge Base.
+            Respond in plain text without explanations or formatting.
+            Maintain conversation continuity and use the same language as the query.
+            If the answer is unknown, respond with "I don't know".
+
+            ---Knowledge Base---
+            [Graph Format]
+            - e: list of entity strings; index i refers to e[i]
+            - r: list of relation strings; index j refers to r[j]
+            - edge_matrix: list of [head_e_idx, r_idx, tail_e_idx]
+            - questions([[e,r,e], ...]): related questions triples in conversation history 
+            - given knowledge([[e,r,e], ...]): prior answer triples according to questions
+            - start thinking with(edges[i]): related questions' thinking process triples
+            - facts(edges[i]):groups of edge indices of facts
+            - facts([[e,r,e], ...]): related facts triples
+
+            [Data]
+            {context_data}
+            """
+
+            system_msg = SYSTEM_PROMPT.format(
+            context_data=final_merged_json
         )
 
-        ctx_lines = [
-            "<<<RETRIEVED_CONTEXT_START>>>",
-            "The system searched for a related question in the database. Below are related question's graph triples and its prior answer as reference. You don't have to follow it completely, just use it as a reference.",
-            "[RELATED QUESTION'S GRAPH TRIPLES]:",
-            q_txt,
-            f"[RELATED QUESTION'S ANSWER TRIPLES]: {gk_txt}",
-        ]
-        
-        if st_txt.strip().lower() != "none.":
-            ctx_lines.append(f"[RELATED THINKING“S TRIPLES]: {st_txt}")
-
-        if ft_txt.strip().lower() != "none.":
-            ctx_lines.append(f"[RELATED FACTS'S TRIPLES]: {ft_txt}")
-
-        ctx_lines.append("<<<RETRIEVED_CONTEXT_END>>>")
-
-        user_msg += "\n".join(ctx_lines) + "\n"
-
-        user_msg += (
-            f"[CURRENT QUESTION]: {question} \n"
-            "[TASK]: You are a QA assistant for open-ended questions.\n"
-            f"- Give a short, direct answer in 2–3 sentences."
-            "- Do NOT restrict to yes/no.\n"
-            "[FORMAT]: Write complete sentences (not a single word)."
-            "Avoid starting with just 'Yes.' or 'No.'; if the question is yes/no-style, state the conclusion AND 1–2 short reasons.\n"
-            "[ANSWER]: "
-        )
-
+            user_msg += (
+                f"\n---Current Question---\n{question}"
+                "\n---Answer---\n"
+            )
+        print(system_msg)
         print(user_msg)
         return system_msg, user_msg
 
@@ -211,7 +247,7 @@ class Phi4MiniReasoningLLM:
         ans_clean = ""
 
         for attempt in range(max_regen):
-            sys_msg, usr_msg = self._build_prompt(final_merged_json, question)
+            sys_msg, usr_msg = self._build_prompt(final_merged_json, question, decode= False)
             out = self._generate(sys_msg, usr_msg)
             print(f"-------------RAW[{attempt+1}/{max_regen}]:", out)
 
@@ -243,7 +279,7 @@ include_thinking = True
 phi_llm = Phi4MiniReasoningLLM(
     include_thinkings=include_thinking,                 
     model_name="microsoft/Phi-4-mini-reasoning",
-    max_new_tokens=512,
+    max_new_tokens=1024,
     temperature=0.2,
     top_p=0.9
 )
