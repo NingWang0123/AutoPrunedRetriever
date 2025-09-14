@@ -1449,15 +1449,15 @@ def make_codebook(n=10_000, d=128, m_edges=50_000, seed=0):
         'thinkings_lst': [list(rng.integers(0, m_edges, size=10)) for _ in range(50)],
     }
 
-# def timed(fn, *args, **kwargs):
-#     t0 = time.perf_counter()
-#     out = fn(*args, **kwargs)
-#     t1 = time.perf_counter()
-#     return out, t1 - t0
+def timed(fn, *args, **kwargs):
+    t0 = time.perf_counter()
+    out = fn(*args, **kwargs)
+    t1 = time.perf_counter()
+    return out, t1 - t0
 # if __name__ == "__main__":
 #     # Small demo (should finish quickly)
-#     N_SMALL, D = 10000, 1
-#     cb_small = make_codebook(N_SMALL, D, m_edges=50000, seed=42)
+#     N_SMALL, D = 10_000, 1
+#     cb_small = make_codebook(N_SMALL, D, m_edges=50_000, seed=42)
 
 #     print(f"\n=== SMALL DATASET: n={N_SMALL}, d={D} ===")
 #     # fast
@@ -1466,10 +1466,10 @@ def make_codebook(n=10_000, d=128, m_edges=50_000, seed=0):
 #     #                             random_state=0, sample_size=2000, k_grid_size=8, scoring="db")
 #     # print(f"[fast]   time={t_fast_s:.2f}s, k={cb_fast_s['_chosen_k']}, |E'|={len(cb_fast_s['e'])}")
 
-#     # cb_fast_s, t_fast_s = timed(combine_ents_auto, deepcopy(cb_small),
-#     #                             min_exp_num=2, max_exp_num=20,
-#     #                             backend='auto',scoring = 'silhouette')
-#     # print(f"[fast new]   time={t_fast_s:.2f}s, |E'|={len(cb_fast_s['e'])}")
+#     cb_fast_s, t_fast_s = timed(coarse_combine, deepcopy(cb_small),
+#                                 min_exp_num=2, max_exp_num=20,
+#                                 backend='auto',scoring = 'silhouette')
+#     print(f"[fast new]   time={t_fast_s:.2f}s, |E'|={len(cb_fast_s['e'])}")
 
 
 #     # config1 = ClusteringConfig(k_neighbors=10, similarity_threshold=0.05, ann_backend="auto")
