@@ -718,7 +718,7 @@ def combine_ents_auto(codebook_main: Dict[str, Any],
 import numpy as np
 from typing import Any, Dict, List, Tuple, Optional, Set
 import logging
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from enum import Enum
 
 # Configure logging
@@ -1008,180 +1008,361 @@ class ANNGraphBuilder:
         return indices[:, 1:], distances[:, 1:]
 
 
+# -----------------------
+# Fixed RepresentativeSelector (metric-aware)
+# -----------------------
 class RepresentativeSelector:
     """Select representatives from clusters"""
-    
+
     @staticmethod
-    def select_medoid(X: np.ndarray, cluster_indices: List[int]) -> int:
+    def select_medoid(X: np.ndarray, cluster_indices: List[int], metric: str = "euclidean") -> int:
         """Select point with minimum distance to all others (medoid)"""
         if len(cluster_indices) == 1:
             return cluster_indices[0]
-        
-        X_cluster = X[cluster_indices]
-        
-        # Compute pairwise distances
         from sklearn.metrics.pairwise import pairwise_distances
-        dists = pairwise_distances(X_cluster)
-        
-        # Find medoid (minimum sum of distances)
+        dists = pairwise_distances(X[cluster_indices], metric=("cosine" if metric == "cosine" else "euclidean"))
         medoid_idx = np.argmin(dists.sum(axis=1))
         return cluster_indices[medoid_idx]
-    
+
     @staticmethod
-    def select_density_peak(X: np.ndarray, cluster_indices: List[int], k: int = 5) -> int:
+    def select_density_peak(X: np.ndarray, cluster_indices: List[int], k: int = 5, metric: str = "euclidean") -> int:
         """Select point with highest local density"""
         if len(cluster_indices) == 1:
             return cluster_indices[0]
-        
-        X_cluster = X[cluster_indices]
-        
-        # Compute k-NN distances for density estimation
+        Xc = X[cluster_indices]
         k = min(k, len(cluster_indices) - 1)
-        nbrs = NearestNeighbors(n_neighbors=k + 1)
-        nbrs.fit(X_cluster)
-        distances, _ = nbrs.kneighbors(X_cluster)
-        
-        # Density = 1 / average k-NN distance
-        densities = 1.0 / (distances[:, 1:].mean(axis=1) + 1e-10)
-        
-        # Select highest density point
-        peak_idx = np.argmax(densities)
-        return cluster_indices[peak_idx]
+        from sklearn.neighbors import NearestNeighbors
+        nn = NearestNeighbors(n_neighbors=k + 1, metric=("cosine" if metric == "cosine" else "euclidean"))
+        nn.fit(Xc)
+        dists, _ = nn.kneighbors(Xc)
+        densities = 1.0 / (dists[:, 1:].mean(axis=1) + 1e-10)
+        return cluster_indices[int(np.argmax(densities))]
 
 
+# -----------------------
+# Fixed ANNGraphBuilder (always returns SIMILARITIES for cosine)
+# -----------------------
+class ANNGraphBuilder:
+    """Build approximate nearest neighbor graph using various backends"""
+
+    def __init__(self, config: ClusteringConfig):
+        self.config = config
+        self.backend = self._select_backend()
+        logger.info(f"Using ANN backend: {self.backend}")
+
+    def _select_backend(self) -> ANNBackend:
+        backend_map = {
+            "faiss": ANNBackend.FAISS,
+            "hnswlib": ANNBackend.HNSWLIB,
+            "pynndescent": ANNBackend.PYNNDESCENT,
+            "annoy": ANNBackend.ANNOY,
+            "sklearn": ANNBackend.SKLEARN
+        }
+        if self.config.ann_backend != "auto":
+            return backend_map.get(self.config.ann_backend, ANNBackend.SKLEARN)
+
+        if FAISS_AVAILABLE:
+            return ANNBackend.FAISS
+        elif HNSWLIB_AVAILABLE:
+            return ANNBackend.HNSWLIB
+        elif PYNNDESCENT_AVAILABLE:
+            return ANNBackend.PYNNDESCENT
+        elif ANNOY_AVAILABLE:
+            return ANNBackend.ANNOY
+        else:
+            return ANNBackend.SKLEARN
+
+    def build_graph(self, X_unit: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        Build k-NN graph.
+        Returns: (indices, sims) where sims are COSINE SIMILARITIES if metric=='cosine'.
+        """
+        n = X_unit.shape[0]
+        k = min(self.config.k_neighbors, max(1, n - 1))
+
+        if self.backend == ANNBackend.FAISS:
+            idx, sims = self._build_faiss_cosine(X_unit, k) if self.config.metric == "cosine" else self._build_faiss_l2(X_unit, k)
+        elif self.backend == ANNBackend.HNSWLIB:
+            idx, sims = self._build_hnswlib(X_unit, k)
+        elif self.backend == ANNBackend.PYNNDESCENT:
+            idx, sims = self._build_pynndescent(X_unit, k)
+        elif self.backend == ANNBackend.ANNOY:
+            idx, sims = self._build_annoy(X_unit, k)
+        else:
+            idx, sims = self._build_sklearn(X_unit, k)
+
+
+        # Robustly remove self and pad/truncate to exactly k
+        clean_idx = np.empty((n, k), dtype=np.int32)
+        clean_sims = np.empty((n, k), dtype=np.float32)
+
+        for i in range(n):
+            row_idx = np.asarray(idx[i], dtype=np.int32)
+            row_sims = np.asarray(sims[i], dtype=np.float32)
+
+            # drop self wherever it appears
+            keep = row_idx != i
+            row_idx = row_idx[keep]
+            row_sims = row_sims[keep]
+
+            # if not enough neighbors remain, pad
+            if row_idx.shape[0] < k:
+                missing = k - row_idx.shape[0]
+                if row_idx.shape[0] > 0:
+                    pad_idx = np.full(missing, row_idx[-1], dtype=np.int32)
+                    pad_sims = np.full(missing, row_sims[-1], dtype=np.float32)
+                else:
+                    # pathological case: no neighbors returned; pad with self and a very low sim
+                    pad_idx = np.full(missing, i, dtype=np.int32)
+                    pad_sims = np.full(missing, -1.0, dtype=np.float32)
+                row_idx = np.concatenate([row_idx, pad_idx], axis=0)
+                row_sims = np.concatenate([row_sims, pad_sims], axis=0)
+
+            # enforce exact length k
+            clean_idx[i, :] = row_idx[:k]
+            clean_sims[i, :] = row_sims[:k]
+
+        return clean_idx, clean_sims
+
+    # ---------- FAISS helpers ----------
+    def _build_faiss_cosine(self, X_unit: np.ndarray, k: int) -> Tuple[np.ndarray, np.ndarray]:
+        """FAISS (cosine) via inner product on unit vectors -> returns cosine SIMILARITIES."""
+        import faiss
+        Xf = np.ascontiguousarray(X_unit.astype(np.float32))
+        d = Xf.shape[1]
+        index = faiss.IndexFlatIP(d)  # IP on unit vectors = cosine similarity
+        if self.config.use_gpu and faiss.get_num_gpus() > 0:
+            logger.info("Using FAISS GPU (IP)")
+            res = faiss.StandardGpuResources()
+            index = faiss.index_cpu_to_gpu(res, 0, index)
+        index.add(Xf)
+        sims, idx = index.search(Xf, k + 1)  # sims are inner products
+        # Drop first col (self) assuming exact search; still self-cleaned again later
+        return idx[:, 1:], sims[:, 1:]
+
+    def _build_faiss_l2(self, X: np.ndarray, k: int) -> Tuple[np.ndarray, np.ndarray]:
+        """FAISS (L2) -> convert to similarities via Gaussian kernel."""
+        import faiss
+        Xf = np.ascontiguousarray(X.astype(np.float32))
+        d = Xf.shape[1]
+        index = faiss.IndexFlatL2(d)
+        if self.config.use_gpu and faiss.get_num_gpus() > 0:
+            logger.info("Using FAISS GPU (L2)")
+            res = faiss.StandardGpuResources()
+            index = faiss.index_cpu_to_gpu(res, 0, index)
+        index.add(Xf)
+        dists, idx = index.search(Xf, k + 1)
+        d2 = dists[:, 1:]
+        # Gaussian kernel similarity
+        sigma = np.median(d2)
+        sigma = float(sigma if sigma > 1e-12 else 1.0)
+        sims = np.exp(-d2 / (2 * sigma ** 2)).astype(np.float32)
+        return idx[:, 1:], sims
+
+    # ---------- HNSWlib ----------
+    def _build_hnswlib(self, X_unit: np.ndarray, k: int) -> Tuple[np.ndarray, np.ndarray]:
+        import hnswlib
+        n, d = X_unit.shape
+        if self.config.metric == "cosine":
+            space = "cosine"  # correct name
+        else:
+            space = "l2"
+        index = hnswlib.Index(space=space, dim=d)
+        index.init_index(max_elements=n, ef_construction=self.config.ef_construction, M=16)
+        index.add_items(X_unit, np.arange(n))
+        index.set_ef(self.config.ef_search)
+        idx, dists = index.knn_query(X_unit, k=k + 1)
+        if self.config.metric == "cosine":
+            sims = (1.0 - dists[:, 1:]).astype(np.float32)
+            return idx[:, 1:], sims
+        else:
+            d2 = dists[:, 1:]
+            sigma = np.median(d2)
+            sigma = float(sigma if sigma > 1e-12 else 1.0)
+            sims = np.exp(-d2 / (2 * sigma ** 2)).astype(np.float32)
+            return idx[:, 1:], sims
+
+    # ---------- PyNNDescent ----------
+    def _build_pynndescent(self, X_unit: np.ndarray, k: int) -> Tuple[np.ndarray, np.ndarray]:
+        import pynndescent
+        if self.config.metric == "cosine":
+            metric = "cosine"
+        else:
+            metric = "euclidean"
+        index = pynndescent.NNDescent(
+            X_unit if self.config.metric == "cosine" else X_unit,  # X_unit ok both ways
+            n_neighbors=k + 1,
+            metric=metric,
+            random_state=42
+        )
+        idx, dists = index.neighbor_graph
+        if self.config.metric == "cosine":
+            sims = (1.0 - dists[:, 1:]).astype(np.float32)
+        else:
+            d2 = dists[:, 1:]
+            sigma = np.median(d2)
+            sigma = float(sigma if sigma > 1e-12 else 1.0)
+            sims = np.exp(-d2 / (2 * sigma ** 2)).astype(np.float32)
+        return idx[:, 1:], sims
+
+    # ---------- Annoy ----------
+    def _build_annoy(self, X_unit: np.ndarray, k: int) -> Tuple[np.ndarray, np.ndarray]:
+        from annoy import AnnoyIndex
+        n, d = X_unit.shape
+        metric = "angular" if self.config.metric == "cosine" else "euclidean"
+        index = AnnoyIndex(d, metric)
+        for i in range(n):
+            index.add_item(i, X_unit[i])
+        index.build(self.config.n_trees)
+        idx = np.empty((n, k + 1), dtype=np.int32)
+        sims = np.empty((n, k + 1), dtype=np.float32)
+        for i in range(n):
+            nn_idx, _ = index.get_nns_by_item(i, k + 1, include_distances=True)
+            # compute cosine sim directly to avoid Annoy's distance conversions
+            nn_idx = np.array(nn_idx, dtype=np.int32)
+            sim_row = (X_unit[i] @ X_unit[nn_idx].T).astype(np.float32)
+            idx[i] = nn_idx
+            sims[i] = sim_row
+        return idx[:, 1:], sims[:, 1:]
+
+    # ---------- sklearn ----------
+    def _build_sklearn(self, X_unit: np.ndarray, k: int) -> Tuple[np.ndarray, np.ndarray]:
+        from sklearn.neighbors import NearestNeighbors
+        if self.config.metric == "cosine":
+            nn = NearestNeighbors(n_neighbors=k + 1, metric="cosine", algorithm="brute")
+            nn.fit(X_unit)
+            dists, idx = nn.kneighbors(X_unit)
+            sims = (1.0 - dists[:, 1:]).astype(np.float32)
+            return idx[:, 1:], sims
+        else:
+            nn = NearestNeighbors(n_neighbors=k + 1, metric="euclidean", algorithm="auto")
+            nn.fit(X_unit)
+            dists, idx = nn.kneighbors(X_unit)
+            d2 = dists[:, 1:]
+            sigma = np.median(d2)
+            sigma = float(sigma if sigma > 1e-12 else 1.0)
+            sims = np.exp(-d2 / (2 * sigma ** 2)).astype(np.float32)
+            return idx[:, 1:], sims
+
+
+# -----------------------
+# Fixed combine_ents_ann_knn (cosine similarities used correctly)
+# -----------------------
 def combine_ents_ann_knn(
     codebook_main: Dict[str, Any],
     config: Optional[ClusteringConfig] = None,
-    min_exp_num: int = 2,
-    max_exp_num: int = 20,
-    use_thinking: bool = True
+    use_thinking: bool = True,
+    use_facts: bool = True
 ) -> Dict[str, Any]:
     """
-    Entity clustering using ANN k-NN graph + Union-Find.
-    
-    This is faster and more flexible than k-means clustering.
-    
-    Args:
-        codebook_main: Dictionary containing entities and embeddings
-        config: ClusteringConfig object with parameters
-        min_exp_num: Minimum expected entities per cluster (used to set k)
-        max_exp_num: Maximum expected entities per cluster (used to set k)
-        use_thinking: Whether to remap thinking indices
-    
-    Returns:
-        Updated codebook with merged entities
+    Entity clustering using ANN k-NN graph + Union-Find with consistent cosine handling.
     """
-    
     # Initialize configuration
     if config is None:
-        # Auto-configure based on data size
         n = len(codebook_main.get('e', []))
-        k = min(50, max(5, int(np.sqrt(n))))  # Adaptive k
-        config = ClusteringConfig(
-            k_neighbors=k,
-            similarity_threshold=0.75,  # Adjust based on your data
-            min_cluster_size=2
-        )
-    
-    # Get entities and embeddings
+        k = min(50, max(5, int(np.sqrt(max(1, n)))))  # Adaptive k
+        config = ClusteringConfig(k_neighbors=k, similarity_threshold=0.8, min_cluster_size=2)
+
+    # Get entities/embeddings
     E = list(codebook_main.get('e', []))
     X = np.asarray(codebook_main.get('e_embeddings', []), dtype=np.float32)
-    n = X.shape[0]
-    
-    # Handle trivial cases
+    n, d = X.shape if X.ndim == 2 else (len(X), 1)
+
     if n <= 2:
         codebook_main['e'] = list(E)
         codebook_main['e_embeddings'] = [np.asarray(v, dtype=np.float32) for v in X]
         codebook_main['edge_matrix'] = [list(map(int, e)) for e in codebook_main.get('edge_matrix', [])]
         return codebook_main
-    
-    logger.info(f"Clustering {n} entities using ANN k-NN + Union-Find")
-    
-    # Normalize embeddings for cosine similarity
-    X_norm = X / (np.linalg.norm(X, axis=1, keepdims=True) + 1e-12)
-    
-    # Build ANN graph
-    graph_builder = ANNGraphBuilder(config)
-    indices, distances = graph_builder.build_graph(X_norm)
-    
-    # Convert distances to similarities (for cosine)
-    if config.metric == "cosine":
-        similarities = 1 - distances
+
+    # 1D + cosine is degenerate -> switch to euclidean just for this call
+    metric = config.metric
+    if metric == "cosine" and d == 1:
+        logger.info("Detected d=1 with cosine metric; switching to 'euclidean' for this run to avoid ±1 collapse.")
+        metric = "euclidean"
+
+    logger.info(f"Clustering {n} entities (metric={metric}) using ANN k-NN + Union-Find")
+
+    # Normalize for cosine
+    if metric == "cosine":
+        X_unit = X / (np.linalg.norm(X, axis=1, keepdims=True) + 1e-12)
     else:
-        # For Euclidean, use Gaussian kernel
-        sigma = np.median(distances)
-        similarities = np.exp(-distances**2 / (2 * sigma**2))
-    
-    # Initialize Union-Find
+        X_unit = X  # for euclidean, use raw
+
+    # Build ANN graph -> indices, SIMILARITIES (if cosine) or kernel sims (if euclidean)
+    gb = ANNGraphBuilder(replace(config, metric=metric))
+    indices, sims = gb.build_graph(X_unit)
+
+    # Union-Find merge with similarity threshold
     uf = UnionFind(n)
-    
-    # Connect nodes with similarity >= threshold
     edges_created = 0
-    for i in range(n):
-        for j, sim in zip(indices[i], similarities[i]):
-            if sim >= config.similarity_threshold:
-                if uf.union(i, j):
-                    edges_created += 1
-    
-    logger.info(f"Created {edges_created} edges with threshold {config.similarity_threshold}")
-    
-    # Get clusters
+    if metric == "cosine":
+        thr = float(config.similarity_threshold)
+        for i in range(n):
+            for j, s in zip(indices[i], sims[i]):
+                if s >= thr:
+                    if uf.union(i, int(j)):
+                        edges_created += 1
+    else:
+        # euclidean path: sims are kernel similarities in (0,1]; interpret threshold in [0,1]
+        thr = float(config.similarity_threshold)
+        if not (0.0 <= thr <= 1.0):
+            thr = 0.5  # safe default if user passed cosine-like value
+        for i in range(n):
+            for j, s in zip(indices[i], sims[i]):
+                if s >= thr:
+                    if uf.union(i, int(j)):
+                        edges_created += 1
+
+    logger.info(f"Created {edges_created} union edges at threshold {config.similarity_threshold}")
+
+    # Build clusters
     clusters = uf.get_clusters()
-    
-    # Filter small clusters and select representatives
+
+    # Representative selection (metric-aware)
     rep_selector = RepresentativeSelector()
-    representatives = {}  # old_idx -> representative_idx
-    kept_indices = []
-    
-    for root, members in clusters.items():
+    representatives: Dict[int, int] = {}
+    kept_indices: List[int] = []
+
+    for _, members in clusters.items():
         if len(members) < config.min_cluster_size:
-            # Keep singleton clusters as-is
             for m in members:
                 representatives[m] = m
                 kept_indices.append(m)
         else:
-            # Select representative
             if config.representative_method == "medoid":
-                rep = rep_selector.select_medoid(X_norm, members)
-            else:  # density
-                rep = rep_selector.select_density_peak(X_norm, members)
-            
+                rep = rep_selector.select_medoid(X_unit, members, metric=metric)
+            else:
+                rep = rep_selector.select_density_peak(X_unit, members, k=min(5, len(members)-1), metric=metric)
             kept_indices.append(rep)
             for m in members:
                 representatives[m] = rep
-    
-    # Remove duplicates and sort
+
     kept_indices = sorted(set(kept_indices))
-    
-    logger.info(f"Reduced from {n} to {len(kept_indices)} entities")
-    logger.info(f"Number of clusters: {len(clusters)}")
-    
+    logger.info(f"Reduced from {n} to {len(kept_indices)} entities (clusters={len(clusters)})")
+
     # Create mappings
     rep_to_new = {old: new for new, old in enumerate(kept_indices)}
     old_ent_to_new = {i: rep_to_new[representatives[i]] for i in range(n)}
-    
-    # Rebuild entities and embeddings
+
+    # Rebuild entities/embeddings
     new_e = [E[i] for i in kept_indices]
-    new_e_emb = [np.asarray(codebook_main['e_embeddings'][i], dtype=np.float32) 
-                 for i in kept_indices]
-    
-    # Remap edges (same as before)
+    new_e_emb = [np.asarray(codebook_main['e_embeddings'][i], dtype=np.float32) for i in kept_indices]
+
+    # Remap edges
     old_edges = [list(map(int, e)) for e in codebook_main.get('edge_matrix', [])]
-    tuple_to_new_edge_idx = {}
-    new_edges = []
-    old_edge_to_new_edge = {}
-    
+    tuple_to_new_edge_idx: Dict[Tuple[int, int, int], int] = {}
+    new_edges: List[List[int]] = []
+    old_edge_to_new_edge: Dict[int, int] = {}
+
     for old_idx, (e1, r, e2) in enumerate(old_edges):
         ne1 = old_ent_to_new.get(e1, e1)
         ne2 = old_ent_to_new.get(e2, e2)
         tup = (ne1, int(r), ne2)
-        
         if tup not in tuple_to_new_edge_idx:
             tuple_to_new_edge_idx[tup] = len(new_edges)
             new_edges.append([ne1, int(r), ne2])
         old_edge_to_new_edge[old_idx] = tuple_to_new_edge_idx[tup]
-    
-    # Remap function
+
     def remap_edge_indices(struct):
         if isinstance(struct, list):
             return [remap_edge_indices(x) for x in struct]
@@ -1189,20 +1370,54 @@ def combine_ents_ann_knn(
             return old_edge_to_new_edge.get(int(struct), int(struct))
         except (ValueError, TypeError):
             return struct
-    
-    # Update codebook
+
     if codebook_main.get('questions_lst') is not None:
         codebook_main['questions_lst'] = remap_edge_indices(codebook_main['questions_lst'])
     if codebook_main.get('answers_lst') is not None:
         codebook_main['answers_lst'] = remap_edge_indices(codebook_main['answers_lst'])
     if use_thinking and codebook_main.get('thinkings_lst') is not None:
         codebook_main['thinkings_lst'] = remap_edge_indices(codebook_main['thinkings_lst'])
-    
+    if use_facts and codebook_main.get('facts_lst') is not None:
+        codebook_main['facts_lst'] = remap_edge_indices(codebook_main['facts_lst'])
+
     codebook_main['e'] = list(new_e)
     codebook_main['e_embeddings'] = list(new_e_emb)
     codebook_main['edge_matrix'] = [list(map(int, e)) for e in new_edges]
-    
     return codebook_main
+
+
+def coarse_combine(codebook_main: Dict[str, Any],
+                     min_exp_num: int = 2,
+                     max_exp_num: int = 20,
+                     use_thinking: bool = True,
+                     use_facts: bool = True,
+                     random_state: int = 0,
+                     sample_size_prop: float = 0.2, #
+                     k_grid_size: int = 8,
+                     scoring: str = "silhouette",
+                     backend: str = 'auto',
+                     config: Optional[ClusteringConfig] = None):
+    
+    filtered_codebook_main = combine_ents_ann_knn(
+                            codebook_main,
+                            config,
+                            use_thinking,
+                            use_facts)
+    
+    final_codebook_main = combine_ents_auto(filtered_codebook_main,
+                                                min_exp_num,
+                                                max_exp_num,
+                                                use_thinking,
+                                                use_facts,
+                                                random_state,
+                                                sample_size_prop, 
+                                                k_grid_size,
+                                                scoring,
+                                                backend)
+    
+    return final_codebook_main
+    
+
 
 
 
@@ -1234,14 +1449,14 @@ def make_codebook(n=10_000, d=128, m_edges=50_000, seed=0):
         'thinkings_lst': [list(rng.integers(0, m_edges, size=10)) for _ in range(50)],
     }
 
-def timed(fn, *args, **kwargs):
-    t0 = time.perf_counter()
-    out = fn(*args, **kwargs)
-    t1 = time.perf_counter()
-    return out, t1 - t0
+# def timed(fn, *args, **kwargs):
+#     t0 = time.perf_counter()
+#     out = fn(*args, **kwargs)
+#     t1 = time.perf_counter()
+#     return out, t1 - t0
 # if __name__ == "__main__":
 #     # Small demo (should finish quickly)
-#     N_SMALL, D = 10000, 96
+#     N_SMALL, D = 10000, 1
 #     cb_small = make_codebook(N_SMALL, D, m_edges=50000, seed=42)
 
 #     print(f"\n=== SMALL DATASET: n={N_SMALL}, d={D} ===")
@@ -1251,17 +1466,29 @@ def timed(fn, *args, **kwargs):
 #     #                             random_state=0, sample_size=2000, k_grid_size=8, scoring="db")
 #     # print(f"[fast]   time={t_fast_s:.2f}s, k={cb_fast_s['_chosen_k']}, |E'|={len(cb_fast_s['e'])}")
 
-#     cb_fast_s, t_fast_s = timed(combine_ents_auto, deepcopy(cb_small),
-#                                 min_exp_num=2, max_exp_num=20,
-#                                 backend='auto',scoring = 'silhouette')
-#     print(f"[fast new]   time={t_fast_s:.2f}s, |E'|={len(cb_fast_s['e'])}")
+#     # cb_fast_s, t_fast_s = timed(combine_ents_auto, deepcopy(cb_small),
+#     #                             min_exp_num=2, max_exp_num=20,
+#     #                             backend='auto',scoring = 'silhouette')
+#     # print(f"[fast new]   time={t_fast_s:.2f}s, |E'|={len(cb_fast_s['e'])}")
 
 
-#     config1 = ClusteringConfig(k_neighbors=10, similarity_threshold=0.2, ann_backend="auto")
+#     # config1 = ClusteringConfig(k_neighbors=10, similarity_threshold=0.05, ann_backend="auto")
 
-#     cb_ann, t_ann = timed(combine_ents_ann_knn, deepcopy(cb_small),
-#                                 config=config1)
-#     print(f"[fast new]   time={t_ann:.2f}s, |E'|={len(cb_ann['e'])}") 
+#     # cb_ann, t_ann = timed(combine_ents_ann_knn, deepcopy(cb_small),
+#     #                             config=config1)
+#     # print(f"[fast new]   time={t_ann:.2f}s, |E'|={len(cb_ann['e'])}") 
+#     N_SMALL, D = 10_000, 1
+#     cb_small = make_codebook(N_SMALL, D, m_edges=50_000, seed=42)
+#     config1 = ClusteringConfig(k_neighbors=10, similarity_threshold=0.5, ann_backend="auto", metric="cosine")
+#     cb_ann, t_ann = timed(combine_ents_ann_knn, deepcopy(cb_small), config=config1)
+#     print(f"[1D] time={t_ann:.2f}s, |E'|={len(cb_ann['e'])}")
+
+#     # 2) Higher-D cosine (should merge a lot)
+#     N2, D2 = 10_000, 80
+#     cb2 = make_codebook(N2, D2, m_edges=50_000, seed=0)
+#     config2 = ClusteringConfig(k_neighbors=5, similarity_threshold=0.95, ann_backend="auto", metric="cosine")
+#     cb2_ann, t2 = timed(combine_ents_ann_knn, deepcopy(cb2), config=config2)
+#     print(f"[64D] time={t2:.2f}s, |E'|={len(cb2_ann['e'])}")
 
 
 

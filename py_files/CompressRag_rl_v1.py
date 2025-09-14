@@ -15,7 +15,7 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
-from optimize_combine_ent import combine_ents_auto
+from optimize_combine_ent import combine_ents_auto,combine_ents_ann_knn,coarse_combine
 
 
 nlp = spacy.load("en_core_web_sm")
