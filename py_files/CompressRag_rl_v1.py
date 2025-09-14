@@ -15,7 +15,7 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
-from optimize_combine_ent import combine_ents_auto,combine_ents_ann_knn,coarse_combine
+from optimize_combine_ent import combine_ents_auto, combine_ents_ann_knn, coarse_combine
 
 
 nlp = spacy.load("en_core_web_sm")
@@ -3118,16 +3118,19 @@ class CompressRag_rl:
             self._facts_preloaded = True
 
 
-    def combine_ents_func(self):
-
-        self.meta_codebook = combine_ents_auto(self.meta_codebook,
-                 self.min_exp_num,  
-                 self.max_exp_num,  
-                 self.include_thinkings,
-                 sample_size_prop = self.sample_size_prop,
-                 k_grid_size = self.k_grid_size
-                 ) 
-        
+    def combine_ents_func(self, mode="auto"):
+        if mode == "auto":
+            self.meta_codebook = combine_ents_auto(self.meta_codebook,
+                    self.min_exp_num,  
+                    self.max_exp_num,  
+                    self.include_thinkings,
+                    sample_size_prop = self.sample_size_prop,
+                    k_grid_size = self.k_grid_size
+                    ) 
+        elif mode == "knn":
+            self.meta_codebook = combine_ents_ann_knn(self.meta_codebook)
+        elif mode == "coarse":
+            self.meta_codebook = coarse_combine(self.meta_codebook)           
 
     def load_and_merge_facts(self, facts_json_path, chunk_chars=800, overlap=120):
         if not facts_json_path:
@@ -3177,7 +3180,10 @@ class CompressRag_rl:
         self.update_meta(new_json_lst, facts_cb=combined_facts_cb)
 
         if self.round % self.combine_ents_rounds == 0:
-            self.combine_ents_func()
+            if self.round == 0:
+                self.combine_ents_func(mode="coarse") # knn
+            else:
+                self.combine_ents_func(mode="auto")
         self.round += 1
 
         return new_result
