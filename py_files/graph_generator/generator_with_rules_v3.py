@@ -123,6 +123,8 @@ def sentence_relations(sentence, include_det=False):
 
     for i, tok in enumerate(doc):
         print(tok, " - ", tok.pos_, " - ", tok.dep_)
+
+    for i, tok in enumerate(doc):
         # --- Special fix for "do/does/did" questions mis-parsed ---
         if tok.lemma_ in {"do", "does", "did"} and tok.dep_ == "ROOT":
             for child in tok.children:
@@ -186,7 +188,7 @@ def sentence_relations(sentence, include_det=False):
             main_verb = find_main_verb_in_passive(tok)
             if main_verb:
                 processed_aux.add(tok.i)
-                
+
                 v = verb_label(main_verb)
                 if collect_neg(tok) or collect_neg(main_verb):
                     v = f"not {v}"
@@ -281,6 +283,309 @@ def sentence_relations(sentence, include_det=False):
                     triples.add((v, f"prep_{prep.text.lower()}", tail))
 
     return triples
+
+def extract_semantic_subject(token, include_det=False):
+    """
+    Extract semantically meaningful subject from complex noun phrases.
+    Promotes 'X of Y' constructions so that Y is treated as the subject.
+    """
+    # Case 1: "cases of Y" → promote Y
+    for prep in token.children:
+        if prep.dep_ == "prep" and prep.text.lower() == "of":
+            pobj = next((c for c in prep.children if c.dep_ == "pobj"), None)
+            if pobj and pobj.pos_ in {"NOUN", "PROPN"}:
+                return noun_phrase_label(pobj, include_det)
+
+    # Case 2: Compounds keep full phrase
+    compounds = [c for c in token.children if c.dep_ == "compound"]
+    if compounds:
+        return noun_phrase_label(token, include_det)
+
+    # Default
+    return noun_phrase_label(token, include_det)
+
+
+def prioritize_semantic_entities(subjects):
+    """
+    Given multiple potential subjects, prioritize based on linguistic structure.
+    Looks for 'of' relationships and compound nouns to find semantic focus.
+    """
+    semantic_subjects = []
+
+    for subj in subjects:
+        # Try to extract semantic entity
+        semantic_entity = extract_semantic_subject(subj)
+        original_entity = noun_phrase_label(subj if subj.pos_ in {"NOUN", "PROPN"} else subj.head)
+
+        # If we extracted something different, we found a semantic focus
+        if semantic_entity != original_entity:
+            semantic_subjects.append((subj, semantic_entity, original_entity))
+        else:
+            semantic_subjects.append((subj, semantic_entity, None))
+
+    return semantic_subjects
+
+
+def extract_core_noun_types(token, include_det=False):
+    """
+    Extract core noun types from complex noun phrases.
+    For "most common type of skin cancer" -> ["type", "skin cancer"]
+    For "the largest city in France" -> ["city"]
+    """
+    results = []
+
+    # Start with the head noun
+    if token.pos_ in {"NOUN", "PROPN"}:
+        # Get the basic noun phrase
+        full_phrase = noun_phrase_label(token, include_det)
+
+        # Look for "of" prepositional phrases that indicate type relationships
+        for prep in token.children:
+            if prep.dep_ == "prep" and prep.text.lower() == "of":
+                for pobj in prep.children:
+                    if pobj.dep_ == "pobj" and pobj.pos_ in {"NOUN", "PROPN"}:
+                        # This is likely the core type (e.g., "skin cancer" from "type of skin cancer")
+                        core_type = noun_phrase_label(pobj, include_det)
+                        results.append(core_type)
+
+        # Also include the head noun itself (e.g., "type")
+        head_noun = token.text
+        if not any(adj.pos_ == "ADJ" and adj.lemma_ in {"common", "large", "big", "small", "most"}
+                   for adj in token.lefts):
+            # Only include head if it's not just a superlative modifier
+            results.append(head_noun)
+
+        # If no "of" relationship found, use the full phrase but try to clean it
+        if not results:
+            # Remove superlative modifiers for cleaner semantic relationships
+            cleaned = full_phrase
+            superlative_patterns = ["most common ", "largest ", "biggest ", "smallest ", "most "]
+            for pattern in superlative_patterns:
+                if cleaned.lower().startswith(pattern):
+                    cleaned = cleaned[len(pattern):]
+            results.append(cleaned)
+
+    return results if results else [token.text]
+
+
+def statement_relations(sentence, include_det=False):
+    doc = nlp(sentence.strip())
+    triples = set()
+
+    # Track processed auxiliaries to avoid double-processing
+    processed_aux = set()
+
+    for i, tok in enumerate(doc):
+        print(tok, " - ", tok.pos_, " - ", tok.dep_)
+
+    for i, tok in enumerate(doc):
+        # Case A: Handle passive voice constructions first
+        if tok.pos_ == "AUX" and is_passive_auxiliary(tok) and tok.i not in processed_aux:
+            main_verb = find_main_verb_in_passive(tok)
+            if main_verb:
+                processed_aux.add(tok.i)
+
+                v = verb_label(main_verb)
+                if collect_neg(tok) or collect_neg(main_verb):
+                    v = f"not {v}"
+
+                # Get subjects from the auxiliary (passive subjects) with semantic prioritization
+                subs = [c for c in tok.children if c.dep_ in SUBJ_DEPS]
+                semantic_subs = prioritize_semantic_entities(subs)
+
+                for subj, semantic_entity, original_entity in semantic_subs:
+                    triples.add((semantic_entity, "subj", v))
+
+                    # Handle quantifier relationships for passive constructions
+                    if original_entity and semantic_entity != original_entity:
+                        # Extract quantifier information using POS tags
+                        for child in subj.lefts:
+                            if child.pos_ == "NUM" or child.dep_ == "nummod":
+                                # Get numeric phrase by looking at dependency structure
+                                quantity_tokens = []
+
+                                # Collect tokens that modify the numeric expression
+                                for t in doc:
+                                    if (t.i <= subj.i and
+                                            (t.pos_ in {"NUM", "DET"} or
+                                             t.dep_ in {"nummod", "amod", "det", "advmod"} or
+                                             (t.dep_ == "prep" and t.head == child))):
+                                        quantity_tokens.append(t)
+
+                                if quantity_tokens:
+                                    sorted_tokens = sorted(quantity_tokens, key=lambda x: x.i)
+                                    quantity_phrase = " ".join([t.text for t in sorted_tokens])
+                                    triples.add((semantic_entity, "has_quantity", quantity_phrase))
+                                break
+
+                # Handle prepositional phrases attached to main verb
+                for prep in (c for c in main_verb.children if c.dep_ == "prep"):
+                    for p in (c for c in prep.children if c.dep_ == "pobj"):
+                        tail = noun_phrase_label(p, include_det) if p.pos_ in {"NOUN", "PROPN"} else p.text
+                        triples.add((v, f"prep_{prep.text.lower()}", tail))
+
+                # Handle agents in passive constructions (by-phrases)
+                for prep in (c for c in main_verb.children if c.dep_ == "prep" and c.text.lower() == "by"):
+                    for p in (c for c in prep.children if c.dep_ == "pobj"):
+                        agent = noun_phrase_label(p, include_det) if p.pos_ in {"NOUN", "PROPN"} else p.text
+                        triples.add((agent, "agent", v))
+
+        # Case B: Regular VERB predicates (active voice statements)
+        elif tok.pos_ == "VERB" and tok.i not in processed_aux and tok.dep_ == "ROOT":
+            # Skip passive participles
+            if any(aux.pos_ == "AUX" and aux.lemma_ == "be" and
+                   find_main_verb_in_passive(aux) == tok for aux in doc):
+                continue
+
+            v = verb_label(tok)
+            if collect_neg(tok):
+                v = f"not {v}"
+
+            # Get subjects
+            subs = subjects_for(tok)
+            for s in subs:
+                # Extract semantic subject (core entity) + original phrase
+                semantic_entity = extract_semantic_subject(s, include_det)
+                original_entity = noun_phrase_label(s if s.pos_ in {"NOUN", "PROPN"} else s.head, include_det)
+
+                triples.add((semantic_entity, "subj", v))
+
+            # Get objects
+            for o in (c for c in tok.children if c.dep_ in OBJ_DEPS):
+                tail = noun_phrase_label(o, include_det) if o.pos_ in {"NOUN", "PROPN"} else o.text
+                triples.add((v, "obj", tail))
+
+            # Get prepositional phrases
+            for prep in (c for c in tok.children if c.dep_ == "prep"):
+                for p in (c for c in prep.children if c.dep_ == "pobj"):
+                    tail = noun_phrase_label(p, include_det) if p.pos_ in {"NOUN", "PROPN"} else p.text
+                    triples.add((v, f"prep_{prep.text.lower()}", tail))
+
+            # Get adverbial complements
+            for adv in (c for c in tok.children if c.dep_ == "advmod"):
+                triples.add((v, "manner", adv.text))
+
+        # Case C: Copular constructions with "be" - nominal predicates
+        elif tok.pos_ == "AUX" and tok.lemma_ == "be" and tok.dep_ == "ROOT":
+            # Get subject
+            subjects = [c for c in tok.children if c.dep_ in SUBJ_DEPS]
+
+            # Check for nominal predicates (attr)
+            attrs = [c for c in tok.children if c.dep_ == "attr"]
+            if subjects and attrs:
+                for s in subjects:
+                    subj = noun_phrase_label(s if s.pos_ in {"NOUN", "PROPN"} else s.head, include_det)
+                    for a in attrs:
+                        core_types = extract_core_noun_types(a, include_det)
+                        for ct in core_types:
+                            triples.add((subj, "isa", ct))
+
+            # Check for adjectival predicates (acomp)
+            acomps = [c for c in tok.children if c.dep_ == "acomp"]
+            if subjects and acomps:
+                for s in subjects:
+                    for a in acomps:
+                        subj = noun_phrase_label(s if s.pos_ in {"NOUN", "PROPN"} else s.head, include_det)
+                        if collect_neg(tok):
+                            pred = f"not {a.text}"
+                        else:
+                            pred = a.text
+                        triples.add((subj, "property", pred))
+
+                        # Handle prepositional phrases attached to the adjective
+                        for prep in (c for c in a.children if c.dep_ == "prep"):
+                            for p in (c for c in prep.children if c.dep_ == "pobj"):
+                                tail = noun_phrase_label(p, include_det) if p.pos_ in {"NOUN", "PROPN"} else p.text
+                                triples.add((pred, f"prep_{prep.text.lower()}", tail))
+
+            # Check for complex auxiliary constructions (like "can be cured")
+            ccomps = [c for c in tok.children if c.dep_ == "ccomp"]
+            if subjects and ccomps and not attrs and not acomps:
+                for s in subjects:
+                    for cc in ccomps:
+                        subj = noun_phrase_label(s if s.pos_ in {"NOUN", "PROPN"} else s.head, include_det)
+
+                        # Handle auxiliary chains (can be cured)
+                        main_action = cc
+                        aux_chain = []
+
+                        # Collect auxiliary verbs
+                        for aux in cc.lefts:
+                            if aux.pos_ == "AUX":
+                                aux_chain.append(aux.lemma_)
+
+                        verb_phrase = " ".join(aux_chain + [main_action.lemma_])
+                        if collect_neg(tok) or collect_neg(cc):
+                            verb_phrase = f"not {verb_phrase}"
+
+                        triples.add((subj, "property", verb_phrase))
+
+                        # Handle prepositional phrases
+                        for prep in (c for c in cc.children if c.dep_ == "prep"):
+                            for p in (c for c in prep.children if c.dep_ == "pobj"):
+                                tail = noun_phrase_label(p, include_det) if p.pos_ in {"NOUN", "PROPN"} else p.text
+                                triples.add((verb_phrase, f"prep_{prep.text.lower()}", tail))
+
+        # Case D: Nominal predicates where NOUN is ROOT (less common in statements)
+        elif tok.pos_ == "NOUN" and tok.dep_ == "ROOT":
+            # This might occur in titles or informal statements
+            # Check if there's an implicit copula relationship
+            subs = subjects_for(tok)
+            if subs:
+                for s in subs:
+                    subj = noun_phrase_label(s if s.pos_ in {"NOUN", "PROPN"} else s.head, include_det)
+                    pred = noun_phrase_label(tok, include_det)
+                    triples.add((subj, "isa", pred))
+
+        # Case E: Adjectival predicates where ADJ is ROOT
+        elif tok.pos_ == "ADJ" and tok.dep_ == "ROOT":
+            subs = subjects_for(tok)
+            for s in subs:
+                subj = noun_phrase_label(s if s.pos_ in {"NOUN", "PROPN"} else s.head, include_det)
+                pred = tok.text
+                if collect_neg(tok):
+                    pred = f"not {pred}"
+                triples.add((subj, "property", pred))
+
+                # Handle prepositional phrases
+                for prep in (c for c in tok.children if c.dep_ == "prep"):
+                    for p in (c for c in prep.children if c.dep_ == "pobj"):
+                        tail = noun_phrase_label(p, include_det) if p.pos_ in {"NOUN", "PROPN"} else p.text
+                        triples.add((pred, f"prep_{prep.text.lower()}", tail))
+
+        # Case F: Handle existential "there is/are" constructions
+        elif tok.text.lower() == "there" and tok.dep_ == "expl":
+            # Look for the associated verb (usually "be")
+            be_verb = tok.head
+            if be_verb.lemma_ == "be":
+                # Get the logical subject (what exists)
+                subjects = [c for c in be_verb.children if c.dep_ in {"nsubj", "attr"}]
+                for s in subjects:
+                    if s.text.lower() != "there":  # Skip the expletive "there"
+                        subj = noun_phrase_label(s if s.pos_ in {"NOUN", "PROPN"} else s.head, include_det)
+                        triples.add((subj, "exists", "true"))
+
+                        # Handle location if present
+                        for prep in (c for c in be_verb.children if c.dep_ == "prep"):
+                            for p in (c for c in prep.children if c.dep_ == "pobj"):
+                                tail = noun_phrase_label(p, include_det) if p.pos_ in {"NOUN", "PROPN"} else p.text
+                                triples.add((subj, f"located_{prep.text.lower()}", tail))
+
+        # Case G: Handle appositions (aliases, also-known-as)
+        if tok.dep_ == "appos" and tok.head.pos_ in {"NOUN", "PROPN"}:
+            head = noun_phrase_label(tok.head, include_det)
+            appos = noun_phrase_label(tok, include_det)
+            triples.add((head, "aka", appos))
+
+            # Optional: propagate isa relations if the head has them
+            for child in tok.head.children:
+                if child.dep_ == "prep" and child.text.lower() == "of":
+                    pobj = next((c for c in child.children if c.dep_ == "pobj"), None)
+                    if pobj:
+                        triples.add((appos, "isa", noun_phrase_label(pobj, include_det)))
+
+    return triples
+
 
 # -------- graph build/plot --------
 def build_graph(triples):
@@ -502,13 +807,19 @@ if __name__ == "__main__":
         # "Was the Great Wall constructed over 2000 years?",
         # "Is the Great Wall an UNESCO World Heritage Site?",
         # "Does the Great Wall stretch across the northern China?",
-        # "Are millions of tourists visiting the Great Wall annually?"
-        # "Is the Great Wall visible from low Earth orbit?"
-        "Is the Great Wall of China located in China? Does the Great Wall span over 13000 miles? Was the Great Wall built during the Ming Dynasty? Can the Great Wall be seen from space? Is the Great Wall made of stone and brick?"
+        # "Are millions of tourists visiting the Great Wall annually?",
+        "The Great Wall is visible from low Earth orbit.",
+        # "Is the Great Wall of China located in China? Does the Great Wall span over 13000 miles? Was the Great Wall built during the Ming Dynasty? Can the Great Wall be seen from space? Is the Great Wall made of stone and brick?"
+        "Gold is heavier than silver.",
+        "Basal cell skin cancer, also known as basal cell carcinoma (BCC), is the most common type of skin cancer.",
+        "About 3 million cases of basal cell skin cancer are diagnosed every year in the United States.",
+        "The good news is it can be cured in most cases.",
+        "Treatment usually involves surgery to remove the cancer.",
+        "If caught early, it is easily treatable and curable.",
     ]
 
     for s in questions:
-        triples = sentence_relations(s, include_det=False)
+        triples = statement_relations(s, include_det=False)
         # id_json = triples_to_id_dictionary(triples)
         # print(json_dump_str(id_json, indent=2))
         print('code book method')
