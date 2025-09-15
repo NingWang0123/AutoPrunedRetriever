@@ -16,6 +16,7 @@ from langchain_community.vectorstores import FAISS
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 from optimize_combine_ent import combine_ents_auto, combine_ents_ann_knn, coarse_combine
+from copy import deepcopy
 
 
 nlp = spacy.load("en_core_web_sm")
@@ -2730,6 +2731,111 @@ class CompressRag:
 
 ### CompressRag RL version
 
+###### adding slicing func
+
+def _approx_token_len(obj: Any) -> int:
+    """
+    Cheap token-length proxy: JSON length // 4.
+    Keeps this util self-contained without tiktoken.
+    """
+    try:
+        s = json.dumps(obj, ensure_ascii=False, separators=(",", ":"))
+    except Exception:
+        # Fallback if non-serializable bits exist
+        s = str(obj)
+    return max(1, len(s) // 4)
+
+def _drop_keys(d: Dict[str, Any], matchers) -> Dict[str, Any]:
+    """
+    Return a shallow-pruned copy of dict `d` dropping any key that matches any matcher.
+    A matcher can be:
+      - exact string (k == matcher)
+      - callable (matcher(k) -> bool)
+    """
+    out = {}
+    for k, v in d.items():
+        drop = False
+        for m in matchers:
+            if callable(m):
+                if m(k):
+                    drop = True
+                    break
+            else:
+                if k == m:
+                    drop = True
+                    break
+        if not drop:
+            out[k] = v
+    return out
+
+def slice_for_final_merged_json(final_merged_json: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Produce a sliced view of `final_merged_json`:
+
+    - format == 'edge_matrix': keep edge-matrix-centric fields (drop ERE/edge-list blocks).
+    - format == 'ere': keep E-R-E list-style fields (drop the matrix + per-index blocks).
+    - format is None/other: return whichever of the two slices is shorter (approx token count).
+
+    This function is defensive against small key-name variations you've used:
+      * 'questions([[e,r,e], ...])'
+      * 'given knowledge([[e,r,e], ...])'
+      * 'facts([[e,r,e], ...])'
+      * 'questions(edges[i])'
+      * 'given knowledge(edges[i])'
+      * 'facts(edges[i])'
+      * 'edge_matrix'
+    """
+    data = deepcopy(final_merged_json)
+
+    # --- Define key matchers -------------------------------------------------
+    # Keys that correspond to ERE (triple-list) style content
+    ere_exact = [
+        'questions([[e,r,e], ...])',
+        'given knowledge([[e,r,e], ...])',
+        'facts([[e,r,e], ...])',
+    ]
+    # Keys that correspond to per-edge indexed content (edges[i])
+
+    per_edge_exact = [
+        'edge_matrix'
+        'questions(edges[i])',
+        'given knowledge(edges[i])',
+        'facts(edges[i])',
+    ]
+
+    # check if ready to build which one (some will include missing vals, we will choose the one more compelted)
+    features_contain_ere_exact = 1 
+    for e in ere_exact:
+      if e in data:
+        features_contain_ere_exact += 1
+
+    features_contain_per_edge_exact = 0 
+    for e in per_edge_exact:
+      if e in data:
+        features_contain_per_edge_exact += 1
+
+    # missing edge matrix cannot do edges[i] format
+    if 'edge_matrix' not in data:
+
+      return _drop_keys(data, per_edge_exact)
+
+    elif features_contain_ere_exact > features_contain_per_edge_exact:
+
+      return _drop_keys(data, per_edge_exact)
+
+    elif features_contain_ere_exact > features_contain_per_edge_exact:
+
+      return _drop_keys(data, ere_exact)
+    
+    else:
+      edge_matrix_view = _drop_keys(data, ere_exact)
+      ere_view = _drop_keys(data, per_edge_exact)
+
+      if _approx_token_len(edge_matrix_view) <= _approx_token_len(ere_view):
+        return edge_matrix_view
+      else:
+        return ere_view
+
 # thinkings extraction choice: keep the overlap(default), not include the thinking, keep the unique thinking
 # answers extraction choice: keep the unique (default), not include the answers, keep the overlap
 # combine ents choice: not combine, combine per round, combine per 3 round
@@ -3175,6 +3281,9 @@ class CompressRag_rl:
             final_merged_json = self.compact_indicies_for_prompt(q_json, domain_knowledge_lst)
         else:
             final_merged_json = combined_facts_cb if combined_facts_cb else q_json.copy()
+
+        final_merged_json = slice_for_final_merged_json(final_merged_json)
+        
         new_result, new_json_lst = self.collect_results(final_merged_json, questions=q_prompt)
 
         self.update_meta(new_json_lst, facts_cb=combined_facts_cb)
