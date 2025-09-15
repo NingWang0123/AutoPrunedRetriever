@@ -127,41 +127,30 @@ class Phi4MiniReasoningLLM:
             )
         else:
             user_msg = ""
-            SYSTEM_PROMPT = """
-            ---Role---
-            You are a helpful assistant responding to user queries.
+            system_msg = (
+                "You are a precise QA agent that answers by expressing facts as short, "
+                "plain English statements. Keep outputs concise and factual."
+            )
 
-            ---Goal---
-            Generate direct and concise answers based strictly on the provided Knowledge Base.
-            Respond in plain text without explanations or formatting.
-            Maintain conversation continuity and use the same language as the query.
-            If the answer is unknown, respond with "I don't know".
-
-            ---Knowledge Base---
-            [Graph Format]
-            - e: list of entity strings; index i refers to e[i]
-            - r: list of relation strings; index j refers to r[j]
-            - edge_matrix: list of [head_e_idx, r_idx, tail_e_idx]
-            - questions([[e,r,e], ...]): related questions triples in conversation history 
-            - given knowledge([[e,r,e], ...]): prior answer triples according to questions
-            - start thinking with(edges[i]): related questions' thinking process triples
-            - facts(edges[i]):groups of edge indices of facts
-            - facts([[e,r,e], ...]): related facts triples
-
-            [Data]
-            {context_data}
-            """
-
-            system_msg = SYSTEM_PROMPT.format(
-            context_data=final_merged_json
-        )
+            ctx_lines = [
+                "<<<RETRIEVED_CONTEXT_START>>>",
+                "The system searched for a related question in the database. Below are related question's graph triples and its prior answer as reference. You don't have to follow it completely, just use it as a reference.",
+                f"{final_merged_json}",
+            ]
+            ctx_lines.append("<<<RETRIEVED_CONTEXT_END>>>")
+            user_msg += "\n".join(ctx_lines) + "\n"
 
             user_msg += (
-                f"\n---Current Question---\n{question}"
-                "\n---Answer---\n"
+                f"[CURRENT QUESTION]: {question} \n"
+                "[TASK]: You are a QA assistant for open-ended questions.\n"
+                f"- Give a short, direct answer in 2–3 sentences."
+                "- Do NOT restrict to yes/no.\n"
+                "[FORMAT]: Write complete sentences (not a single word)."
+                "Avoid starting with just 'Yes.' or 'No.'; if the question is yes/no-style, state the conclusion AND 1–2 short reasons.\n"
+                "[ANSWER]: "
             )
-        print(system_msg)
-        print(user_msg)
+        #print(system_msg)
+        #print(user_msg)
         return system_msg, user_msg
 
 
@@ -279,7 +268,7 @@ include_thinking = True
 phi_llm = Phi4MiniReasoningLLM(
     include_thinkings=include_thinking,                 
     model_name="microsoft/Phi-4-mini-reasoning",
-    max_new_tokens=256,
+    max_new_tokens=512,
     temperature=0.2,
     top_p=0.9
 )
@@ -317,7 +306,7 @@ def to_serializable(obj):
 i = 0
 for q in questions:
     print(f'q {i}')
-    result = rag.run_work_flow(q, facts_json_path=["context/novel copy.json", "context/medical copy.json"], warm_start="coarse")
+    result = rag.run_work_flow(q, facts_json_path=["context/novel copy.json", "context/medical copy.json"], warm_start="auto")
     #print(result)
 
     #with open(f"meta_codebook_{i}.json", "w", encoding="utf-8") as f:
