@@ -2273,7 +2273,7 @@ def get_json_with_given_knowledge_and_thinkings(flat_answers_lsts,flat_thinkings
             'edge_matrix':edge_matrix_sub,
             'questions([[e,r,e], ...])':decode_questions(questions, final_merged_json, 'edges'),
             'given knowledge([[e,r,e], ...])': decode_questions(flat_answers_lsts, final_merged_json, 'edges'),
-            'start thinking with(edges[i])':decode_questions(flat_thinkings_lsts,final_merged_json,'edges'),
+            'start thinking with([[e,r,e], ...])':decode_questions(flat_thinkings_lsts,final_merged_json,'edges'),
             'rule':codebook_sub_q['rule']
 
         }
@@ -2438,7 +2438,7 @@ def get_json_with_given_thinkings(flat_thinkings_lsts,codebook_main,codebook_sub
             'r':r_set,
             'edge_matrix':edge_matrix_sub,
             'questions([[e,r,e], ...])':decode_questions(questions, final_merged_json, 'edges'),
-            'start thinking with(edges[i])':decode_questions(flat_thinkings_lsts,final_merged_json,'edges'),
+            'start thinking with([[e,r,e], ...])':decode_questions(flat_thinkings_lsts,final_merged_json,'edges'),
             'rule':codebook_sub_q['rule']
 
         }
