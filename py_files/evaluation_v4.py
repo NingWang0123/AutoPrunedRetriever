@@ -100,109 +100,109 @@ print(f"[DEBUG] after facts-merge: |E|={len(cr.meta_codebook['e'])} "
       f"|R|={len(cr.meta_codebook['r'])} "
       f"|edges|={len(cr.meta_codebook['edge_matrix'])}")
 
-# # ---------------------------------------------------------------------
-# # 4) Build DPO preference dataset on seed Q-A pairs
-# # ---------------------------------------------------------------------
-# print("» Building preference pairs for DPO …")
-# pref_ds = make_preference_dataset_2head(
-#     cr            = cr,
-#     questions     = seed_questions,
-#     gold_answers  = gold_lookup,
-#     per_q_samples = 6,
-#     reward_fn     = default_reward,
-#     seed          = 42,
-# )
-# print(f"   generated {len(pref_ds)} preference examples")
+# ---------------------------------------------------------------------
+# 4) Build DPO preference dataset on seed Q-A pairs
+# ---------------------------------------------------------------------
+print("» Building preference pairs for DPO …")
+pref_ds = make_preference_dataset_2head(
+    cr            = cr,
+    questions     = seed_questions,
+    gold_answers  = gold_lookup,
+    per_q_samples = 6,
+    reward_fn     = default_reward,
+    seed          = 42,
+)
+print(f"   generated {len(pref_ds)} preference examples")
 
-# policy, _ = train_dpo_2head(pref_ds, input_dim=384)
+policy, _ = train_dpo_2head(pref_ds, input_dim=384)
 
-# # ---------------------------------------------------------------------
-# # 5) LinUCB scheduler (entity-combine cadence)
-# # ---------------------------------------------------------------------
-# state_dim  = featurize_state(cr).shape[0]   # typically 4
-# scheduler  = CombineScheduler(d=state_dim, arms=COMBINE_ARMS,
-#                               alpha=1.0, epsilon=0.05)
+# ---------------------------------------------------------------------
+# 5) LinUCB scheduler (entity-combine cadence)
+# ---------------------------------------------------------------------
+state_dim  = featurize_state(cr).shape[0]   # typically 4
+scheduler  = CombineScheduler(d=state_dim, arms=COMBINE_ARMS,
+                              alpha=1.0, epsilon=0.05)
 
-# # ---------------------------------------------------------------------
-# # 6) Seed history with first 30 Q-A (store answers / thinkings)
-# # ---------------------------------------------------------------------
-# print("» Seeding history with first 30 questions …")
-# for q in seed_questions:
-#     answer_with_auto_strategy(
-#         cr, policy, scheduler, q,
-#         reward_fn       = default_reward,
-#         gold_answer     = gold_lookup[q],
-#         facts_json_path = facts_json_paths,
-#         chunk_chars     = 200,
-#         overlap         = 30,
-#         greedy          = True
-#     )
+# ---------------------------------------------------------------------
+# 6) Seed history with first 30 Q-A (store answers / thinkings)
+# ---------------------------------------------------------------------
+print("» Seeding history with first 30 questions …")
+for q in seed_questions:
+    answer_with_auto_strategy(
+        cr, policy, scheduler, q,
+        reward_fn       = default_reward,
+        gold_answer     = gold_lookup[q],
+        facts_json_path = facts_json_paths,
+        chunk_chars     = 200,
+        overlap         = 30,
+        greedy          = True
+    )
 
-# # ---------------------------------------------------------------------
-# # 7) Helper: capture CR’s last retrieved context
-# # ---------------------------------------------------------------------
-# def _collect_ctx(cr, k: int = TOPK_CTX) -> List[str]:
-#     ctx = getattr(cr, "_last_ctx", [])[:k]
-#     return [re.sub(r"\s+", " ", c.strip()) for c in ctx]
+# ---------------------------------------------------------------------
+# 7) Helper: capture CR’s last retrieved context
+# ---------------------------------------------------------------------
+def _collect_ctx(cr, k: int = TOPK_CTX) -> List[str]:
+    ctx = getattr(cr, "_last_ctx", [])[:k]
+    return [re.sub(r"\s+", " ", c.strip()) for c in ctx]
 
-# # ---------------------------------------------------------------------
-# # 8) Evaluate next 20 questions & dump JSON
-# # ---------------------------------------------------------------------
-# def dump_results(questions: List[str], out_path: str):
-#     rows = []
-#     for q in questions:
-#         pred, _meta = answer_with_auto_strategy(
-#             cr, policy, scheduler, q,
-#             reward_fn       = default_reward,
-#             gold_answer     = gold_lookup[q],
-#             facts_json_path = facts_json_paths,
-#             chunk_chars     = 400,
-#             overlap         = 80,
-#             greedy          = True
-#         )
-#         row = row_lookup[q]
-#         rows.append({
-#             "id":              row["id"],
-#             "question":        q,
-#             "source":          row["source"],
-#             "context":         _collect_ctx(cr),
-#             "evidence":        row["evidence"],
-#             "question_type":   row["question_type"],
-#             "generated_answer": pred,
-#             "ground_truth":    row["answer"],
-#         })
+# ---------------------------------------------------------------------
+# 8) Evaluate next 20 questions & dump JSON
+# ---------------------------------------------------------------------
+def dump_results(questions: List[str], out_path: str):
+    rows = []
+    for q in questions:
+        pred, _meta = answer_with_auto_strategy(
+            cr, policy, scheduler, q,
+            reward_fn       = default_reward,
+            gold_answer     = gold_lookup[q],
+            facts_json_path = facts_json_paths,
+            chunk_chars     = 400,
+            overlap         = 80,
+            greedy          = True
+        )
+        row = row_lookup[q]
+        rows.append({
+            "id":              row["id"],
+            "question":        q,
+            "source":          row["source"],
+            "context":         _collect_ctx(cr),
+            "evidence":        row["evidence"],
+            "question_type":   row["question_type"],
+            "generated_answer": pred,
+            "ground_truth":    row["answer"],
+        })
 
-#     Path(out_path).parent.mkdir(parents=True, exist_ok=True)
-#     json.dump(rows, open(out_path, "w"), indent=2)
-#     print(f"   wrote {len(rows)} rows → {out_path}")
+    Path(out_path).parent.mkdir(parents=True, exist_ok=True)
+    json.dump(rows, open(out_path, "w"), indent=2)
+    print(f"   wrote {len(rows)} rows → {out_path}")
 
-# print("» Answering 20 evaluation questions …")
-# dump_results(test_questions, "results/compressrag_medical.json")
+print("» Answering 20 evaluation questions …")
+dump_results(test_questions, "results/compressrag_medical.json")
 
-# # ---------------------------------------------------------------------
-# # 9) Optional: basic cost summary (tokens / latency)
-# # ---------------------------------------------------------------------
-# # NOTE: CompressRag_rl_v1 里只有 _record_metric() 时才会有数据
-# try:
-#     txt_stats  = cr.report_cost(kind="text")
-#     gph_stats  = cr.report_cost(kind="graph")
-#     os.makedirs("results", exist_ok=True)
-#     json.dump(
-#         {"text": txt_stats, "graph": gph_stats},
-#         open("results/cost_summary.json", "w"), indent=2
-#     )
-# except Exception as e:
-#     print("[WARN] cost report failed:", e)
+# ---------------------------------------------------------------------
+# 9) Optional: basic cost summary (tokens / latency)
+# ---------------------------------------------------------------------
+# NOTE: CompressRag_rl_v1 里只有 _record_metric() 时才会有数据
+try:
+    txt_stats  = cr.report_cost(kind="text")
+    gph_stats  = cr.report_cost(kind="graph")
+    os.makedirs("results", exist_ok=True)
+    json.dump(
+        {"text": txt_stats, "graph": gph_stats},
+        open("results/cost_summary.json", "w"), indent=2
+    )
+except Exception as e:
+    print("[WARN] cost report failed:", e)
 
-# # ---------------------------------------------------------------------
-# # 10) (Optional) save FAISS indexes – enable if you later add those APIs
-# # ---------------------------------------------------------------------
-# # TODO: 如果你在 CompressRag_rl_v1 里实现了 rebuild_vector_stores() / graph_db /
-# # text_db，可取消下面 3 行注释做 index size 统计：
-# # ---------------------------------------------------------------------
-# # if hasattr(cr, "rebuild_vector_stores"):
-# #     cr.rebuild_vector_stores()
-# #     cr.save_index_and_report_size(db="text",  out_dir="faiss_text_idx")
-# #     cr.save_index_and_report_size(db="graph", out_dir="faiss_graph_idx")
+# ---------------------------------------------------------------------
+# 10) (Optional) save FAISS indexes – enable if you later add those APIs
+# ---------------------------------------------------------------------
+# TODO: 如果你在 CompressRag_rl_v1 里实现了 rebuild_vector_stores() / graph_db /
+# text_db，可取消下面 3 行注释做 index size 统计：
+# ---------------------------------------------------------------------
+# if hasattr(cr, "rebuild_vector_stores"):
+#     cr.rebuild_vector_stores()
+#     cr.save_index_and_report_size(db="text",  out_dir="faiss_text_idx")
+#     cr.save_index_and_report_size(db="graph", out_dir="faiss_graph_idx")
 
 # print("\nDONE – ready to evaluate with generation_eval.py / retrieval_eval.py")
