@@ -17,6 +17,8 @@ from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 from optimize_combine_ent import combine_ents_auto, combine_ents_ann_knn, coarse_combine
 from copy import deepcopy
+from textwrap import dedent
+
 
 
 nlp = spacy.load("en_core_web_sm")
@@ -2733,6 +2735,30 @@ class CompressRag:
 
 ###### adding slicing func
 
+rule_ere_exact = dedent("""\
+    ---Knowledge Base---
+    [JSON format]
+    - e: list of entities (e[i] = entity string)
+    - r: list of relations (r[j] = relation string)
+    - edge_matrix: [[head_e_idx, r_idx, tail_e_idx]]; edges[i] = edge_matrix[i]
+    - questions(edges[i]): question triples linked to edge i
+    - given knowledge(edges[i]): prior answers linked to edge i
+    - start thinking with(edges[i]): reasoning steps for edge i
+    - facts(edges[i]): groups of edge indices for facts
+""")
+
+rule_edge_exact = dedent("""\
+    ---Knowledge Base---
+    [JSON format]
+    - e: list of entities (e[i] = entity string)
+    - r: list of relations (r[j] = relation string)
+    - [e,r,e]: triple [head_e_idx, r_idx, tail_e_idx]
+    - questions([[e,r,e], ...]): question triples in history
+    - given knowledge([[e,r,e], ...]): prior answer triples
+    - start thinking with([[e,r,e], ...]): reasoning steps
+    - facts([[e,r,e], ...]): fact triples
+""")
+
 def _approx_token_len(obj: Any) -> int:
     """
     Cheap token-length proxy: JSON length // 4.
@@ -2816,20 +2842,26 @@ def slice_for_final_merged_json(final_merged_json: Dict[str, Any]) -> Dict[str, 
 
     # missing edge matrix cannot do edges[i] format
     if 'edge_matrix' not in data:
+      data['rule'] = rule_edge_exact
 
       return _drop_keys(data, per_edge_exact)
 
     elif features_contain_ere_exact > features_contain_per_edge_exact:
+      data['rule'] = rule_edge_exact
 
       return _drop_keys(data, per_edge_exact)
 
     elif features_contain_ere_exact > features_contain_per_edge_exact:
+      data['rule'] =  rule_ere_exact
 
       return _drop_keys(data, ere_exact)
     
     else:
       edge_matrix_view = _drop_keys(data, ere_exact)
+      edge_matrix_view['rule'] =  rule_ere_exact
+
       ere_view = _drop_keys(data, per_edge_exact)
+      ere_view['rule'] =  rule_edge_exact
 
       if _approx_token_len(edge_matrix_view) <= _approx_token_len(ere_view):
         return edge_matrix_view
@@ -3283,7 +3315,7 @@ class CompressRag_rl:
             final_merged_json = combined_facts_cb if combined_facts_cb else q_json.copy()
 
         final_merged_json = slice_for_final_merged_json(final_merged_json)
-        
+
         new_result, new_json_lst = self.collect_results(final_merged_json, questions=q_prompt)
 
         self.update_meta(new_json_lst, facts_cb=combined_facts_cb)
