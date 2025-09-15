@@ -2740,11 +2740,12 @@ rule_ere_exact = dedent("""\
     [JSON format]
     - e: list of entities (e[i] = entity string)
     - r: list of relations (r[j] = relation string)
-    - edge_matrix: [[head_e_idx, r_idx, tail_e_idx]]; edges[i] = edge_matrix[i]
-    - questions(edges[i]): question triples linked to edge i
-    - given knowledge(edges[i]): prior answers linked to edge i
-    - start thinking with(edges[i]): reasoning steps for edge i
-    - facts(edges[i]): groups of edge indices for facts
+    - edge_matrix: [[head_e_idx, r_idx, tail_e_idx]]
+        * NOTE: edges[i] is just shorthand for edge_matrix[i]
+    - questions(edges[i]): questions linked by edge i
+    - given knowledge(edges[i]): prior answers linked by edge i
+    - start thinking with(edges[i]): reasoning steps linked by edge i
+    - facts(edges[i]): factss linked by edge i
 """)
 
 rule_edge_exact = dedent("""\
@@ -2753,7 +2754,7 @@ rule_edge_exact = dedent("""\
     - e: list of entities (e[i] = entity string)
     - r: list of relations (r[j] = relation string)
     - [e,r,e]: triple [head_e_idx, r_idx, tail_e_idx]
-    - questions([[e,r,e], ...]): question triples in history
+    - questions([[e,r,e], ...]): question triples 
     - given knowledge([[e,r,e], ...]): prior answer triples
     - start thinking with([[e,r,e], ...]): reasoning steps
     - facts([[e,r,e], ...]): fact triples
