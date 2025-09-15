@@ -5,6 +5,7 @@ import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import re, os
 from typing import List, Tuple
+import time
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
@@ -87,6 +88,41 @@ class Phi4MiniReasoningLLM:
         else:
             self._use_chat_template = True
 
+            # === metrics containers ===
+        self.metrics_runs = []         # append per-call metrics dict
+        self.last_metrics = None       # most recent one
+        self.model_name = model_name
+
+    # ---------- helpers for metrics ----------
+    def _count_tokens(self, text: str) -> int:
+        if not text:
+            return 0
+        return len(self.tokenizer.encode(text, add_special_tokens=False))
+
+    def _cuda_peak_mib(self) -> float:
+        try:
+            if torch.cuda.is_available():
+                # 清零历史峰值再测当前调用峰值
+                torch.cuda.reset_peak_memory_stats()
+                return 0.0  # 先返回0，真正的峰值在_generate结束后读取
+        except Exception:
+            pass
+        return 0.0
+
+    def _get_cuda_peak_mib_after(self) -> float:
+        try:
+            if torch.cuda.is_available():
+                return float(torch.cuda.max_memory_allocated() / (1024**2))
+        except Exception:
+            pass
+        return 0.0
+
+    def _device_str(self) -> str:
+        if torch.cuda.is_available():
+            return f"cuda:{torch.cuda.current_device()}"
+        if getattr(torch.backends, "mps", None) and torch.backends.mps.is_available():
+            return "mps"
+        return "cpu"
 
     def _build_prompt(self, final_merged_json, question, decode = False):
         if decode:
@@ -135,7 +171,7 @@ class Phi4MiniReasoningLLM:
             ctx_lines = [
                 "<<<RETRIEVED_CONTEXT_START>>>",
                 "The system searched for a related question in the database. Below are related question's graph triples and its prior answer as reference. You don't have to follow it completely, just use it as a reference.",
-                f"{final_merged_json}",
+                #f"{final_merged_json}",
             ]
             ctx_lines.append("<<<RETRIEVED_CONTEXT_END>>>")
             user_msg += "\n".join(ctx_lines) + "\n"
@@ -156,6 +192,9 @@ class Phi4MiniReasoningLLM:
 
     @torch.no_grad()
     def _generate(self, system_msg: str, user_msg: str) -> str:
+        self._cuda_peak_mib()
+        t0 = time.perf_counter()
+
         if self._use_chat_template:
             messages = [
                 {"role": "system", "content": system_msg},
@@ -166,6 +205,9 @@ class Phi4MiniReasoningLLM:
             prompt = f"<|system|>\n{system_msg}\n<|user|>\n{user_msg}\n<|assistant|>\n"
 
         inputs = self.tokenizer(prompt, return_tensors="pt").to(self.model.device)
+        input_tokens = int(inputs["input_ids"].shape[-1])
+
+        t1 = time.perf_counter()
         outputs = self.model.generate(
             **inputs,
             max_new_tokens=self.max_new_tokens,
@@ -174,9 +216,41 @@ class Phi4MiniReasoningLLM:
             top_p=self.top_p,
             pad_token_id=self.tokenizer.eos_token_id,
         )
+        t2 = time.perf_counter()
         text = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+        total_tokens = int(outputs[0].shape[-1])  # includes input + generated with special tokens (approx)
+        output_tokens = max(0, total_tokens - input_tokens)
         cut = text.rfind(user_msg)
-        return text[cut + len(user_msg):].strip() if cut != -1 else text.strip()
+
+        gen_latency_sec = t2 - t1
+        latency_sec = t2 - t0
+        # prompt chars
+        prompt_chars = float(len(prompt))
+        # cuda peak
+        peak_vram = self._get_cuda_peak_mib_after()
+        gen_info = {
+            "input_tokens": float(input_tokens),
+            "output_tokens": float(output_tokens),
+            "total_tokens": float(input_tokens + output_tokens),
+            "latency_sec": float(latency_sec),
+            "gen_latency_sec": float(gen_latency_sec),
+            # retrieval_latency_sec / retrieved_count 由上层调用注入（见 take_questions）
+            "retrieval_latency_sec": None,
+            "peak_vram_MiB": float(peak_vram),
+            "prompt_chars": float(prompt_chars),
+            # 衍生指标
+            "throughput_tok_per_s": float((output_tokens / gen_latency_sec) if gen_latency_sec > 0 else 0.0),
+            "prompt_tok_per_s": float((input_tokens / (latency_sec - gen_latency_sec)) if (latency_sec - gen_latency_sec) > 0 else 0.0),
+            "device": self._device_str(),
+            "dtype": str(getattr(self.model, "dtype", "unknown")),
+            "model_name": self.model_name,
+            "temperature": float(self.temperature),
+            "top_p": float(self.top_p),
+            "max_new_tokens": int(self.max_new_tokens),
+            "timestamp_start": t0,
+            "timestamp_end": t2,
+        }
+        return text[cut + len(user_msg):].strip() if cut != -1 else text.strip(), gen_info
     
     def strip_think(self, s: str) -> Tuple[str, List[str]]:
         """Remove <think>...</think> blocks; also handle dangling <think> at EOF."""
@@ -225,7 +299,7 @@ class Phi4MiniReasoningLLM:
         clean = re.sub(r"(?:^|\n)\s*(Okay,|Let’s|Let's|Step by step|Thought:).*", "", clean, flags=re.I)
         return clean.strip(), thinks
         
-    def take_questions(self, final_merged_json, question, *, max_regen: int = 3):
+    def take_questions(self, final_merged_json, question, *, max_regen: int = 3, retrieval_time):
         def _clean_answer(s: str, limit=4):
             parts = [p.strip() for p in re.split(r'(?<=[.!?])\s+', s) if p.strip()]
             if not parts:
@@ -237,8 +311,19 @@ class Phi4MiniReasoningLLM:
 
         for attempt in range(max_regen):
             sys_msg, usr_msg = self._build_prompt(final_merged_json, question, decode= False)
-            out = self._generate(sys_msg, usr_msg)
+            out, gen_info = self._generate(sys_msg, usr_msg)
             print(f"-------------RAW[{attempt+1}/{max_regen}]:", out)
+
+            gen_info["retrieval_latency_sec"] = float(retrieval_time)
+            gen_info["attempt"] = int(attempt + 1)
+            gen_info["question_chars"] = float(len(str(question)))
+            gen_info["answer_raw_chars"] = float(len(out))
+            gen_info["answer_raw_tokens"] = float(self._count_tokens(out))
+            gen_info["prompt_to_output_char_ratio"] = float(
+                (gen_info["prompt_chars"] / max(1.0, gen_info["answer_raw_chars"]))
+            )
+
+            final_metrics = gen_info
 
             raw = out.strip()
             m = re.search(r"\[answers\](.*?)(?:\[thinkings\]|\Z)", raw, flags=re.S | re.I)
@@ -254,6 +339,10 @@ class Phi4MiniReasoningLLM:
         if not ans_clean:
             ans_clean = "No answer."
 
+        metrics_wrapped = {f"{question}":final_metrics or {} }
+        self.last_metrics = metrics_wrapped
+        self.metrics_runs.append(metrics_wrapped)
+
         if self.include_thinkings:
             thinks_str = "\n\n".join(t.strip() for t in last_thinks if t.strip())
             return ans_clean, thinks_str
@@ -268,7 +357,7 @@ include_thinking = True
 phi_llm = Phi4MiniReasoningLLM(
     include_thinkings=include_thinking,                 
     model_name="microsoft/Phi-4-mini-reasoning",
-    max_new_tokens=512,
+    max_new_tokens=256,
     temperature=0.2,
     top_p=0.9
 )
@@ -289,7 +378,7 @@ rag.questions_db_batch_size = 16
 
 questions = [
     "From which cell type does basal cell carcinoma arise?",
-    "From which cell type does basal cell carcinoma arise?",
+    #"From which cell type does basal cell carcinoma arise?",
 ]
 import json
 import numpy as np
@@ -307,6 +396,7 @@ i = 0
 for q in questions:
     print(f'q {i}')
     result = rag.run_work_flow(q, facts_json_path=["context/novel copy.json", "context/medical copy.json"], warm_start="auto")
+    print(rag.metrics_runs)  
     #print(result)
 
     #with open(f"meta_codebook_{i}.json", "w", encoding="utf-8") as f:
