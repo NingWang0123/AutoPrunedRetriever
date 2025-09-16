@@ -2898,6 +2898,7 @@ class CompressRag_rl:
         # start with empty codebook
         self.meta_codebook = ini_meta_codebook
         self.llm = llm
+        self.cur_fact_context = None
 
         # Embeddings
         self.sentence_emb = sentence_emb 
@@ -3316,6 +3317,8 @@ class CompressRag_rl:
             final_merged_json = combined_facts_cb if combined_facts_cb else q_json.copy()
 
         final_merged_json = slice_for_final_merged_json(final_merged_json)
+
+        self.cur_fact_context = get_context(final_merged_json)
 
         new_result, new_json_lst = self.collect_results(final_merged_json, questions=q_prompt)
 
