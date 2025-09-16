@@ -185,8 +185,7 @@ class Phi4MiniReasoningLLM:
                 "Avoid starting with just 'Yes.' or 'No.'; if the question is yes/no-style, state the conclusion AND 1–2 short reasons.\n"
                 "[ANSWER]: "
             )
-        #print(system_msg)
-        #print(user_msg)
+
         return system_msg, user_msg
 
 
@@ -299,7 +298,7 @@ class Phi4MiniReasoningLLM:
         clean = re.sub(r"(?:^|\n)\s*(Okay,|Let’s|Let's|Step by step|Thought:).*", "", clean, flags=re.I)
         return clean.strip(), thinks
         
-    def take_questions(self, final_merged_json, question, *, max_regen: int = 3, retrieval_time):
+    def take_questions(self, final_merged_json, question, *, max_regen: int = 3, retrieval_time: float = 0.0):
         def _clean_answer(s: str, limit=4):
             parts = [p.strip() for p in re.split(r'(?<=[.!?])\s+', s) if p.strip()]
             if not parts:
@@ -326,12 +325,16 @@ class Phi4MiniReasoningLLM:
             final_metrics = gen_info
 
             raw = out.strip()
+            # print(f'out: {out}') 
+            # print(f'raw: {raw}') 
             m = re.search(r"\[answers\](.*?)(?:\[thinkings\]|\Z)", raw, flags=re.S | re.I)
             ans_region = m.group(1).strip() if m else raw
 
             ans_no_think, thinks = self.strip_think(ans_region)
             last_thinks = thinks  
-
+            # print(f'ans_region: {ans_region}')  
+            # print(f'ans_no_think: {ans_no_think}')
+            # print(f'last_thinks: {last_thinks}')  
             ans_clean = _clean_answer(ans_no_think, 4).strip()
             if ans_clean:
                 break
@@ -345,6 +348,7 @@ class Phi4MiniReasoningLLM:
 
         if self.include_thinkings:
             thinks_str = "\n\n".join(t.strip() for t in last_thinks if t.strip())
+            # print(f'ans_clean: {ans_clean}')
             return ans_clean, thinks_str
         else:
             return ans_clean
@@ -392,16 +396,16 @@ def to_serializable(obj):
         return float(obj)     # numpy float -> float
     raise TypeError(f"Type {type(obj)} not serializable")
 
-i = 0
-for q in questions:
-    print(f'q {i}')
-    result = rag.run_work_flow(q, facts_json_path=["context/novel copy.json", "context/medical copy.json"], warm_start="auto")
-    print(rag.metrics_runs)  
-    #print(result)
+# i = 0
+# for q in questions:
+#     print(f'q {i}')
+#     result = rag.run_work_flow(q, facts_json_path=["/home/ra_daniel/bilby/relational_graph_llm/py_files/medical_sub.json"], warm_start="auto")
+#     print(rag.llm.metrics_runs)  
+#     #print(result)
 
-    #with open(f"meta_codebook_{i}.json", "w", encoding="utf-8") as f:
-    #    json.dump(rag.meta_codebook, f, ensure_ascii=False, indent=2, default=to_serializable)
-    i += 1
+#     with open(f"meta_codebook_{i}.json", "w", encoding="utf-8") as f:
+#        json.dump(rag.meta_codebook, f, ensure_ascii=False, indent=2, default=to_serializable)
+#     i += 1
 
 
 
