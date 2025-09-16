@@ -375,8 +375,8 @@ def statement_relations(sentence, include_det=False):
     # Track processed auxiliaries to avoid double-processing
     processed_aux = set()
 
-    for i, tok in enumerate(doc):
-        print(tok, " - ", tok.pos_, " - ", tok.dep_)
+    # for i, tok in enumerate(doc):
+    #     print(tok, " - ", tok.pos_, " - ", tok.dep_)
 
     for i, tok in enumerate(doc):
         # Case A: Handle passive voice constructions first

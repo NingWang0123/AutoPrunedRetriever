@@ -402,8 +402,8 @@ def sentence_relations(sentence, include_det=False):
     triples = set()
 
     # Debug
-    for tok in doc:
-        print(tok, "-", tok.pos_, "-", tok.dep_)
+    # for tok in doc:
+    #     print(tok, "-", tok.pos_, "-", tok.dep_)
 
     root = next((t for t in doc if t.dep_ == "ROOT"), None)
     if not root:
