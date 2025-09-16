@@ -270,9 +270,11 @@ class Phi4MiniReasoningLLM:
 
         last_thinks: List[str] = []
         ans_clean = ""
+        print(f'final_merged_json: {final_merged_json}')
 
         for attempt in range(max_regen):
             sys_msg, usr_msg = self._build_prompt(final_merged_json, question, decode=False)
+
             raw = self._generate(sys_msg, usr_msg).strip()
             # print(f"-------------RAW[{attempt+1}/{max_regen}]: {raw}")
 
@@ -284,6 +286,8 @@ class Phi4MiniReasoningLLM:
             m_th = re.search(r"\[thinkings\]\s*:\s*(.*)\Z", raw, flags=re.S | re.I)
             think_text = (m_th.group(1).strip() if m_th else "").strip()
 
+            print(f'ans_text: {ans_text}') 
+            print(f'think_text: {think_text}') 
             # 3) Also capture any <think>...</think> spans anywhere
             _, think_spans = self.strip_think(raw)
 
@@ -339,7 +343,7 @@ rag.questions_db_batch_size = 16
 
 questions = [
     "From which cell type does basal cell carcinoma arise?",
-    "From which cell type does basal cell carcinoma arise?",
+    # "From which cell type does basal cell carcinoma arise?",
 ]
 import json
 import numpy as np
@@ -353,12 +357,16 @@ def to_serializable(obj):
         return float(obj)     # numpy float -> float
     raise TypeError(f"Type {type(obj)} not serializable")
 
+results = []
+
 i = 0
 for q in questions:
     print(f'q {i}')
-    result = rag.run_work_flow(q, facts_json_path=["context/novel copy.json", "context/medical copy.json"], warm_start="coarse")
-    #print(result)
-
-    #with open(f"meta_codebook_{i}.json", "w", encoding="utf-8") as f:
-    #    json.dump(rag.meta_codebook, f, ensure_ascii=False, indent=2, default=to_serializable)
+    result = rag.run_work_flow(q, facts_json_path=["/home/ra_daniel/bilby/relational_graph_llm/py_files/medical_sub.json"], warm_start="coarse")
+    print(result)
+    results.append(result)
+    with open(f"meta_codebook_{i}.json", "w", encoding="utf-8") as f:
+       json.dump(rag.meta_codebook, f, ensure_ascii=False, indent=2, default=to_serializable)
     i += 1
+
+print(f'results here: {results}')
