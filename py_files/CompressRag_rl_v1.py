@@ -3318,7 +3318,9 @@ class CompressRag_rl:
 
         final_merged_json = slice_for_final_merged_json(final_merged_json)
 
-        self.cur_fact_context = get_context(final_merged_json)
+        q_txt, gk_txt, st_txt, ft_txt = get_context(final_merged_json)
+
+        self.cur_fact_context = ft_txt
 
         new_result, new_json_lst = self.collect_results(final_merged_json, questions=q_prompt)
 
