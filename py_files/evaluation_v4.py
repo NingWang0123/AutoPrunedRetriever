@@ -20,13 +20,15 @@ from huggingface_hub import hf_hub_download
 from langchain_community.embeddings import HuggingFaceEmbeddings
 
 from CompressRag_rl_v1 import (
-    CompressRag_rl, WordAvgEmbeddings, merging_codebook
+    CompressRag_rl, WordAvgEmbeddings, merging_codebook, get_word_embeddings
 )
-from dpo_compressrag import (            # same folder as shown
+from dpo_compressrag import (    
     make_preference_dataset_2head, train_dpo_2head,
     default_reward, featurize_state, CombineScheduler,
-    COMBINE_ARMS, answer_with_auto_strategy, Phi4MiniReasoningLLM,
+    COMBINE_ARMS, answer_with_auto_strategy,
 )
+
+from test_for_compressrag import Phi4MiniReasoningLLM
 
 # ---------------------------------------------------------------------
 # 0) Paths / constants
@@ -35,8 +37,8 @@ REPO_ID      = "GraphRAG-Bench/GraphRAG-Bench"
 CORPUS_FILE  = "Datasets/Corpus/medical.json"
 QUEST_FILE   = "Datasets/Questions/medical_questions.json"
 
-SEED_N       = 30     # first 30 rows → bootstrap + DPO train
-TEST_N       = 20     # next 20 rows  → evaluation
+SEED_N       = 5    # first 30 rows → bootstrap + DPO train
+TEST_N       = 5     # next 20 rows  → evaluation
 TOPK_CTX     = 5
 
 # ---------------------------------------------------------------------
@@ -51,19 +53,23 @@ sent_emb = HuggingFaceEmbeddings(
 )
 phi_llm  = Phi4MiniReasoningLLM(
     include_thinkings=True,
-    model_name="microsoft/Phi-4-mini-reasoning",
-    max_new_tokens=256,
+    model_name="Qwen/Qwen3-4B-Thinking-2507", #microsoft/Phi-4-mini-reasoning
+    max_new_tokens=1000,
     temperature=0.2,
     top_p=0.9,
 )
 
+import json
+with open("meta_codebook.json", "r") as f:
+    ini = json.load(f)
+
 cr = CompressRag_rl(
-    ini_meta_codebook = {},
+    ini_meta_codebook = ini,
     sentence_emb      = sent_emb,
     word_emb          = word_emb,
     llm               = phi_llm,
     combine_ents_rounds = 1,        # LinUCB 会改写
-    thinkings_choice    = 'not_include',
+    thinkings_choice    = 'overlap',
     answers_choice      = 'overlap',
 )
 
@@ -75,7 +81,7 @@ q_fp = hf_hub_download(REPO_ID, QUEST_FILE, repo_type="dataset")
 qrows = json.load(open(q_fp, encoding="utf-8"))
 
 row_lookup  = {r["question"].strip(): r for r in qrows}
-gold_lookup = {q: r["answer"]          for q, r in row_lookup.items()}
+gold_lookup = {q: r["answer"]        for q, r in row_lookup.items()}
 
 all_questions  = list(row_lookup.keys())
 seed_questions = all_questions[:SEED_N]
@@ -84,8 +90,7 @@ test_questions = all_questions[SEED_N : SEED_N+TEST_N]
 # ---------------------------------------------------------------------
 # 3) Pre-load corpus as facts into CR
 # ---------------------------------------------------------------------
-facts_json_paths = [hf_hub_download(REPO_ID, CORPUS_FILE, repo_type="dataset")]
-cr.set_facts_sources(facts_json_paths)
+facts_json_paths = '/home/ra_daniel/bilby/relational_graph_llm/py_files/medical_sub.json'
 
 facts_cb = cr.load_and_merge_facts(facts_json_paths, chunk_chars=100, overlap=30)
 cr._facts_preloaded = True
@@ -93,8 +98,23 @@ cr.top_m = 3          # sentence-embedding rerank top-m
 
 cr.meta_codebook = merging_codebook(
     cr.meta_codebook, facts_cb,
-    type='facts', word_emb=cr.word_emb, use_thinkings=False
+    type='facts', word_emb=cr.word_emb, use_thinkings=True
 )
+print(cr.meta_codebook)
+
+def make_json_safe(obj):
+    """Recursively convert numpy arrays into lists."""
+    if isinstance(obj, np.ndarray):
+        return obj.tolist()
+    if isinstance(obj, dict):
+        return {k: make_json_safe(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [make_json_safe(v) for v in obj]
+    return obj
+
+with open("meta_codebook.json", "w") as f:
+    json.dump(make_json_safe(cr.meta_codebook), f, indent=2)
+
 
 print(f"[DEBUG] after facts-merge: |E|={len(cr.meta_codebook['e'])} "
       f"|R|={len(cr.meta_codebook['r'])} "
@@ -129,12 +149,12 @@ scheduler  = CombineScheduler(d=state_dim, arms=COMBINE_ARMS,
 print("» Seeding history with first 30 questions …")
 for q in seed_questions:
     answer_with_auto_strategy(
-        cr, policy, scheduler, q,
+        cr =cr, 
+        policy =policy, 
+        scheduler = scheduler, 
+        q = q,
         reward_fn       = default_reward,
         gold_answer     = gold_lookup[q],
-        facts_json_path = facts_json_paths,
-        chunk_chars     = 200,
-        overlap         = 30,
         greedy          = True
     )
 
@@ -148,61 +168,108 @@ def _collect_ctx(cr, k: int = TOPK_CTX) -> List[str]:
 # ---------------------------------------------------------------------
 # 8) Evaluate next 20 questions & dump JSON
 # ---------------------------------------------------------------------
-def dump_results(questions: List[str], out_path: str):
+def dump_results(
+    questions: List[str],
+    out_path: str,
+    metrics_path: str
+):
     rows = []
+    run_metrics = []
+
     for q in questions:
+        start_idx = len(cr.llm.metrics_runs)
         pred, _meta = answer_with_auto_strategy(
             cr, policy, scheduler, q,
             reward_fn       = default_reward,
             gold_answer     = gold_lookup[q],
-            facts_json_path = facts_json_paths,
-            chunk_chars     = 400,
-            overlap         = 80,
             greedy          = True
         )
+
+        gen_metrics = (cr.llm.metrics_runs[start_idx:] or [{}])[-1]
+        run_metrics.append({"question": q, **gen_metrics})    
+    
         row = row_lookup[q]
+        print(f'context: {_collect_ctx(cr.cur_fact_context)}')
         rows.append({
-            "id":              row["id"],
-            "question":        q,
-            "source":          row["source"],
-            "context":         _collect_ctx(cr),
-            "evidence":        row["evidence"],
-            "question_type":   row["question_type"],
+            "id":               row["id"],
+            "question":         q,
+            "source":           row["source"],
+            "context":          _collect_ctx(cr.cur_fact_context),
+            "evidence":         row["evidence"],
+            "question_type":    row["question_type"],
             "generated_answer": pred,
-            "ground_truth":    row["answer"],
+            "ground_truth":     row["answer"],
         })
 
     Path(out_path).parent.mkdir(parents=True, exist_ok=True)
-    json.dump(rows, open(out_path, "w"), indent=2)
-    print(f"   wrote {len(rows)} rows → {out_path}")
+    with open(out_path, "w") as f:
+        json.dump(rows, f, indent=2)
+        print(f"✓ wrote {len(rows)} rows → {out_path}")
 
-print("» Answering 20 evaluation questions …")
-dump_results(test_questions, "results/compressrag_medical.json")
+    with open(metrics_path, "w") as f:
+        json.dump({"run_meta": run_metrics}, f, indent=2)
+    print(f"✓ wrote metrics         → {metrics_path}")
 
-# ---------------------------------------------------------------------
-# 9) Optional: basic cost summary (tokens / latency)
-# ---------------------------------------------------------------------
-# NOTE: CompressRag_rl_v1 里只有 _record_metric() 时才会有数据
-try:
-    txt_stats  = cr.report_cost(kind="text")
-    gph_stats  = cr.report_cost(kind="graph")
-    os.makedirs("results", exist_ok=True)
-    json.dump(
-        {"text": txt_stats, "graph": gph_stats},
-        open("results/cost_summary.json", "w"), indent=2
-    )
-except Exception as e:
-    print("[WARN] cost report failed:", e)
 
-# ---------------------------------------------------------------------
-# 10) (Optional) save FAISS indexes – enable if you later add those APIs
-# ---------------------------------------------------------------------
-# TODO: 如果你在 CompressRag_rl_v1 里实现了 rebuild_vector_stores() / graph_db /
-# text_db，可取消下面 3 行注释做 index size 统计：
-# ---------------------------------------------------------------------
-# if hasattr(cr, "rebuild_vector_stores"):
-#     cr.rebuild_vector_stores()
-#     cr.save_index_and_report_size(db="text",  out_dir="faiss_text_idx")
-#     cr.save_index_and_report_size(db="graph", out_dir="faiss_graph_idx")
+print("» Answering evaluation questions …")
+dump_results(test_questions, out_path= "results/compressrag_medical_data.json", metrics_path ="results/compressrag_medical_metrics.json")
 
-# print("\nDONE – ready to evaluate with generation_eval.py / retrieval_eval.py")
+
+# import os, subprocess, sys, pathlib
+
+# DATA      = "results/compressrag_medical_data.json"
+# BASE_URL  = "https://api.deepseek.com/v1"
+# API_KEY   = pathlib.Path("deepseek_key.txt").read_text().strip()
+
+# ROOT_DIR  = pathlib.Path(
+#     "/home/ra_daniel/bilby/relational_graph_llm/py_files/GraphRAG_Benchmark"
+# )
+# PKG_PARENT = str(ROOT_DIR.parent)  # .../py_files
+
+# env = os.environ.copy()
+# env["OPENAI_API_BASE"] = BASE_URL
+# env["OPENAI_API_KEY"]  = API_KEY
+# env["LLM_API_KEY"]     = API_KEY
+# env["PYTHONPATH"]      = PKG_PARENT + os.pathsep + env.get("PYTHONPATH", "")
+
+# def run_eval(cmd, outfile):
+#     proc = subprocess.run(cmd, env=env, capture_output=True, text=True)
+#     if proc.returncode != 0:
+#         print("----- evaluator stdout -----\n", proc.stdout)
+#         print("----- evaluator stderr -----\n", proc.stderr)
+#         proc.check_returncode()
+#     else:
+#         print(f"✅ wrote {outfile}")
+
+# EVAL_PKG = "GraphRAG_Benchmark.Evaluation"
+
+# # retrieval evaluator
+# run_eval(
+#     [
+#         sys.executable, "-m", f"{EVAL_PKG}.retrieval_eval",
+#         "--mode", "API",
+#         "--model", "deepseek-chat",
+#         "--base_url", BASE_URL,
+#         "--embedding_model", "BAAI/bge-large-en-v1.5",
+#         "--data_file", DATA,
+#         "--output_file", "results/retrieval_scores.json",
+#         "--detailed_output",
+#     ],
+#     "results/retrieval_scores.json",
+# )
+
+# # generation evaluator
+# run_eval(
+#     [
+#         sys.executable, "-m", f"{EVAL_PKG}.generation_eval",
+#         "--mode", "API",
+#         "--model", "deepseek-chat",
+#         "--base_url", BASE_URL,
+#         "--data_file", DATA,
+#         "--output_file", "results/generation_scores.json",
+#         "--detailed_output",
+#     ],
+#     "results/generation_scores.json",
+# )
+
+# print("🎉  Benchmark complete — score files are in results/")
