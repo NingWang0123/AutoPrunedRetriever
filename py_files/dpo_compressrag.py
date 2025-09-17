@@ -18,7 +18,8 @@ from test_for_compressrag import Phi4MiniReasoningLLM
 # THINKINGS_CHOICES = ['overlap','unique','not_include']
 # ANSWERS_CHOICES   = ['overlap','unique','not_include']
 
-THINKINGS_CHOICES = ['overlap','not_include']
+# THINKINGS_CHOICES = ['overlap','not_include']
+THINKINGS_CHOICES = ['not_include']
 ANSWERS_CHOICES   = ['overlap','not_include']
 
 
@@ -198,6 +199,9 @@ def make_preference_dataset_2head(
     seed: int = 0,
     isolate_state: bool = True,
     combine_rounds_default: int = 1,
+    ANSWERS_CHOICES = ANSWERS_CHOICES,
+    THINKINGS_CHOICES = THINKINGS_CHOICES,
+
 ) -> List[PrefExample2]:
     """
     Build DPO pairs for (answers_choice, thinkings_choice) ONLY.
@@ -226,12 +230,15 @@ def make_preference_dataset_2head(
         for (ai, ti) in tried:
             ans = ANSWERS_CHOICES[ai]
             th  = THINKINGS_CHOICES[ti]
-            try:
-                with temp_ans_th(cr, ans, th, isolate_state=isolate_state):
-                    pred = cr.run_work_flow(q)
-                    print(f'pred{pred}')
-            except Exception:
-                continue
+            # try:
+            #     with temp_ans_th(cr, ans, th, isolate_state=isolate_state):
+            #         pred = cr.run_work_flow(q)
+            #         print(f'pred{pred}')
+            # except Exception:
+            #     continue
+            with temp_ans_th(cr, ans, th, isolate_state=isolate_state):
+                pred = cr.run_work_flow(q)
+                print(f'pred{pred}')
             score = reward_fn(pred, gold_answers.get(q) if gold_answers else None)
             scored.append(((ai, ti), score))
 
@@ -253,7 +260,7 @@ def make_preference_dataset_2head(
 # ===============================
 class StrategyPolicy2Head(nn.Module):
     """MLP with two categorical heads: answers, thinkings."""
-    def __init__(self, input_dim: int, hidden: int = 512, drop: float = 0.1):
+    def __init__(self, input_dim: int, hidden: int = 512, drop: float = 0.1,ANSWERS_CHOICES = ANSWERS_CHOICES, THINKINGS_CHOICES = THINKINGS_CHOICES,):
         super().__init__()
         self.ff = nn.Sequential(
             nn.Linear(input_dim, hidden), nn.ReLU(), nn.Dropout(drop),
@@ -390,7 +397,7 @@ class CombineScheduler:
 # 7) INFERENCE PIPELINE
 # ===============================
 @torch.no_grad()
-def select_ans_th(policy: StrategyPolicy2Head, cr, q: str, feature_dim: int = 384, greedy: bool = True):
+def select_ans_th(policy: StrategyPolicy2Head, cr, q: str, feature_dim: int = 384, greedy: bool = True,  ANSWERS_CHOICES = ANSWERS_CHOICES,THINKINGS_CHOICES = THINKINGS_CHOICES,):
     x = torch.tensor(featurize_query(cr, q, dims=feature_dim),dtype=torch.float32).unsqueeze(0).to(next(policy.parameters()).device)
     y = policy.sample(x, greedy=greedy)[0].cpu().numpy().tolist()
     ai, ti = int(y[0]), int(y[1])
@@ -403,7 +410,9 @@ def answer_with_auto_strategy(
     q: str,
     reward_fn: Callable[[str, Optional[str]], float] = None,
     gold_answer: Optional[str] = None,
-    greedy: bool = True
+    greedy: bool = True,
+    ANSWERS_CHOICES = ANSWERS_CHOICES,
+    THINKINGS_CHOICES = THINKINGS_CHOICES,
 ) -> Tuple[str, Dict[str, object]]:
     """
     1) Choose answers/th via DPO policy (question features)

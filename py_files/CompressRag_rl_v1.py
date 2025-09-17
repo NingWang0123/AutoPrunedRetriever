@@ -2938,6 +2938,9 @@ thinkings_choice = ['overlap','unique','not_include']
 answers_choice = ['overlap','unique','not_include']
 combine_ents_choice = [0,1,2]
 
+def skip_func(a,b):
+    return None
+
 class CompressRag_rl:
     def __init__(
         self,
@@ -2988,8 +2991,10 @@ class CompressRag_rl:
         self.round = 1
 
         ### thinkings param
+        self.thinkings_choice = thinkings_choice
         if thinkings_choice == "not_include":
             self.include_thinkings = False
+            self.thinking_extract_function = skip_func
         else:
             self.include_thinkings = True
             if thinkings_choice == "overlap":
@@ -3010,8 +3015,25 @@ class CompressRag_rl:
 
         ### context fact param
         self.context_json_path = None  
-        self._facts_preloaded = False  
+        self._facts_preloaded = False 
 
+    def set_include_thinkings(self):
+        if self.thinkings_choice == "not_include":
+            self.include_thinkings = False
+
+        else:
+            self.include_thinkings = True
+
+    def set_include_answers(self):
+        if self.answers_choice == "not_include":
+            self.include_answers = False
+
+        else:
+            self.include_answers = True
+
+    def set_includings(self):
+        self.set_include_thinkings()
+        self.set_include_answers()
 
     def preload_context_json(self, json_path: str, chunk_chars: int = 800, overlap: int = 120):
         import json
@@ -3175,10 +3197,13 @@ class CompressRag_rl:
         # answers
         if self.include_answers:
             final_flat_answers_lsts = self.answers_extract_function(all_answers)
-            domain_knowledge_lst.append(final_flat_answers_lsts)
+            print(f'self.thinkings_choice  {self.thinkings_choice}')
+            if not final_flat_answers_lsts:
+                domain_knowledge_lst.append(final_flat_answers_lsts)
 
         # thinkings
         if self.include_thinkings:
+            print(self.include_thinkings)
             final_flat_thinkings_lsts = self.thinking_extract_function(all_q_indices, self.meta_codebook)
             domain_knowledge_lst.append(final_flat_thinkings_lsts)
 
@@ -3365,6 +3390,9 @@ class CompressRag_rl:
         return combined_facts_cb
 
     def run_work_flow(self, q_prompt, rule="Answer questions", facts_json_path: str = None, chunk_chars: int = 800, overlap: int = 120, warm_start = "knn"): #coarse
+
+        #prevent dpo change choice but not change includings
+        self.set_includings()
         q_json = self.encode_question(q_prompt, rule)
   
         combined_facts_cb = None
