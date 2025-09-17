@@ -37,8 +37,8 @@ REPO_ID      = "GraphRAG-Bench/GraphRAG-Bench"
 CORPUS_FILE  = "Datasets/Corpus/medical.json"
 QUEST_FILE   = "Datasets/Questions/medical_questions.json"
 
-SEED_N       = 2    # first 30 rows → bootstrap + DPO train
-TEST_N       = 2     # next 20 rows  → evaluation
+SEED_N       = 5    # first 30 rows → bootstrap + DPO train
+TEST_N       = 5     # next 20 rows  → evaluation
 TOPK_CTX     = 2
 
 # ---------------------------------------------------------------------
@@ -52,8 +52,8 @@ sent_emb = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-MiniLM-L6-v2"
 )
 phi_llm  = Phi4MiniReasoningLLM(
-    include_thinkings=True,
-    model_name="Qwen/Qwen3-4B-Thinking-2507", #microsoft/Phi-4-mini-reasoning
+    include_thinkings=False,
+    model_name="Qwen/Qwen3-4B", #microsoft/Phi-4-mini-reasoning
     max_new_tokens=1000,
     temperature=0.2,
     top_p=0.9,
@@ -69,7 +69,7 @@ cr = CompressRag_rl(
     word_emb          = word_emb,
     llm               = phi_llm,
     combine_ents_rounds = 1,        # LinUCB 会改写
-    thinkings_choice    = 'overlap',
+    thinkings_choice    = 'non_include',
     answers_choice      = 'overlap',
 )
 
@@ -190,7 +190,6 @@ def dump_results(
         run_metrics.append({"question": q, **gen_metrics})    
     
         row = row_lookup[q]
-        print(f'context: {_collect_ctx(cr.cur_fact_context)}')
         rows.append({
             "id":               row["id"],
             "question":         q,
@@ -216,64 +215,61 @@ print("» Answering evaluation questions …")
 dump_results(test_questions, out_path= "results/compressrag_medical_data.json", metrics_path ="results/compressrag_medical_metrics.json")
 
 
-# import os, subprocess, sys, pathlib
+import os, subprocess, sys, pathlib
 
-# DATA      = "results/compressrag_medical_data.json"
-# BASE_URL  = "https://api.deepseek.com/v1"
-# API_KEY   = pathlib.Path("deepseek_key.txt").read_text().strip()
+DATA      = "results/compressrag_medical_data.json"
+BASE_URL  = "https://api.deepseek.com/v1"
+API_KEY   = pathlib.Path("deepseek_key.txt").read_text().strip()
 
-# ROOT_DIR  = pathlib.Path(
-#     "/home/ra_daniel/bilby/relational_graph_llm/py_files/GraphRAG_Benchmark"
-# )
-# PKG_PARENT = str(ROOT_DIR.parent)  # .../py_files
+ROOT_DIR  = pathlib.Path(
+    "/home/ra_daniel/bilby/relational_graph_llm/py_files/GraphRAG_Benchmark"
+)
+PKG_PARENT = str(ROOT_DIR.parent)  # .../py_files
 
-# env = os.environ.copy()
-# env["OPENAI_API_BASE"] = BASE_URL
-# env["OPENAI_API_KEY"]  = API_KEY
-# env["LLM_API_KEY"]     = API_KEY
-# env["PYTHONPATH"]      = PKG_PARENT + os.pathsep + env.get("PYTHONPATH", "")
+env = os.environ.copy()
+env["OPENAI_API_BASE"] = BASE_URL
+env["OPENAI_API_KEY"]  = API_KEY
+env["LLM_API_KEY"]     = API_KEY
+env["PYTHONPATH"]      = PKG_PARENT + os.pathsep + env.get("PYTHONPATH", "")
 
-# def run_eval(cmd, outfile):
-#     proc = subprocess.run(cmd, env=env, capture_output=True, text=True)
-#     if proc.returncode != 0:
-#         print("----- evaluator stdout -----\n", proc.stdout)
-#         print("----- evaluator stderr -----\n", proc.stderr)
-#         proc.check_returncode()
-#     else:
-#         print(f"✅ wrote {outfile}")
+def run_eval(cmd, outfile):
+    proc = subprocess.run(cmd, env=env, text=True)
+    if proc.returncode != 0:
+        print("----- evaluator stdout -----\n", proc.stdout)
+        print("----- evaluator stderr -----\n", proc.stderr)
+        proc.check_returncode()
+    else:
+        print(f"✅ wrote {outfile}")
 
-# EVAL_PKG = "GraphRAG_Benchmark.Evaluation"
+EVAL_PKG = "GraphRAG_Benchmark.Evaluation"
 
-# # retrieval evaluator
-# run_eval(
-#     [
-#         sys.executable, "-m", f"{EVAL_PKG}.retrieval_eval",
-#         "--mode", "API",
-#         "--model", "deepseek-chat",
-#         "--base_url", BASE_URL,
-#         "--embedding_model", "BAAI/bge-large-en-v1.5",
-#         "--data_file", DATA,
-#         "--output_file", "results/retrieval_scores.json",
-#         "--detailed_output",
-#     ],
-#     "results/retrieval_scores.json",
-# )
+# retrieval evaluator
+run_eval(
+    [
+        sys.executable, "-m", f"{EVAL_PKG}.retrieval_eval",
+        "--mode", "API",
+        "--model", "deepseek-chat",
+        "--base_url", BASE_URL,
+        "--embedding_model", "BAAI/bge-large-en-v1.5",
+        "--data_file", DATA,
+        "--output_file", "results/retrieval_scores.json",
+        "--detailed_output",
+    ],
+    "results/retrieval_scores.json",
+)
 
-# # generation evaluator
-# run_eval(
-#     [
-#         sys.executable, "-m", f"{EVAL_PKG}.generation_eval",
-#         "--mode", "API",
-#         "--model", "deepseek-chat",
-#         "--base_url", BASE_URL,
-#         "--data_file", DATA,
-#         "--output_file", "results/generation_scores.json",
-#         "--detailed_output",
-#     ],
-#     "results/generation_scores.json",
-# )
+# generation evaluator
+run_eval(
+    [
+        sys.executable, "-m", f"{EVAL_PKG}.generation_eval",
+        "--mode", "API",
+        "--model", "deepseek-chat",
+        "--base_url", BASE_URL,
+        "--data_file", DATA,
+        "--output_file", "results/generation_scores.json",
+        "--detailed_output",
+    ],
+    "results/generation_scores.json",
+)
 
-# print("🎉  Benchmark complete — score files are in results/")
-
-
-# python evaluation_v4.py
+print("🎉  Benchmark complete — score files are in results/")
