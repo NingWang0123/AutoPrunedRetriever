@@ -1796,106 +1796,15 @@ def _is_subrun(a, b):
     L = len(a)
     return any(b[i:i+L] == a for i in range(len(b) - L + 1))
 
-def common_contiguous_overlaps(answers_lst, min_len=2):
-    """
-    Return all maximal common contiguous subsequences (runs) that appear in EVERY list.
-    Each run has length >= min_len.
-    """
-    if not answers_lst:
-        return []
+def common_contiguous_overlaps(answers_lst, min_len=2, min_support_ratio=0.7, mode="advanced"):
+    if mode == "advanced":
+        return common_contiguous_overlaps_advanced(answers_lst, min_len, min_support_ratio)
+    elif mode == "naive":
+        return common_contiguous_overlaps_naive(answers_lst, min_len=2)
+    elif mode == "hash":
+        return common_contiguous_overlaps_hash(lists, min_len=2)
 
-    # Candidate runs = all runs from the first list
-    candidates = set(_all_contiguous_subseqs(answers_lst[0], min_len=min_len))
-
-    # Intersect with runs from all the other lists
-    for lst in answers_lst[1:]:
-        runs_here = set(_all_contiguous_subseqs(lst, min_len=min_len))
-        candidates &= runs_here
-        if not candidates:
-            return []
-
-    # Keep only maximal runs (remove those that are subruns of longer runs)
-    maximal = set(candidates)
-    for a in list(candidates):
-        for b in candidates:
-            if a != b and _is_subrun(a, b):
-                maximal.discard(a)
-                break
-
-    # Sort by length desc, then lexicographically for determinism
-    return [list(t) for t in sorted(maximal, key=lambda t: (-len(t), t))]
-
-
-
-def get_flat_answers_lsts(answers_lsts):    
-    return [[x for group in bucket for x in (group if isinstance(group, (list, tuple)) else [group])] for bucket in answers_lsts]
-
-
-def find_overlapped_answers(answers_lsts):
-    flat_answers_lsts = get_flat_answers_lsts(answers_lsts)
-    # default 2 for the overlap
-    final_flat_answers_lsts = common_contiguous_overlaps(flat_answers_lsts,2)
-    return final_flat_answers_lsts
-
-
-def find_overlapped_thinkings(all_q_indices,codebook_main):
-    # from q indices to get answers
-
-    selected_thinkings_lsts = []
-    questions_to_thinkings_dict = codebook_main['questions_to_thinkings']
-
-    for q_index in all_q_indices:
-        if q_index in questions_to_thinkings_dict.keys():
-            selected_thinkings_lsts.append(codebook_main['thinkings_lst'][questions_to_thinkings_dict[q_index]])
-
-
-    if selected_thinkings_lsts:
-        flat_thinkings_lsts = get_flat_answers_lsts(selected_thinkings_lsts)
-        # default 2 for the overlap
-        final_flat_thinkings_lsts = common_contiguous_overlaps(flat_thinkings_lsts,2)
-    else:
-        final_flat_thinkings_lsts = selected_thinkings_lsts
-
-    return final_flat_thinkings_lsts
-
-def _list_from_index_map(index_map: Dict[str, int]) -> List[str]:
-    """把 {item -> idx} 映射还原为按 idx 排序的列表"""
-    out = [None] * len(index_map)
-    for item, idx in index_map.items():
-        out[idx] = item
-    return out
-
-def decode_chain_to_text(edge_idx_chain: List[int], codebook_main: Dict[str, Any]) -> str:
-    """
-    把一条 answers 的边索引链解码成可读文本（用与问题相同的线性化逻辑）。
-    """
-    return make_question_text(edge_idx_chain, codebook_main)
-
-def decode_answers_bucket_to_texts(answers_bucket, codebook_main: Dict[str, Any]) -> List[str]:
-    """
-    answers_bucket 的结构来源于 add_answers_to_filtered_lst 组装的
-    item['answers(edges[i])']：通常是一个“答案候选集合”，内部是多条“边索引链”。
-    这个函数把它统一解码成一批可读短句，便于展示。
-    """
-    texts = []
-    # answers_bucket 可能是 List[List[int]]（多条链），也可能包含更深的嵌套
-    # 这里尽量稳健地拍平一层
-    if isinstance(answers_bucket, (list, tuple)):
-        for maybe_chain in answers_bucket:
-            if isinstance(maybe_chain, (list, tuple)) and len(maybe_chain) > 0 and isinstance(maybe_chain[0], int):
-                # 单条边索引链
-                texts.append(decode_chain_to_text(maybe_chain, codebook_main))
-            elif isinstance(maybe_chain, (list, tuple)):
-                # 可能是更深一层的嵌套
-                for chain in maybe_chain:
-                    if isinstance(chain, (list, tuple)) and len(chain) > 0 and isinstance(chain[0], int):
-                        texts.append(decode_chain_to_text(chain, codebook_main))
-    return texts
-
-
-#### get the all unique knowledge
-
-def get_unique_knowledge(overlapped_answers,flat_answers_lsts):
+def get_unique_knowledge_naive(overlapped_answers,flat_answers_lsts):
     """
     For each overlap run in overlapped_answers['overlaps'], keep that run only
     in the 'owner' sequence (the one with the longest continuation after the run),
@@ -1907,7 +1816,7 @@ def get_unique_knowledge(overlapped_answers,flat_answers_lsts):
     flat_answers_lsts: [[edges_index,...],...] ; get from get_flat_answers_lsts(answers_lsts)
     """
 
-    # Normalize inputs 
+    # Normalize inputs
     out_answers: List[List[int]] = [list(map(int, seq)) for seq in flat_answers_lsts]
     runs: List[List[int]] = [list(map(int, run)) for run in overlapped_answers.get("overlaps", [])]
 
@@ -1974,6 +1883,308 @@ def get_unique_knowledge(overlapped_answers,flat_answers_lsts):
 
     return {'assignments': assignments, 'out_answers': out_answers}
 
+# --- Optimized Unique Knowledge ---
+def get_unique_knowledge_efficient(overlapped_answers, flat_answers_lsts):
+    out_answers: List[List[int]] = [list(map(int, seq)) for seq in flat_answers_lsts]
+    runs: List[List[int]] = [list(map(int, run)) for run in overlapped_answers.get("overlaps", [])]
+
+    runs_sorted = sorted(runs, key=len, reverse=True)
+    assignments = []
+
+    for run in runs_sorted:
+        L = len(run)
+        if L == 0: continue
+
+        # Find occurrences
+        occs = {}
+        for idx, seq in enumerate(out_answers):
+            positions = [i for i in range(len(seq) - L + 1) if seq[i:i+L] == run]
+            if positions:
+                occs[idx] = positions
+
+        if not occs: continue
+
+        # Pick owner
+        owner, best_tail, best_len = None, -1, -1
+        for i, positions in occs.items():
+            for pos in positions:
+                tail_len = len(out_answers[i]) - (pos + L)
+                if (tail_len > best_tail or
+                   (tail_len == best_tail and len(out_answers[i]) > best_len) or
+                   (tail_len == best_tail and len(out_answers[i]) == best_len and (owner is None or i < owner))):
+                    owner, best_tail, best_len = i, tail_len, len(out_answers[i])
+
+        # Remove from non-owners
+        for j in occs:
+            if j != owner:
+                new_seq, skip = [], 0
+                seq = out_answers[j]
+                for k in range(len(seq)):
+                    if skip: skip -= 1; continue
+                    if seq[k:k+L] == run:
+                        skip = L - 1
+                        continue
+                    new_seq.append(seq[k])
+                out_answers[j] = new_seq
+
+        assignments.append({"run": run, "owner": owner, "occurrences": occs})
+
+    return {"assignments": assignments, "out_answers": out_answers}
+
+from typing import List, Dict, Any
+
+def get_unique_knowledge_advanced(overlapped_answers, flat_answers_lsts,
+                                  alpha=1.0, beta=0.5, gamma=0.5):
+    """
+    Smarter version: assign each overlap run to exactly ONE owner sequence
+    using a weighted scoring function.
+    score=α⋅tail_len + β⋅seq_len + γ⋅frequency (frequency: how many times this run appears in the sequence)
+    high tail_len -> more following description
+    high seq_len -> more general information
+    high frequency -> likely closer description of the overlapped_answers
+    """
+    out_answers: List[List[int]] = [list(map(int, seq)) for seq in flat_answers_lsts]
+    runs: List[List[int]] = [list(map(int, run)) for run in overlapped_answers.get("overlaps", [])]
+
+    def find_run_positions(run: List[int], seq: List[int]) -> List[int]:
+        L = len(run)
+        if L == 0 or L > len(seq):
+            return []
+        return [i for i in range(len(seq) - L + 1) if seq[i:i + L] == run]
+
+    def remove_all_runs(seq: List[int], run: List[int]) -> List[int]:
+        """Remove all non-overlapping occurrences of run from seq (greedy left-to-right)."""
+        res, i, L, n = [], 0, len(run), len(seq)
+        while i <= n - L:
+            if seq[i:i+L] == run:
+                i += L
+            else:
+                res.append(seq[i]); i += 1
+        res.extend(seq[i:])
+        return res
+
+    runs_sorted = sorted(runs, key=len, reverse=True)
+    assignments = []
+
+    for run in runs_sorted:
+        occs: Dict[int, List[int]] = {idx: find_run_positions(run, seq) for idx, seq in enumerate(out_answers)}
+        present = {i: pos for i, pos in occs.items() if pos}
+        if not present:
+            continue
+
+        # --- scoring ---
+        best_score, owner = -1e9, None
+        for i, positions in present.items():
+            seq = out_answers[i]
+            seq_len = len(seq)
+            freq = len(positions)
+            for pos in positions:
+                tail_len = seq_len - (pos + len(run))
+                score = alpha * tail_len + beta * seq_len + gamma * freq
+                if score > best_score:
+                    best_score, owner = score, i
+
+        # remove from all non-owner
+        for j in range(len(out_answers)):
+            if j != owner and occs.get(j):
+                out_answers[j] = remove_all_runs(out_answers[j], run)
+
+        assignments.append({'run': run, 'owner': owner, 'score': best_score})
+
+    return {'assignments': assignments, 'out_answers': out_answers}
+
+def _all_contiguous_subseqs(seq, min_len=2):
+    """Generate all contiguous subsequences of seq with length >= min_len."""
+    n = len(seq)
+    for i in range(n):
+        for j in range(i + min_len, n + 1):
+            yield tuple(seq[i:j])
+
+def _is_subrun(a, b):
+    """Check if subsequence a is fully inside b (both are tuples)."""
+    return len(a) < len(b) and any(
+        b[i:i+len(a)] == a for i in range(len(b) - len(a) + 1)
+    )
+
+def common_contiguous_overlaps_naive(answers_lst, min_len=2):
+    """
+    Naïve version: find all maximal common contiguous subsequences.
+    """
+    if not answers_lst:
+        return []
+
+    candidates = set(_all_contiguous_subseqs(answers_lst[0], min_len=min_len))
+
+    for lst in answers_lst[1:]:
+        runs_here = set(_all_contiguous_subseqs(lst, min_len=min_len))
+        candidates &= runs_here
+        if not candidates:
+            return []
+
+    maximal = set(candidates)
+    for a in list(candidates):
+        for b in candidates:
+            if a != b and _is_subrun(a, b):
+                maximal.discard(a)
+                break
+
+    return [list(t) for t in sorted(maximal, key=lambda t: (-len(t), t))]
+
+# Rolling-hash-based approach
+def common_contiguous_overlaps_hash(lists, min_len=2):
+    """
+    Corrected hash-based implementation that matches naive semantics.
+    Finds maximal common contiguous subsequences in all lists.
+    """
+    if not lists:
+        return []
+    if len(lists) == 1:
+        return [lists[0]]
+
+    # Collect all candidates from the first list
+    first = lists[0]
+    candidates = set()
+    for i in range(len(first)):
+        for j in range(i + min_len, len(first) + 1):
+            candidates.add(tuple(first[i:j]))
+
+    # Intersect with candidates from the rest
+    for lst in lists[1:]:
+        runs_here = set()
+        for i in range(len(lst)):
+            for j in range(i + min_len, len(lst) + 1):
+                runs_here.add(tuple(lst[i:j]))
+        candidates &= runs_here
+        if not candidates:
+            return []
+
+    # Keep only maximal runs
+    maximal = set(candidates)
+    for a in list(candidates):
+        for b in candidates:
+            if a != b and len(a) < len(b) and any(
+                tuple(b[i:i+len(a)]) == a for i in range(len(b) - len(a) + 1)
+            ):
+                maximal.discard(a)
+                break
+
+    # Sort by length desc, then lex for determinism
+    return [list(t) for t in sorted(maximal, key=lambda t: (-len(t), t))]
+
+from collections import defaultdict
+
+def common_contiguous_overlaps_advanced(lists, min_len=2, min_support_ratio=0.7):
+    """
+    Find maximal contiguous subsequences that appear in at least `min_support` lists.
+    """
+    if not lists:
+        return []
+
+    min_support = max(1, round(len(lists) * min_support_ratio))
+    print("min_support: ", min_support)
+
+    # Collect all candidates from all lists
+    candidate_counts = defaultdict(set)  # subseq -> set of list indices
+    for idx, lst in enumerate(lists):
+        for i in range(len(lst)):
+            for j in range(i + min_len, len(lst) + 1):
+                subseq = tuple(lst[i:j])
+                candidate_counts[subseq].add(idx)
+
+    # Keep only those with enough support
+    frequent = {subseq for subseq, idxs in candidate_counts.items() if len(idxs) >= min_support}
+
+    # Filter to maximal
+    maximal = set(frequent)
+    for a in list(frequent):
+        for b in frequent:
+            if a != b and len(a) < len(b):
+                if any(tuple(b[i:i+len(a)]) == a for i in range(len(b)-len(a)+1)):
+                    maximal.discard(a)
+                    break
+
+    # Return sorted list
+    return [list(t) for t in sorted(maximal, key=lambda t: (-len(t), t))]
+
+def get_flat_answers_lsts(answers_lsts):    
+    return [[x for group in bucket for x in (group if isinstance(group, (list, tuple)) else [group])] for bucket in answers_lsts]
+
+
+def find_overlapped_answers(answers_lsts):
+    flat_answers_lsts = get_flat_answers_lsts(answers_lsts)
+    # default 2 for the overlap
+    final_flat_answers_lsts = common_contiguous_overlaps(flat_answers_lsts,2, mode="advanced")
+    return final_flat_answers_lsts
+
+
+def find_overlapped_thinkings(all_q_indices,codebook_main):
+    # from q indices to get answers
+
+    selected_thinkings_lsts = []
+    questions_to_thinkings_dict = codebook_main['questions_to_thinkings']
+
+    for q_index in all_q_indices:
+        if q_index in questions_to_thinkings_dict.keys():
+            selected_thinkings_lsts.append(codebook_main['thinkings_lst'][questions_to_thinkings_dict[q_index]])
+
+
+    if selected_thinkings_lsts:
+        flat_thinkings_lsts = get_flat_answers_lsts(selected_thinkings_lsts)
+        # default 2 for the overlap
+        final_flat_thinkings_lsts = common_contiguous_overlaps(flat_thinkings_lsts,2, mode="advanced")
+    else:
+        final_flat_thinkings_lsts = selected_thinkings_lsts
+
+    return final_flat_thinkings_lsts
+
+def _list_from_index_map(index_map: Dict[str, int]) -> List[str]:
+    """把 {item -> idx} 映射还原为按 idx 排序的列表"""
+    out = [None] * len(index_map)
+    for item, idx in index_map.items():
+        out[idx] = item
+    return out
+
+def decode_chain_to_text(edge_idx_chain: List[int], codebook_main: Dict[str, Any]) -> str:
+    """
+    把一条 answers 的边索引链解码成可读文本（用与问题相同的线性化逻辑）。
+    """
+    return make_question_text(edge_idx_chain, codebook_main)
+
+def decode_answers_bucket_to_texts(answers_bucket, codebook_main: Dict[str, Any]) -> List[str]:
+    """
+    answers_bucket 的结构来源于 add_answers_to_filtered_lst 组装的
+    item['answers(edges[i])']：通常是一个“答案候选集合”，内部是多条“边索引链”。
+    这个函数把它统一解码成一批可读短句，便于展示。
+    """
+    texts = []
+    # answers_bucket 可能是 List[List[int]]（多条链），也可能包含更深的嵌套
+    # 这里尽量稳健地拍平一层
+    if isinstance(answers_bucket, (list, tuple)):
+        for maybe_chain in answers_bucket:
+            if isinstance(maybe_chain, (list, tuple)) and len(maybe_chain) > 0 and isinstance(maybe_chain[0], int):
+                # 单条边索引链
+                texts.append(decode_chain_to_text(maybe_chain, codebook_main))
+            elif isinstance(maybe_chain, (list, tuple)):
+                # 可能是更深一层的嵌套
+                for chain in maybe_chain:
+                    if isinstance(chain, (list, tuple)) and len(chain) > 0 and isinstance(chain[0], int):
+                        texts.append(decode_chain_to_text(chain, codebook_main))
+    return texts
+
+
+#### get the all unique knowledge
+
+def get_unique_knowledge(overlapped_answers,flat_answers_lsts,alpha=1.0, beta=0.5, gamma=0.5, mode="advanced"):
+    if mode == "naive":
+        return get_unique_knowledge_naive(overlapped_answers,flat_answers_lsts)
+    elif mode == "advanced":
+        return get_unique_knowledge_advanced(overlapped_answers, flat_answers_lsts, alpha, beta, gamma)
+    elif mode == "efficient":
+        return get_unique_knowledge_efficient(overlapped_answers, flat_answers_lsts)
+
+
+    return {'assignments': assignments, 'out_answers': out_answers}
+
 def find_unique_thinkings(all_q_indices, codebook_main):
     selected_thinkings_lsts = []
     questions_to_thinkings_dict = codebook_main['questions_to_thinkings']
@@ -1986,9 +2197,9 @@ def find_unique_thinkings(all_q_indices, codebook_main):
 
     if selected_thinkings_lsts:
         flat_thinkings_lsts = get_flat_answers_lsts(selected_thinkings_lsts)
-        overlapped_runs = common_contiguous_overlaps(flat_thinkings_lsts, 2)  # list
+        overlapped_runs = common_contiguous_overlaps(flat_thinkings_lsts, 2, mode="advanced")  # list
         unique_dict = get_unique_knowledge({'overlaps': overlapped_runs},     # ✅ wrap
-                                           flat_thinkings_lsts)
+                                           flat_thinkings_lsts, mode="advanced")
         uniqie_thinkings = unique_dict['out_answers']
     else:
         uniqie_thinkings = selected_thinkings_lsts
@@ -2000,9 +2211,9 @@ def find_unique_thinkings(all_q_indices, codebook_main):
 
 def find_unique_answers(answers_lsts):
     flat_answers_lsts = get_flat_answers_lsts(answers_lsts)
-    overlapped_runs = common_contiguous_overlaps(flat_answers_lsts, 2)   # list[list[int]]
+    overlapped_runs = common_contiguous_overlaps(flat_answers_lsts, 2, mode="advanced")   # list[list[int]]
     unique_dict = get_unique_knowledge({'overlaps': overlapped_runs},    # ✅ wrap
-                                       flat_answers_lsts)
+                                       flat_answers_lsts, mode="advanced")
     uniqie_answers = unique_dict['out_answers']
     return uniqie_answers
 
@@ -2694,7 +2905,7 @@ class CompressRag:
 
         overlapped_answers_dict = {'overlaps': overlapped_answers}
 
-        unique_knowledge_dict = get_unique_knowledge(overlapped_answers_dict,flat_answers)
+        unique_knowledge_dict = get_unique_knowledge(overlapped_answers_dict,flat_answers, mode="advanced")
 
         unique_knowledge = unique_knowledge_dict['out_answers']
 
@@ -3004,6 +3215,7 @@ class CompressRag_rl:
 
         self.llm.include_thinkings = self.include_thinkings
         ### answers param
+        self.answers_choice   = answers_choice
         if answers_choice == "not_include":
             self.include_answers = False
         else:
