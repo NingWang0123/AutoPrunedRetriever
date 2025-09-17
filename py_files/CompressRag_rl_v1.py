@@ -3020,9 +3020,11 @@ class CompressRag_rl:
     def set_include_thinkings(self):
         if self.thinkings_choice == "not_include":
             self.include_thinkings = False
+            self.llm.include_thinkings = False
 
         else:
             self.include_thinkings = True
+            self.llm.include_thinkings = True
 
     def set_include_answers(self):
         if self.answers_choice == "not_include":
@@ -3334,6 +3336,7 @@ class CompressRag_rl:
             new_json_lst.extend([a_new_json, t_new_json])
         else:
             a_new = llm.take_questions(final_merged_json, questions, retrieval_time=retrieval_time)
+            print(a_new)
             new_result = a_new
             a_new_json = get_code_book(a_new, type='answers')
             new_json_lst.append(a_new_json)
@@ -3413,6 +3416,7 @@ class CompressRag_rl:
             print("all_f_indices", all_f_indices)
             domain_knowledge_lst = self.find_related_knowledge(all_answers, all_q_indices, all_f_indices)
             print("domain_knowledge_lst", domain_knowledge_lst)
+            print(f'q_json is {q_json}')
             final_merged_json = self.compact_indicies_for_prompt(q_json, domain_knowledge_lst)
         else:
             final_merged_json = combined_facts_cb if combined_facts_cb else q_json.copy()
