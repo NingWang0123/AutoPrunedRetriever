@@ -200,15 +200,33 @@ def get_context(final_merged_json):
 
 # for edges one
 def get_context_edge_index(final_merged_json):
+  def _linearize_triples_block(triples, sep=", ", end=""):
+      if not triples:
+          return "None."
+      return sep.join(f"{h} {r} {t}{end}" for h, r, t in triples)
+
+  def _extract_txt_groups(groups):
+    if groups:
+        all_words = []
+        for g in groups:
+            if g:
+                all_words.append(_linearize_triples_block(g))
+        return " | ".join(all_words) if all_words else "None."
+
   q_txt,gk_txt,st_txt,ft_txt = [None]*4
   if "questions(edges[i])" in final_merged_json:
     q_txt  = decode_questions(final_merged_json["questions(edges[i])"], final_merged_json,fmt='words')
+    q_txt = _extract_txt_groups(q_txt)
   if "given knowledge(edges[i])" in final_merged_json:
     gk_txt = decode_questions(final_merged_json["given knowledge(edges[i])"], final_merged_json,fmt='words')
+    gk_txt = _extract_txt_groups(gk_txt)
   if "start thinking with(edges[i])" in final_merged_json:
     st_txt = decode_questions(final_merged_json["start thinking with(edges[i])"], final_merged_json,fmt='words')
+    st_txt = _extract_txt_groups(st_txt)
   if "facts(edges[i])" in final_merged_json:
     ft_txt = decode_questions(final_merged_json["facts(edges[i])"],final_merged_json, fmt='words')  
+    ft_txt = _extract_txt_groups(ft_txt)
+
   return q_txt, gk_txt, st_txt, ft_txt
 
 # automatically select context
