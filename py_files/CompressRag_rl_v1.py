@@ -3444,7 +3444,8 @@ class CompressRag_rl:
             if self.round == 1:
                 self.combine_ents_func(mode=warm_start) 
             else:
-                self.combine_ents_func(mode="auto")
+                #change to coarse combine for effieciency
+                self.combine_ents_func(mode=warm_start)
         self.round += 1
 
         print(f'new_result {new_result}')
