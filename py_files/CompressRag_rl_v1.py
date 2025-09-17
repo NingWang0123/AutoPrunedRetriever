@@ -3268,6 +3268,10 @@ class CompressRag_rl:
         else:
             final_merged_json = codebook_sub_q.copy()
 
+            # make sure final merged json have same output keys
+            final_merged_json['edge_matrix']  = final_merged_json['edges([e,r,e])']
+            final_merged_json.pop('edges([e,r,e])')
+
         if include_facts and flat_facts_lsts:
             em_final = final_merged_json['edge_matrix']
             E_final  = final_merged_json['e']
