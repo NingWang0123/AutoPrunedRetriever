@@ -3238,12 +3238,21 @@ class CompressRag_rl:
             self.include_thinkings = True
             self.llm.include_thinkings = True
 
+            if thinkings_choice == "overlap":
+                self.thinking_extract_function = find_overlapped_thinkings
+            elif thinkings_choice == "unique":
+                self.thinking_extract_function = find_unique_thinkings
+
     def set_include_answers(self):
         if self.answers_choice == "not_include":
             self.include_answers = False
 
         else:
             self.include_answers = True
+            if answers_choice == "overlap":
+                self.answers_extract_function = find_overlapped_answers
+            elif answers_choice == "unique":
+                self.answers_extract_function = find_unique_answers
 
     def set_includings(self):
         self.set_include_thinkings()
