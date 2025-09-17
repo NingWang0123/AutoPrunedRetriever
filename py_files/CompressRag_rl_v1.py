@@ -2674,7 +2674,7 @@ class CompressRag:
         new_result = None
 
         if self.include_thinkings:
-            a_new, t_new = llm.take_questions(final_merged_json, question, retrieval_time = retrieval_time)
+            a_new, t_new = llm.take_questions(final_merged_json, question)
             new_result = a_new
             a_new_json = get_code_book(a_new, type='answers')
             t_new_json = get_code_book(t_new, type='thinkings')
@@ -3126,8 +3126,13 @@ class CompressRag_rl:
 
         if all_f_indices:
             facts_lsts = self._gather_facts_by_indices(all_f_indices, self.meta_codebook)
-            final_flat_facts_lsts = (self.answers_extract_function(facts_lsts)
-                                    if self.include_answers else get_flat_answers_lsts(facts_lsts))
+            print(f'facts_lsts{facts_lsts}')
+            print(f'facts_lsts chocie 1 include ans{self.answers_extract_function(facts_lsts)}')
+            print(f'facts_lsts chocie 2 not include{get_flat_answers_lsts(facts_lsts)}')
+            # final_flat_facts_lsts = (self.answers_extract_function(facts_lsts)
+            #                         if self.include_answers else get_flat_answers_lsts(facts_lsts))
+            final_flat_facts_lsts = get_flat_answers_lsts(facts_lsts)
+            print(f'final_flat_facts_lsts{final_flat_facts_lsts}')
             if final_flat_facts_lsts:                
                 domain_knowledge_lst.append(final_flat_facts_lsts)
 
@@ -3321,12 +3326,17 @@ class CompressRag_rl:
             final_merged_json = self.compact_indicies_for_prompt(q_json, domain_knowledge_lst)
         else:
             final_merged_json = combined_facts_cb if combined_facts_cb else q_json.copy()
+            retrieval_time = 0
 
         final_merged_json = slice_for_final_merged_json(final_merged_json)
 
         q_txt, gk_txt, st_txt, ft_txt = get_context(final_merged_json)
 
+        print(f'{final_merged_json} final_merged_json')
+
         self.cur_fact_context = ft_txt
+
+        print(f'{ft_txt} ft_txt')
 
         new_result, new_json_lst = self.collect_results(final_merged_json, questions=q_prompt, retrieval_time=retrieval_time)
 
@@ -3338,6 +3348,8 @@ class CompressRag_rl:
             else:
                 self.combine_ents_func(mode="auto")
         self.round += 1
+
+        print(f'new_result {new_result}')
 
         return new_result
 

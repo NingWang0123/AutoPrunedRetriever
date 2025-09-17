@@ -37,9 +37,9 @@ REPO_ID      = "GraphRAG-Bench/GraphRAG-Bench"
 CORPUS_FILE  = "Datasets/Corpus/medical.json"
 QUEST_FILE   = "Datasets/Questions/medical_questions.json"
 
-SEED_N       = 5    # first 30 rows → bootstrap + DPO train
-TEST_N       = 5     # next 20 rows  → evaluation
-TOPK_CTX     = 5
+SEED_N       = 2    # first 30 rows → bootstrap + DPO train
+TEST_N       = 2     # next 20 rows  → evaluation
+TOPK_CTX     = 2
 
 # ---------------------------------------------------------------------
 # 1) Initialise embeddings & LLM
@@ -90,11 +90,11 @@ test_questions = all_questions[SEED_N : SEED_N+TEST_N]
 # ---------------------------------------------------------------------
 # 3) Pre-load corpus as facts into CR
 # ---------------------------------------------------------------------
-facts_json_paths = '/home/ra_daniel/bilby/relational_graph_llm/py_files/medical_sub.json'
+facts_json_paths = 'medical_sub.json'
 
 facts_cb = cr.load_and_merge_facts(facts_json_paths, chunk_chars=100, overlap=30)
 cr._facts_preloaded = True
-cr.top_m = 3          # sentence-embedding rerank top-m
+cr.top_m = 2          # sentence-embedding rerank top-m
 
 cr.meta_codebook = merging_codebook(
     cr.meta_codebook, facts_cb,
@@ -123,6 +123,7 @@ print(f"[DEBUG] after facts-merge: |E|={len(cr.meta_codebook['e'])} "
 # ---------------------------------------------------------------------
 # 4) Build DPO preference dataset on seed Q-A pairs
 # ---------------------------------------------------------------------
+print(cr.meta_codebook)
 print("» Building preference pairs for DPO …")
 pref_ds = make_preference_dataset_2head(
     cr            = cr,
@@ -194,7 +195,7 @@ def dump_results(
             "id":               row["id"],
             "question":         q,
             "source":           row["source"],
-            "context":          _collect_ctx(cr.cur_fact_context),
+            "context":          _meta['fact_context'],
             "evidence":         row["evidence"],
             "question_type":    row["question_type"],
             "generated_answer": pred,
@@ -273,3 +274,6 @@ dump_results(test_questions, out_path= "results/compressrag_medical_data.json", 
 # )
 
 # print("🎉  Benchmark complete — score files are in results/")
+
+
+# python evaluation_v4.py
