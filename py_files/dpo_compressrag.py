@@ -421,7 +421,7 @@ def answer_with_auto_strategy(
     4) If reward_fn & gold provided, update scheduler online
     """
     # 1) per-question knobs
-    ans_choice, th_choice = select_ans_th(policy, cr, q, greedy=greedy)
+    ans_choice, th_choice = select_ans_th(policy, cr, q, greedy=greedy,ANSWERS_CHOICES = ANSWERS_CHOICES,THINKINGS_CHOICES = THINKINGS_CHOICES)
 
     # 2) combine cadence via state features
     state_x = featurize_state(cr)  # d

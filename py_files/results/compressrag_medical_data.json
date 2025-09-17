@@ -1,0 +1,74 @@
+[
+  {
+    "id": "Medical-6b0f8bc4",
+    "question": "Does older age influence the risk of basal cell carcinoma?",
+    "source": "Medical",
+    "context": "their cancer type obj impact | their cancer type obj impact",
+    "evidence": [
+      "Older age is associated with a higher risk of BCC."
+    ],
+    "question_type": "Fact Retrieval",
+    "generated_answer": "assistant\n\n\nYes, older age is associated with an increased risk of basal cell carcinoma. This is partly due to cumulative sun damage over a lifetime and a weakened immune system, which may reduce the body's ability to detect and eliminate precancerous cells. The risk generally rises with age, making sun protection and regular skin checks more critical for older individuals.",
+    "ground_truth": "Older age is associated with higher risk of BCC."
+  },
+  {
+    "id": "Medical-75c9949b",
+    "question": "How does family history impact the risk of basal cell carcinoma?",
+    "source": "Medical",
+    "context": "their cancer type subj impact, impact obj their cancer type",
+    "evidence": [
+      "Family history of skin cancer increases the risk of BCC."
+    ],
+    "question_type": "Fact Retrieval",
+    "generated_answer": "assistant\n\n\nFamily history can increase the risk of basal cell carcinoma, particularly if close relatives have been diagnosed with the condition. Genetic factors, such as mutations in genes like TP53 or CDKN2A, may contribute to a predisposition, though most cases are linked to environmental factors like UV exposure. While UV radiation remains the primary cause, inherited genetic syndromes can elevate risk in individuals with a family history.",
+    "ground_truth": "Family history of skin cancer increases risk of BCC."
+  },
+  {
+    "id": "Medical-ec091b24",
+    "question": "Is immune suppression a risk factor for BCC?",
+    "source": "Medical",
+    "context": "immune checkpoint inhibitor isa their cancer type | immune checkpoint inhibitor isa their cancer type",
+    "evidence": [
+      "Immune suppression is a risk factor for BCC."
+    ],
+    "question_type": "Fact Retrieval",
+    "generated_answer": "assistant\n\n\nImmune suppression is a known risk factor for basal cell carcinoma (BCC) because it impairs the body's ability to detect and eliminate precancerous cells. Patients on immunosuppressive therapy, such as those with HIV or post-organ transplant, have an increased risk due to reduced immune surveillance. Additionally, long-term use of immunosuppressants may enhance UV light-induced DNA damage, further promoting BCC development.",
+    "ground_truth": "Immune suppression is a risk factor for BCC."
+  },
+  {
+    "id": "Medical-89de49a4",
+    "question": "What are common symptoms of basal cell carcinoma?",
+    "source": "Medical",
+    "context": "esophagus subj known risk factor for BCC, known risk factor for BCC prep_of striated muscl",
+    "evidence": [
+      "BCC presents as flat, pale areas.",
+      "BCC presents as yellow areas.",
+      "BCC presents as red patches.",
+      "BCC presents as shiny bumps.",
+      "BCC presents as open sores.",
+      "BCC presents as brown bumps.",
+      "BCC presents as black bumps.",
+      "BCC presents as bumps with rolled borders."
+    ],
+    "question_type": "Fact Retrieval",
+    "generated_answer": "assistant\n\n\nBasal cell carcinoma often presents as a persistent, non-healing skin sore with a pearly, shiny appearance. It may have a raised border with a central depression or scaling area. Lesions are commonly found on sun-exposed skin, such as the face, neck, or hands.",
+    "ground_truth": "BCC presents as flat, pale or yellow areas, red patches, shiny bumps, open sores, or brown/black bumps with rolled borders."
+  },
+  {
+    "id": "Medical-88c0b2ba",
+    "question": "Which diagnostic methods are used for BCC?",
+    "source": "Medical",
+    "context": "cer staging technique subj known risk factor for BCC, known risk factor for BCC manner known risk factor for BCC | cer staging technique subj known risk factor for BCC, known risk factor for BCC manner known risk factor for BCC | known risk factor for BCC subj known risk factor for BCC, known risk factor for BCC obj histology | known risk factor for BCC subj known risk factor for BCC, known risk factor for BCC obj histology",
+    "evidence": [
+      "Diagnosis of BCC involves medical history.",
+      "Diagnosis of BCC involves family history.",
+      "Diagnosis of BCC involves a physical exam.",
+      "Diagnosis of BCC involves a skin exam.",
+      "Diagnosis of BCC involves a biopsy.",
+      "Diagnosis of BCC may involve imaging."
+    ],
+    "question_type": "Fact Retrieval",
+    "generated_answer": "assistant\n\n\nBasal Cell Carcinoma (BCC) is typically diagnosed through a skin biopsy, where a sample is examined under a microscope to confirm cancerous cells. Dermatoscopy, a non-invasive imaging technique, may also be used to assess skin lesions visually. In some cases, imaging tests like ultrasound or MRI might be employed to evaluate tumor depth or potential spread.",
+    "ground_truth": "Diagnosis of BCC involves medical and family history, physical exam, skin exam, biopsy, and sometimes imaging."
+  }
+]
