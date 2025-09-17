@@ -190,12 +190,52 @@ def get_context(final_merged_json):
                 return " | ".join(all_words) if all_words else "None."
         return "None."
 
-    q_txt  = _extract_txt(["questions([[e,r,e], ...])", "questions(edges[i])"])
-    gk_txt = _extract_txt(["given knowledge([[e,r,e], ...])", "given knowledge(edges[i])"])
-    st_txt = _extract_txt(["start thinking with([[e,r,e], ...])", "start thinking with(edges[i])"])
-    ft_txt = _extract_txt(["facts([[e,r,e], ...])", "facts(edges[i])"])  
+    q_txt  = _extract_txt(["questions([[e,r,e], ...])"])
+    gk_txt = _extract_txt(["given knowledge([[e,r,e], ...])"])
+    st_txt = _extract_txt(["start thinking with([[e,r,e], ...])"])
+    ft_txt = _extract_txt(["facts([[e,r,e], ...])"])  
 
     return q_txt, gk_txt, st_txt, ft_txt
+
+
+# for edges one
+def get_context_edge_index(final_merged_json):
+  q_txt,gk_txt,st_txt,ft_txt = [None]*4
+  if "questions(edges[i])" in final_merged_json:
+    q_txt  = decode_questions(final_merged_json["questions(edges[i])"], final_merged_json,fmt='words')
+  if "given knowledge(edges[i])" in final_merged_json:
+    gk_txt = decode_questions(final_merged_json["given knowledge(edges[i])"], final_merged_json,fmt='words')
+  if "start thinking with(edges[i])" in final_merged_json:
+    st_txt = decode_questions(final_merged_json["start thinking with(edges[i])"], final_merged_json,fmt='words')
+  if "facts(edges[i])" in final_merged_json:
+    ft_txt = decode_questions(final_merged_json["facts(edges[i])"],final_merged_json, fmt='words')  
+  return q_txt, gk_txt, st_txt, ft_txt
+
+# automatically select context
+def select_best_context_by_keys(final_merged_json):
+    # The keys each function relies on
+    triple_keys = [
+        "questions([[e,r,e], ...])",
+        "given knowledge([[e,r,e], ...])",
+        "start thinking with([[e,r,e], ...])",
+        "facts([[e,r,e], ...])",
+    ]
+    edge_keys = [
+        "questions(edges[i])",
+        "given knowledge(edges[i])",
+        "start thinking with(edges[i])",
+        "facts(edges[i])",
+    ]
+
+    # Count how many of those keys exist in the JSON
+    triple_count = sum(1 for k in triple_keys if k in final_merged_json)
+    edge_count   = sum(1 for k in edge_keys   if k in final_merged_json)
+
+    # Pick the function with more matching keys
+    if edge_count > triple_count:
+        return get_context_edge_index(final_merged_json)
+    else:
+        return get_context(final_merged_json)
 
 # -------- node labels --------
 def noun_phrase_label(head, include_det=False, use_ents=True):
@@ -3334,7 +3374,7 @@ class CompressRag_rl:
 
         final_merged_json = slice_for_final_merged_json(final_merged_json)
 
-        q_txt, gk_txt, st_txt, ft_txt = get_context(final_merged_json)
+        q_txt, gk_txt, st_txt, ft_txt = select_best_context_by_keys(final_merged_json)
 
         print(f'{final_merged_json} final_merged_json')
 
