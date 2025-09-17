@@ -3126,12 +3126,16 @@ class CompressRag_rl:
 
         if all_f_indices:
             facts_lsts = self._gather_facts_by_indices(all_f_indices, self.meta_codebook)
-            print(f'facts_lsts{facts_lsts}')
-            print(f'facts_lsts chocie 1 include ans{self.answers_extract_function(facts_lsts)}')
-            print(f'facts_lsts chocie 2 not include{get_flat_answers_lsts(facts_lsts)}')
+            # print(f'facts_lsts{facts_lsts}')
+            # print(f'facts_lsts chocie 1 include ans{self.answers_extract_function(facts_lsts)}')
+            # print(f'facts_lsts chocie 2 not include{get_flat_answers_lsts(facts_lsts)}')
             # final_flat_facts_lsts = (self.answers_extract_function(facts_lsts)
             #                         if self.include_answers else get_flat_answers_lsts(facts_lsts))
-            final_flat_facts_lsts = get_flat_answers_lsts(facts_lsts)
+
+            final_flat_facts_lsts = self.answers_extract_function(facts_lsts)
+            if not final_flat_facts_lsts:
+                final_flat_facts_lsts = get_flat_answers_lsts(facts_lsts)
+                
             print(f'final_flat_facts_lsts{final_flat_facts_lsts}')
             if final_flat_facts_lsts:                
                 domain_knowledge_lst.append(final_flat_facts_lsts)
