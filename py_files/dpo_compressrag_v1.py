@@ -990,7 +990,7 @@ if __name__ == "__main__":
         # "When was the UN founded?": "1945",
     }
 
-    examples = make_preference_dataset_2head(
+    examples, run_metadata = make_preference_dataset_2head(
         cr=cr,
         questions=train_questions,
         gold_answers=gold,
@@ -1001,7 +1001,7 @@ if __name__ == "__main__":
         isolate_state=True,
         combine_rounds_default=1,  # keep combine fixed during DPO data creation
     )
-
+    print("------run_metadata--------: ", run_metadata)
     print('after answer questions merging')
 
     for k, v in cr.meta_codebook.items():
