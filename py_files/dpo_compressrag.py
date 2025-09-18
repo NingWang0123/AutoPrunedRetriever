@@ -163,11 +163,157 @@ def f1_overlap(pred: str, gold: str) -> float:
     tp = len(P & G); prec = tp/(len(P)+1e-8); rec = tp/(len(G)+1e-8)
     return 0.0 if prec+rec == 0 else 2*prec*rec/(prec+rec)
 
+def reward_multihop(pred: str, gold: str, graph=None) -> float:
+    def verify_multihop_path(pred: str, graph: dict) -> bool:
+        entities = graph.get("e", [])
+        edges = graph.get("edges([e,r,e])", [])
+
+        mentioned = [i for i, ent in enumerate(entities) if ent.lower() in pred.lower()]
+        if len(mentioned) < 2:
+            return False
+
+        # Check if there's a path between mentioned entities
+        for i in mentioned:
+            for j in mentioned:
+                if i == j:
+                    continue
+                if any(edge[0] == i and edge[2] == j for edge in edges):
+                    return True
+        return False
+
+    def detect_hallucination_score(pred: str, graph: dict, gold: Optional[str] = None) -> float:
+        import re
+        from difflib import SequenceMatcher
+
+        known_entities = set(ent.lower() for ent in graph.get("e", []))
+        known_relations = set(rel.lower() for rel in graph.get("r", []))
+        known_tokens = known_entities | known_relations
+
+        if gold:
+            known_tokens |= set(gold.lower().split())
+
+        pred_tokens = re.findall(r"\b\w+\b", pred.lower())
+        if not pred_tokens:
+            return 1.0
+
+        def token_score(tok):
+            return max(SequenceMatcher(None, tok, known).ratio() for known in known_tokens) if known_tokens else 0.0
+
+        scores = [token_score(tok) for tok in pred_tokens if tok.isalpha()]
+        avg_score = sum(scores) / len(scores) if scores else 1.0
+
+        # Apply a soft penalty for tokens with very low match
+        penalty = sum(1 for s in scores if s < 0.3) / len(scores)
+        return max(0.0, avg_score - 0.5 * penalty)
+
+    f1 = f1_overlap(pred, gold)
+    logic_score = 1.0 if graph and verify_multihop_path(pred, graph) else 0.0
+    hallucination_penalty = detect_hallucination_score(pred, graph)
+    return f1 + logic_score - hallucination_penalty
+
+def reward_citation(pred: str, gold_citations: List[str], graph=None) -> float:
+    def extract_citations(pred: str, known_entities: List[str]) -> List[str]:
+        return [ent for ent in known_entities if ent.lower() in pred.lower()]
+
+    known_entities = []
+    for citation in gold_citations:
+        words = citation.split()
+        for word in words:
+            known_entities.append(word.lower())
+
+    cited = extract_citations(pred, known_entities=known_entities)
+    tp = len(set(cited) & set(gold_citations))
+    prec = tp / (len(cited) + 1e-8)
+    rec  = tp / (len(gold_citations) + 1e-8)
+    return 0.0 if prec + rec == 0 else 2 * prec * rec / (prec + rec)
+
+def reward_abstention(pred: str, gold: str) -> float:
+    """
+    An improved version that uses a more comprehensive list of abstention phrases.
+    """
+    pred_lower = pred.strip().lower()
+
+    # Define what constitutes an "unknown" gold answer
+    unknown_gold_phrases = ["no answer", "n/a", "unknown", "not available", "unanswerable", ""]
+
+    # Define a comprehensive set of ways a model can abstain from answering
+    abstention_phrases = [
+        "i don't know", "i do not know", "no answer", "unknown",
+        "not known", "cannot answer", "can't answer", "unable to answer",
+        "there is no answer", "the answer is unknown", "it is not known",
+        "the context does not say", "the context doesn't say", "not specified",
+        "not provided", "not mentioned", "is unclear", "is not clear",
+        "there is no information", "no information provided", "i have no information"
+    ]
+
+    # Check if the gold standard indicates the question is unanswerable
+    if gold.strip().lower() in unknown_gold_phrases:
+        # Check if the model's prediction indicates abstention
+        if any(phrase in pred_lower for phrase in abstention_phrases):
+            return 1.0  # Strong reward for correct abstention
+        else:
+            return -1.0  # Penalty for hallucinating an answer
+
+    # If the gold answer is a known fact, use your F1 metric
+    return f1_overlap(pred, gold)
+
+def reward_conflict_resolution(pred: str, gold: str, graph=None) -> float:
+    def handles_conflict(pred: str) -> bool:
+        conflict_keywords = [
+            # Direct Keywords
+            "conflict", "conflicting", "uncertain", "uncertainty", "ambiguous", "ambiguity",
+            "disagree", "disagreement", "diverg", "contrast", "contrary",
+            # Phrases indicating uncertainty
+            "it depends", "not sure", "not clear", "unclear", "hard to say",
+            "difficult to determine", "no consensus", "lacks consensus", "inconclusive",
+            "debatable", "subject to debate", "not definitive", "varied sources",
+            "multiple perspectives", "on one hand", "on the other hand",
+            # Modals and Hedging Language
+            "may", "might", "could", "possibly", "perhaps", "seems to", "appears to",
+            "suggests", "likely", "unlikely", "sometimes", "often", "generally", "usually"
+        ]
+        return any(kw in pred.lower() for kw in conflict_keywords)
+
+    def is_factuality_score(pred: str, graph: dict, gold: Optional[str] = None) -> float:
+        from difflib import SequenceMatcher
+        import re
+
+        entities = graph.get("e", [])
+        relations = graph.get("r", [])
+        edges = graph.get("edges([e,r,e])", [])
+
+        pred_tokens = re.findall(r"\b\w+\b", pred.lower())
+        if not pred_tokens:
+            return 1.0
+
+        # Score based on whether tokens match entities or relations
+        def token_score(tok):
+            ent_match = max(SequenceMatcher(None, tok, ent.lower()).ratio() for ent in entities) if entities else 0.0
+            rel_match = max(SequenceMatcher(None, tok, rel.lower()).ratio() for rel in relations) if relations else 0.0
+            return max(ent_match, rel_match)
+
+        scores = [token_score(tok) for tok in pred_tokens if tok.isalpha()]
+        avg_score = sum(scores) / len(scores) if scores else 1.0
+
+        # Bonus if token pairs match known edges
+        mentioned = [i for i, ent in enumerate(entities) if ent.lower() in pred.lower()]
+        edge_bonus = 0.0
+        for i in mentioned:
+            for j in mentioned:
+                if i != j and any(edge[0] == i and edge[2] == j for edge in edges):
+                    edge_bonus += 0.1
+
+        return min(1.0, avg_score + edge_bonus)
+
+    f1 = f1_overlap(pred, gold)
+    ambiguity_score = handles_conflict(pred)
+    factual_consistency = is_factuality_score(pred, graph)
+    return f1 + ambiguity_score + factual_consistency
+
 def default_reward(pred_answer: str, gold_answer: Optional[str]) -> float:
     base = f1_overlap(pred_answer, gold_answer or "")
     toks = len((pred_answer or "").split())
     return base - 0.0005*max(0, toks-256)
-
 
 # ===============================
 # 4) DPO DATA (2-HEAD: ans/th)
