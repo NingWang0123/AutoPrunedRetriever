@@ -3266,7 +3266,8 @@ class CompressRag_rl:
         llm = None,
         combine_ents_rounds = 1, # params to control the combine ents
         thinkings_choice = 'not_include',
-        answers_choice = 'overlap'
+        answers_choice = 'overlap',
+        use_word = False
     ):
         """
         thinkings_choice and answers_choice must be one of 'overlap','unique','not_include'
@@ -3280,6 +3281,7 @@ class CompressRag_rl:
         self.meta_codebook = ini_meta_codebook
         self.llm = llm
         self.cur_fact_context = None
+        self.use_word = use_word
 
         # Embeddings
         self.sentence_emb = sentence_emb 
@@ -3754,7 +3756,7 @@ class CompressRag_rl:
 
         q_txt, gk_txt, st_txt, ft_txt = select_best_context_by_keys(final_merged_json)
 
-        final_merged_json = slice_for_final_merged_json(final_merged_json)
+        final_merged_json = slice_for_final_merged_json(final_merged_json,self.use_word)
 
         self.cur_fact_context = ft_txt
 
