@@ -3032,6 +3032,15 @@ rule_edge_exact = dedent("""\
     - start thinking with([[e,r,e], ...]): reasoning steps
     - facts([[e,r,e], ...]): fact triples
 """)
+                         
+rule_words = dedent("""\
+    ---Knowledge Base---
+    [JSON format]
+    - questions(words): question triples 
+    - given knowledge(words): prior answer triples
+    - start thinking with(words): reasoning triples
+    - facts(words): fact triples
+""")
 
 def _approx_token_len(obj: Any) -> int:
     """
@@ -3068,7 +3077,35 @@ def _drop_keys(d: Dict[str, Any], matchers) -> Dict[str, Any]:
             out[k] = v
     return out
 
-def slice_for_final_merged_json(final_merged_json: Dict[str, Any]) -> Dict[str, Any]:
+
+# decode ere or edge into words
+def decode_into_words_for_ere_and_edge(final_merged_json: Dict[str, Any],format : str = 'edge',choices = []):
+  final_merged_json_copy = deepcopy(final_merged_json)
+
+  if format == 'edge':
+    for choice in choices:
+      if choice in final_merged_json_copy:
+        trans_formed_choice = decode_questions(final_merged_json_copy[choice], final_merged_json_copy, fmt='words')
+        final_merged_json_copy[choice.split("(")[0]+'words'] = trans_formed_choice
+        final_merged_json_copy.pop(choice)
+      
+
+  elif format == 'ere':
+    def _triples_to_words(triples, cb):
+      E, R = cb["e"], cb["r"]
+      return [[E[h], R[r], E[t]] for (h, r, t) in triples]
+
+    for choice in choices:
+      trans_formed_choice = []
+      if choice in final_merged_json_copy:
+        for triples in final_merged_json_copy[choice]:
+          trans_formed_choice.append(_triples_to_words(triples, final_merged_json_copy))
+        final_merged_json_copy[choice.split("(")[0]+'words'] = trans_formed_choice
+        final_merged_json_copy.pop(choice)
+
+  return final_merged_json_copy
+
+def slice_for_final_merged_json(final_merged_json: Dict[str, Any],use_word_format : bool = True) -> Dict[str, Any]:
     """
     Produce a sliced view of `final_merged_json`:
 
@@ -3093,6 +3130,7 @@ def slice_for_final_merged_json(final_merged_json: Dict[str, Any]) -> Dict[str, 
         'questions([[e,r,e], ...])',
         'given knowledge([[e,r,e], ...])',
         'facts([[e,r,e], ...])',
+        'start thinking with([[e,r,e], ...])'
     ]
     # Keys that correspond to per-edge indexed content (edges[i])
 
@@ -3101,6 +3139,14 @@ def slice_for_final_merged_json(final_merged_json: Dict[str, Any]) -> Dict[str, 
         'questions(edges[i])',
         'given knowledge(edges[i])',
         'facts(edges[i])',
+        'start thinking with(edges[i])'
+    ]
+
+    edge_feats = [
+        'questions(edges[i])',
+        'given knowledge(edges[i])',
+        'facts(edges[i])',
+        'start thinking with(edges[i])'
     ]
 
     # check if ready to build which one (some will include missing vals, we will choose the one more compelted)
@@ -3115,20 +3161,59 @@ def slice_for_final_merged_json(final_merged_json: Dict[str, Any]) -> Dict[str, 
         features_contain_per_edge_exact += 1
 
     # missing edge matrix cannot do edges[i] format
+    # ere format
     if 'edge_matrix' not in data:
       data['rule'] = rule_edge_exact
+      final_format = _drop_keys(data, per_edge_exact)
 
-      return _drop_keys(data, per_edge_exact)
+      # get word format and transformed feats
+      if use_word_format:
+        word_format,all_transformed_feats = decode_into_words_for_ere_and_edge(final_format,format = 'ere',choices =ere_exact )
 
+        # check improvement in tokens
+        word_format['rule']  = rule_words
+        if _approx_token_len(word_format) < _approx_token_len(final_format):
+
+          return word_format
+
+      return final_format
+
+    # ere format
+    # ere format does not need edge_matrix
     elif features_contain_ere_exact > features_contain_per_edge_exact:
       data['rule'] = rule_edge_exact
+      final_format = _drop_keys(data, per_edge_exact)
+      final_format.pop('edge_matrix')
 
-      return _drop_keys(data, per_edge_exact)
+      if use_word_format:
+        word_format,all_transformed_feats = decode_into_words_for_ere_and_edge(final_format,format = 'ere',choices =ere_exact )
 
+        # check improvement in tokens
+        word_format['rule']  = rule_words
+        word_format = {k: word_format[k] for k in all_transformed_feats if k in word_format}
+
+        if _approx_token_len(word_format) < _approx_token_len(final_format):
+
+          return word_format
+
+      return final_format
+
+    # edge format
     elif features_contain_ere_exact > features_contain_per_edge_exact:
       data['rule'] =  rule_ere_exact
+      final_format = _drop_keys(data, rule_ere_exact)
 
-      return _drop_keys(data, ere_exact)
+      if use_word_format:
+        word_format,all_transformed_feats = decode_into_words_for_ere_and_edge(final_format,format = 'edge',choices =edge_feats )
+        # check improvement in tokens
+        word_format['rule']  = rule_words
+        word_format = {k: word_format[k] for k in all_transformed_feats if k in word_format}
+
+        if _approx_token_len(word_format) < _approx_token_len(final_format):
+
+          return word_format
+
+      return final_format
     
     else:
       edge_matrix_view = _drop_keys(data, ere_exact)
@@ -3138,10 +3223,30 @@ def slice_for_final_merged_json(final_merged_json: Dict[str, Any]) -> Dict[str, 
       ere_view['rule'] =  rule_edge_exact
 
       if _approx_token_len(edge_matrix_view) <= _approx_token_len(ere_view):
+
+        if use_word_format:
+
+          word_format,all_transformed_feats = decode_into_words_for_ere_and_edge(edge_matrix_view,format = 'edge',choices =edge_feats )
+          word_format['rule']  = rule_words
+          word_format = {k: word_format[k] for k in all_transformed_feats if k in word_format}
+
+          if _approx_token_len(word_format) < _approx_token_len(edge_matrix_view):
+            return word_format
+
         return edge_matrix_view
       else:
-        return ere_view
 
+        if use_word_format:
+
+          word_format,all_transformed_feats = decode_into_words_for_ere_and_edge(ere_view,format = 'ere',choices =ere_exact)
+          word_format['rule']  = rule_words
+          word_format = {k: word_format[k] for k in all_transformed_feats if k in word_format}
+
+          if _approx_token_len(word_format) < _approx_token_len(ere_view):
+            return word_format
+
+        return ere_view
+      
 # thinkings extraction choice: keep the overlap(default), not include the thinking, keep the unique thinking
 # answers extraction choice: keep the unique (default), not include the answers, keep the overlap
 # combine ents choice: not combine, combine per round, combine per 3 round
@@ -3647,11 +3752,9 @@ class CompressRag_rl:
             final_merged_json = combined_facts_cb if combined_facts_cb else q_json.copy()
             retrieval_time = 0
 
-        final_merged_json = slice_for_final_merged_json(final_merged_json)
-
         q_txt, gk_txt, st_txt, ft_txt = select_best_context_by_keys(final_merged_json)
 
-        print(f'{final_merged_json} final_merged_json')
+        final_merged_json = slice_for_final_merged_json(final_merged_json)
 
         self.cur_fact_context = ft_txt
 
