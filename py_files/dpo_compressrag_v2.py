@@ -187,6 +187,9 @@ class PrefDataset2(torch.utils.data.Dataset):
         return (torch.tensor(ex.x, dtype=torch.float32),
                 torch.tensor(ex.y_pos, dtype=torch.long),
                 torch.tensor(ex.y_neg, dtype=torch.long))
+    
+
+# {'Who discovered penicillin?': {'input_tokens': 191.0, 'output_tokens': 165.0, 'total_tokens': 356.0, 'latency_sec': 4.346117499982938, 'gen_latency_sec': 4.344727099989541, 'retrieval_latency_sec': 0.003563100006431341, 'peak_vram_MiB': 14869.89306640625, 'prompt_chars': 863.0, 'throughput_tok_per_s': 37.977068801489786, 'prompt_tok_per_s': 137370.54150389606, 'device': 'cuda:0', 'dtype': 'torch.bfloat16', 'model_name': 'microsoft/Phi-4-mini-reasoning', 'temperature': 0.2, 'top_p': 0.9, 'max_new_tokens': 512, 'timestamp_start': 785499.1458307, 'timestamp_end': 785503.4919482, 'attempt': 1, 'question_chars': 26.0, 'answer_raw_chars': 810.0, 'answer_raw_tokens': 164.0, 'prompt_to_output_char_ratio': 1.065432098765432}}
 
 def make_preference_dataset_2head(
     cr,
@@ -237,7 +240,8 @@ def make_preference_dataset_2head(
             #     continue
             with temp_ans_th(cr, ans, th, isolate_state=isolate_state):
                 pred,metrics_from_llm = cr.run_work_flow_for_dpo(q)
-            score = reward_fn(pred, gold_answers.get(q) if gold_answers else None,metrics_from_llm)
+                print(f'metrics_from_llm is {metrics_from_llm}')
+            score = reward_fn(pred, gold_answers.get(q) if gold_answers else None)
             scored.append(((ai, ti), score))
 
         if len(scored) < 2:
@@ -633,93 +637,93 @@ def answer_with_auto_strategy(
 # ===============================
 # 8) SMALL EXAMPLE (USAGE)
 # ===============================
-# if __name__ == "__main__":
+if __name__ == "__main__":
 
-#     # --- 1) create CR 
+    # --- 1) create CR 
 
-#     # intialization
+    # intialization
 
-#     include_thinking = True
-#     word_emb = WordAvgEmbeddings(model_path="gensim-data/glove-wiki-gigaword-100/glove-wiki-gigaword-100.model")
-#     sentence_emb = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-#     phi_llm = Phi4MiniReasoningLLM(
-#         include_thinkings=include_thinking,                 
-#         model_name="microsoft/Phi-4-mini-reasoning",
-#         max_new_tokens=512,
-#         temperature=0.2,
-#         top_p=0.9
-#     )
-#     cr = CompressRag_rl(
-#         ini_meta_codebook = {},
-#         sentence_emb=sentence_emb,
-#         word_emb=word_emb,
-#         llm=phi_llm,
-#         combine_ents_rounds=1,            # default; scheduler will overwrite
-#         thinkings_choice='not_include',
-#         answers_choice='overlap'
-#     )
+    include_thinking = True
+    word_emb = WordAvgEmbeddings(model_path="gensim-data/glove-wiki-gigaword-100/glove-wiki-gigaword-100.model")
+    sentence_emb = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+    phi_llm = Phi4MiniReasoningLLM(
+        include_thinkings=include_thinking,                 
+        model_name="microsoft/Phi-4-mini-reasoning",
+        max_new_tokens=512,
+        temperature=0.2,
+        top_p=0.9
+    )
+    cr = CompressRag_rl(
+        ini_meta_codebook = {},
+        sentence_emb=sentence_emb,
+        word_emb=word_emb,
+        llm=phi_llm,
+        combine_ents_rounds=1,            # default; scheduler will overwrite
+        thinkings_choice='not_include',
+        answers_choice='overlap'
+    )
 
-#     facts_json_paths = 'medical_sub.json'
+    facts_json_paths = 'medical_sub.json'
 
-#     facts_cb = cr.load_and_merge_facts(facts_json_paths, chunk_chars=100, overlap=30)
-#     cr._facts_preloaded = True
-#     cr.top_m = 2          # sentence-embedding rerank top-m
+    facts_cb = cr.load_and_merge_facts(facts_json_paths, chunk_chars=100, overlap=30)
+    cr._facts_preloaded = True
+    cr.top_m = 2          # sentence-embedding rerank top-m
 
-#     cr.meta_codebook = merging_codebook(
-#         cr.meta_codebook, facts_cb,
-#         type='facts', word_emb=cr.word_emb, use_thinkings=True
-#     )
-#     print('ini merging')
-#     for k, v in cr.meta_codebook.items():
-#         if "fact" in k.lower():
-#             print(k, ":", v)
-#     # ensure round exists
-#     if not hasattr(cr, "round"):
-#         cr.round = 0
+    cr.meta_codebook = merging_codebook(
+        cr.meta_codebook, facts_cb,
+        type='facts', word_emb=cr.word_emb, use_thinkings=True
+    )
+    print('ini merging')
+    for k, v in cr.meta_codebook.items():
+        if "fact" in k.lower():
+            print(k, ":", v)
+    # ensure round exists
+    if not hasattr(cr, "round"):
+        cr.round = 0
 
-#     # --- 2) build preference data for DPO (answers/th)
-#     train_questions = [
-#         "Who discovered penicillin?",
-#         # "What is the capital of France?",
-#         # "Define mitochondria.",
-#         # "When was the UN founded?",
-#     ]
+    # --- 2) build preference data for DPO (answers/th)
+    train_questions = [
+        "Who discovered penicillin?",
+        # "What is the capital of France?",
+        # "Define mitochondria.",
+        # "When was the UN founded?",
+    ]
 
-#     # for q in train_questions:
-#     #     cr.run_work_flow(q)
+    # for q in train_questions:
+    #     cr.run_work_flow(q)
 
-#     # print('after answer questions merging')
+    # print('after answer questions merging')
 
-#     # for k, v in cr.meta_codebook.items():
-#     #     if "fact" in k.lower():
-#     #         print(k, ":", v)
+    # for k, v in cr.meta_codebook.items():
+    #     if "fact" in k.lower():
+    #         print(k, ":", v)
 
-#     gold = {
-#         "Who discovered penicillin?": "Alexander Fleming",
-#         # "What is the capital of France?": "Paris",
-#         # "Define mitochondria.": "Organelle responsible for ATP production",
-#         # "When was the UN founded?": "1945",
-#     }
+    gold = {
+        "Who discovered penicillin?": "Alexander Fleming",
+        # "What is the capital of France?": "Paris",
+        # "Define mitochondria.": "Organelle responsible for ATP production",
+        # "When was the UN founded?": "1945",
+    }
 
-#     examples = make_preference_dataset_2head(
-#         cr=cr,
-#         questions=train_questions,
-#         gold_answers=gold,
-#         per_q_samples=6,
-#         feature_dim=384,
-#         reward_fn=default_reward,
-#         seed=0,
-#         isolate_state=True,
-#         combine_rounds_default=1,  # keep combine fixed during DPO data creation
-#     )
+    examples = make_preference_dataset_2head(
+        cr=cr,
+        questions=train_questions,
+        gold_answers=gold,
+        per_q_samples=6,
+        feature_dim=384,
+        reward_fn=default_reward,
+        seed=0,
+        isolate_state=True,
+        combine_rounds_default=1,  # keep combine fixed during DPO data creation
+    )
 
-#     print('after answer questions merging')
+    print('after answer questions merging')
 
-#     for k, v in cr.meta_codebook.items():
-#         if "fact" in k.lower():
-#             print(k, ":", v)
+    for k, v in cr.meta_codebook.items():
+        if "fact" in k.lower():
+            print(k, ":", v)
 
-#     print(examples)
+    print(examples)
 
 #     # --- 3) train DPO policy
 #     policy, ref = train_dpo_2head(examples, input_dim=384)
@@ -750,4 +754,4 @@ def answer_with_auto_strategy(
 
 
 #python py_files/dpo_compressrag.py
-#python dpo_compressrag.py
+#python dpo_compressrag_v2.py
