@@ -301,10 +301,25 @@ class Phi4MiniReasoningLLM:
         
     def take_questions(self, final_merged_json, question, *, max_regen: int = 3, retrieval_time):
         def _clean_answer(s: str, limit=4):
-            parts = [p.strip() for p in re.split(r'(?<=[.!?])\s+', s) if p.strip()]
-            if not parts:
+            import re
+            if not s:
                 return ""
-            return " ".join(parts[:limit])
+
+            s = s.replace("\ufeff", "").strip()
+
+            lines = s.splitlines()
+            role_pat = re.compile(r'\s*[\[\(]?\s*assistant\s*[\]\)]?\s*[:：-]*\s*$', re.IGNORECASE)
+            while lines and role_pat.fullmatch(lines[0]):
+                lines.pop(0)
+                while lines and not lines[0].strip():
+                    lines.pop(0)
+
+            s = " ".join(l.strip() for l in lines).strip()
+            s = re.sub(r'\s+', ' ', s)
+
+            parts = [p.strip() for p in re.split(r'(?<=[.!?])\s+', s) if p.strip()]
+            return " ".join(parts[:limit]) if parts else ""
+
 
         last_thinks: List[str] = []
         ans_clean = ""
@@ -399,15 +414,15 @@ def to_serializable(obj):
 
 i = 0
 
-# for q in questions:
-#     print(f'q {i}')
-#     result = rag.run_work_flow(q, facts_json_path=["context/novel copy.json", "context/medical_sub.json"], warm_start="auto")
-#     print(rag.llm.metrics_runs)  
-#     #print(result)
+for q in questions:
+    print(f'q {i}')
+    result = rag.run_work_flow(q, facts_json_path=["context/novel copy.json", "context/medical_sub.json"], warm_start="auto")
+    print(rag.llm.metrics_runs)  
+    #print(result)
 
-#     #with open(f"meta_codebook_{i}.json", "w", encoding="utf-8") as f:
-#     #    json.dump(rag.meta_codebook, f, ensure_ascii=False, indent=2, default=to_serializable)
-#     i += 1
+    #with open(f"meta_codebook_{i}.json", "w", encoding="utf-8") as f:
+    #    json.dump(rag.meta_codebook, f, ensure_ascii=False, indent=2, default=to_serializable)
+    i += 1
 
 
 
