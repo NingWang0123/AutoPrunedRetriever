@@ -9,7 +9,7 @@ Graph/Text CompressRAG-RL evaluation on GraphRAG-Benchmark (Medical)
 • Seeds history with the same 30 Q-A, then evaluates the next 20
 • Dumps benchmark-compatible JSON + optional cost reports
 """
-
+import asyncio
 import os, json, re, random
 from pathlib import Path
 from typing import List, Dict, Tuple, Optional
@@ -135,40 +135,45 @@ print("» Building preference pairs for DPO …")
 saved_examples_name = "pref_examples_medical.json"
 
 # check if it is saved or not, reuse the trained one
-if not os.path.exists(saved_examples_name):
+async def main():
+    if not os.path.exists(saved_examples_name):
 
-    embedding_for_reward = HuggingFaceBgeEmbeddings(model_name='BAAI/bge-large-en-v1.5')
-    BASE_URL  = "https://api.deepseek.com/v1"
-    API_KEY = pathlib.Path("deepseek_key.txt").read_text().strip()
+        embedding_for_reward = HuggingFaceBgeEmbeddings(
+            model_name="BAAI/bge-large-en-v1.5"
+        )
+        BASE_URL = "https://api.deepseek.com/v1"
+        API_KEY = pathlib.Path("deepseek_key.txt").read_text().strip()
 
-    llm = ChatOpenAI(
-        model="deepseek-chat",
-        base_url=BASE_URL,
-        api_key=API_KEY,
-        temperature=0.0,
-        max_retries=3,
-        timeout=30
-    )
+        llm = ChatOpenAI(
+            model="deepseek-chat",
+            base_url=BASE_URL,
+            api_key=API_KEY,
+            temperature=0.0,
+            max_retries=3,
+            timeout=30,
+        )
 
-    pref_ds = make_preference_dataset_2head_using_llm(
-        cr            = cr,
-        questions     = seed_questions,
-        gold_answers  = gold_lookup,
-        per_q_samples = 6,
-        reward_fn     = default_reward,
-        seed          = 42,
-        llm =llm,
-        embeddings = embedding_for_reward,
-        reward_fn = compute_answer_correctness
-    )
-    print(f"   generated {len(pref_ds)} preference examples")
+        pref_ds = await make_preference_dataset_2head_using_llm(
+            cr=cr,
+            questions=seed_questions,
+            gold_answers=gold_lookup,
+            per_q_samples=6,
+            reward_fn=compute_answer_correctness,   # ✅ only once
+            seed=42,
+            llm=llm,
+            embeddings=embedding_for_reward,
+        )
 
-    saved_examples_name = "pref_examples_medical.json"
+        print(f"   generated {len(pref_ds)} preference examples")
+        save_pref_examples(saved_examples_name, pref_ds)
 
-    save_pref_examples(saved_examples_name, pref_ds)
+    else:
+        pref_ds = load_pref_examples(saved_examples_name)
+        print(f"   loaded {len(pref_ds)} cached preference examples")
 
-else:
-    pref_ds = load_pref_examples(saved_examples_name)
+# run the async main
+if __name__ == "__main__":
+    asyncio.run(main())
 
 policy, _ = train_dpo_2head(pref_ds, input_dim=384)
 
