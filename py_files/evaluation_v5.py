@@ -25,7 +25,7 @@ from CompressRag_rl_v2 import (
 from dpo_compressrag_v2 import (    
     make_preference_dataset_2head, train_dpo_2head,make_preference_dataset_2head_using_llm,
     default_reward, featurize_state, CombineScheduler,
-    COMBINE_ARMS, answer_with_auto_strategy,save_pref_examples,load_pref_examples
+    COMBINE_ARMS, answer_with_auto_strategy,save_pref_examples,load_pref_examples,ANSWERS_CHOICES,THINKINGS_CHOICES
 )
 
 from test_for_compressrag import Phi4MiniReasoningLLM
@@ -162,6 +162,11 @@ async def build_or_load_pref_ds() -> list:
             seed=42,
             llm=llm,
             embeddings=embedding_for_reward,
+            ANSWERS_CHOICES=ANSWERS_CHOICES,
+            THINKINGS_CHOICES=THINKINGS_CHOICES,
+            isolate_state = True,
+            combine_rounds_default  = 1,
+            feature_dim = 384
         )
         print(f"   generated {len(pref_ds)} preference examples")
         save_pref_examples(saved_examples_name, pref_ds)
