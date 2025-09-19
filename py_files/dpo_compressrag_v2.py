@@ -559,124 +559,124 @@ def answer_with_auto_strategy(
 # ===============================
 # 8) SMALL EXAMPLE (USAGE)
 # ===============================
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
-    # --- 1) create CR 
+#     # --- 1) create CR 
 
-    # intialization
+#     # intialization
 
-    include_thinking = True
-    word_emb = WordAvgEmbeddings(model_path="gensim-data/glove-wiki-gigaword-100/glove-wiki-gigaword-100.model")
-    sentence_emb = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-    phi_llm = Phi4MiniReasoningLLM(
-        include_thinkings=include_thinking,                 
-        model_name="microsoft/Phi-4-mini-reasoning",
-        max_new_tokens=512,
-        temperature=0.2,
-        top_p=0.9
-    )
-    cr = CompressRag_rl(
-        ini_meta_codebook = {},
-        sentence_emb=sentence_emb,
-        word_emb=word_emb,
-        llm=phi_llm,
-        combine_ents_rounds=1,            # default; scheduler will overwrite
-        thinkings_choice='not_include',
-        answers_choice='overlap'
-    )
+#     include_thinking = True
+#     word_emb = WordAvgEmbeddings(model_path="gensim-data/glove-wiki-gigaword-100/glove-wiki-gigaword-100.model")
+#     sentence_emb = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+#     phi_llm = Phi4MiniReasoningLLM(
+#         include_thinkings=include_thinking,                 
+#         model_name="microsoft/Phi-4-mini-reasoning",
+#         max_new_tokens=512,
+#         temperature=0.2,
+#         top_p=0.9
+#     )
+#     cr = CompressRag_rl(
+#         ini_meta_codebook = {},
+#         sentence_emb=sentence_emb,
+#         word_emb=word_emb,
+#         llm=phi_llm,
+#         combine_ents_rounds=1,            # default; scheduler will overwrite
+#         thinkings_choice='not_include',
+#         answers_choice='overlap'
+#     )
 
-    facts_json_paths = 'medical_sub.json'
+#     facts_json_paths = 'medical_sub.json'
 
-    facts_cb = cr.load_and_merge_facts(facts_json_paths, chunk_chars=100, overlap=30)
-    cr._facts_preloaded = True
-    cr.top_m = 2          # sentence-embedding rerank top-m
+#     facts_cb = cr.load_and_merge_facts(facts_json_paths, chunk_chars=100, overlap=30)
+#     cr._facts_preloaded = True
+#     cr.top_m = 2          # sentence-embedding rerank top-m
 
-    cr.meta_codebook = merging_codebook(
-        cr.meta_codebook, facts_cb,
-        type='facts', word_emb=cr.word_emb, use_thinkings=True
-    )
-    print('ini merging')
-    for k, v in cr.meta_codebook.items():
-        if "fact" in k.lower():
-            print(k, ":", v)
-    # ensure round exists
-    if not hasattr(cr, "round"):
-        cr.round = 0
+#     cr.meta_codebook = merging_codebook(
+#         cr.meta_codebook, facts_cb,
+#         type='facts', word_emb=cr.word_emb, use_thinkings=True
+#     )
+#     print('ini merging')
+#     for k, v in cr.meta_codebook.items():
+#         if "fact" in k.lower():
+#             print(k, ":", v)
+#     # ensure round exists
+#     if not hasattr(cr, "round"):
+#         cr.round = 0
 
-    # --- 2) build preference data for DPO (answers/th)
-    train_questions = [
-        "Who discovered penicillin?",
-        # "What is the capital of France?",
-        # "Define mitochondria.",
-        # "When was the UN founded?",
-    ]
+#     # --- 2) build preference data for DPO (answers/th)
+#     train_questions = [
+#         "Who discovered penicillin?",
+#         # "What is the capital of France?",
+#         # "Define mitochondria.",
+#         # "When was the UN founded?",
+#     ]
 
-    # for q in train_questions:
-    #     cr.run_work_flow(q)
+#     # for q in train_questions:
+#     #     cr.run_work_flow(q)
 
-    # print('after answer questions merging')
+#     # print('after answer questions merging')
 
-    # for k, v in cr.meta_codebook.items():
-    #     if "fact" in k.lower():
-    #         print(k, ":", v)
+#     # for k, v in cr.meta_codebook.items():
+#     #     if "fact" in k.lower():
+#     #         print(k, ":", v)
 
-    gold = {
-        "Who discovered penicillin?": "Alexander Fleming",
-        # "What is the capital of France?": "Paris",
-        # "Define mitochondria.": "Organelle responsible for ATP production",
-        # "When was the UN founded?": "1945",
-    }
+#     gold = {
+#         "Who discovered penicillin?": "Alexander Fleming",
+#         # "What is the capital of France?": "Paris",
+#         # "Define mitochondria.": "Organelle responsible for ATP production",
+#         # "When was the UN founded?": "1945",
+#     }
 
-    examples = make_preference_dataset_2head(
-        cr=cr,
-        questions=train_questions,
-        gold_answers=gold,
-        per_q_samples=6,
-        feature_dim=384,
-        reward_fn=default_reward,
-        seed=0,
-        isolate_state=True,
-        combine_rounds_default=1,  # keep combine fixed during DPO data creation
-    )
+#     examples = make_preference_dataset_2head(
+#         cr=cr,
+#         questions=train_questions,
+#         gold_answers=gold,
+#         per_q_samples=6,
+#         feature_dim=384,
+#         reward_fn=default_reward,
+#         seed=0,
+#         isolate_state=True,
+#         combine_rounds_default=1,  # keep combine fixed during DPO data creation
+#     )
 
-    print('after answer questions merging')
+#     print('after answer questions merging')
 
-    for k, v in cr.meta_codebook.items():
-        if "fact" in k.lower():
-            print(k, ":", v)
+#     for k, v in cr.meta_codebook.items():
+#         if "fact" in k.lower():
+#             print(k, ":", v)
 
-    print(examples)
+#     print(examples)
 
-    save_pref_examples("pref_examples.json", examples)
+#     save_pref_examples("pref_examples.json", examples)
 
-    # 2) Later, just load (no retraining / re-scoring)
-    examples = load_pref_examples("pref_examples.json")
+#     # 2) Later, just load (no retraining / re-scoring)
+#     examples = load_pref_examples("pref_examples.json")
 
-    # --- 3) train DPO policy
-    policy, ref = train_dpo_2head(examples, input_dim=384)
+#     # --- 3) train DPO policy
+#     policy, ref = train_dpo_2head(examples, input_dim=384)
 
-    # --- 4) init LinUCB scheduler with state feature dim
-    d_state = featurize_state(cr).shape[0]  # typically 4
-    scheduler = CombineScheduler(d=d_state, arms=COMBINE_ARMS, alpha=1.0, epsilon=0.05)
+#     # --- 4) init LinUCB scheduler with state feature dim
+#     d_state = featurize_state(cr).shape[0]  # typically 4
+#     scheduler = CombineScheduler(d=d_state, arms=COMBINE_ARMS, alpha=1.0, epsilon=0.05)
 
-    # --- 5) inference on new questions (+ optional online bandit updates)
-    test_questions = [
-        "What is the tallest mountain in Africa?",
-        # "Explain CRISPR in one sentence.",
-        # "Who wrote Pride and Prejudice?",
-    ]
-    for q in test_questions:
-        pred, meta = answer_with_auto_strategy(
-            cr=cr,
-            policy=policy,
-            scheduler=scheduler,
-            q=q,
-            reward_fn=default_reward,  # if you have gold; else set to None
-            gold_answer=None,          # supply if you have target
-            greedy=True
-        )
-        print(f"\nQ: {q}\nA: {pred}\nmeta: {meta}")
-        # print(cr.cur_fact_context)
+#     # --- 5) inference on new questions (+ optional online bandit updates)
+#     test_questions = [
+#         "What is the tallest mountain in Africa?",
+#         # "Explain CRISPR in one sentence.",
+#         # "Who wrote Pride and Prejudice?",
+#     ]
+#     for q in test_questions:
+#         pred, meta = answer_with_auto_strategy(
+#             cr=cr,
+#             policy=policy,
+#             scheduler=scheduler,
+#             q=q,
+#             reward_fn=default_reward,  # if you have gold; else set to None
+#             gold_answer=None,          # supply if you have target
+#             greedy=True
+#         )
+#         print(f"\nQ: {q}\nA: {pred}\nmeta: {meta}")
+#         # print(cr.cur_fact_context)
 
 
 

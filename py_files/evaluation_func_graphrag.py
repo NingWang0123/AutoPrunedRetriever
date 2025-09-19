@@ -19,18 +19,18 @@ from Evaluation.metrics.utils import JSONHandler
 
 
 
-embedding = HuggingFaceBgeEmbeddings(model_name='BAAI/bge-large-en-v1.5')
-BASE_URL  = "https://api.deepseek.com/v1"
-API_KEY = pathlib.Path("deepseek_key.txt").read_text().strip()
+# embedding = HuggingFaceBgeEmbeddings(model_name='BAAI/bge-large-en-v1.5')
+# BASE_URL  = "https://api.deepseek.com/v1"
+# API_KEY = pathlib.Path("deepseek_key.txt").read_text().strip()
 
-llm = ChatOpenAI(
-    model="deepseek-chat",
-    base_url=BASE_URL,
-    api_key=API_KEY,
-    temperature=0.0,
-    max_retries=3,
-    timeout=30
-)
+# llm = ChatOpenAI(
+#     model="deepseek-chat",
+#     base_url=BASE_URL,
+#     api_key=API_KEY,
+#     temperature=0.0,
+#     max_retries=3,
+#     timeout=30
+# )
 
 # evaluate_sample from generation_eval.py
 
