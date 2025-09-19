@@ -10,6 +10,7 @@ import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import re, os
 from test_for_compressrag import Phi4MiniReasoningLLM
+import json
 
 
 # ===============================
@@ -649,35 +650,33 @@ if __name__ == "__main__":
     save_pref_examples("pref_examples.json", examples)
 
     # 2) Later, just load (no retraining / re-scoring)
-    loaded_examples = load_pref_examples("pref_examples.json")
+    examples = load_pref_examples("pref_examples.json")
 
-    print(loaded_examples)
+    # --- 3) train DPO policy
+    policy, ref = train_dpo_2head(examples, input_dim=384)
 
-#     # --- 3) train DPO policy
-#     policy, ref = train_dpo_2head(examples, input_dim=384)
+    # --- 4) init LinUCB scheduler with state feature dim
+    d_state = featurize_state(cr).shape[0]  # typically 4
+    scheduler = CombineScheduler(d=d_state, arms=COMBINE_ARMS, alpha=1.0, epsilon=0.05)
 
-#     # --- 4) init LinUCB scheduler with state feature dim
-#     d_state = featurize_state(cr).shape[0]  # typically 4
-#     scheduler = CombineScheduler(d=d_state, arms=COMBINE_ARMS, alpha=1.0, epsilon=0.05)
-
-#     # --- 5) inference on new questions (+ optional online bandit updates)
-#     test_questions = [
-#         "What is the tallest mountain in Africa?",
-#         # "Explain CRISPR in one sentence.",
-#         # "Who wrote Pride and Prejudice?",
-#     ]
-#     for q in test_questions:
-#         pred, meta = answer_with_auto_strategy(
-#             cr=cr,
-#             policy=policy,
-#             scheduler=scheduler,
-#             q=q,
-#             reward_fn=default_reward,  # if you have gold; else set to None
-#             gold_answer=None,          # supply if you have target
-#             greedy=True
-#         )
-#         print(f"\nQ: {q}\nA: {pred}\nmeta: {meta}")
-#         # print(cr.cur_fact_context)
+    # --- 5) inference on new questions (+ optional online bandit updates)
+    test_questions = [
+        "What is the tallest mountain in Africa?",
+        # "Explain CRISPR in one sentence.",
+        # "Who wrote Pride and Prejudice?",
+    ]
+    for q in test_questions:
+        pred, meta = answer_with_auto_strategy(
+            cr=cr,
+            policy=policy,
+            scheduler=scheduler,
+            q=q,
+            reward_fn=default_reward,  # if you have gold; else set to None
+            gold_answer=None,          # supply if you have target
+            greedy=True
+        )
+        print(f"\nQ: {q}\nA: {pred}\nmeta: {meta}")
+        # print(cr.cur_fact_context)
 
 
 
