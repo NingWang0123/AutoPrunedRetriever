@@ -135,9 +135,9 @@ print("» Building preference pairs for DPO …")
 saved_examples_name = "pref_examples_medical.json"
 
 # check if it is saved or not, reuse the trained one
-async def main():
+async def build_or_load_pref_ds() -> list:
     if not os.path.exists(saved_examples_name):
-
+        # init only when needed
         embedding_for_reward = HuggingFaceBgeEmbeddings(
             model_name="BAAI/bge-large-en-v1.5"
         )
@@ -158,22 +158,22 @@ async def main():
             questions=seed_questions,
             gold_answers=gold_lookup,
             per_q_samples=6,
-            reward_fn=compute_answer_correctness,   # ✅ only once
+            reward_fn=compute_answer_correctness,   
             seed=42,
             llm=llm,
             embeddings=embedding_for_reward,
         )
-
         print(f"   generated {len(pref_ds)} preference examples")
         save_pref_examples(saved_examples_name, pref_ds)
-
+        return pref_ds
     else:
         pref_ds = load_pref_examples(saved_examples_name)
         print(f"   loaded {len(pref_ds)} cached preference examples")
+        return pref_ds
 
-# run the async main
+# Run async builder and CAPTURE the result
 if __name__ == "__main__":
-    asyncio.run(main())
+    pref_ds = asyncio.run(build_or_load_pref_ds())
 
 policy, _ = train_dpo_2head(pref_ds, input_dim=384)
 
