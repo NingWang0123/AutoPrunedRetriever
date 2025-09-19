@@ -346,8 +346,8 @@ async def make_preference_dataset_2head_using_llm(
     seed: int = 0,
     isolate_state: bool = True,
     combine_rounds_default: int = 1,
-    ANSWERS_CHOICES=None,
-    THINKINGS_CHOICES=None,
+    ANSWERS_CHOICES = ANSWERS_CHOICES,
+    THINKINGS_CHOICES = THINKINGS_CHOICES,
     llm=None,
     embeddings=None,
 ) -> List["PrefExample2"]:
