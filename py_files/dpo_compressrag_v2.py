@@ -11,6 +11,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 import re, os
 from test_for_compressrag import Phi4MiniReasoningLLM
 import json
+import asyncio,inspect
 
 
 # ===============================
@@ -257,67 +258,163 @@ def make_preference_dataset_2head(
 
 # {'Who discovered penicillin?': {'input_tokens': 191.0, 'output_tokens': 165.0, 'total_tokens': 356.0, 'latency_sec': 4.346117499982938, 'gen_latency_sec': 4.344727099989541, 'retrieval_latency_sec': 0.003563100006431341, 'peak_vram_MiB': 14869.89306640625, 'prompt_chars': 863.0, 'throughput_tok_per_s': 37.977068801489786, 'prompt_tok_per_s': 137370.54150389606, 'device': 'cuda:0', 'dtype': 'torch.bfloat16', 'model_name': 'microsoft/Phi-4-mini-reasoning', 'temperature': 0.2, 'top_p': 0.9, 'max_new_tokens': 512, 'timestamp_start': 785499.1458307, 'timestamp_end': 785503.4919482, 'attempt': 1, 'question_chars': 26.0, 'answer_raw_chars': 810.0, 'answer_raw_tokens': 164.0, 'prompt_to_output_char_ratio': 1.065432098765432}}
 
-def make_preference_dataset_2head_using_llm(
+# def make_preference_dataset_2head_using_llm(
+#     cr,
+#     questions: List[str],
+#     gold_answers: Optional[Dict[str,str]] = None,
+#     per_q_samples: int = 6,
+#     feature_dim: int = 384,
+#     reward_fn: Callable[[str, Optional[str]], float] = None,
+#     seed: int = 0,
+#     isolate_state: bool = True,
+#     combine_rounds_default: int = 1,
+#     ANSWERS_CHOICES = ANSWERS_CHOICES,
+#     THINKINGS_CHOICES = THINKINGS_CHOICES,
+#     llm = None ,
+#     embeddings = None
+
+# ) -> List[PrefExample2]:
+#     """
+#     Build DPO pairs for (answers_choice, thinkings_choice) ONLY.
+#     Combine cadence is fixed to 'combine_rounds_default' here and will
+#     be handled by the contextual bandit at runtime.
+#     """
+#     if reward_fn is None:
+#         reward_fn = default_reward
+
+#     rng = random.Random(seed)
+#     all_pairs = [(ai, ti)
+#                  for ai in range(len(ANSWERS_CHOICES))
+#                  for ti in range(len(THINKINGS_CHOICES))]
+
+#     examples: List[PrefExample2] = []
+
+#     # Set combine cadence safely for whole dataset creation
+#     prev_combine = getattr(cr, "combine_ents_rounds", None)
+#     set_combine_rounds(cr, combine_rounds_default)
+
+#     for q in questions:
+#         x = featurize_query(cr, q, dims=feature_dim)
+#         tried = rng.sample(all_pairs, k=min(per_q_samples, len(all_pairs)))
+
+#         scored: List[Tuple[Tuple[int,int], float]] = []
+#         for (ai, ti) in tried:
+#             ans = ANSWERS_CHOICES[ai]
+#             th  = THINKINGS_CHOICES[ti]
+#             with temp_ans_th(cr, ans, th, isolate_state=isolate_state):
+#                 pred,metrics_from_llm,ft_txt = cr.run_work_flow_for_dpo(q)
+
+#             ## compute_answer_correctness(
+#             # question, answer, ground_truth, llm, embeddings
+#                 #         )
+#             score = reward_fn(q, pred, gold_answers.get(q),llm, embeddings)
+#             scored.append(((ai, ti), score))
+
+#         if len(scored) < 2:
+#             continue
+#         scored.sort(key=lambda z: z[1], reverse=True)
+#         y_pos, y_neg = scored[0][0], scored[-1][0]
+#         examples.append(PrefExample2(x=x, y_pos=y_pos, y_neg=y_neg))
+
+#     # restore original combine cadence
+#     if prev_combine is not None:
+#         set_combine_rounds(cr, prev_combine)
+
+#     return examples
+async def _call_reward_fn(
+    reward_fn: Callable,
+    question: str,
+    pred: str,
+    gold: Optional[str],
+    llm,
+    embeddings,
+):
+    # normalize None -> "" to satisfy embedding/LMM calls
+    gold = gold or ""
+    if inspect.iscoroutinefunction(reward_fn):
+        return await reward_fn(question, pred, gold, llm, embeddings)
+    else:
+        return reward_fn(question, pred, gold, llm, embeddings)
+
+async def make_preference_dataset_2head_using_llm(
     cr,
     questions: List[str],
-    gold_answers: Optional[Dict[str,str]] = None,
+    gold_answers: Optional[dict] = None,
     per_q_samples: int = 6,
     feature_dim: int = 384,
-    reward_fn: Callable[[str, Optional[str]], float] = None,
+    reward_fn: Optional[Callable] = None,  # pass compute_answer_correctness here
     seed: int = 0,
     isolate_state: bool = True,
     combine_rounds_default: int = 1,
-    ANSWERS_CHOICES = ANSWERS_CHOICES,
-    THINKINGS_CHOICES = THINKINGS_CHOICES,
-    llm = None ,
-    embeddings = None
-
-) -> List[PrefExample2]:
+    ANSWERS_CHOICES=None,
+    THINKINGS_CHOICES=None,
+    llm=None,
+    embeddings=None,
+) -> List["PrefExample2"]:
     """
     Build DPO pairs for (answers_choice, thinkings_choice) ONLY.
-    Combine cadence is fixed to 'combine_rounds_default' here and will
-    be handled by the contextual bandit at runtime.
+    Runs async reward function correctly (awaited).
     """
     if reward_fn is None:
+        # fallback to your synchronous default if desired
         reward_fn = default_reward
 
+    gold_answers = gold_answers or {}
     rng = random.Random(seed)
     all_pairs = [(ai, ti)
                  for ai in range(len(ANSWERS_CHOICES))
                  for ti in range(len(THINKINGS_CHOICES))]
 
-    examples: List[PrefExample2] = []
+    examples: List["PrefExample2"] = []
 
     # Set combine cadence safely for whole dataset creation
     prev_combine = getattr(cr, "combine_ents_rounds", None)
     set_combine_rounds(cr, combine_rounds_default)
 
-    for q in questions:
-        x = featurize_query(cr, q, dims=feature_dim)
-        tried = rng.sample(all_pairs, k=min(per_q_samples, len(all_pairs)))
+    try:
+        for q in questions:
+            x = featurize_query(cr, q, dims=feature_dim)
+            tried = rng.sample(all_pairs, k=min(per_q_samples, len(all_pairs)))
 
-        scored: List[Tuple[Tuple[int,int], float]] = []
-        for (ai, ti) in tried:
-            ans = ANSWERS_CHOICES[ai]
-            th  = THINKINGS_CHOICES[ti]
-            with temp_ans_th(cr, ans, th, isolate_state=isolate_state):
-                pred,metrics_from_llm,ft_txt = cr.run_work_flow_for_dpo(q)
+            # (optional) parallelize scoring for this question
+            tasks = []
+            meta = []  # keep (ai, ti) aligned with tasks
+            for (ai, ti) in tried:
+                ans = ANSWERS_CHOICES[ai]
+                th  = THINKINGS_CHOICES[ti]
+                with temp_ans_th(cr, ans, th, isolate_state=isolate_state):
+                    pred, metrics_from_llm, ft_txt = cr.run_work_flow_for_dpo(q)
 
-            ## compute_answer_correctness(
-            # question, answer, ground_truth, llm, embeddings
-                #         )
-            score = reward_fn(q, pred, gold_answers.get(q),llm, embeddings)
-            scored.append(((ai, ti), score))
+                tasks.append(_call_reward_fn(
+                    reward_fn, q, pred, gold_answers.get(q), llm, embeddings
+                ))
+                meta.append((ai, ti))
 
-        if len(scored) < 2:
-            continue
-        scored.sort(key=lambda z: z[1], reverse=True)
-        y_pos, y_neg = scored[0][0], scored[-1][0]
-        examples.append(PrefExample2(x=x, y_pos=y_pos, y_neg=y_neg))
+            # await all scores
+            scores = await asyncio.gather(*tasks, return_exceptions=True)
 
-    # restore original combine cadence
-    if prev_combine is not None:
-        set_combine_rounds(cr, prev_combine)
+            scored: List[Tuple[Tuple[int,int], float]] = []
+            for (ai_ti, s) in zip(meta, scores):
+                if isinstance(s, Exception) or s is None:
+                    # skip failures or None
+                    continue
+                try:
+                    scored.append((ai_ti, float(s)))
+                except (TypeError, ValueError):
+                    # skip non-numeric results
+                    continue
+
+            if len(scored) < 2:
+                continue
+
+            scored.sort(key=lambda z: z[1], reverse=True)
+            y_pos, y_neg = scored[0][0], scored[-1][0]
+            examples.append(PrefExample2(x=x, y_pos=y_pos, y_neg=y_neg))
+
+    finally:
+        # restore original combine cadence
+        if prev_combine is not None:
+            set_combine_rounds(cr, prev_combine)
 
     return examples
 
