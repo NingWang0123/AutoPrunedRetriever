@@ -135,8 +135,8 @@ print("» Building preference pairs for DPO …")
 saved_examples_name = "pref_examples_medical.json"
 
 # check if it is saved or not, reuse the trained one
-if os.path.exists(saved_examples_name):
-    
+if not os.path.exists(saved_examples_name):
+
     embedding_for_reward = HuggingFaceBgeEmbeddings(model_name='BAAI/bge-large-en-v1.5')
     BASE_URL  = "https://api.deepseek.com/v1"
     API_KEY = pathlib.Path("deepseek_key.txt").read_text().strip()
