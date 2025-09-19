@@ -3471,4 +3471,4 @@ class CompressRag_rl:
 
         # print(f'new_result {new_result}')
 
-        return new_result,metrics_from_llm
+        return new_result,metrics_from_llm,ft_txt

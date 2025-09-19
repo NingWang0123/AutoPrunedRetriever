@@ -1,6 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import List, Tuple, Dict, Optional, Callable
+from typing import List, Tuple, Dict, Optional, Callable,Any
 from contextlib import contextmanager
 import math, random, numpy as np
 import torch, torch.nn as nn, torch.nn.functional as F
@@ -188,9 +188,6 @@ class PrefDataset2(torch.utils.data.Dataset):
                 torch.tensor(ex.y_pos, dtype=torch.long),
                 torch.tensor(ex.y_neg, dtype=torch.long))
     
-
-# {'Who discovered penicillin?': {'input_tokens': 191.0, 'output_tokens': 165.0, 'total_tokens': 356.0, 'latency_sec': 4.346117499982938, 'gen_latency_sec': 4.344727099989541, 'retrieval_latency_sec': 0.003563100006431341, 'peak_vram_MiB': 14869.89306640625, 'prompt_chars': 863.0, 'throughput_tok_per_s': 37.977068801489786, 'prompt_tok_per_s': 137370.54150389606, 'device': 'cuda:0', 'dtype': 'torch.bfloat16', 'model_name': 'microsoft/Phi-4-mini-reasoning', 'temperature': 0.2, 'top_p': 0.9, 'max_new_tokens': 512, 'timestamp_start': 785499.1458307, 'timestamp_end': 785503.4919482, 'attempt': 1, 'question_chars': 26.0, 'answer_raw_chars': 810.0, 'answer_raw_tokens': 164.0, 'prompt_to_output_char_ratio': 1.065432098765432}}
-
 def make_preference_dataset_2head(
     cr,
     questions: List[str],
@@ -239,8 +236,8 @@ def make_preference_dataset_2head(
             # except Exception:
             #     continue
             with temp_ans_th(cr, ans, th, isolate_state=isolate_state):
-                pred,metrics_from_llm = cr.run_work_flow_for_dpo(q)
-                print(f'metrics_from_llm is {metrics_from_llm}')
+                pred = cr.run_work_flow(q)
+                print(f'pred{pred}')
             score = reward_fn(pred, gold_answers.get(q) if gold_answers else None)
             scored.append(((ai, ti), score))
 
@@ -255,6 +252,100 @@ def make_preference_dataset_2head(
         set_combine_rounds(cr, prev_combine)
 
     return examples
+    
+
+# {'Who discovered penicillin?': {'input_tokens': 191.0, 'output_tokens': 165.0, 'total_tokens': 356.0, 'latency_sec': 4.346117499982938, 'gen_latency_sec': 4.344727099989541, 'retrieval_latency_sec': 0.003563100006431341, 'peak_vram_MiB': 14869.89306640625, 'prompt_chars': 863.0, 'throughput_tok_per_s': 37.977068801489786, 'prompt_tok_per_s': 137370.54150389606, 'device': 'cuda:0', 'dtype': 'torch.bfloat16', 'model_name': 'microsoft/Phi-4-mini-reasoning', 'temperature': 0.2, 'top_p': 0.9, 'max_new_tokens': 512, 'timestamp_start': 785499.1458307, 'timestamp_end': 785503.4919482, 'attempt': 1, 'question_chars': 26.0, 'answer_raw_chars': 810.0, 'answer_raw_tokens': 164.0, 'prompt_to_output_char_ratio': 1.065432098765432}}
+
+def make_preference_dataset_2head_using_llm(
+    cr,
+    questions: List[str],
+    gold_answers: Optional[Dict[str,str]] = None,
+    per_q_samples: int = 6,
+    feature_dim: int = 384,
+    reward_fn: Callable[[str, Optional[str]], float] = None,
+    seed: int = 0,
+    isolate_state: bool = True,
+    combine_rounds_default: int = 1,
+    ANSWERS_CHOICES = ANSWERS_CHOICES,
+    THINKINGS_CHOICES = THINKINGS_CHOICES,
+    llm = None ,
+    embeddings = None
+
+) -> List[PrefExample2]:
+    """
+    Build DPO pairs for (answers_choice, thinkings_choice) ONLY.
+    Combine cadence is fixed to 'combine_rounds_default' here and will
+    be handled by the contextual bandit at runtime.
+    """
+    if reward_fn is None:
+        reward_fn = default_reward
+
+    rng = random.Random(seed)
+    all_pairs = [(ai, ti)
+                 for ai in range(len(ANSWERS_CHOICES))
+                 for ti in range(len(THINKINGS_CHOICES))]
+
+    examples: List[PrefExample2] = []
+
+    # Set combine cadence safely for whole dataset creation
+    prev_combine = getattr(cr, "combine_ents_rounds", None)
+    set_combine_rounds(cr, combine_rounds_default)
+
+    for q in questions:
+        x = featurize_query(cr, q, dims=feature_dim)
+        tried = rng.sample(all_pairs, k=min(per_q_samples, len(all_pairs)))
+
+        scored: List[Tuple[Tuple[int,int], float]] = []
+        for (ai, ti) in tried:
+            ans = ANSWERS_CHOICES[ai]
+            th  = THINKINGS_CHOICES[ti]
+            with temp_ans_th(cr, ans, th, isolate_state=isolate_state):
+                pred,metrics_from_llm,ft_txt = cr.run_work_flow_for_dpo(q)
+
+            ## compute_answer_correctness(
+            # question, answer, ground_truth, llm, embeddings
+                #         )
+            score = reward_fn(q, pred, gold_answers.get(q),llm, embeddings)
+            scored.append(((ai, ti), score))
+
+        if len(scored) < 2:
+            continue
+        scored.sort(key=lambda z: z[1], reverse=True)
+        y_pos, y_neg = scored[0][0], scored[-1][0]
+        examples.append(PrefExample2(x=x, y_pos=y_pos, y_neg=y_neg))
+
+    # restore original combine cadence
+    if prev_combine is not None:
+        set_combine_rounds(cr, prev_combine)
+
+    return examples
+
+def _pref2_to_dict(e) -> Dict[str, Any]:
+    return {
+        "x": np.asarray(e.x, dtype=float).tolist(),   # vector -> list
+        "y_pos": list(e.y_pos),                       # (ai, ti) -> [ai, ti]
+        "y_neg": list(e.y_neg),
+    }
+
+def _pref2_from_dict(d):
+    # Replace with your real PrefExample2(..) if the signature differs
+    return PrefExample2(
+        x=np.array(d["x"], dtype=np.float32),
+        y_pos=tuple(d["y_pos"]),
+        y_neg=tuple(d["y_neg"]),
+    )
+
+def save_pref_examples(path: str, examples: List["PrefExample2"]) -> None:
+    """Save ONLY the examples list to a JSON file."""
+    payload = [_pref2_to_dict(e) for e in examples]
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False)
+
+def load_pref_examples(path: str) -> List["PrefExample2"]:
+    """Load ONLY the examples list from a JSON file you saved before."""
+    with open(path, "r", encoding="utf-8") as f:
+        payload = json.load(f)
+    return [_pref2_from_dict(row) for row in payload]
 
 
 # ===============================
@@ -462,176 +553,6 @@ def answer_with_auto_strategy(
     return pred, meta
 
 
-#### class for llm
-# class Phi4MiniReasoningLLM:
-#     def __init__(self, include_thinkings: bool = True,
-#                 model_name: str = "microsoft/Phi-4-mini-reasoning",
-#                 max_new_tokens: int = 256,
-#                 temperature: float = 0.3,
-#                 top_p: float = 0.95):
-#         self.include_thinkings = include_thinkings
-#         self.max_new_tokens = max_new_tokens
-#         self.temperature = temperature
-#         self.top_p = top_p
-
-#         self.tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
-#         self.model = AutoModelForCausalLM.from_pretrained(
-#             model_name,
-#             torch_dtype=torch.bfloat16,
-#             device_map="auto",
-#             trust_remote_code=True,
-#         )
-#         if not hasattr(self.tokenizer, "apply_chat_template"):
-#             self._use_chat_template = False
-#         else:
-#             self._use_chat_template = True
-
-
-#     def _build_prompt(self, final_merged_json, question = 'answer q'):
-#         q_txt, gk_txt, st_txt, ft_txt = get_context(final_merged_json)
-#         user_msg = ""
-
-#         system_msg = (
-#             "You are a precise QA agent that answers by expressing facts as short, "
-#             "plain English statements. Keep outputs concise and factual."
-#         )
-
-#         ctx_lines = [
-#             "<<<RETRIEVED_CONTEXT_START>>>",
-#             "The system searched for a related question in the database. Below are related question's graph triples and its prior answer as reference. You don't have to follow it completely, just use it as a reference.",
-#             "[RELATED QUESTION'S GRAPH TRIPLES]:",
-#             q_txt,
-#             f"[RELATED QUESTION'S ANSWER TRIPLES]: {gk_txt}",
-#         ]
-        
-#         if st_txt.strip().lower() != "none.":
-#             ctx_lines.append(f"[RELATED THINKING“S TRIPLES]: {st_txt}")
-
-#         if ft_txt.strip().lower() != "none.":
-#             ctx_lines.append(f"[RELATED FACTS'S TRIPLES]: {ft_txt}")
-
-#         ctx_lines.append("<<<RETRIEVED_CONTEXT_END>>>")
-
-#         user_msg += "\n".join(ctx_lines) + "\n"
-
-#         user_msg += (
-#             f"[CURRENT QUESTION]: {question} \n"
-#             "[TASK]: You are a QA assistant for open-ended questions.\n"
-#             f"- Give a short, direct answer in 2–3 sentences."
-#             "- Do NOT restrict to yes/no.\n"
-#             "[FORMAT]: Write complete sentences (not a single word)."
-#             "Avoid starting with just 'Yes.' or 'No.'; if the question is yes/no-style, state the conclusion AND 1–2 short reasons.\n"
-#             "[ANSWER]: "
-#         )
-
-#         print(user_msg)
-#         return system_msg, user_msg
-
-#     @torch.no_grad()
-#     def _generate(self, system_msg: str, user_msg: str) -> str:
-#         if self._use_chat_template:
-#             messages = [
-#                 {"role": "system", "content": system_msg},
-#                 {"role": "user",   "content": user_msg},
-#             ]
-#             prompt = self.tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
-#         else:
-#             prompt = f"<|system|>\n{system_msg}\n<|user|>\n{user_msg}\n<|assistant|>\n"
-
-#         inputs = self.tokenizer(prompt, return_tensors="pt").to(self.model.device)
-#         outputs = self.model.generate(
-#             **inputs,
-#             max_new_tokens=self.max_new_tokens,
-#             do_sample=(self.temperature > 0),
-#             temperature=self.temperature,
-#             top_p=self.top_p,
-#             pad_token_id=self.tokenizer.eos_token_id,
-#         )
-#         text = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
-#         cut = text.rfind(user_msg)
-#         return text[cut + len(user_msg):].strip() if cut != -1 else text.strip()
-    
-#     def strip_think(self, s: str) -> Tuple[str, List[str]]:
-#         """Remove <think>...</think> blocks; also handle dangling <think> at EOF."""
-#         if not s:
-#             return "", []
-#         s_lower = s.lower()
-#         thinks: List[str] = []
-#         spans: List[Tuple[int, int]] = []
-
-#         for m in re.finditer(r"<think>(.*?)</think>", s, flags=re.S | re.I):
-#             thinks.append(m.group(1).strip())
-#             spans.append((m.start(), m.end()))
-
-#         last_open = s_lower.rfind("<think>")
-#         if last_open != -1 and s_lower.find("</think>", last_open) == -1:
-#             content_start = last_open + len("<think>")
-#             dangling_text = s[content_start:].strip()
-#             if dangling_text:
-#                 thinks.append(dangling_text)
-#             spans.append((last_open, len(s)))
-
-#         if spans:
-#             spans.sort()
-#             merged = []
-#             cur_s, cur_e = spans[0]
-#             for st, en in spans[1:]:
-#                 if st <= cur_e:
-#                     cur_e = max(cur_e, en)
-#                 else:
-#                     merged.append((cur_s, cur_e))
-#                     cur_s, cur_e = st, en
-#             merged.append((cur_s, cur_e))
-#         else:
-#             merged = []
-
-#         parts = []
-#         prev = 0
-#         for st, en in merged:
-#             if prev < st:
-#                 parts.append(s[prev:st])
-#             prev = en
-#         if prev < len(s):
-#             parts.append(s[prev:])
-
-#         clean = "".join(parts)
-#         clean = re.sub(r"(?:^|\n)\s*(Okay,|Let’s|Let's|Step by step|Thought:).*", "", clean, flags=re.I)
-#         return clean.strip(), thinks
-        
-#     def take_questions(self, final_merged_json, question, *, max_regen: int = 3):
-#         def _clean_answer(s: str, limit=4):
-#             parts = [p.strip() for p in re.split(r'(?<=[.!?])\s+', s) if p.strip()]
-#             if not parts:
-#                 return ""
-#             return " ".join(parts[:limit])
-
-#         last_thinks: List[str] = []
-#         ans_clean = ""
-
-#         for attempt in range(max_regen):
-#             sys_msg, usr_msg = self._build_prompt(final_merged_json, question)
-#             out = self._generate(sys_msg, usr_msg)
-#             print(f"-------------RAW[{attempt+1}/{max_regen}]:", out)
-
-#             raw = out.strip()
-#             m = re.search(r"\[answers\](.*?)(?:\[thinkings\]|\Z)", raw, flags=re.S | re.I)
-#             ans_region = m.group(1).strip() if m else raw
-
-#             ans_no_think, thinks = self.strip_think(ans_region)
-#             last_thinks = thinks  
-
-#             ans_clean = _clean_answer(ans_no_think, 4).strip()
-#             if ans_clean:
-#                 break
-
-#         if not ans_clean:
-#             ans_clean = "No answer."
-
-#         if self.include_thinkings:
-#             thinks_str = "\n\n".join(t.strip() for t in last_thinks if t.strip())
-#             return ans_clean, thinks_str
-#         else:
-#             return ans_clean
 
 
 # ===============================
@@ -724,6 +645,13 @@ if __name__ == "__main__":
             print(k, ":", v)
 
     print(examples)
+
+    save_pref_examples("pref_examples.json", examples)
+
+    # 2) Later, just load (no retraining / re-scoring)
+    loaded_examples = load_pref_examples("pref_examples.json")
+
+    print(loaded_examples)
 
 #     # --- 3) train DPO policy
 #     policy, ref = train_dpo_2head(examples, input_dim=384)
