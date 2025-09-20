@@ -4,15 +4,16 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import re
 import json, hashlib
-from typing import List, Tuple, Dict, Optional,Iterable
+from typing import List, Tuple, Dict, Optional, Iterable
 import itertools
 from collections import defaultdict
 
 nlp = spacy.load("en_core_web_sm")
 
 SUBJ_DEPS = {"nsubj", "nsubjpass", "csubj", "csubjpass"}
-OBJ_DEPS  = {"dobj", "obj", "attr", "oprd", "dative"}
-NEG_DEPS  = {"neg"}
+OBJ_DEPS = {"dobj", "obj", "attr", "oprd", "dative"}
+NEG_DEPS = {"neg"}
+
 
 # -------- node labels --------
 def noun_phrase_label(head, include_det=False, use_ents=True):
@@ -20,7 +21,7 @@ def noun_phrase_label(head, include_det=False, use_ents=True):
     if use_ents:
         for ent in head.doc.ents:
             if ent.start <= head.i < ent.end and ent.label_ in {
-                "PERSON","ORG","GPE","LOC","PRODUCT","EVENT","WORK_OF_ART","FAC"
+                "PERSON", "ORG", "GPE", "LOC", "PRODUCT", "EVENT", "WORK_OF_ART", "FAC"
             }:
                 return ent.text
 
@@ -41,22 +42,27 @@ def noun_phrase_label(head, include_det=False, use_ents=True):
             label += " of " + noun_phrase_label(p, include_det=include_det)
     return label
 
+
 def verb_label(tok):
     base = tok.lemma_
     prt = []
-    prt  = [c.text for c in tok.children if c.dep_ == "prt"]
+    prt = [c.text for c in tok.children if c.dep_ == "prt"]
     return " ".join([base] + prt)
+
 
 def collect_neg(tok):
     return any(c.dep_ in NEG_DEPS for c in tok.children)
 
+
 def has_copula(tok):
     return any(c.dep_ == "cop" for c in tok.children)
 
+
 def is_passive_auxiliary(tok):
     """Check if token is an auxiliary verb in passive construction"""
-    return (tok.pos_ == "AUX" and tok.lemma_ == "be" and 
+    return (tok.pos_ == "AUX" and tok.lemma_ == "be" and
             any(c.dep_ in {"nsubjpass", "csubjpass"} for c in tok.children))
+
 
 def find_main_verb_in_passive(aux_tok):
     """Find the main verb (participle) in passive construction"""
@@ -64,14 +70,15 @@ def find_main_verb_in_passive(aux_tok):
     for child in aux_tok.children:
         if child.pos_ == "VERB" and child.tag_ in {"VBN"}:  # past participle
             return child
-    
+
     # Alternative: look in the sentence for past participles
     for tok in aux_tok.doc:
-        if (tok.i > aux_tok.i and tok.pos_ == "VERB" and 
-            tok.tag_ == "VBN" and tok.head == aux_tok):
+        if (tok.i > aux_tok.i and tok.pos_ == "VERB" and
+                tok.tag_ == "VBN" and tok.head == aux_tok):
             return tok
-    
+
     return None
+
 
 # -------- robust subject finder --------
 def subjects_for(pred):
@@ -81,7 +88,7 @@ def subjects_for(pred):
         return subs
 
     # 2) borrow from coordinated predicate
-    if pred.dep_ == "conj" and pred.head.pos_ in {"VERB","ADJ","NOUN"}:
+    if pred.dep_ == "conj" and pred.head.pos_ in {"VERB", "ADJ", "NOUN"}:
         sh = [c for c in pred.head.children if c.dep_ in SUBJ_DEPS]
         if sh:
             return sh
@@ -90,7 +97,7 @@ def subjects_for(pred):
     if pred.pos_ == "VERB":
         for tok in pred.doc:
             if (tok.pos_ == "AUX" and tok.lemma_ == "be" and
-                any(c.dep_ in SUBJ_DEPS for c in tok.children)):
+                    any(c.dep_ in SUBJ_DEPS for c in tok.children)):
                 return [c for c in tok.children if c.dep_ in SUBJ_DEPS]
 
     # 4) aux-fronted question: noun_chunks between last AUX and predicate
@@ -107,11 +114,12 @@ def subjects_for(pred):
         return [sorted(chunks, key=lambda nc: nc.end)[-1].root]
 
     # 6) token fallback
-    cands = [t for t in pred.doc if t.i < pred.i and t.pos_ in {"NOUN","PROPN","PRON"}]
+    cands = [t for t in pred.doc if t.i < pred.i and t.pos_ in {"NOUN", "PROPN", "PRON"}]
     if cands:
         return [cands[-1]]
 
     return []
+
 
 # -------- extraction --------
 def sentence_relations(sentence, include_det=False):
@@ -196,13 +204,13 @@ def sentence_relations(sentence, include_det=False):
                 # Get subjects from the auxiliary (passive subjects)
                 subs = [c for c in tok.children if c.dep_ in SUBJ_DEPS]
                 for s in subs:
-                    subj = noun_phrase_label(s if s.pos_ in {"NOUN","PROPN"} else s.head, include_det)
+                    subj = noun_phrase_label(s if s.pos_ in {"NOUN", "PROPN"} else s.head, include_det)
                     triples.add((subj, "subj", v))
 
                 # Handle prepositional phrases attached to main verb
                 for prep in (c for c in main_verb.children if c.dep_ == "prep"):
                     for p in (c for c in prep.children if c.dep_ == "pobj"):
-                        tail = noun_phrase_label(p, include_det) if p.pos_ in {"NOUN","PROPN"} else p.text
+                        tail = noun_phrase_label(p, include_det) if p.pos_ in {"NOUN", "PROPN"} else p.text
                         triples.add((v, f"prep_{prep.text.lower()}", tail))
 
         # Case B: Regular VERB predicates (non-passive)
@@ -265,7 +273,7 @@ def sentence_relations(sentence, include_det=False):
         elif tok.pos_ == "NOUN" and has_copula(tok):
             subs = subjects_for(tok)
             for s in subs:
-                subj = noun_phrase_label(s if s.pos_ in {"NOUN","PROPN"} else s.head, include_det)
+                subj = noun_phrase_label(s if s.pos_ in {"NOUN", "PROPN"} else s.head, include_det)
                 pred = noun_phrase_label(tok, include_det)
                 triples.add((subj, "isa", pred))
 
@@ -274,15 +282,16 @@ def sentence_relations(sentence, include_det=False):
             v = tok.lemma_
             subs = subjects_for(tok)
             for s in subs:
-                subj = noun_phrase_label(s if s.pos_ in {"NOUN","PROPN"} else s.head, include_det)
+                subj = noun_phrase_label(s if s.pos_ in {"NOUN", "PROPN"} else s.head, include_det)
                 triples.add((subj, "subj", v))
             # keep prepositional modifiers anchored to the adjective
             for prep in (c for c in tok.children if c.dep_ == "prep"):
                 for p in (c for c in prep.children if c.dep_ == "pobj"):
-                    tail = noun_phrase_label(p, include_det) if p.pos_ in {"NOUN","PROPN"} else p.text
+                    tail = noun_phrase_label(p, include_det) if p.pos_ in {"NOUN", "PROPN"} else p.text
                     triples.add((v, f"prep_{prep.text.lower()}", tail))
 
     return triples
+
 
 def extract_semantic_subject(token, include_det=False):
     """
@@ -366,6 +375,36 @@ def extract_core_noun_types(token, include_det=False):
             results.append(cleaned)
 
     return results if results else [token.text]
+
+def handle_subordinate_verb(tok, parent_subj, triples, include_det=False):
+    v = verb_label(tok)
+    if collect_neg(tok):
+        v = f"not {v}"
+
+    # Subject: either explicit or inherited
+    subs = subjects_for(tok)
+    if not subs and parent_subj:
+        subs = [parent_subj]
+
+    for s in subs:
+        subj = noun_phrase_label(s if s.pos_ in {"NOUN", "PROPN"} else s.head, include_det)
+        triples.add((subj, "subj", v))
+
+    # Objects
+    for o in (c for c in tok.children if c.dep_ in OBJ_DEPS):
+        tail = noun_phrase_label(o, include_det) if o.pos_ in {"NOUN", "PROPN"} else o.text
+        triples.add((v, "obj", tail))
+
+    # Prepositions
+    for prep in (c for c in tok.children if c.dep_ == "prep"):
+        for p in (c for c in prep.children if c.dep_ == "pobj"):
+            tail = noun_phrase_label(p, include_det) if p.pos_ in {"NOUN", "PROPN"} else p.text
+            triples.add((v, f"prep_{prep.text.lower()}", tail))
+
+    # Recurse into its own subordinate clauses
+    for child in tok.children:
+        if child.pos_ == "VERB" and child.dep_ in {"acl", "advcl", "xcomp"}:
+            handle_subordinate_verb(child, subj, triples, include_det)
 
 
 def statement_relations(sentence, include_det=False):
@@ -464,6 +503,13 @@ def statement_relations(sentence, include_det=False):
             # Get adverbial complements
             for adv in (c for c in tok.children if c.dep_ == "advmod"):
                 triples.add((v, "manner", adv.text))
+
+            # 🔑 Handle subordinate verbs (acl, advcl, xcomp)
+            parent_subj = subs[0] if subs else None
+            for child in tok.children:
+                if child.pos_ == "VERB" and child.dep_ in {"acl", "advcl", "xcomp"}:
+                    handle_subordinate_verb(child, parent_subj, triples, include_det)
+
 
         # Case C: Copular constructions with "be" - nominal predicates
         elif tok.pos_ == "AUX" and tok.lemma_ == "be" and tok.dep_ == "ROOT":
@@ -584,6 +630,32 @@ def statement_relations(sentence, include_det=False):
                     if pobj:
                         triples.add((appos, "isa", noun_phrase_label(pobj, include_det)))
 
+        # Case H: Handle subordinate clauses (acl, advcl, xcomp)
+        elif tok.pos_ == "VERB" and tok.dep_ in {"acl", "advcl", "xcomp"}:
+            v = verb_label(tok)
+            if collect_neg(tok):
+                v = f"not {v}"
+
+            # Subjects: if none explicitly, inherit from head noun/verb
+            subs = subjects_for(tok)
+            if not subs and tok.head:
+                subs = [tok.head]
+
+            for s in subs:
+                subj = noun_phrase_label(s if s.pos_ in {"NOUN", "PROPN"} else s.head, include_det)
+                triples.add((subj, "subj", v))
+
+            # Objects
+            for o in (c for c in tok.children if c.dep_ in OBJ_DEPS):
+                tail = noun_phrase_label(o, include_det) if o.pos_ in {"NOUN", "PROPN"} else o.text
+                triples.add((v, "obj", tail))
+
+            # Prepositional modifiers
+            for prep in (c for c in tok.children if c.dep_ == "prep"):
+                for p in (c for c in prep.children if c.dep_ == "pobj"):
+                    tail = noun_phrase_label(p, include_det) if p.pos_ in {"NOUN", "PROPN"} else p.text
+                    triples.add((v, f"prep_{prep.text.lower()}", tail))
+
     return triples
 
 
@@ -591,22 +663,25 @@ def statement_relations(sentence, include_det=False):
 def build_graph(triples):
     G = nx.DiGraph()
     for h, r, t in triples:
-        G.add_node(h); G.add_node(t)
+        G.add_node(h);
+        G.add_node(t)
         G.add_edge(h, t, rel=r)
     return G
 
+
 def plot_graph(G, title=None):
     pos = nx.spring_layout(G, seed=42)
-    plt.figure(figsize=(8,6))
+    plt.figure(figsize=(8, 6))
     nx.draw(G, pos, with_labels=True, node_color="lightblue",
             node_size=2400, font_size=10, font_weight="bold", arrows=True, arrowsize=18)
-    nx.draw_networkx_edge_labels(G, pos, edge_labels=nx.get_edge_attributes(G,'rel'), font_size=9)
+    nx.draw_networkx_edge_labels(G, pos, edge_labels=nx.get_edge_attributes(G, 'rel'), font_size=9)
     if title: plt.title(title)
-    plt.tight_layout(); plt.show()
+    plt.tight_layout();
+    plt.show()
 
 
 # ---------- ) JSON with ID + Dictionary ----------
-def triples_to_id_dictionary(triples,tasks = 'answer the questions'):
+def triples_to_id_dictionary(triples, tasks='answer the questions'):
     """
     triples: set or list of (head, rel, tail)
     Return:
@@ -639,7 +714,7 @@ def triples_to_id_dictionary(triples,tasks = 'answer the questions'):
         t_id = _eid(t)
         edges.append([h_id, r_id, t_id])
 
-    return {"entity_dict": entity_dict, "relation_dict": relation_dict, "edges": edges,"tasks":tasks}
+    return {"entity_dict": entity_dict, "relation_dict": relation_dict, "edges": edges, "tasks": tasks}
 
 
 # ---------- Utility ----------
@@ -650,10 +725,9 @@ def json_dump_str(obj, indent=0):
     return json.dumps(obj, ensure_ascii=False, separators=(",", ":"))
 
 
-
 # ---------- ) Codebook ----------
 
-def all_chains_no_subchains(edges,use_full_edges = True):
+def all_chains_no_subchains(edges, use_full_edges=True):
     """
     Generate all simple chains where edges[i].tail == edges[j].head for consecutive edges,
     then remove any chain that appears contiguously inside a longer chain (order matters).
@@ -681,11 +755,12 @@ def all_chains_no_subchains(edges,use_full_edges = True):
 
     # prune paths that are contiguous subchains of longer ones
     paths = list(all_paths)
+
     def is_contig_subseq(a, b):
         if len(a) >= len(b): return False
         la = len(a)
-        for i in range(len(b)-la+1):
-            if b[i:i+la] == a:
+        for i in range(len(b) - la + 1):
+            if b[i:i + la] == a:
                 return True
         return False
 
@@ -696,16 +771,17 @@ def all_chains_no_subchains(edges,use_full_edges = True):
 
     # map back to triples
     if use_full_edges:
-      keep_chains = [[edges[i] for i in tup] for tup in keep]
+        keep_chains = [[edges[i] for i in tup] for tup in keep]
     else:
-      keep_chains = [[i for i in tup] for tup in keep]
+        keep_chains = [[i for i in tup] for tup in keep]
     # (optional) sort by length desc then lexicographically by indices for stable output
     keep_chains.sort(key=lambda c: (-len(c), c))
     return keep_chains
 
+
 def build_codebook_from_triples(
-    triples: List[Tuple[str, str, str]],
-    rule: str = "Reply with a Y/N/? string in order only; no explanations."
+        triples: List[Tuple[str, str, str]],
+        rule: str = "Reply with a Y/N/? string in order only; no explanations."
 ):
     ent2id: Dict[str, int] = {}
     rel2id: Dict[str, int] = {}
@@ -727,7 +803,9 @@ def build_codebook_from_triples(
 
     # Touch all nodes/relations to populate dictionaries
     for h, r, t in triples:
-        _eid(h); _rid(r); _eid(t)
+        _eid(h);
+        _rid(r);
+        _eid(t)
 
     # Stable short id for this codebook
     sid_src = json_dump_str({"e": entities, "r": relations})
@@ -735,64 +813,71 @@ def build_codebook_from_triples(
 
     codebook = {
         "sid": sid,
-        "e": entities,   # entity dictionary 
-        "r": relations,  # relation dictionary 
+        "e": entities,  # entity dictionary
+        "r": relations,  # relation dictionary
         "rule": rule
     }
     return codebook, ent2id, rel2id
 
+
 # ---------- Edges from triples using the codebook ----------
 def edges_from_triples(
-    triples: List[Tuple[str, str, str]],
-    ent2id: Dict[str, int],
-    rel2id: Dict[str, int],
+        triples: List[Tuple[str, str, str]],
+        ent2id: Dict[str, int],
+        rel2id: Dict[str, int],
 ) -> List[List[int]]:
     g = []
     for h, r, t in triples:
         g.append([ent2id[h], rel2id[r], ent2id[t]])
     return g
 
+
 # ---------- Message builders ----------
 def make_codebook_message(codebook: dict) -> str:
     # Send once at session start (or when the codebook changes)
     return json_dump_str(codebook)
 
-def make_edges_message(sid: str, edges: List[List[int]],use_full_edges:bool = True) -> str:
+
+def make_edges_message(sid: str, edges: List[List[int]], use_full_edges: bool = True) -> str:
     # Send repeatedly; tiny payload (ids only)
     if use_full_edges:
-        json_msg = json_dump_str({"sid": sid,'questions([e,r,e])':all_chains_no_subchains(edges,use_full_edges)})
+        json_msg = json_dump_str({"sid": sid, 'questions([e,r,e])': all_chains_no_subchains(edges, use_full_edges)})
     else:
-        json_msg = json_dump_str({"sid": sid, "edges([e,r,e])": edges,'questions(edges[i])':all_chains_no_subchains(edges,use_full_edges)})
+        json_msg = json_dump_str({"sid": sid, "edges([e,r,e])": edges,
+                                  'questions(edges[i])': all_chains_no_subchains(edges, use_full_edges)})
 
     return json_msg
 
+
 # ---------- Deltas for new entities/relations (no aliasing) ----------
 def compute_deltas_for_new_triples(
-    new_triples: List[Tuple[str, str, str]],
-    ent2id: Dict[str, int],
-    rel2id: Dict[str, int],
+        new_triples: List[Tuple[str, str, str]],
+        ent2id: Dict[str, int],
+        rel2id: Dict[str, int],
 ):
     add_e: List[str] = []
     add_r: List[str] = []
     for h, r, t in new_triples:
         if h not in ent2id:
-            ent2id[h] = len(ent2id); add_e.append(h)
+            ent2id[h] = len(ent2id);
+            add_e.append(h)
         if r not in rel2id:
-            rel2id[r] = len(rel2id); add_r.append(r)
+            rel2id[r] = len(rel2id);
+            add_r.append(r)
         if t not in ent2id:
-            ent2id[t] = len(ent2id); add_e.append(t)
+            ent2id[t] = len(ent2id);
+            add_e.append(t)
     delta = {}
     if add_e: delta["add_e"] = add_e
     if add_r: delta["add_r"] = add_r
     return delta
+
 
 def make_delta_message(sid: str, delta: dict) -> Optional[str]:
     if not delta: return None
     out = {"sid": sid}
     out.update(delta)
     return json_dump_str(out)
-
-
 
 
 # ---------------- tests ----------------
@@ -808,14 +893,17 @@ if __name__ == "__main__":
         # "Is the Great Wall an UNESCO World Heritage Site?",
         # "Does the Great Wall stretch across the northern China?",
         # "Are millions of tourists visiting the Great Wall annually?",
-        "The Great Wall is visible from low Earth orbit.",
-        # "Is the Great Wall of China located in China? Does the Great Wall span over 13000 miles? Was the Great Wall built during the Ming Dynasty? Can the Great Wall be seen from space? Is the Great Wall made of stone and brick?"
-        "Gold is heavier than silver.",
-        "Basal cell skin cancer, also known as basal cell carcinoma (BCC), is the most common type of skin cancer.",
-        "About 3 million cases of basal cell skin cancer are diagnosed every year in the United States.",
+        # "The Great Wall is visible from low Earth orbit.",
+        # # "Is the Great Wall of China located in China? Does the Great Wall span over 13000 miles? Was the Great Wall built during the Ming Dynasty? Can the Great Wall be seen from space? Is the Great Wall made of stone and brick?"
+        # "Gold is heavier than silver.",
+        # "Basal cell skin cancer, also known as basal cell carcinoma (BCC), is the most common type of skin cancer.",
+        # "About 3 million cases of basal cell skin cancer are diagnosed every year in the United States.",
         "The good news is it can be cured in most cases.",
         "Treatment usually involves surgery to remove the cancer.",
         "If caught early, it is easily treatable and curable.",
+
+        # "Assume the role of a genetic counselor.",
+        # "Prepare a summary for a patient newly found to have a BRCA1 mutation, explaining the implications for breast cancer risk, recommended surveillance, and potential preventive strategies."
     ]
 
     for s in questions:
@@ -838,7 +926,5 @@ if __name__ == "__main__":
 
         print(triples)
         plot_graph(G, s)
-
-
 
 # python py_files/graph_generator/generator_with_rules_v3.py
