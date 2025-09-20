@@ -6,6 +6,7 @@ import nest_asyncio
 import argparse
 import json
 from typing import Dict, List
+import time, torch
 
 from lightrag import LightRAG, QueryParam
 from lightrag.llm.openai import openai_complete_if_cache
@@ -107,10 +108,15 @@ async def initialize_rag(
     elif mode == "ollama":
         ollama_host = llm_base_url or "http://localhost:11434"
 
-        if embed_model_name in ("nomic-embed-text",):
+        name = embed_model_name.lower()
+        if ("minilm" in name) or ("all-minilm-l6-v2" in name):
+            embedding_dim = 384
+        elif "nomic-embed-text" in name:
             embedding_dim = 768
-        else:
+        elif ("bge-m3" in name) or ("mxbai-embed-large" in name):
             embedding_dim = 1024
+        else:
+            embedding_dim = 768
 
         embedding_func = EmbeddingFunc(
             embedding_dim=embedding_dim,
@@ -128,9 +134,26 @@ async def initialize_rag(
     else:
         raise ValueError(f"Unsupported mode: {mode}. Use 'API' or 'ollama'.")
 
+    timing_state = {
+        "sum_kw_sec": 0.0,   
+        "sum_gen_sec": 0.0,  
+    }
+
+    async def timed_llm_model_func(*args, **kwargs):
+        is_kw = bool(kwargs.get("keyword_extraction", False))
+        t_start = time.time()
+        try:
+            return await llm_model_func_input(*args, **kwargs)
+        finally:
+            dt = time.time() - t_start
+            if is_kw:
+                timing_state["sum_kw_sec"] += dt
+            else:
+                timing_state["sum_gen_sec"] += dt
+
     rag = LightRAG(
         working_dir=working_dir,
-        llm_model_func=llm_model_func_input,  
+        llm_model_func=timed_llm_model_func,  
         llm_model_name=model_name,
         llm_model_max_async=4,
         chunk_token_size=1200,
@@ -141,7 +164,9 @@ async def initialize_rag(
 
     await rag.initialize_storages()
     await initialize_pipeline_status()
-    return rag
+
+    return rag, timing_state
+
 
 
 async def process_corpus(
@@ -155,13 +180,15 @@ async def process_corpus(
     llm_api_key: str,
     questions: List[dict],
     sample: int,
-    retrieve_topk: int
+    retrieve_topk: int,
+    q_start,
+    q_end
 ):
     """Process a single corpus: index it and answer its questions"""
     logging.info(f"📚 Processing corpus: {corpus_name}")
     
     # Initialize RAG for this corpus
-    rag = await initialize_rag(
+    rag, timing_state = await initialize_rag(
         base_dir=base_dir,
         source=corpus_name,
         mode=mode,
@@ -170,6 +197,7 @@ async def process_corpus(
         llm_base_url=llm_base_url,
         llm_api_key=llm_api_key
     )
+
     
     # Index the corpus content
     rag.insert(context)
@@ -184,6 +212,11 @@ async def process_corpus(
     # Sample questions if requested
     if sample and sample < len(corpus_questions):
         corpus_questions = corpus_questions[:sample]
+
+    if q_start is not None or q_end is not None:
+        start_idx = (q_start - 1) if q_start else 0
+        end_idx = q_end if q_end else len(corpus_questions)
+        corpus_questions = corpus_questions[start_idx:end_idx]
     
     logging.info(f"🔍 Found {len(corpus_questions)} questions for {corpus_name}")
     
@@ -197,12 +230,14 @@ async def process_corpus(
     query_type = 'hybrid'
     
     for q in tqdm(corpus_questions, desc=f"Answering questions for {corpus_name}"):
-        # Prepare query parameters
-        query_param = QueryParam(
-            mode=query_type,
-            top_k=retrieve_topk,
-        )
+        query_param = QueryParam(mode=query_type, top_k=retrieve_topk)
 
+        # 重置本题的 LLM 时间累积
+        timing_state["sum_kw_sec"] = 0.0
+        timing_state["sum_gen_sec"] = 0.0
+
+        # 总耗时起止
+        t_total_start = time.time()
         result = rag.query(
             q["question"],
             param=query_param,
@@ -210,6 +245,7 @@ async def process_corpus(
         )
         if asyncio.iscoroutine(result):
             result = await result
+        t_total_end = time.time()
 
         context = ""
         if isinstance(result, tuple):
@@ -218,11 +254,52 @@ async def process_corpus(
                 context = result[1] if result[1] is not None else ""
         else:
             response = result
-
         predicted_answer = str(response)
 
+        # === 指标计算 ===
+        total_latency = max(0.0, t_total_end - t_total_start)
+        gen_latency_sec = float(timing_state.get("sum_gen_sec", 0.0))
+        retrieval_latency_sec = max(0.0, total_latency - gen_latency_sec)
 
-        # Collect results
+        approx_prompt_chars = len(SYSTEM_PROMPT) + len(context) + len(q["question"])
+        input_tokens  = approx_prompt_chars / 4.0
+        output_tokens = len(predicted_answer) / 4.0
+
+        peak_vram = 0.0
+        try:
+            import torch
+            if torch.cuda.is_available():
+                peak_vram = float(torch.cuda.max_memory_allocated() / (1024 ** 2))
+        except Exception:
+            peak_vram = 0.0
+
+        device = "ollama" if mode.lower() == "ollama" else "api"
+        dtype = "unknown"
+        temperature = None
+        top_p = None
+        max_new_tokens = None
+
+        gen_info = {
+            "input_tokens": float(input_tokens),
+            "output_tokens": float(output_tokens),
+            "total_tokens": float(input_tokens + output_tokens),
+            "latency_sec": float(total_latency),
+            "gen_latency_sec": float(gen_latency_sec),
+            "retrieval_latency_sec": float(retrieval_latency_sec),  
+            "peak_vram_MiB": float(peak_vram),
+            "prompt_chars": float(approx_prompt_chars),
+            "throughput_tok_per_s": float((output_tokens / gen_latency_sec) if gen_latency_sec > 0 else 0.0),
+            "prompt_tok_per_s": float((input_tokens / retrieval_latency_sec) if retrieval_latency_sec > 0 else 0.0),
+            "device": device,
+            "dtype": str(dtype),
+            "model_name": model_name,
+            "temperature": float(temperature) if temperature is not None else None,
+            "top_p": float(top_p) if top_p is not None else None,
+            "max_new_tokens": int(max_new_tokens) if max_new_tokens is not None else None,
+            "timestamp_start": t_total_start,
+            "timestamp_end": t_total_end,
+        }
+
         results.append({
             "id": q["id"],
             "question": q["question"],
@@ -232,8 +309,10 @@ async def process_corpus(
             "question_type": q["question_type"],
             "generated_answer": predicted_answer,
             "ground_truth": q.get("answer"),
-
+            "gen_info": gen_info,
         })
+
+
     
     # Save results
     with open(output_path, "w", encoding="utf-8") as f:
@@ -259,6 +338,11 @@ def main():
     # Core arguments
     parser.add_argument("--subset", required=True, choices=["medical", "novel"], 
                         help="Subset to process (medical or novel)")
+    parser.add_argument("--q_start", type=int, default=None,
+                    help="Start index of questions (1-based, inclusive)")
+    parser.add_argument("--q_end", type=int, default=None,
+                    help="End index of questions (1-based, inclusive)")
+
     parser.add_argument("--base_dir", default="./lightrag_workspace", help="Base working directory")
     
     # Model configuration
@@ -337,7 +421,9 @@ def main():
                 llm_api_key=api_key,
                 questions=grouped_questions,
                 sample=args.sample,
-                retrieve_topk=args.retrieve_topk
+                retrieve_topk=args.retrieve_topk,
+                q_start=args.q_start,
+                q_end=args.q_end
             )
         )
 
