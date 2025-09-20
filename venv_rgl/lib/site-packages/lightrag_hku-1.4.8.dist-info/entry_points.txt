@@ -1,0 +1,3 @@
+[console_scripts]
+lightrag-gunicorn = lightrag.api.run_with_gunicorn:main
+lightrag-server = lightrag.api.lightrag_server:main
