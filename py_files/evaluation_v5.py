@@ -13,6 +13,7 @@ import asyncio
 import os, json, re, random
 from pathlib import Path
 from typing import List, Dict, Tuple, Optional
+import json
 
 import numpy   as np
 import torch
@@ -40,9 +41,9 @@ REPO_ID      = "GraphRAG-Bench/GraphRAG-Bench"
 CORPUS_FILE  = "Datasets/Corpus/medical.json"
 QUEST_FILE   = "Datasets/Questions/medical_questions.json"
 
-SEED_N       = 5    # first 30 rows → bootstrap + DPO train
-TEST_N       = 5     # next 20 rows  → evaluation
-TOPK_CTX     = 2
+SEED_N       = 20    # first 30 rows → bootstrap + DPO train
+TEST_N       = 30     # next 20 rows  → evaluation
+TOPK_CTX     = 5
 
 # ---------------------------------------------------------------------
 # 1) Initialise embeddings & LLM
@@ -62,9 +63,23 @@ phi_llm  = Phi4MiniReasoningLLM(
     top_p=0.9,
 )
 
-import json
-with open("meta_codebook.json", "r") as f:
-    ini = json.load(f)
+
+
+ini_meta_json = Path("meta_codebook.json")
+pre_loaded_meta = False
+
+if ini_meta_json.is_file():
+    try:
+        with ini_meta_json.open("r", encoding="utf-8") as f:
+            ini = json.load(f)
+            pre_loaded_meta = True
+    except json.JSONDecodeError:
+        print("[warn] meta_codebook.json is not valid JSON; starting fresh.")
+        ini = {}
+        pre_loaded_meta = False
+else:
+    ini = {}
+
 
 cr = CompressRag_rl(
     ini_meta_codebook = ini,
@@ -93,35 +108,36 @@ test_questions = all_questions[SEED_N : SEED_N+TEST_N]
 # ---------------------------------------------------------------------
 # 3) Pre-load corpus as facts into CR
 # ---------------------------------------------------------------------
-facts_json_paths = 'medical_sub.json'
+# only load if we do not have ini_meta 
+if not pre_loaded_meta:
+    # corpus file is the facts
+    facts_cb = cr.load_and_merge_facts(CORPUS_FILE, chunk_chars=100, overlap=30)
+    cr._facts_preloaded = True
+    cr.top_m = 2          # sentence-embedding rerank top-m
 
-facts_cb = cr.load_and_merge_facts(facts_json_paths, chunk_chars=100, overlap=30)
-cr._facts_preloaded = True
-cr.top_m = 2          # sentence-embedding rerank top-m
+    cr.meta_codebook = merging_codebook(
+        cr.meta_codebook, facts_cb,
+        type='facts', word_emb=cr.word_emb, use_thinkings=True
+    )
+    print(cr.meta_codebook)
 
-cr.meta_codebook = merging_codebook(
-    cr.meta_codebook, facts_cb,
-    type='facts', word_emb=cr.word_emb, use_thinkings=True
-)
-print(cr.meta_codebook)
+    def make_json_safe(obj):
+        """Recursively convert numpy arrays into lists."""
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        if isinstance(obj, dict):
+            return {k: make_json_safe(v) for k, v in obj.items()}
+        if isinstance(obj, list):
+            return [make_json_safe(v) for v in obj]
+        return obj
 
-def make_json_safe(obj):
-    """Recursively convert numpy arrays into lists."""
-    if isinstance(obj, np.ndarray):
-        return obj.tolist()
-    if isinstance(obj, dict):
-        return {k: make_json_safe(v) for k, v in obj.items()}
-    if isinstance(obj, list):
-        return [make_json_safe(v) for v in obj]
-    return obj
-
-with open("meta_codebook.json", "w") as f:
-    json.dump(make_json_safe(cr.meta_codebook), f, indent=2)
+    with open("meta_codebook.json", "w") as f:
+        json.dump(make_json_safe(cr.meta_codebook), f, indent=2)
 
 
-print(f"[DEBUG] after facts-merge: |E|={len(cr.meta_codebook['e'])} "
-      f"|R|={len(cr.meta_codebook['r'])} "
-      f"|edges|={len(cr.meta_codebook['edge_matrix'])}")
+    print(f"[DEBUG] after facts-merge: |E|={len(cr.meta_codebook['e'])} "
+        f"|R|={len(cr.meta_codebook['r'])} "
+        f"|edges|={len(cr.meta_codebook['edge_matrix'])}")
 
 # ---------------------------------------------------------------------
 # 4) Build DPO preference dataset on seed Q-A pairs
