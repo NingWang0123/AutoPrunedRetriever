@@ -18,8 +18,7 @@ from sklearn.metrics import silhouette_score
 from optimize_combine_ent import combine_ents_auto, combine_ents_ann_knn, coarse_combine
 from copy import deepcopy
 from textwrap import dedent
-from graph_generator.generator_with_rules_v3 import statement_relations
-from graph_generator.generator_latest_questions import sentence_relations
+from graph_generator.rebel import triplet_parser
 import time
 
 
@@ -617,7 +616,7 @@ def make_edges_message(sid: str, edges: List[List[int]],use_full_edges:bool = Tr
 
 
 def get_js_msgs_use_triples(question_prompt):
-    triples = sentence_relations(question_prompt, include_det=False)
+    triples = triplet_parser(question_prompt)
     codebook, ent2id, rel2id = build_codebook_from_triples(triples)
     msg1 = make_codebook_message(codebook)  # send once
 
@@ -628,7 +627,7 @@ def get_js_msgs_use_triples(question_prompt):
 
 
 def get_merged_message(question_prompt,use_full_edges = True):
-    triples = sentence_relations(question_prompt, include_det=False)
+    triples = triplet_parser(question_prompt)
 
     codebook, ent2id, rel2id = build_codebook_from_triples(triples)
 
@@ -748,9 +747,10 @@ def get_code_book(prompt, type='questions', rule="Answer questions.", factparser
         raise ValueError(f"type must be one of {valid_types}, got: {type}")
 
     if factparser:
-        triples = statement_relations(prompt, include_det=False)
+        triples = triplet_parser(prompt)
+        
     else:
-        triples = sentence_relations(prompt, include_det=False)
+        triples = triplet_parser(prompt)
 
     codebook, ent2id, rel2id = build_codebook_from_triples(triples, rule)
     edges = edges_from_triples(triples, ent2id, rel2id)

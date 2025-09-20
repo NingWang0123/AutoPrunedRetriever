@@ -18,8 +18,7 @@ from sklearn.metrics import silhouette_score
 from optimize_combine_ent import combine_ents_auto, combine_ents_ann_knn, coarse_combine
 from copy import deepcopy
 from textwrap import dedent
-from graph_generator.generator_with_rules_v3 import statement_relations
-from graph_generator.generator_latest_questions import sentence_relations
+from graph_generator.rebel import triplet_parser
 import time
 
 
@@ -1001,7 +1000,9 @@ def make_edges_message(sid: str, edges: List[List[int]],use_full_edges:bool = Tr
 
 
 def get_js_msgs_use_triples(question_prompt):
-    triples = sentence_relations(question_prompt, include_det=False)
+    print("before parser questions:",question_prompt)
+    triples = triplet_parser(question_prompt)
+    print("after parser questions:",triples)
     codebook, ent2id, rel2id = build_codebook_from_triples(triples)
     msg1 = make_codebook_message(codebook)  # send once
 
@@ -1012,7 +1013,7 @@ def get_js_msgs_use_triples(question_prompt):
 
 
 def get_merged_message(question_prompt,use_full_edges = True):
-    triples = sentence_relations(question_prompt, include_det=False)
+    triples = triplet_parser(question_prompt)
 
     codebook, ent2id, rel2id = build_codebook_from_triples(triples)
 
@@ -1132,9 +1133,9 @@ def get_code_book(prompt, type='questions', rule="Answer questions.", factparser
         raise ValueError(f"type must be one of {valid_types}, got: {type}")
 
     if factparser:
-        triples = statement_relations(prompt, include_det=False)
+        triples = triplet_parser(prompt)
     else:
-        triples = sentence_relations(prompt, include_det=False)
+        triples = triplet_parser(prompt)
 
     codebook, ent2id, rel2id = build_codebook_from_triples(triples, rule)
     edges = edges_from_triples(triples, ent2id, rel2id)
@@ -3032,15 +3033,6 @@ rule_edge_exact = dedent("""\
     - start thinking with([[e,r,e], ...]): reasoning steps
     - facts([[e,r,e], ...]): fact triples
 """)
-                         
-rule_words = dedent("""\
-    ---Knowledge Base---
-    [JSON format]
-    - questions(words): question triples 
-    - given knowledge(words): prior answer triples
-    - start thinking with(words): reasoning triples
-    - facts(words): fact triples
-""")
 
 def _approx_token_len(obj: Any) -> int:
     """
@@ -3077,35 +3069,7 @@ def _drop_keys(d: Dict[str, Any], matchers) -> Dict[str, Any]:
             out[k] = v
     return out
 
-
-# decode ere or edge into words
-def decode_into_words_for_ere_and_edge(final_merged_json: Dict[str, Any],format : str = 'edge',choices = []):
-  final_merged_json_copy = deepcopy(final_merged_json)
-
-  if format == 'edge':
-    for choice in choices:
-      if choice in final_merged_json_copy:
-        trans_formed_choice = decode_questions(final_merged_json_copy[choice], final_merged_json_copy, fmt='words')
-        final_merged_json_copy[choice.split("(")[0]+'words'] = trans_formed_choice
-        final_merged_json_copy.pop(choice)
-      
-
-  elif format == 'ere':
-    def _triples_to_words(triples, cb):
-      E, R = cb["e"], cb["r"]
-      return [[E[h], R[r], E[t]] for (h, r, t) in triples]
-
-    for choice in choices:
-      trans_formed_choice = []
-      if choice in final_merged_json_copy:
-        for triples in final_merged_json_copy[choice]:
-          trans_formed_choice.append(_triples_to_words(triples, final_merged_json_copy))
-        final_merged_json_copy[choice.split("(")[0]+'words'] = trans_formed_choice
-        final_merged_json_copy.pop(choice)
-
-  return final_merged_json_copy
-
-def slice_for_final_merged_json(final_merged_json: Dict[str, Any],use_word_format : bool = True) -> Dict[str, Any]:
+def slice_for_final_merged_json(final_merged_json: Dict[str, Any]) -> Dict[str, Any]:
     """
     Produce a sliced view of `final_merged_json`:
 
@@ -3130,7 +3094,6 @@ def slice_for_final_merged_json(final_merged_json: Dict[str, Any],use_word_forma
         'questions([[e,r,e], ...])',
         'given knowledge([[e,r,e], ...])',
         'facts([[e,r,e], ...])',
-        'start thinking with([[e,r,e], ...])'
     ]
     # Keys that correspond to per-edge indexed content (edges[i])
 
@@ -3139,14 +3102,6 @@ def slice_for_final_merged_json(final_merged_json: Dict[str, Any],use_word_forma
         'questions(edges[i])',
         'given knowledge(edges[i])',
         'facts(edges[i])',
-        'start thinking with(edges[i])'
-    ]
-
-    edge_feats = [
-        'questions(edges[i])',
-        'given knowledge(edges[i])',
-        'facts(edges[i])',
-        'start thinking with(edges[i])'
     ]
 
     # check if ready to build which one (some will include missing vals, we will choose the one more compelted)
@@ -3161,59 +3116,20 @@ def slice_for_final_merged_json(final_merged_json: Dict[str, Any],use_word_forma
         features_contain_per_edge_exact += 1
 
     # missing edge matrix cannot do edges[i] format
-    # ere format
     if 'edge_matrix' not in data:
       data['rule'] = rule_edge_exact
-      final_format = _drop_keys(data, per_edge_exact)
 
-      # get word format and transformed feats
-      if use_word_format:
-        word_format,all_transformed_feats = decode_into_words_for_ere_and_edge(final_format,format = 'ere',choices =ere_exact )
+      return _drop_keys(data, per_edge_exact)
 
-        # check improvement in tokens
-        word_format['rule']  = rule_words
-        if _approx_token_len(word_format) < _approx_token_len(final_format):
-
-          return word_format
-
-      return final_format
-
-    # ere format
-    # ere format does not need edge_matrix
     elif features_contain_ere_exact > features_contain_per_edge_exact:
       data['rule'] = rule_edge_exact
-      final_format = _drop_keys(data, per_edge_exact)
-      final_format.pop('edge_matrix')
 
-      if use_word_format:
-        word_format,all_transformed_feats = decode_into_words_for_ere_and_edge(final_format,format = 'ere',choices =ere_exact )
+      return _drop_keys(data, per_edge_exact)
 
-        # check improvement in tokens
-        word_format['rule']  = rule_words
-        word_format = {k: word_format[k] for k in all_transformed_feats if k in word_format}
-
-        if _approx_token_len(word_format) < _approx_token_len(final_format):
-
-          return word_format
-
-      return final_format
-
-    # edge format
     elif features_contain_ere_exact > features_contain_per_edge_exact:
       data['rule'] =  rule_ere_exact
-      final_format = _drop_keys(data, rule_ere_exact)
 
-      if use_word_format:
-        word_format,all_transformed_feats = decode_into_words_for_ere_and_edge(final_format,format = 'edge',choices =edge_feats )
-        # check improvement in tokens
-        word_format['rule']  = rule_words
-        word_format = {k: word_format[k] for k in all_transformed_feats if k in word_format}
-
-        if _approx_token_len(word_format) < _approx_token_len(final_format):
-
-          return word_format
-
-      return final_format
+      return _drop_keys(data, ere_exact)
     
     else:
       edge_matrix_view = _drop_keys(data, ere_exact)
@@ -3223,30 +3139,10 @@ def slice_for_final_merged_json(final_merged_json: Dict[str, Any],use_word_forma
       ere_view['rule'] =  rule_edge_exact
 
       if _approx_token_len(edge_matrix_view) <= _approx_token_len(ere_view):
-
-        if use_word_format:
-
-          word_format,all_transformed_feats = decode_into_words_for_ere_and_edge(edge_matrix_view,format = 'edge',choices =edge_feats )
-          word_format['rule']  = rule_words
-          word_format = {k: word_format[k] for k in all_transformed_feats if k in word_format}
-
-          if _approx_token_len(word_format) < _approx_token_len(edge_matrix_view):
-            return word_format
-
         return edge_matrix_view
       else:
-
-        if use_word_format:
-
-          word_format,all_transformed_feats = decode_into_words_for_ere_and_edge(ere_view,format = 'ere',choices =ere_exact)
-          word_format['rule']  = rule_words
-          word_format = {k: word_format[k] for k in all_transformed_feats if k in word_format}
-
-          if _approx_token_len(word_format) < _approx_token_len(ere_view):
-            return word_format
-
         return ere_view
-      
+
 # thinkings extraction choice: keep the overlap(default), not include the thinking, keep the unique thinking
 # answers extraction choice: keep the unique (default), not include the answers, keep the overlap
 # combine ents choice: not combine, combine per round, combine per 3 round
@@ -3266,8 +3162,7 @@ class CompressRag_rl:
         llm = None,
         combine_ents_rounds = 1, # params to control the combine ents
         thinkings_choice = 'not_include',
-        answers_choice = 'overlap',
-        use_word = False
+        answers_choice = 'overlap'
     ):
         """
         thinkings_choice and answers_choice must be one of 'overlap','unique','not_include'
@@ -3281,7 +3176,6 @@ class CompressRag_rl:
         self.meta_codebook = ini_meta_codebook
         self.llm = llm
         self.cur_fact_context = None
-        self.use_word = use_word
 
         # Embeddings
         self.sentence_emb = sentence_emb 
@@ -3345,21 +3239,12 @@ class CompressRag_rl:
             self.include_thinkings = True
             self.llm.include_thinkings = True
 
-            if thinkings_choice == "overlap":
-                self.thinking_extract_function = find_overlapped_thinkings
-            elif thinkings_choice == "unique":
-                self.thinking_extract_function = find_unique_thinkings
-
     def set_include_answers(self):
         if self.answers_choice == "not_include":
             self.include_answers = False
 
         else:
             self.include_answers = True
-            if answers_choice == "overlap":
-                self.answers_extract_function = find_overlapped_answers
-            elif answers_choice == "unique":
-                self.answers_extract_function = find_unique_answers
 
     def set_includings(self):
         self.set_include_thinkings()
@@ -3754,9 +3639,10 @@ class CompressRag_rl:
             final_merged_json = combined_facts_cb if combined_facts_cb else q_json.copy()
             retrieval_time = 0
 
-        q_txt, gk_txt, st_txt, ft_txt = select_best_context_by_keys(final_merged_json)
+        final_merged_json = slice_for_final_merged_json(final_merged_json)
 
-        final_merged_json = slice_for_final_merged_json(final_merged_json,self.use_word)
+
+        q_txt, gk_txt, st_txt, ft_txt = select_best_context_by_keys(final_merged_json)
 
         self.cur_fact_context = ft_txt
 
@@ -3767,6 +3653,7 @@ class CompressRag_rl:
         self.update_meta(new_json_lst, facts_cb=combined_facts_cb)
 
         if self.round % self.combine_ents_rounds == 0:
+            warm_start = "auto"
             if self.round == 1:
                 self.combine_ents_func(mode=warm_start) 
             else:
