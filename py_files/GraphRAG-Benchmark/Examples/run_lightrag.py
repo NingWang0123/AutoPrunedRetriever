@@ -202,18 +202,25 @@ async def process_corpus(
             mode=query_type,
             top_k=retrieve_topk,
         )
-        
-        # Execute query
-        response, context = rag.query(
+
+        result = rag.query(
             q["question"],
             param=query_param,
             system_prompt=SYSTEM_PROMPT
         )
-        
-        # Handle both async and sync responses
-        if asyncio.iscoroutine(response):
-            response = await response
+        if asyncio.iscoroutine(result):
+            result = await result
+
+        context = ""
+        if isinstance(result, tuple):
+            response = result[0]
+            if len(result) >= 2:
+                context = result[1] if result[1] is not None else ""
+        else:
+            response = result
+
         predicted_answer = str(response)
+
 
         # Collect results
         results.append({
