@@ -293,9 +293,6 @@ async def process_corpus(
             "device": device,
             "dtype": str(dtype),
             "model_name": model_name,
-            "temperature": float(temperature) if temperature is not None else None,
-            "top_p": float(top_p) if top_p is not None else None,
-            "max_new_tokens": int(max_new_tokens) if max_new_tokens is not None else None,
             "timestamp_start": t_total_start,
             "timestamp_end": t_total_end,
         }
