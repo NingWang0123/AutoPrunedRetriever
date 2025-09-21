@@ -115,6 +115,8 @@ async def initialize_rag(
             embedding_dim = 768
         elif ("bge-m3" in name) or ("mxbai-embed-large" in name):
             embedding_dim = 1024
+        elif ("bge-large" in name) or ("bge-large-en-v1.5" in name): 
+            embedding_dim = 1024
         else:
             embedding_dim = 768
 
