@@ -3484,8 +3484,18 @@ class CompressRag_rl:
         return new_result,metrics_from_llm,ft_txt
     
 
-# if __name__ == "__main__":
-#     prompt = "Punta Cana is a resort town in the municipality of Higuey, in La Altagracia Province, the eastern most province of the Dominican Republic"
-#     q_json = get_code_book(prompt, type='questions', rule="Answer questions.")
-#     # q_json['q'] - decode_question()
-#     print(q_json)
+from pathlib import Path
+if __name__ == "__main__":
+    prompt = "Punta Cana is a resort town in the municipality of Higuey, in La Altagracia Province, the eastern most province of the Dominican Republic"
+    q_json = get_code_book(prompt, type='questions', rule="Answer questions.")
+    # q_json['q'] - decode_question()
+    print(q_json)
+
+
+    ini_meta_json = Path("meta_codebook.json")
+    pre_loaded_meta = False
+    q_json  =  {'e': ['fair skin', 'BCC'], 'r': ['has effect', 'has cause'], 'rule': 'Answer questions', 'edges([e,r,e])': [[0, 0, 1], [1, 1, 0]], 'questions(edges[i])': [[0, 1], [1, 0]]}
+
+    final_merged = get_json_with_given_knowledge([[6, 7], [7, 6], [6, 7], [7, 6]],ini_meta_json,q_json,decode = True)
+
+    print(final_merged)
