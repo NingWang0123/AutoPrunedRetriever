@@ -3012,7 +3012,9 @@ class CompressRag_rl:
             ctx = (item.get("context") or "").strip()
             if not ctx:
                 continue
+            count = 0
             for ch in _chunk_text(ctx, chunk_chars=chunk_chars, overlap=overlap):
+                count += 1
                 fact_cb = get_code_book(ch, type='facts', rule="Store factual statements.", factparser= True)
                 if combined is None:
                     combined = {
@@ -3046,7 +3048,7 @@ class CompressRag_rl:
                     combined["e"].extend(new_ents)
                     combined["r"].extend(new_rels)
                     combined["edge_matrix"] = new_edge_matrix
-
+        print(f"{json_path} chunk num:", count)
         return combined
 
 
@@ -3364,7 +3366,7 @@ class CompressRag_rl:
                 )
         return combined_facts_cb
 
-    def run_work_flow(self, q_prompt, rule="Answer questions", facts_json_path: str = None, chunk_chars: int = 800, overlap: int = 120, warm_start = "knn"): #coarse
+    def run_work_flow(self, q_prompt, rule="Answer questions", facts_json_path: list = None, chunk_chars: int = 800, overlap: int = 120, warm_start = "knn"): #coarse
 
         #prevent dpo change choice but not change includings
         self.set_includings()
