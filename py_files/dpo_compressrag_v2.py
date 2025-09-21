@@ -30,13 +30,6 @@ AN2I = {v:i for i,v in enumerate(ANSWERS_CHOICES)}
 I2TH = {i:v for v,i in TH2I.items()}
 I2AN = {i:v for v,i in AN2I.items()}
 
-# Combine cadence is scheduled by a bandit over these arms.
-# Semantics: 0 = "never combine", 1 = every round, 3 = every 3 rounds
-# COMBINE_ARMS = [0, 1, 3]
-COMBINE_ARMS = [0, 1]
-
-# Large sentinel to emulate "never combine" without modulo-by-zero in user code
-_NEVER_COMBINE_SENTINEL = 10**9
 
 
 # ===============================
@@ -139,17 +132,6 @@ def temp_ans_th(cr,
             if prev_round is not None: cr.round = prev_round
 
 
-def set_combine_rounds(cr, rounds: int):
-    """
-    Safely set combine cadence on CR to avoid modulo-by-zero in user code.
-    If rounds == 0 => emulate 'never combine' by a huge sentinel.
-    """
-    if rounds == 0:
-        setattr(cr, "combine_ents_rounds", _NEVER_COMBINE_SENTINEL)
-        setattr(cr, "_combine_never", True)
-    else:
-        setattr(cr, "combine_ents_rounds", int(rounds))
-        setattr(cr, "_combine_never", False)
 
 
 # ===============================
@@ -199,15 +181,12 @@ def make_preference_dataset_2head(
     reward_fn: Callable[[str, Optional[str]], float] = None,
     seed: int = 0,
     isolate_state: bool = True,
-    combine_rounds_default: int = 1,
     ANSWERS_CHOICES = ANSWERS_CHOICES,
     THINKINGS_CHOICES = THINKINGS_CHOICES,
 
 ) -> List[PrefExample2]:
     """
     Build DPO pairs for (answers_choice, thinkings_choice) ONLY.
-    Combine cadence is fixed to 'combine_rounds_default' here and will
-    be handled by the contextual bandit at runtime.
     """
     if reward_fn is None:
         reward_fn = default_reward
@@ -219,10 +198,6 @@ def make_preference_dataset_2head(
 
     examples: List[PrefExample2] = []
 
-    # Set combine cadence safely for whole dataset creation
-    prev_combine = getattr(cr, "combine_ents_rounds", None)
-    set_combine_rounds(cr, combine_rounds_default)
-
     for q in questions:
         x = featurize_query(cr, q, dims=feature_dim)
         tried = rng.sample(all_pairs, k=min(per_q_samples, len(all_pairs)))
@@ -231,12 +206,7 @@ def make_preference_dataset_2head(
         for (ai, ti) in tried:
             ans = ANSWERS_CHOICES[ai]
             th  = THINKINGS_CHOICES[ti]
-            # try:
-            #     with temp_ans_th(cr, ans, th, isolate_state=isolate_state):
-            #         pred = cr.run_work_flow(q)
-            #         print(f'pred{pred}')
-            # except Exception:
-            #     continue
+
             with temp_ans_th(cr, ans, th, isolate_state=isolate_state):
                 pred = cr.run_work_flow(q)
                 print(f'pred{pred}')
@@ -249,78 +219,12 @@ def make_preference_dataset_2head(
         y_pos, y_neg = scored[0][0], scored[-1][0]
         examples.append(PrefExample2(x=x, y_pos=y_pos, y_neg=y_neg))
 
-    # restore original combine cadence
-    if prev_combine is not None:
-        set_combine_rounds(cr, prev_combine)
 
     return examples
     
 
 # {'Who discovered penicillin?': {'input_tokens': 191.0, 'output_tokens': 165.0, 'total_tokens': 356.0, 'latency_sec': 4.346117499982938, 'gen_latency_sec': 4.344727099989541, 'retrieval_latency_sec': 0.003563100006431341, 'peak_vram_MiB': 14869.89306640625, 'prompt_chars': 863.0, 'throughput_tok_per_s': 37.977068801489786, 'prompt_tok_per_s': 137370.54150389606, 'device': 'cuda:0', 'dtype': 'torch.bfloat16', 'model_name': 'microsoft/Phi-4-mini-reasoning', 'temperature': 0.2, 'top_p': 0.9, 'max_new_tokens': 512, 'timestamp_start': 785499.1458307, 'timestamp_end': 785503.4919482, 'attempt': 1, 'question_chars': 26.0, 'answer_raw_chars': 810.0, 'answer_raw_tokens': 164.0, 'prompt_to_output_char_ratio': 1.065432098765432}}
 
-# def make_preference_dataset_2head_using_llm(
-#     cr,
-#     questions: List[str],
-#     gold_answers: Optional[Dict[str,str]] = None,
-#     per_q_samples: int = 6,
-#     feature_dim: int = 384,
-#     reward_fn: Callable[[str, Optional[str]], float] = None,
-#     seed: int = 0,
-#     isolate_state: bool = True,
-#     combine_rounds_default: int = 1,
-#     ANSWERS_CHOICES = ANSWERS_CHOICES,
-#     THINKINGS_CHOICES = THINKINGS_CHOICES,
-#     llm = None ,
-#     embeddings = None
-
-# ) -> List[PrefExample2]:
-#     """
-#     Build DPO pairs for (answers_choice, thinkings_choice) ONLY.
-#     Combine cadence is fixed to 'combine_rounds_default' here and will
-#     be handled by the contextual bandit at runtime.
-#     """
-#     if reward_fn is None:
-#         reward_fn = default_reward
-
-#     rng = random.Random(seed)
-#     all_pairs = [(ai, ti)
-#                  for ai in range(len(ANSWERS_CHOICES))
-#                  for ti in range(len(THINKINGS_CHOICES))]
-
-#     examples: List[PrefExample2] = []
-
-#     # Set combine cadence safely for whole dataset creation
-#     prev_combine = getattr(cr, "combine_ents_rounds", None)
-#     set_combine_rounds(cr, combine_rounds_default)
-
-#     for q in questions:
-#         x = featurize_query(cr, q, dims=feature_dim)
-#         tried = rng.sample(all_pairs, k=min(per_q_samples, len(all_pairs)))
-
-#         scored: List[Tuple[Tuple[int,int], float]] = []
-#         for (ai, ti) in tried:
-#             ans = ANSWERS_CHOICES[ai]
-#             th  = THINKINGS_CHOICES[ti]
-#             with temp_ans_th(cr, ans, th, isolate_state=isolate_state):
-#                 pred,metrics_from_llm,ft_txt = cr.run_work_flow_for_dpo(q)
-
-#             ## compute_answer_correctness(
-#             # question, answer, ground_truth, llm, embeddings
-#                 #         )
-#             score = reward_fn(q, pred, gold_answers.get(q),llm, embeddings)
-#             scored.append(((ai, ti), score))
-
-#         if len(scored) < 2:
-#             continue
-#         scored.sort(key=lambda z: z[1], reverse=True)
-#         y_pos, y_neg = scored[0][0], scored[-1][0]
-#         examples.append(PrefExample2(x=x, y_pos=y_pos, y_neg=y_neg))
-
-#     # restore original combine cadence
-#     if prev_combine is not None:
-#         set_combine_rounds(cr, prev_combine)
-
-#     return examples
 async def _call_reward_fn(
     reward_fn: Callable,
     question: str,
@@ -345,7 +249,6 @@ async def make_preference_dataset_2head_using_llm(
     reward_fn: Optional[Callable] = None,  # pass compute_answer_correctness here
     seed: int = 0,
     isolate_state: bool = True,
-    combine_rounds_default: int = 1,
     ANSWERS_CHOICES = ANSWERS_CHOICES,
     THINKINGS_CHOICES = THINKINGS_CHOICES,
     llm=None,
@@ -367,54 +270,44 @@ async def make_preference_dataset_2head_using_llm(
 
     examples: List["PrefExample2"] = []
 
-    # Set combine cadence safely for whole dataset creation
-    prev_combine = getattr(cr, "combine_ents_rounds", None)
-    set_combine_rounds(cr, combine_rounds_default)
+    for q in questions:
+        x = featurize_query(cr, q, dims=feature_dim)
+        tried = rng.sample(all_pairs, k=min(per_q_samples, len(all_pairs)))
 
-    try:
-        for q in questions:
-            x = featurize_query(cr, q, dims=feature_dim)
-            tried = rng.sample(all_pairs, k=min(per_q_samples, len(all_pairs)))
+        # (optional) parallelize scoring for this question
+        tasks = []
+        meta = []  # keep (ai, ti) aligned with tasks
+        for (ai, ti) in tried:
+            ans = ANSWERS_CHOICES[ai]
+            th  = THINKINGS_CHOICES[ti]
+            with temp_ans_th(cr, ans, th, isolate_state=isolate_state):
+                pred, metrics_from_llm, ft_txt = cr.run_work_flow_for_dpo(q)
 
-            # (optional) parallelize scoring for this question
-            tasks = []
-            meta = []  # keep (ai, ti) aligned with tasks
-            for (ai, ti) in tried:
-                ans = ANSWERS_CHOICES[ai]
-                th  = THINKINGS_CHOICES[ti]
-                with temp_ans_th(cr, ans, th, isolate_state=isolate_state):
-                    pred, metrics_from_llm, ft_txt = cr.run_work_flow_for_dpo(q)
+            tasks.append(_call_reward_fn(
+                reward_fn, q, pred, gold_answers.get(q), llm, embeddings
+            ))
+            meta.append((ai, ti))
 
-                tasks.append(_call_reward_fn(
-                    reward_fn, q, pred, gold_answers.get(q), llm, embeddings
-                ))
-                meta.append((ai, ti))
+        # await all scores
+        scores = await asyncio.gather(*tasks, return_exceptions=True)
 
-            # await all scores
-            scores = await asyncio.gather(*tasks, return_exceptions=True)
-
-            scored: List[Tuple[Tuple[int,int], float]] = []
-            for (ai_ti, s) in zip(meta, scores):
-                if isinstance(s, Exception) or s is None:
-                    # skip failures or None
-                    continue
-                try:
-                    scored.append((ai_ti, float(s)))
-                except (TypeError, ValueError):
-                    # skip non-numeric results
-                    continue
-
-            if len(scored) < 2:
+        scored: List[Tuple[Tuple[int,int], float]] = []
+        for (ai_ti, s) in zip(meta, scores):
+            if isinstance(s, Exception) or s is None:
+                # skip failures or None
+                continue
+            try:
+                scored.append((ai_ti, float(s)))
+            except (TypeError, ValueError):
+                # skip non-numeric results
                 continue
 
-            scored.sort(key=lambda z: z[1], reverse=True)
-            y_pos, y_neg = scored[0][0], scored[-1][0]
-            examples.append(PrefExample2(x=x, y_pos=y_pos, y_neg=y_neg))
+        if len(scored) < 2:
+            continue
 
-    finally:
-        # restore original combine cadence
-        if prev_combine is not None:
-            set_combine_rounds(cr, prev_combine)
+        scored.sort(key=lambda z: z[1], reverse=True)
+        y_pos, y_neg = scored[0][0], scored[-1][0]
+        examples.append(PrefExample2(x=x, y_pos=y_pos, y_neg=y_neg))
 
     return examples
 
@@ -561,27 +454,6 @@ class LinUCBArm:
         self.A += (x @ x.T)
         self.b += reward * x
 
-class CombineScheduler:
-    """
-    LinUCB contextual bandit over arms in COMBINE_ARMS.
-    Context = featurize_state(cr).
-    """
-    def __init__(self, d: int, arms: List[int] = None, alpha: float = 1.0, epsilon: float = 0.05):
-        self.arms = arms or COMBINE_ARMS
-        self.alpha = alpha
-        self.epsilon = epsilon
-        self.models = {a: LinUCBArm(d=d, alpha=alpha) for a in self.arms}
-
-    def select(self, x: np.ndarray, explore: bool = True) -> int:
-        if explore and random.random() < self.epsilon:
-            return random.choice(self.arms)
-        # pick arm with highest UCB
-        scores = [(a, self.models[a].ucb(x)) for a in self.arms]
-        scores.sort(key=lambda z: z[1], reverse=True)
-        return scores[0][0]
-
-    def update(self, arm: int, x: np.ndarray, reward: float):
-        self.models[arm].update(x, reward)
 
 
 # ===============================
@@ -597,7 +469,6 @@ def select_ans_th(policy: StrategyPolicy2Head, cr, q: str, feature_dim: int = 38
 def answer_with_auto_strategy(
     cr: CompressRag_rl,
     policy: StrategyPolicy2Head,
-    scheduler: CombineScheduler,
     q: str,
     reward_fn: Callable[[str, Optional[str]], float] = None,
     gold_answer: Optional[str] = None,
@@ -607,25 +478,18 @@ def answer_with_auto_strategy(
 ) -> Tuple[str, Dict[str, object]]:
     """
     1) Choose answers/th via DPO policy (question features)
-    2) Choose combine_ents_rounds via LinUCB (state features)
-    3) Run CR once and return result (+ metadata)
-    4) If reward_fn & gold provided, update scheduler online
+    2) Run CR once and return result (+ metadata)
+    3) If reward_fn & gold provided, update scheduler online
     """
     # 1) per-question knobs
     ans_choice, th_choice = select_ans_th(policy, cr, q, greedy=greedy,ANSWERS_CHOICES = ANSWERS_CHOICES,THINKINGS_CHOICES = THINKINGS_CHOICES)
 
-    # 2) combine cadence via state features
-    state_x = featurize_state(cr)  # d
-    arm = scheduler.select(state_x, explore=True)
-    # set combine rounds safely
-    set_combine_rounds(cr, arm)
-
-    # 3) run
+    # 2) run
     with temp_ans_th(cr, ans_choice, th_choice, isolate_state=False):
         pred = cr.run_work_flow(q)
         fact_context =  cr.cur_fact_context
 
-    # 4) update bandit online if evaluable
+    # 3) update bandit online if evaluable
     reward = None
     if reward_fn is not None:
         try:
@@ -633,7 +497,6 @@ def answer_with_auto_strategy(
         except Exception:
             reward = None
     if reward is not None:
-        scheduler.update(arm, state_x, reward)
         # optionally maintain a rolling average on CR
         try:
             rr = getattr(cr, "_recent_reward_avg", 0.0)
@@ -644,7 +507,6 @@ def answer_with_auto_strategy(
     meta = {
         "answers_choice": ans_choice,
         "thinkings_choice": th_choice,
-        "combine_rounds": arm if arm != _NEVER_COMBINE_SENTINEL else 0,
         "reward": reward,
         "fact_context": fact_context,
     }
@@ -677,7 +539,6 @@ def answer_with_auto_strategy(
 #         sentence_emb=sentence_emb,
 #         word_emb=word_emb,
 #         llm=phi_llm,
-#         combine_ents_rounds=1,            # default; scheduler will overwrite
 #         thinkings_choice='not_include',
 #         answers_choice='overlap'
 #     )
@@ -733,7 +594,6 @@ def answer_with_auto_strategy(
 #         reward_fn=default_reward,
 #         seed=0,
 #         isolate_state=True,
-#         combine_rounds_default=1,  # keep combine fixed during DPO data creation
 #     )
 
 #     print('after answer questions merging')
@@ -754,7 +614,6 @@ def answer_with_auto_strategy(
 
 #     # --- 4) init LinUCB scheduler with state feature dim
 #     d_state = featurize_state(cr).shape[0]  # typically 4
-#     scheduler = CombineScheduler(d=d_state, arms=COMBINE_ARMS, alpha=1.0, epsilon=0.05)
 
 #     # --- 5) inference on new questions (+ optional online bandit updates)
 #     test_questions = [

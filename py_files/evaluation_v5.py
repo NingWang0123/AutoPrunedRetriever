@@ -5,7 +5,6 @@ Graph/Text CompressRAG-RL evaluation on GraphRAG-Benchmark (Medical)
 
 • Builds a CompressRag_rl instance
 • Learns a 2-head DPO policy (answers / thinkings) on the first 30 Q-A
-• Uses a LinUCB scheduler to choose entity-combination cadence online
 • Seeds history with the same 30 Q-A, then evaluates the next 20
 • Dumps benchmark-compatible JSON + optional cost reports
 """
@@ -86,7 +85,6 @@ cr = CompressRag_rl(
     sentence_emb      = sent_emb,
     word_emb          = word_emb,
     llm               = phi_llm,
-    combine_ents_rounds = 1,        # LinUCB 会改写
     thinkings_choice    = 'non_include',
     answers_choice      = 'overlap',
 )
@@ -181,7 +179,6 @@ async def build_or_load_pref_ds() -> list:
             ANSWERS_CHOICES=ANSWERS_CHOICES,
             THINKINGS_CHOICES=THINKINGS_CHOICES,
             isolate_state = True,
-            combine_rounds_default  = 1,
             feature_dim = 384
         )
         print(f"   generated {len(pref_ds)} preference examples")
@@ -198,22 +195,15 @@ if __name__ == "__main__":
 
 policy, _ = train_dpo_2head(pref_ds, input_dim=384)
 
-# ---------------------------------------------------------------------
-# 5) LinUCB scheduler (entity-combine cadence)
-# ---------------------------------------------------------------------
-state_dim  = featurize_state(cr).shape[0]   # typically 4
-scheduler  = CombineScheduler(d=state_dim, arms=COMBINE_ARMS,
-                              alpha=1.0, epsilon=0.05)
 
 # ---------------------------------------------------------------------
-# 6) Seed history with first 30 Q-A (store answers / thinkings)
+# 5) Seed history with first 30 Q-A (store answers / thinkings)
 # ---------------------------------------------------------------------
 print("» Seeding history with first 30 questions …")
 for q in seed_questions:
     answer_with_auto_strategy(
         cr =cr, 
         policy =policy, 
-        scheduler = scheduler, 
         q = q,
         reward_fn       = default_reward,
         gold_answer     = gold_lookup[q],
@@ -221,7 +211,7 @@ for q in seed_questions:
     )
 
 # ---------------------------------------------------------------------
-# 7) Helper: capture CR’s last retrieved context
+# 6) Helper: capture CR’s last retrieved context
 # ---------------------------------------------------------------------
 def _collect_ctx(cr, k: int = TOPK_CTX) -> List[str]:
     ctx = getattr(cr, "_last_ctx", [])[:k]
@@ -241,7 +231,7 @@ def dump_results(
     for q in questions:
         start_idx = len(cr.llm.metrics_runs)
         pred, _meta = answer_with_auto_strategy(
-            cr, policy, scheduler, q,
+            cr, policy, q,
             reward_fn       = default_reward,
             gold_answer     = gold_lookup[q],
             greedy          = True

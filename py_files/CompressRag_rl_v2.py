@@ -2880,7 +2880,7 @@ class CompressRag_rl:
         sentence_emb: Optional[Embeddings] = None,
         word_emb: Optional[Embeddings] = None,
         llm = None,
-        combine_ents_rounds = 1, # params to control the combine ents
+        # combine_ents_rounds = 1, # params to control the combine ents # remove the combine ents rounds
         thinkings_choice = 'not_include',
         answers_choice = 'overlap',
         use_word = False
@@ -2920,9 +2920,9 @@ class CompressRag_rl:
 
 
         # params for dpo
-        ### ents param
-        self.combine_ents_rounds = combine_ents_rounds
-        self.round = 1
+        # ### ents param
+        # self.combine_ents_rounds = combine_ents_rounds
+        # self.round = 1
 
         ### thinkings param
         self.thinkings_choice = thinkings_choice
@@ -3406,13 +3406,17 @@ class CompressRag_rl:
 
         self.update_meta(new_json_lst, facts_cb=combined_facts_cb)
 
-        if self.round % self.combine_ents_rounds == 0:
-            if self.round == 1:
-                self.combine_ents_func(mode=warm_start) 
-            else:
-                #change to coarse combine for effieciency
-                self.combine_ents_func(mode=warm_start)
-        self.round += 1
+        # replace the learning periodical combine ents with trapped by ram
+
+        # self.combine_ents_func(mode=warm_start) 
+
+        # if self.round % self.combine_ents_rounds == 0:
+        #     if self.round == 1:
+        #         self.combine_ents_func(mode=warm_start) 
+        #     else:
+        #         #change to coarse combine for effieciency
+        #         self.combine_ents_func(mode=warm_start)
+        # self.round += 1
 
         # print(f'new_result {new_result}')
 
@@ -3461,13 +3465,17 @@ class CompressRag_rl:
 
         self.update_meta(new_json_lst, facts_cb=combined_facts_cb)
 
-        if self.round % self.combine_ents_rounds == 0:
-            if self.round == 1:
-                self.combine_ents_func(mode=warm_start) 
-            else:
-                #change to coarse combine for effieciency
-                self.combine_ents_func(mode=warm_start)
-        self.round += 1
+
+        # replace the learning periodical combine ents with trapped by ram
+        self.combine_ents_func(mode=warm_start) 
+
+        # if self.round % self.combine_ents_rounds == 0:
+        #     if self.round == 1:
+        #         self.combine_ents_func(mode=warm_start) 
+        #     else:
+        #         #change to coarse combine for effieciency
+        #         self.combine_ents_func(mode=warm_start)
+        # self.round += 1
 
         # print(f'new_result {new_result}')
 
