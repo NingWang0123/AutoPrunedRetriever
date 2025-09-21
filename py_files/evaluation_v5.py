@@ -24,8 +24,7 @@ from CompressRag_rl_v2 import (
 )
 from dpo_compressrag_v2 import (    
     make_preference_dataset_2head, train_dpo_2head,make_preference_dataset_2head_using_llm,
-    default_reward, featurize_state, CombineScheduler,
-    COMBINE_ARMS, answer_with_auto_strategy,save_pref_examples,load_pref_examples,ANSWERS_CHOICES,THINKINGS_CHOICES
+    default_reward, answer_with_auto_strategy,save_pref_examples,load_pref_examples,ANSWERS_CHOICES,THINKINGS_CHOICES
 )
 
 from test_for_compressrag import Phi4MiniReasoningLLM

@@ -1,0 +1,17 @@
+{
+  "doc-3d7a4f05339f0e3f3870b407d21d9c8a": {
+    "status": "failed",
+    "error_msg": "model \"mahonzhan/all-MiniLM-L6-v2:latest\" not found, try pulling it first (status code: 404)",
+    "content_summary": "About basal cell skin cancer What is basal cell skin cancer? How is basal cell skin cancer treated? What can you do to get the best care? Basal cell skin cancer, also known as basal cell carcinoma (BCC), is the most common type of skin cancer. About ...",
+    "content_length": 1052158,
+    "created_at": "2025-09-21T11:24:14.090560+00:00",
+    "updated_at": "2025-09-21T11:24:14.667010+00:00",
+    "file_path": "unknown_source",
+    "track_id": "insert_20250921_072413_da178deb",
+    "metadata": {
+      "processing_start_time": 1758453854,
+      "processing_end_time": 1758453854
+    },
+    "chunks_list": []
+  }
+}
