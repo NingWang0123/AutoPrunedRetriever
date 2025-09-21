@@ -1,4 +1,35 @@
 from transformers import pipeline
+from functools import lru_cache
+from typing import Optional, Union
+import torch
+
+@lru_cache(maxsize=3)
+def get_triplet_extractor(device: Optional[Union[str, int]] = None):
+    """
+    device:
+      - 'mps'  -> Apple MPS
+      - -1     -> CPU
+      - 0/1... -> CUDA GPU
+      - None   -> 自动检测（优先 mps，否则 CPU）
+    """
+    if device is None:
+        if hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+            device = torch.device("mps")
+        elif torch.cuda.is_available():
+            device = 0
+        else:
+            device = -1
+    elif isinstance(device, str) and device.lower() == "mps":
+        device = torch.device("mps")
+
+    # 关键点：用 device=...，不要用 torch_device=...
+    return pipeline(
+        task="text2text-generation",
+        model="Babelscape/rebel-large",
+        tokenizer="Babelscape/rebel-large",
+        device=device,                 # ✅ 正确姿势
+        # torch_dtype=torch.float32,   # 可选：MPS 上通常用 fp32 更稳
+    )
 
 def extract_triplets(text):
     triplets = []
@@ -36,12 +67,16 @@ def extract_triplets(text):
     }
     return triplets
 
-def triplet_parser(text):
-    triplet_extractor = pipeline('text2text-generation', model='Babelscape/rebel-large',
-                                  tokenizer='Babelscape/rebel-large', device=0)
-    extracted_text = triplet_extractor.tokenizer.batch_decode([triplet_extractor(text, return_tensors=True, return_text=False)[0]["generated_token_ids"]])
-    extracted_triplets = extract_triplets(extracted_text[0])
-    return extracted_triplets
+def triplet_parser(text: str, *, device: Optional[str|int] = None, max_new_tokens: int = 256):
+    extractor = get_triplet_extractor(device)
+    out = extractor(text, return_text=True, return_tensors=True, max_new_tokens=max_new_tokens)
+    rec = out[0]
+    if "generated_token_ids" in rec and hasattr(extractor, "tokenizer"):
+        decoded = extractor.tokenizer.batch_decode([rec["generated_token_ids"]])
+        gen = decoded[0]
+    else:
+        gen = rec.get("generated_text") or str(rec)
+    return extract_triplets(gen)
 
 if __name__ == "__main__":
    print(triplet_parser("Punta Cana is a resort town in the municipality of Higuey, in La Altagracia Province, the eastern most province of the Dominican Republic"))
