@@ -3,7 +3,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import re
 import json, hashlib
-from typing import List, Tuple, Dict, Optional,Iterable,Any,Callable
+from typing import List, Tuple, Dict, Optional,Iterable,Any,Callable, Set, Union
 import itertools
 from collections import defaultdict
 import numpy as np
@@ -21,6 +21,7 @@ from textwrap import dedent
 from graph_generator.rebel import triplet_parser
 import time
 
+Triplet = Tuple[str, str, str]
 
 nlp = spacy.load("en_core_web_sm")
 
@@ -737,33 +738,59 @@ def get_word_embeddings(list_of_text,word_emb):
 
 
 ### edit codebook to also take the answers
-def get_code_book(prompt, type='questions', rule="Answer questions.", factparser = False):
-    """
-    prompt : str
-    type   : one of {'questions','answers','thinkings','facts'}
-    """
+def _merge_sets(sets: Iterable[Set[Triplet]]) -> Set[Triplet]:
+    merged: Set[Triplet] = set()
+    for s in sets:
+        if s:
+            merged |= s
+    return merged
+
+def get_code_book(
+    prompt: Union[str, List[str]],
+    type: str = 'questions',
+    rule: str = "Answer questions.",
+    factparser: bool = False,   
+    *,
+    batch_size: int = 64       
+):
     valid_types = {'questions', 'answers', 'thinkings', 'facts'}
     if type not in valid_types:
         raise ValueError(f"type must be one of {valid_types}, got: {type}")
 
-    if factparser:
-        triples = triplet_parser(prompt)
-        
+    if isinstance(prompt, str):
+        triples_merged: Set[Triplet] = triplet_parser(prompt)  # Set[Triplet]
     else:
-        triples = triplet_parser(prompt)
+        texts: List[str] = [t for t in prompt if isinstance(t, str) and t.strip()]
+        if not texts:
+            triples_merged = set()
+        elif len(texts) <= batch_size:
+            triples_list: List[Set[Triplet]] = triplet_parser(texts)  # List[Set[Triplet]]
+            triples_merged = _merge_sets(triples_list)
+        else:
+            acc: List[Set[Triplet]] = []
+            for i in range(0, len(texts), batch_size):
+                acc.extend(triplet_parser(texts[i:i+batch_size]))
+            triples_merged = _merge_sets(acc)
 
-    codebook, ent2id, rel2id = build_codebook_from_triples(triples, rule)
-    edges = edges_from_triples(triples, ent2id, rel2id)
+    if not triples_merged:
+        feat_name = f"{type}(edges[i])"
+        return {
+            "e": [],
+            "r": [],
+            "edges([e,r,e])": [],
+            feat_name: [],
+            "rule": rule,
+        }
 
-    feat_name = f"{type}(edges[i])"  
+    codebook, ent2id, rel2id = build_codebook_from_triples(triples_merged, rule)
+    edges = edges_from_triples(triples_merged, ent2id, rel2id)
+    feat_name = f"{type}(edges[i])"
 
-    dict_2 = {
+    codebook.update({
         "edges([e,r,e])": edges,
-        feat_name: all_chains_no_subchains(edges, False)
-    }
-
-    codebook.update(dict_2)
-    codebook.pop('sid')
+        feat_name: all_chains_no_subchains(edges, False),
+    })
+    codebook.pop('sid', None)
     return codebook
 
 
@@ -3020,6 +3047,16 @@ class CompressRag_rl:
 
         items = data if isinstance(data, list) else [data]
 
+        all_chunks = []
+        for item in items:
+            ctx = (item.get("context") or "").strip()
+            if ctx:
+                all_chunks.extend(_chunk_text(ctx, chunk_chars=chunk_chars, overlap=overlap))
+
+        total_chunks = len(all_chunks)
+        if total_chunks == 0:
+            return None
+        
         combined = None  
 
         for item in items:
