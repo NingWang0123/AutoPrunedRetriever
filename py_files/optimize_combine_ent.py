@@ -7,6 +7,7 @@ import numpy as np
 from typing import Any, Dict, List, Tuple, Optional
 import warnings
 import logging
+import psutil
 
 # -----------------------
 #original
@@ -1386,35 +1387,96 @@ def combine_ents_ann_knn(
     return codebook_main
 
 
+# def coarse_combine(codebook_main: Dict[str, Any],
+#                      min_exp_num: int = 2,
+#                      max_exp_num: int = 20,
+#                      use_thinking: bool = True,
+#                      use_facts: bool = True,
+#                      random_state: int = 0,
+#                      sample_size_prop: float = 0.2, #
+#                      k_grid_size: int = 8,
+#                      scoring: str = "silhouette",
+#                      backend: str = 'auto',
+#                      config: Optional[ClusteringConfig] = None):
+    
+#     filtered_codebook_main = combine_ents_ann_knn(
+#                             codebook_main,
+#                             config,
+#                             use_thinking,
+#                             use_facts)
+    
+#     final_codebook_main = combine_ents_auto(filtered_codebook_main,
+#                                                 min_exp_num,
+#                                                 max_exp_num,
+#                                                 use_thinking,
+#                                                 use_facts,
+#                                                 random_state,
+#                                                 sample_size_prop, 
+#                                                 k_grid_size,
+#                                                 scoring,
+#                                                 backend)
+    
+#     return final_codebook_main
+
+
+
+## new coarse combine will only do the aggressive merging if ram takes more then a threshold
 def coarse_combine(codebook_main: Dict[str, Any],
-                     min_exp_num: int = 2,
-                     max_exp_num: int = 20,
-                     use_thinking: bool = True,
-                     use_facts: bool = True,
-                     random_state: int = 0,
-                     sample_size_prop: float = 0.2, #
-                     k_grid_size: int = 8,
-                     scoring: str = "silhouette",
-                     backend: str = 'auto',
-                     config: Optional[ClusteringConfig] = None):
-    
+                   min_exp_num: int = 2,
+                   max_exp_num: int = 20,
+                   use_thinking: bool = True,
+                   use_facts: bool = True,
+                   random_state: int = 0,
+                   sample_size_prop: float = 0.2,
+                   k_grid_size: int = 8,
+                   scoring: str = "silhouette",
+                   backend: str = 'auto',
+                   config: Optional["ClusteringConfig"] = None,
+                   ram_threshold: float = 70.0  # percentage
+                   ):
+    """
+    Combines entities in two stages:
+    1. KNN-based combine (always applied).
+    2. Auto combine (only if RAM usage < ram_threshold).
+
+    Parameters
+    ----------
+    ram_threshold : float
+        Percentage of system RAM usage above which the second
+        (aggressive) compression will be skipped.
+    """
+
+    # Stage 1: always do the lightweight combine
     filtered_codebook_main = combine_ents_ann_knn(
-                            codebook_main,
-                            config,
-                            use_thinking,
-                            use_facts)
-    
-    final_codebook_main = combine_ents_auto(filtered_codebook_main,
-                                                min_exp_num,
-                                                max_exp_num,
-                                                use_thinking,
-                                                use_facts,
-                                                random_state,
-                                                sample_size_prop, 
-                                                k_grid_size,
-                                                scoring,
-                                                backend)
-    
+        codebook_main,
+        config,
+        use_thinking,
+        use_facts
+    )
+
+    # Check RAM usage before doing the aggressive combine
+    ram_used_percent = psutil.virtual_memory().percent
+    print(f"[INFO] Current RAM usage: {ram_used_percent:.2f}%")
+
+    if ram_used_percent < ram_threshold:
+        # Stage 2: apply powerful combine
+        final_codebook_main = combine_ents_auto(
+            filtered_codebook_main,
+            min_exp_num,
+            max_exp_num,
+            use_thinking,
+            use_facts,
+            random_state,
+            sample_size_prop,
+            k_grid_size,
+            scoring,
+            backend
+        )
+    else:
+        print(f"[WARN] RAM usage {ram_used_percent:.2f}% exceeds threshold {ram_threshold}%. "
+              f"Skipping aggressive combine.")
+        final_codebook_main = filtered_codebook_main
+
     return final_codebook_main
     
 
