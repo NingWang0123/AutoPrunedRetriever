@@ -2792,7 +2792,6 @@ def slice_for_final_merged_json(final_merged_json: Dict[str, Any],use_word_forma
     # Keys that correspond to per-edge indexed content (edges[i])
 
     per_edge_exact = [
-        'edge_matrix',
         'questions(edges[i])',
         'given knowledge(edges[i])',
         'facts(edges[i])',
