@@ -1901,378 +1901,383 @@ def combine_ents(codebook_main: Dict[str, Any],
 # =========================
 # END-TO-END TEST HARNESS
 # =========================
+# if __name__ == "__main__":
+#     import random
+#     from typing import Sequence
+
+#     print("\n========== Graph/Codebook E2E Test ==========")
+
+#     # ---------- 0) Embedding fallbacks ----------
+#     class TinyRandomEmbeddings(Embeddings):
+#         """
+#         A stable random embedder (deterministic): hash(text) -> seed -> vector
+#         Used as a fallback when external models are unavailable.
+#         """
+#         def __init__(self, dim: int = 64):
+#             self.dim = dim
+
+#         def _vec(self, text: str) -> list[float]:
+#             rnd = random.Random(hash(text) & 0xffffffff)
+#             return [rnd.uniform(-1, 1) for _ in range(self.dim)]
+
+#         def embed_documents(self, texts: Sequence[str]) -> list[list[float]]:
+#             return [self._vec(t) for t in texts]
+
+#         def embed_query(self, text: str) -> list[float]:
+#             return self._vec(text)
+
+#     # Ensure word_emb is usable; otherwise replace with TinyRandomEmbeddings
+#     try:
+#         _ = word_emb.dim
+#     except Exception:
+#         print("[WARN] GloVe KeyedVectors not ready. Using TinyRandomEmbeddings as word embedding fallback.")
+#         word_emb = TinyRandomEmbeddings(dim=64)
+
+#     # Prepare sentence embedder for rerank; fallback if model can't be loaded
+#     try:
+#         sent_emb = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+#         _ = sent_emb.embed_query("hello")
+#         print("[OK] Using HuggingFaceEmbeddings: sentence-transformers/all-MiniLM-L6-v2")
+#     except Exception as e:
+#         print(f"[WARN] Cannot load HuggingFaceEmbeddings ({e}). Using TinyRandomEmbeddings fallback.")
+#         sent_emb = TinyRandomEmbeddings(dim=64)
+
+#     # ---------- 1) Build question & answer codebooks from raw text ----------
+#     # Multi-sentence to trigger diverse extraction paths (passive / copular ADJ / VERB)
+#     questions_text = (
+#         "Is the Great Wall of China visible from space? "
+#         "Frankenstein was written by Mary Shelley in 1818. "
+#         "The novel inspired many films."
+#     )
+#     answers_text_1 = (
+#         "The Great Wall is not visible from space with the naked eye. "
+#         "Mary Shelley wrote Frankenstein in 1818."
+#     )
+#     answers_text_2 = (
+#         "From low Earth orbit, the Great Wall cannot be seen unaided. "
+#         "Frankenstein is a novel authored by Mary Shelley."
+#     )
+#     answers_text_3 = (
+#     "Frankenstein was published in 1818 by Mary Shelley. "
+#     "The Great Wall cannot be seen with unaided eyes from orbit."
+# )
+
+#     # Build separate codebooks (questions / answers)
+#     codebook_q = get_code_book(questions_text, type='questions')   
+#     codebook_a1 = get_code_book(answers_text_1, type='answers')
+#     codebook_a2 = get_code_book(answers_text_2, type='answers')
+#     codebook_a3 = get_code_book(answers_text_3, type='answers')
+
+#     print("\n== Sample codebook (questions) ==")
+#     print(json_dump_str({
+#         "e": codebook_q["e"][:8],
+#         "r": codebook_q["r"][:8],
+#         "edges_sample": codebook_q["edges([e,r,e])"][:6],
+#         "#edges": len(codebook_q["edges([e,r,e])"]),
+#         "#q_chains": len(codebook_q["questions(edges[i])"]),
+#     }, indent=2))
+
+#     print("\n== Sample codebook (answers 1) ==")
+#     print(json_dump_str({
+#         "e": codebook_a1["e"][:8],
+#         "r": codebook_a1["r"][:8],
+#         "edges_sample": codebook_a1["edges([e,r,e])"][:6],
+#         "#edges": len(codebook_a1["edges([e,r,e])"]),
+#         "#a_chains": len(codebook_a1["answers(edges[i])"]),
+#     }, indent=2))
+
+#     # ---------- 2) Initialize main codebook & merge Q/A ----------
+#     # Start with empty -> merge questions -> merge answers_1 -> merge answers_2
+#     codebook_main = merging_codebook(None, codebook_q, type='questions', word_emb=word_emb)
+#     codebook_main = merging_codebook(codebook_main, codebook_a1, type='answers',   word_emb=word_emb)
+#     codebook_main = merging_codebook(codebook_main, codebook_a2, type='answers',   word_emb=word_emb)
+#     codebook_main = merging_codebook(codebook_main, codebook_a3, type='answers',   word_emb=word_emb)
+#     print("---------", codebook_main)
+
+#     print("\n== Codebook (main) stats after merges ==")
+#     print(json_dump_str({
+#         "#entities": len(codebook_main["e"]),
+#         "#relations": len(codebook_main["r"]),
+#         "#edges": len(codebook_main["edge_matrix"]),
+#         "#questions_buckets": len(codebook_main["questions_lst"]),
+#         "#answers_buckets": len(codebook_main["answers_lst"]),
+#         "rule": codebook_main["rule"],
+#     }, indent=2))
+
+#     # ---------- 3) Pull some question chains & test decode ----------
+#     if not codebook_main["questions_lst"] or not codebook_main["questions_lst"][0]:
+#         raise RuntimeError("No question chains produced; try a different input sentence.")
+
+#     all_q_chains = codebook_main["questions_lst"][0]
+#     query_chains = all_q_chains[: min(3, len(all_q_chains))]  # take a few
+
+#     print("\n== Query chains (edge indices) ==")
+#     for i, ch in enumerate(query_chains):
+#         print(f"Q{i}: {ch}")
+
+#     # Test decode_question on: single int, single chain, batch chains (by yourself)
+#     # Single edge index (if available)
+#     if query_chains and query_chains[0]:
+#         edge_idx = query_chains[0][0]
+#         print("\n-- decode_question(single int, words) --")
+#         print(decode_question([edge_idx], codebook_main, fmt='words'))  # wrap into list to keep API consistent
+
+#     # Single chain
+#     print("\n-- decode_question(single chain, edges/words/embeddings) --")
+#     one_chain = query_chains[0]
+#     print("edges:",       decode_question(one_chain, codebook_main, fmt='edges'))
+#     print("words:",       decode_question(one_chain, codebook_main, fmt='words'))
+#     print("embeddings: [#triples, dims?] ->", len(decode_question(one_chain, codebook_main, fmt='embeddings')), "triples")
+
+#     # ---------- 4) Word-embedding coarse top-k over whole DB ----------
+#     coarse_topk = get_topk_word_embedding_batched(
+#         questions=query_chains,
+#         codebook_main=codebook_main,
+#         top_k=3,
+#         question_batch_size=2,
+#         questions_db_batch_size=8,
+#     )
+#     print("\n== Coarse Top-K (word embeddings) ==")
+#     for qi, lst in coarse_topk.items():
+#         print(f"Q{qi} → {lst}")
+
+#     # ---------- 5) Sentence-embedding rerank ----------
+#     reranked = rerank_with_sentence_embeddings(
+#         questions=query_chains,
+#         codebook_main=codebook_main,
+#         coarse_topk=coarse_topk,
+#         emb=sent_emb,
+#         top_m=3,  # keep top-2 to show list
+#     )
+#     print("\n== Reranked (sentence embeddings) ==")
+#     for qi, lst in reranked.items():
+#         print(f"Q{qi} → {lst}")
+
+#     # ---------- 6) One-call coarse+fine wrapper ----------
+#     print("\n== Coarse+Fine (wrapper: coarse_filter) ==")
+#     wrapper_res = coarse_filter(
+#         questions=query_chains,
+#         codebook_main=codebook_main,
+#         emb=sent_emb,
+#         top_k=3,
+#         question_batch_size=2,
+#         questions_db_batch_size=8,
+#         top_m=2,
+#     )
+#     for qi, lst in wrapper_res.items():
+#         print(f"Q{qi} → {lst}")
+
+#     # ---------- 7) Attach answers to top-m results ----------
+#     topm_with_answers = add_answers_to_filtered_lst(wrapper_res, codebook_main)
+#     print("\n== Top-m with attached answers (edge-index chains) ==")
+#     for qi, lst in topm_with_answers.items():
+#         print(f"\nQ{qi}:")
+#         for item in lst:
+#             print(json_dump_str(item, indent=2))
+
+#     # ---------- 8) Decode & show final top-1 per query ----------
+#     print("\n== Final decode (top-1 per query) ==")
+#     for qi, lst in wrapper_res.items():
+#         if not lst:
+#             print(f"Q{qi}: <no candidate>")
+#             continue
+#         best = lst[0]
+#         qi_db = best["questions_index"]
+#         qj_db = best["question_index"]
+#         best_edges_idx_chain = codebook_main["questions_lst"][qi_db][qj_db]
+
+#         decoded_edges = decode_question(best_edges_idx_chain, codebook_main, fmt='edges')
+#         decoded_words = decode_question(best_edges_idx_chain, codebook_main, fmt='words')
+#         decoded_vecs  = decode_question(best_edges_idx_chain, codebook_main, fmt='embeddings')
+
+#         print(f"\nQ{qi} top-1:")
+#         print("- edges indices:", decoded_edges)
+#         print("- words triples:", decoded_words)
+#         print("- embeddings triples: count =", len(decoded_vecs))
+
+#     # ---------- 9) Find overlapped answer snippets (contiguous runs) + BEFORE/AFTER texts ----------
+#     print("\n== Overlapped contiguous answer runs among selected candidates (with BEFORE/AFTER text) ==")
+
+#     for qi, lst in topm_with_answers.items():
+#         if not lst:
+#             print(f"\nQ{qi}: <no candidate with answers>")
+#             continue
+
+#         print(f"\nQ{qi} — BEFORE (raw candidate answer texts):")
+#         per_candidate_answers_texts = []  
+#         for rank, item in enumerate(lst):
+#             answers_bucket = item['answers(edges[i])']  
+#             texts = decode_answers_bucket_to_texts(answers_bucket, codebook_main)
+#             per_candidate_answers_texts.append(texts)
+    
+#             joined = " | ".join(texts) if texts else "<empty>"
+#             print(f"  - cand#{rank}: {joined}")
+
+    
+#         answers_buckets_for_overlap = []
+#         for item in lst:
+#             answers_buckets_for_overlap.append(item['answers(edges[i])'])
+
+#         overlaps = find_overlapped_answers(answers_buckets_for_overlap)
+
+#         print("----------",overlaps)
+#         if overlaps:
+#             print(f"Q{qi} — AFTER (merged/common segments):")
+#             for seg_id, edge_run in enumerate(overlaps):
+    
+#                 text_after = decode_chain_to_text(edge_run, codebook_main)
+#                 print(f"  * segment#{seg_id}: {text_after}   [edges: {edge_run}]")
+#         else:
+#             print(f"Q{qi} — AFTER: <no common contiguous runs found>")
+
+#     print("\n== 10) Manual answers buckets for overlap test ==")
+
+#     # 1) Helper: decode each edge into a readable short string
+#     def _edge_words(i):
+#         h, r, t = decode_question([i], codebook_main, fmt='words')[0]
+#         return f"{h} {r} {t}"
+
+#     all_edge_texts = [_edge_words(i) for i in range(len(codebook_main["edge_matrix"]))]
+
+#     def find_edge_idx(keyword_like: str) -> int:
+#         """
+#         Fuzzy find an edge index by substring match.
+#         Example:
+#           find_edge_idx("Mary Shelley subj write")
+#           find_edge_idx("write obj Frankenstein")
+#         """
+#         key = keyword_like.lower().strip()
+#         for i, s in enumerate(all_edge_texts):
+#             if key in s.lower():
+#                 return i
+#         raise ValueError(
+#             f"Edge not found for key ~{keyword_like}~ ; "
+#             f"available samples:\n" + "\n".join(all_edge_texts[:12])
+#         )
+
+#     # 2) Pick some edges of interest
+#     idx_MS_subj_write     = find_edge_idx("Mary Shelley subj write")
+#     idx_write_obj_Franken = find_edge_idx("write obj Frankenstein")
+#     idx_write_in_1818     = find_edge_idx("write prep_in 1818")
+#     try:
+#         idx_wall_visible  = find_edge_idx("Great Wall property visible")
+#     except Exception:
+#         idx_wall_visible  = find_edge_idx("Great Wall isa visible")
+
+#     # 3) Manually define two candidate answer buckets (lists of edge-index chains)
+#     manual_answers_buckets = {
+#         0: [
+#             [idx_MS_subj_write, idx_write_obj_Franken],
+#             [idx_write_in_1818],
+#         ],
+#         1: [
+#             [idx_MS_subj_write, idx_write_obj_Franken],
+#             [idx_write_in_1818, idx_wall_visible],
+#         ],
+#     }
+
+#     # 4) Build a fake retrieval result wrapper with two candidates
+#     manual_topm_with_answers = {
+#         0: [
+#             {
+#                 "score": 0.0,
+#                 "questions_index": 0,
+#                 "question_index": 0,
+#                 "text": "<manual-cand-0>",
+#                 "answers(edges[i])": manual_answers_buckets[0],
+#             },
+#             {
+#                 "score": 0.0,
+#                 "questions_index": 0,
+#                 "question_index": 1,
+#                 "text": "<manual-cand-1>",
+#                 "answers(edges[i])": manual_answers_buckets[1],
+#             },
+#         ]
+#     }
+
+#     # 5) BEFORE/AFTER merge demonstration
+#     print("\n== 10.A BEFORE/AFTER using manual answers_buckets ==")
+#     for qi, lst in manual_topm_with_answers.items():
+#         print(f"\nQ{qi} — BEFORE (raw candidate answer texts):")
+#         for rank, item in enumerate(lst):
+#             answers_bucket = item['answers(edges[i])']
+#             texts = decode_answers_bucket_to_texts(answers_bucket, codebook_main)
+#             joined = " | ".join(texts) if texts else "<empty>"
+#             print(f"  - cand#{rank}: {joined}")
+
+#         overlaps = find_overlapped_answers([it['answers(edges[i])'] for it in lst])
+#         if overlaps:
+#             print(f"Q{qi} — AFTER (merged/common segments):")
+#             for seg_id, edge_run in enumerate(overlaps):
+#                 text_after = decode_chain_to_text(edge_run, codebook_main)
+#                 print(f"  * segment#{seg_id}: {text_after}   [edges: {edge_run}]")
+#         else:
+#             print(f"Q{qi} — AFTER: <no common contiguous runs found>")
+
+#     # ========= 11) Unique knowledge assignment =========
+#     print("\n== 11) Unique Knowledge assignment ==")
+#     flat_lists = get_flat_answers_lsts([it['answers(edges[i])'] for it in manual_topm_with_answers[0]])
+#     overlaps   = common_contiguous_overlaps(flat_lists, min_len=2)
+#     uniq_res   = get_unique_knowledge({'overlaps': overlaps}, flat_lists)
+
+#     print("Assignments (which run kept by which owner):")
+#     for x in uniq_res['assignments']:
+#         readable = decode_chain_to_text(x['run'], codebook_main)
+#         print(f"  run: {readable}  kept_by: cand#{x['owner']}  occurrences: {x['occurrences']}")
+
+#     print("\nOut answers (unique knowledge per candidate):")
+#     for i, seq in enumerate(uniq_res['out_answers']):
+#         readable = decode_chain_to_text(seq, codebook_main)
+#         print(f"  cand#{i}: {readable}   [edges: {seq}]")
+
+#     # ========= 12) Build compact JSON with given knowledge =========
+#     print("\n== 12) Build compact JSON with given knowledge ==")
+#     print("-----------------------------------")
+#     print(uniq_res['out_answers'])
+#     print(codebook_main)
+#     print({
+#             'e': codebook_main['e'],
+#             'r': codebook_main['r'],
+#             'edge_matrix': codebook_main['edge_matrix'],
+#             'questions(edges[i])': query_chains, 
+#             'rule': codebook_main.get('rule', ''),
+#         })
+#     print("-----------------------------------")
+#     compact_json = get_json_with_given_knowledge(
+#         flat_answers_lsts = uniq_res['out_answers'],
+#         codebook_main     = codebook_main,
+#         codebook_sub_q    = {
+#             'e': codebook_main['e'],
+#             'r': codebook_main['r'],
+#             'edge_matrix': codebook_main['edge_matrix'],
+#             'questions(edges[i])': query_chains,
+#             'rule': codebook_main['rule'],
+#         },
+#         decode = True
+#     )
+#     print(json_dump_str({
+#         'e[:5]': compact_json['e'][:5],
+#         'r[:5]': compact_json['r'][:5],
+#         '#edges': len(compact_json['edge_matrix']),
+#         '#questions_triples_preview': len(compact_json['questions([[e,r,e], ...])'][:1]),
+#         '#knowledge_triples_preview': len(compact_json['given knowledge([[e,r,e], ...])'][:1]),
+#     }, indent=2))
+
+
+#     print("\n== 13) Entity clustering & merge (fixed) ==")
+#     print(codebook_main)
+#     merged_cb = combine_ents(codebook_main, min_exp_num=2, max_exp_num=8, random_state=0, use_thinking=False)
+#     print(json_dump_str({
+#         "entities_before": len(codebook_main['e']),
+#         "entities_after":  len(merged_cb['e']),
+#         "edges_before":    len(codebook_main['edge_matrix']),
+#         "edges_after":     len(merged_cb['edge_matrix']),
+#     }, indent=2))
+#     print(merged_cb)
+#     print("\n========== Test completed. ==========\n")
+
 if __name__ == "__main__":
-    import random
-    from typing import Sequence
-
-    print("\n========== Graph/Codebook E2E Test ==========")
-
-    # ---------- 0) Embedding fallbacks ----------
-    class TinyRandomEmbeddings(Embeddings):
-        """
-        A stable random embedder (deterministic): hash(text) -> seed -> vector
-        Used as a fallback when external models are unavailable.
-        """
-        def __init__(self, dim: int = 64):
-            self.dim = dim
-
-        def _vec(self, text: str) -> list[float]:
-            rnd = random.Random(hash(text) & 0xffffffff)
-            return [rnd.uniform(-1, 1) for _ in range(self.dim)]
-
-        def embed_documents(self, texts: Sequence[str]) -> list[list[float]]:
-            return [self._vec(t) for t in texts]
-
-        def embed_query(self, text: str) -> list[float]:
-            return self._vec(text)
-
-    # Ensure word_emb is usable; otherwise replace with TinyRandomEmbeddings
-    try:
-        _ = word_emb.dim
-    except Exception:
-        print("[WARN] GloVe KeyedVectors not ready. Using TinyRandomEmbeddings as word embedding fallback.")
-        word_emb = TinyRandomEmbeddings(dim=64)
-
-    # Prepare sentence embedder for rerank; fallback if model can't be loaded
-    try:
-        sent_emb = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-        _ = sent_emb.embed_query("hello")
-        print("[OK] Using HuggingFaceEmbeddings: sentence-transformers/all-MiniLM-L6-v2")
-    except Exception as e:
-        print(f"[WARN] Cannot load HuggingFaceEmbeddings ({e}). Using TinyRandomEmbeddings fallback.")
-        sent_emb = TinyRandomEmbeddings(dim=64)
-
-    # ---------- 1) Build question & answer codebooks from raw text ----------
-    # Multi-sentence to trigger diverse extraction paths (passive / copular ADJ / VERB)
-    questions_text = (
-        "Is the Great Wall of China visible from space? "
-        "Frankenstein was written by Mary Shelley in 1818. "
-        "The novel inspired many films."
-    )
-    answers_text_1 = (
-        "The Great Wall is not visible from space with the naked eye. "
-        "Mary Shelley wrote Frankenstein in 1818."
-    )
-    answers_text_2 = (
-        "From low Earth orbit, the Great Wall cannot be seen unaided. "
-        "Frankenstein is a novel authored by Mary Shelley."
-    )
-    answers_text_3 = (
-    "Frankenstein was published in 1818 by Mary Shelley. "
-    "The Great Wall cannot be seen with unaided eyes from orbit."
-)
-
-    # Build separate codebooks (questions / answers)
-    codebook_q = get_code_book(questions_text, type='questions')   
-    codebook_a1 = get_code_book(answers_text_1, type='answers')
-    codebook_a2 = get_code_book(answers_text_2, type='answers')
-    codebook_a3 = get_code_book(answers_text_3, type='answers')
-
-    print("\n== Sample codebook (questions) ==")
-    print(json_dump_str({
-        "e": codebook_q["e"][:8],
-        "r": codebook_q["r"][:8],
-        "edges_sample": codebook_q["edges([e,r,e])"][:6],
-        "#edges": len(codebook_q["edges([e,r,e])"]),
-        "#q_chains": len(codebook_q["questions(edges[i])"]),
-    }, indent=2))
-
-    print("\n== Sample codebook (answers 1) ==")
-    print(json_dump_str({
-        "e": codebook_a1["e"][:8],
-        "r": codebook_a1["r"][:8],
-        "edges_sample": codebook_a1["edges([e,r,e])"][:6],
-        "#edges": len(codebook_a1["edges([e,r,e])"]),
-        "#a_chains": len(codebook_a1["answers(edges[i])"]),
-    }, indent=2))
-
-    # ---------- 2) Initialize main codebook & merge Q/A ----------
-    # Start with empty -> merge questions -> merge answers_1 -> merge answers_2
-    codebook_main = merging_codebook(None, codebook_q, type='questions', word_emb=word_emb)
-    codebook_main = merging_codebook(codebook_main, codebook_a1, type='answers',   word_emb=word_emb)
-    codebook_main = merging_codebook(codebook_main, codebook_a2, type='answers',   word_emb=word_emb)
-    codebook_main = merging_codebook(codebook_main, codebook_a3, type='answers',   word_emb=word_emb)
-    print("---------", codebook_main)
-
-    print("\n== Codebook (main) stats after merges ==")
-    print(json_dump_str({
-        "#entities": len(codebook_main["e"]),
-        "#relations": len(codebook_main["r"]),
-        "#edges": len(codebook_main["edge_matrix"]),
-        "#questions_buckets": len(codebook_main["questions_lst"]),
-        "#answers_buckets": len(codebook_main["answers_lst"]),
-        "rule": codebook_main["rule"],
-    }, indent=2))
-
-    # ---------- 3) Pull some question chains & test decode ----------
-    if not codebook_main["questions_lst"] or not codebook_main["questions_lst"][0]:
-        raise RuntimeError("No question chains produced; try a different input sentence.")
-
-    all_q_chains = codebook_main["questions_lst"][0]
-    query_chains = all_q_chains[: min(3, len(all_q_chains))]  # take a few
-
-    print("\n== Query chains (edge indices) ==")
-    for i, ch in enumerate(query_chains):
-        print(f"Q{i}: {ch}")
-
-    # Test decode_question on: single int, single chain, batch chains (by yourself)
-    # Single edge index (if available)
-    if query_chains and query_chains[0]:
-        edge_idx = query_chains[0][0]
-        print("\n-- decode_question(single int, words) --")
-        print(decode_question([edge_idx], codebook_main, fmt='words'))  # wrap into list to keep API consistent
-
-    # Single chain
-    print("\n-- decode_question(single chain, edges/words/embeddings) --")
-    one_chain = query_chains[0]
-    print("edges:",       decode_question(one_chain, codebook_main, fmt='edges'))
-    print("words:",       decode_question(one_chain, codebook_main, fmt='words'))
-    print("embeddings: [#triples, dims?] ->", len(decode_question(one_chain, codebook_main, fmt='embeddings')), "triples")
-
-    # ---------- 4) Word-embedding coarse top-k over whole DB ----------
-    coarse_topk = get_topk_word_embedding_batched(
-        questions=query_chains,
-        codebook_main=codebook_main,
-        top_k=3,
-        question_batch_size=2,
-        questions_db_batch_size=8,
-    )
-    print("\n== Coarse Top-K (word embeddings) ==")
-    for qi, lst in coarse_topk.items():
-        print(f"Q{qi} → {lst}")
-
-    # ---------- 5) Sentence-embedding rerank ----------
-    reranked = rerank_with_sentence_embeddings(
-        questions=query_chains,
-        codebook_main=codebook_main,
-        coarse_topk=coarse_topk,
-        emb=sent_emb,
-        top_m=3,  # keep top-2 to show list
-    )
-    print("\n== Reranked (sentence embeddings) ==")
-    for qi, lst in reranked.items():
-        print(f"Q{qi} → {lst}")
-
-    # ---------- 6) One-call coarse+fine wrapper ----------
-    print("\n== Coarse+Fine (wrapper: coarse_filter) ==")
-    wrapper_res = coarse_filter(
-        questions=query_chains,
-        codebook_main=codebook_main,
-        emb=sent_emb,
-        top_k=3,
-        question_batch_size=2,
-        questions_db_batch_size=8,
-        top_m=2,
-    )
-    for qi, lst in wrapper_res.items():
-        print(f"Q{qi} → {lst}")
-
-    # ---------- 7) Attach answers to top-m results ----------
-    topm_with_answers = add_answers_to_filtered_lst(wrapper_res, codebook_main)
-    print("\n== Top-m with attached answers (edge-index chains) ==")
-    for qi, lst in topm_with_answers.items():
-        print(f"\nQ{qi}:")
-        for item in lst:
-            print(json_dump_str(item, indent=2))
-
-    # ---------- 8) Decode & show final top-1 per query ----------
-    print("\n== Final decode (top-1 per query) ==")
-    for qi, lst in wrapper_res.items():
-        if not lst:
-            print(f"Q{qi}: <no candidate>")
-            continue
-        best = lst[0]
-        qi_db = best["questions_index"]
-        qj_db = best["question_index"]
-        best_edges_idx_chain = codebook_main["questions_lst"][qi_db][qj_db]
-
-        decoded_edges = decode_question(best_edges_idx_chain, codebook_main, fmt='edges')
-        decoded_words = decode_question(best_edges_idx_chain, codebook_main, fmt='words')
-        decoded_vecs  = decode_question(best_edges_idx_chain, codebook_main, fmt='embeddings')
-
-        print(f"\nQ{qi} top-1:")
-        print("- edges indices:", decoded_edges)
-        print("- words triples:", decoded_words)
-        print("- embeddings triples: count =", len(decoded_vecs))
-
-    # ---------- 9) Find overlapped answer snippets (contiguous runs) + BEFORE/AFTER texts ----------
-    print("\n== Overlapped contiguous answer runs among selected candidates (with BEFORE/AFTER text) ==")
-
-    for qi, lst in topm_with_answers.items():
-        if not lst:
-            print(f"\nQ{qi}: <no candidate with answers>")
-            continue
-
-        print(f"\nQ{qi} — BEFORE (raw candidate answer texts):")
-        per_candidate_answers_texts = []  
-        for rank, item in enumerate(lst):
-            answers_bucket = item['answers(edges[i])']  
-            texts = decode_answers_bucket_to_texts(answers_bucket, codebook_main)
-            per_candidate_answers_texts.append(texts)
-    
-            joined = " | ".join(texts) if texts else "<empty>"
-            print(f"  - cand#{rank}: {joined}")
-
-    
-        answers_buckets_for_overlap = []
-        for item in lst:
-            answers_buckets_for_overlap.append(item['answers(edges[i])'])
-
-        overlaps = find_overlapped_answers(answers_buckets_for_overlap)
-
-        print("----------",overlaps)
-        if overlaps:
-            print(f"Q{qi} — AFTER (merged/common segments):")
-            for seg_id, edge_run in enumerate(overlaps):
-    
-                text_after = decode_chain_to_text(edge_run, codebook_main)
-                print(f"  * segment#{seg_id}: {text_after}   [edges: {edge_run}]")
-        else:
-            print(f"Q{qi} — AFTER: <no common contiguous runs found>")
-
-    print("\n== 10) Manual answers buckets for overlap test ==")
-
-    # 1) Helper: decode each edge into a readable short string
-    def _edge_words(i):
-        h, r, t = decode_question([i], codebook_main, fmt='words')[0]
-        return f"{h} {r} {t}"
-
-    all_edge_texts = [_edge_words(i) for i in range(len(codebook_main["edge_matrix"]))]
-
-    def find_edge_idx(keyword_like: str) -> int:
-        """
-        Fuzzy find an edge index by substring match.
-        Example:
-          find_edge_idx("Mary Shelley subj write")
-          find_edge_idx("write obj Frankenstein")
-        """
-        key = keyword_like.lower().strip()
-        for i, s in enumerate(all_edge_texts):
-            if key in s.lower():
-                return i
-        raise ValueError(
-            f"Edge not found for key ~{keyword_like}~ ; "
-            f"available samples:\n" + "\n".join(all_edge_texts[:12])
-        )
-
-    # 2) Pick some edges of interest
-    idx_MS_subj_write     = find_edge_idx("Mary Shelley subj write")
-    idx_write_obj_Franken = find_edge_idx("write obj Frankenstein")
-    idx_write_in_1818     = find_edge_idx("write prep_in 1818")
-    try:
-        idx_wall_visible  = find_edge_idx("Great Wall property visible")
-    except Exception:
-        idx_wall_visible  = find_edge_idx("Great Wall isa visible")
-
-    # 3) Manually define two candidate answer buckets (lists of edge-index chains)
-    manual_answers_buckets = {
-        0: [
-            [idx_MS_subj_write, idx_write_obj_Franken],
-            [idx_write_in_1818],
-        ],
-        1: [
-            [idx_MS_subj_write, idx_write_obj_Franken],
-            [idx_write_in_1818, idx_wall_visible],
-        ],
-    }
-
-    # 4) Build a fake retrieval result wrapper with two candidates
-    manual_topm_with_answers = {
-        0: [
-            {
-                "score": 0.0,
-                "questions_index": 0,
-                "question_index": 0,
-                "text": "<manual-cand-0>",
-                "answers(edges[i])": manual_answers_buckets[0],
-            },
-            {
-                "score": 0.0,
-                "questions_index": 0,
-                "question_index": 1,
-                "text": "<manual-cand-1>",
-                "answers(edges[i])": manual_answers_buckets[1],
-            },
-        ]
-    }
-
-    # 5) BEFORE/AFTER merge demonstration
-    print("\n== 10.A BEFORE/AFTER using manual answers_buckets ==")
-    for qi, lst in manual_topm_with_answers.items():
-        print(f"\nQ{qi} — BEFORE (raw candidate answer texts):")
-        for rank, item in enumerate(lst):
-            answers_bucket = item['answers(edges[i])']
-            texts = decode_answers_bucket_to_texts(answers_bucket, codebook_main)
-            joined = " | ".join(texts) if texts else "<empty>"
-            print(f"  - cand#{rank}: {joined}")
-
-        overlaps = find_overlapped_answers([it['answers(edges[i])'] for it in lst])
-        if overlaps:
-            print(f"Q{qi} — AFTER (merged/common segments):")
-            for seg_id, edge_run in enumerate(overlaps):
-                text_after = decode_chain_to_text(edge_run, codebook_main)
-                print(f"  * segment#{seg_id}: {text_after}   [edges: {edge_run}]")
-        else:
-            print(f"Q{qi} — AFTER: <no common contiguous runs found>")
-
-    # ========= 11) Unique knowledge assignment =========
-    print("\n== 11) Unique Knowledge assignment ==")
-    flat_lists = get_flat_answers_lsts([it['answers(edges[i])'] for it in manual_topm_with_answers[0]])
-    overlaps   = common_contiguous_overlaps(flat_lists, min_len=2)
-    uniq_res   = get_unique_knowledge({'overlaps': overlaps}, flat_lists)
-
-    print("Assignments (which run kept by which owner):")
-    for x in uniq_res['assignments']:
-        readable = decode_chain_to_text(x['run'], codebook_main)
-        print(f"  run: {readable}  kept_by: cand#{x['owner']}  occurrences: {x['occurrences']}")
-
-    print("\nOut answers (unique knowledge per candidate):")
-    for i, seq in enumerate(uniq_res['out_answers']):
-        readable = decode_chain_to_text(seq, codebook_main)
-        print(f"  cand#{i}: {readable}   [edges: {seq}]")
-
-    # ========= 12) Build compact JSON with given knowledge =========
-    print("\n== 12) Build compact JSON with given knowledge ==")
-    print("-----------------------------------")
-    print(uniq_res['out_answers'])
-    print(codebook_main)
-    print({
-            'e': codebook_main['e'],
-            'r': codebook_main['r'],
-            'edge_matrix': codebook_main['edge_matrix'],
-            'questions(edges[i])': query_chains, 
-            'rule': codebook_main.get('rule', ''),
-        })
-    print("-----------------------------------")
-    compact_json = get_json_with_given_knowledge(
-        flat_answers_lsts = uniq_res['out_answers'],
-        codebook_main     = codebook_main,
-        codebook_sub_q    = {
-            'e': codebook_main['e'],
-            'r': codebook_main['r'],
-            'edge_matrix': codebook_main['edge_matrix'],
-            'questions(edges[i])': query_chains,
-            'rule': codebook_main['rule'],
-        },
-        decode = True
-    )
-    print(json_dump_str({
-        'e[:5]': compact_json['e'][:5],
-        'r[:5]': compact_json['r'][:5],
-        '#edges': len(compact_json['edge_matrix']),
-        '#questions_triples_preview': len(compact_json['questions([[e,r,e], ...])'][:1]),
-        '#knowledge_triples_preview': len(compact_json['given knowledge([[e,r,e], ...])'][:1]),
-    }, indent=2))
-
-
-    print("\n== 13) Entity clustering & merge (fixed) ==")
-    print(codebook_main)
-    merged_cb = combine_ents(codebook_main, min_exp_num=2, max_exp_num=8, random_state=0, use_thinking=False)
-    print(json_dump_str({
-        "entities_before": len(codebook_main['e']),
-        "entities_after":  len(merged_cb['e']),
-        "edges_before":    len(codebook_main['edge_matrix']),
-        "edges_after":     len(merged_cb['edge_matrix']),
-    }, indent=2))
-    print(merged_cb)
-    print("\n========== Test completed. ==========\n")
+    prompt = "Punta Cana is a resort town in the municipality of Higuey, in La Altagracia Province, the eastern most province of the Dominican Republic"
+    q_json = get_code_book(prompt, type='questions')
+    print(q_json)
