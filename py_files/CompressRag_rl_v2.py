@@ -755,7 +755,7 @@ def get_code_book(prompt, type='questions', rule="Answer questions.", factparser
     codebook, ent2id, rel2id = build_codebook_from_triples(triples, rule)
     edges = edges_from_triples(triples, ent2id, rel2id)
 
-    feat_name = f"{type}([[e,r,e], ...])"  
+    feat_name = f"{type}(edges[i])"  
 
     dict_2 = {
         "edges([e,r,e])": edges,
@@ -899,7 +899,7 @@ def merging_codebook(codebook_main, codebook_sub, type='questions', word_emb=wor
     if type == 'fact':
         type = 'facts'
 
-    feat_name = type + '([[e,r,e], ...])'
+    feat_name = type + '(edges[i])'
 
     if type == 'questions':
         main_feat_name = 'questions_lst'
@@ -1969,6 +1969,9 @@ def get_json_with_given_knowledge(flat_answers_lsts,codebook_main,codebook_sub_q
 
 
     # update the questions
+    print(edge_mat_for_q_sub_dict)
+    print(codebook_sub_q)
+    print(codebook_sub_q['questions(edges[i])'])
     questions = [
         [edge_mat_for_q_sub_dict.get(val, val) for val in inner]
         for inner in codebook_sub_q['questions(edges[i])']
@@ -3484,20 +3487,20 @@ class CompressRag_rl:
         return new_result,metrics_from_llm,ft_txt
     
 
-from pathlib import Path
-if __name__ == "__main__":
-    # prompt = "Punta Cana is a resort town in the municipality of Higuey, in La Altagracia Province, the eastern most province of the Dominican Republic"
-    # q_json = get_code_book(prompt, type='questions', rule="Answer questions.")
-    # # q_json['q'] - decode_question()
-    # print(q_json)
+# from pathlib import Path
+# if __name__ == "__main__":
+#     # prompt = "Punta Cana is a resort town in the municipality of Higuey, in La Altagracia Province, the eastern most province of the Dominican Republic"
+#     # q_json = get_code_book(prompt, type='questions', rule="Answer questions.")
+#     # # q_json['q'] - decode_question()
+#     # print(q_json)
 
 
-    ini_meta_json = Path("meta_codebook.json")
-    with ini_meta_json.open("r", encoding="utf-8") as f:
-        ini = json.load(f)
-    pre_loaded_meta = False
-    q_json  =  {'e': ['fair skin', 'BCC'], 'r': ['has effect', 'has cause'], 'rule': 'Answer questions', 'edges([e,r,e])': [[0, 0, 1], [1, 1, 0]], 'questions(edges[i])': [[0, 1], [1, 0]]}
+#     ini_meta_json = Path("meta_codebook.json")
+#     with ini_meta_json.open("r", encoding="utf-8") as f:
+#         ini = json.load(f)
+#     pre_loaded_meta = False
+#     q_json  =  {'e': ['fair skin', 'BCC'], 'r': ['has effect', 'has cause'], 'rule': 'Answer questions', 'edges([e,r,e])': [[0, 0, 1], [1, 1, 0]], 'questions(edges[i])': [[0, 1], [1, 0]]}
 
-    final_merged = get_json_with_given_knowledge([[6, 7], [7, 6], [6, 7], [7, 6]],ini,q_json,decode = True)
+#     final_merged = get_json_with_given_knowledge([[6, 7], [7, 6], [6, 7], [7, 6]],ini,q_json,decode = True)
 
-    print(final_merged)
+#     print(final_merged)

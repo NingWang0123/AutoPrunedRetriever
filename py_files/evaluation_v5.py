@@ -13,7 +13,7 @@ import os, json, re, random
 from pathlib import Path
 from typing import List, Dict, Tuple, Optional
 import json
-
+import pathlib
 import numpy   as np
 import torch
 from huggingface_hub import hf_hub_download
@@ -30,7 +30,7 @@ from dpo_compressrag_v2 import (
 from test_for_compressrag import Phi4MiniReasoningLLM
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings
 from langchain_openai import ChatOpenAI
-from evaluation_func_graphrag import compute_answer_correctness
+# from evaluation_func_graphrag import compute_answer_correctness
 
 # ---------------------------------------------------------------------
 # 0) Paths / constants
@@ -84,7 +84,7 @@ cr = CompressRag_rl(
     sentence_emb      = sent_emb,
     word_emb          = word_emb,
     llm               = phi_llm,
-    thinkings_choice    = 'non_include',
+    thinkings_choice    = 'not_include',
     answers_choice      = 'overlap',
 )
 
@@ -135,191 +135,196 @@ if not pre_loaded_meta:
     print(f"[DEBUG] after facts-merge: |E|={len(cr.meta_codebook['e'])} "
         f"|R|={len(cr.meta_codebook['r'])} "
         f"|edges|={len(cr.meta_codebook['edge_matrix'])}")
-
-# ---------------------------------------------------------------------
-# 4) Build DPO preference dataset on seed Q-A pairs
-# ---------------------------------------------------------------------
-print(cr.meta_codebook)
-print("» Building preference pairs for DPO …")
-
-
-# using llm one to replace the old one
-# using answer_correctness from graph rag benchmark
-saved_examples_name = "pref_examples_medical.json"
-
-# check if it is saved or not, reuse the trained one
-async def build_or_load_pref_ds() -> list:
-    if not os.path.exists(saved_examples_name):
-        # init only when needed
-        embedding_for_reward = HuggingFaceBgeEmbeddings(
-            model_name="BAAI/bge-large-en-v1.5"
-        )
-        BASE_URL = "https://api.deepseek.com/v1"
-        API_KEY = pathlib.Path("deepseek_key.txt").read_text().strip()
-
-        llm = ChatOpenAI(
-            model="deepseek-chat",
-            base_url=BASE_URL,
-            api_key=API_KEY,
-            temperature=0.0,
-            max_retries=3,
-            timeout=30,
-        )
-
-        pref_ds = await make_preference_dataset_2head_using_llm(
-            cr=cr,
-            questions=seed_questions,
-            gold_answers=gold_lookup,
-            per_q_samples=6,
-            reward_fn=compute_answer_correctness,   
-            seed=42,
-            llm=llm,
-            embeddings=embedding_for_reward,
-            ANSWERS_CHOICES=ANSWERS_CHOICES,
-            THINKINGS_CHOICES=THINKINGS_CHOICES,
-            isolate_state = True,
-            feature_dim = 384
-        )
-        print(f"   generated {len(pref_ds)} preference examples")
-        save_pref_examples(saved_examples_name, pref_ds)
-        return pref_ds
-    else:
-        pref_ds = load_pref_examples(saved_examples_name)
-        print(f"   loaded {len(pref_ds)} cached preference examples")
-        return pref_ds
-
-# Run async builder and CAPTURE the result
-if __name__ == "__main__":
-    pref_ds = asyncio.run(build_or_load_pref_ds())
-
-policy, _ = train_dpo_2head(pref_ds, input_dim=384)
-
-
-# ---------------------------------------------------------------------
-# 5) Seed history with first 30 Q-A (store answers / thinkings)
-# ---------------------------------------------------------------------
-print("» Seeding history with first 30 questions …")
-for q in seed_questions:
-    answer_with_auto_strategy(
-        cr =cr, 
-        policy =policy, 
-        q = q,
-        reward_fn       = default_reward,
-        gold_answer     = gold_lookup[q],
-        greedy          = True
-    )
-
-# ---------------------------------------------------------------------
-# 6) Helper: capture CR’s last retrieved context
-# ---------------------------------------------------------------------
-def _collect_ctx(cr, k: int = TOPK_CTX) -> List[str]:
-    ctx = getattr(cr, "_last_ctx", [])[:k]
-    return [re.sub(r"\s+", " ", c.strip()) for c in ctx]
-
-# ---------------------------------------------------------------------
-# 8) Evaluate next 20 questions & dump JSON
-# ---------------------------------------------------------------------
-def dump_results(
-    questions: List[str],
-    out_path: str,
-    metrics_path: str
-):
-    rows = []
-    run_metrics = []
-
-    for q in questions:
-        start_idx = len(cr.llm.metrics_runs)
-        pred, _meta = answer_with_auto_strategy(
-            cr, policy, q,
-            reward_fn       = default_reward,
-            gold_answer     = gold_lookup[q],
-            greedy          = True
-        )
-
-        gen_metrics = (cr.llm.metrics_runs[start_idx:] or [{}])[-1]
-        run_metrics.append({"question": q, **gen_metrics})    
     
-        row = row_lookup[q]
-        rows.append({
-            "id":               row["id"],
-            "question":         q,
-            "source":           row["source"],
-            "context":          _meta['fact_context'],
-            "evidence":         row["evidence"],
-            "question_type":    row["question_type"],
-            "generated_answer": pred,
-            "ground_truth":     row["answer"],
-        })
 
-    Path(out_path).parent.mkdir(parents=True, exist_ok=True)
-    with open(out_path, "w") as f:
-        json.dump(rows, f, indent=2)
-        print(f"✓ wrote {len(rows)} rows → {out_path}")
+for q in seed_questions:
+    a = cr.run_work_flow(q)
+    print(a)
 
-    with open(metrics_path, "w") as f:
-        json.dump({"run_meta": run_metrics}, f, indent=2)
-    print(f"✓ wrote metrics         → {metrics_path}")
+# # ---------------------------------------------------------------------
+# # 4) Build DPO preference dataset on seed Q-A pairs
+# # ---------------------------------------------------------------------
+# print(cr.meta_codebook)
+# print("» Building preference pairs for DPO …")
 
 
-print("» Answering evaluation questions …")
-dump_results(test_questions, out_path= "results/compressrag_medical_data.json", metrics_path ="results/compressrag_medical_metrics.json")
+# # using llm one to replace the old one
+# # using answer_correctness from graph rag benchmark
+# saved_examples_name = "pref_examples_medical.json"
+
+# # check if it is saved or not, reuse the trained one
+# async def build_or_load_pref_ds() -> list:
+#     if not os.path.exists(saved_examples_name):
+#         # init only when needed
+#         embedding_for_reward = HuggingFaceBgeEmbeddings(
+#             model_name="BAAI/bge-large-en-v1.5"
+#         )
+#         BASE_URL = "https://api.deepseek.com/v1"
+#         API_KEY = pathlib.Path("deepseek_key.txt").read_text().strip()
+
+#         llm = ChatOpenAI(
+#             model="deepseek-chat",
+#             base_url=BASE_URL,
+#             api_key=API_KEY,
+#             temperature=0.0,
+#             max_retries=3,
+#             timeout=30,
+#         )
+
+#         pref_ds = await make_preference_dataset_2head_using_llm(
+#             cr=cr,
+#             questions=seed_questions,
+#             gold_answers=gold_lookup,
+#             per_q_samples=6,
+#             reward_fn=compute_answer_correctness,   
+#             seed=42,
+#             llm=llm,
+#             embeddings=embedding_for_reward,
+#             ANSWERS_CHOICES=ANSWERS_CHOICES,
+#             THINKINGS_CHOICES=THINKINGS_CHOICES,
+#             isolate_state = True,
+#             feature_dim = 384
+#         )
+#         print(f"   generated {len(pref_ds)} preference examples")
+#         save_pref_examples(saved_examples_name, pref_ds)
+#         return pref_ds
+#     else:
+#         pref_ds = load_pref_examples(saved_examples_name)
+#         print(f"   loaded {len(pref_ds)} cached preference examples")
+#         return pref_ds
+
+# # Run async builder and CAPTURE the result
+# if __name__ == "__main__":
+#     pref_ds = asyncio.run(build_or_load_pref_ds())
+
+# policy, _ = train_dpo_2head(pref_ds, input_dim=384)
 
 
-import os, subprocess, sys, pathlib
+# # ---------------------------------------------------------------------
+# # 5) Seed history with first 30 Q-A (store answers / thinkings)
+# # ---------------------------------------------------------------------
+# print("» Seeding history with first 30 questions …")
+# for q in seed_questions:
+#     answer_with_auto_strategy(
+#         cr =cr, 
+#         policy =policy, 
+#         q = q,
+#         reward_fn       = default_reward,
+#         gold_answer     = gold_lookup[q],
+#         greedy          = True
+#     )
 
-DATA      = "results/compressrag_medical_data.json"
-BASE_URL  = "https://api.deepseek.com/v1"
-API_KEY   = pathlib.Path("deepseek_key.txt").read_text().strip()
+# # ---------------------------------------------------------------------
+# # 6) Helper: capture CR’s last retrieved context
+# # ---------------------------------------------------------------------
+# def _collect_ctx(cr, k: int = TOPK_CTX) -> List[str]:
+#     ctx = getattr(cr, "_last_ctx", [])[:k]
+#     return [re.sub(r"\s+", " ", c.strip()) for c in ctx]
 
-ROOT_DIR  = pathlib.Path(
-    "/home/ra_daniel/bilby/relational_graph_llm/py_files/GraphRAG_Benchmark"
-)
-PKG_PARENT = str(ROOT_DIR.parent)  # .../py_files
+# # ---------------------------------------------------------------------
+# # 8) Evaluate next 20 questions & dump JSON
+# # ---------------------------------------------------------------------
+# def dump_results(
+#     questions: List[str],
+#     out_path: str,
+#     metrics_path: str
+# ):
+#     rows = []
+#     run_metrics = []
 
-env = os.environ.copy()
-env["OPENAI_API_BASE"] = BASE_URL
-env["OPENAI_API_KEY"]  = API_KEY
-env["LLM_API_KEY"]     = API_KEY
-env["PYTHONPATH"]      = PKG_PARENT + os.pathsep + env.get("PYTHONPATH", "")
+#     for q in questions:
+#         start_idx = len(cr.llm.metrics_runs)
+#         pred, _meta = answer_with_auto_strategy(
+#             cr, policy, q,
+#             reward_fn       = default_reward,
+#             gold_answer     = gold_lookup[q],
+#             greedy          = True
+#         )
 
-def run_eval(cmd, outfile):
-    proc = subprocess.run(cmd, env=env, text=True)
-    if proc.returncode != 0:
-        print("----- evaluator stdout -----\n", proc.stdout)
-        print("----- evaluator stderr -----\n", proc.stderr)
-        proc.check_returncode()
-    else:
-        print(f"✅ wrote {outfile}")
+#         gen_metrics = (cr.llm.metrics_runs[start_idx:] or [{}])[-1]
+#         run_metrics.append({"question": q, **gen_metrics})    
+    
+#         row = row_lookup[q]
+#         rows.append({
+#             "id":               row["id"],
+#             "question":         q,
+#             "source":           row["source"],
+#             "context":          _meta['fact_context'],
+#             "evidence":         row["evidence"],
+#             "question_type":    row["question_type"],
+#             "generated_answer": pred,
+#             "ground_truth":     row["answer"],
+#         })
 
-EVAL_PKG = "GraphRAG_Benchmark.Evaluation"
+#     Path(out_path).parent.mkdir(parents=True, exist_ok=True)
+#     with open(out_path, "w") as f:
+#         json.dump(rows, f, indent=2)
+#         print(f"✓ wrote {len(rows)} rows → {out_path}")
 
-# retrieval evaluator
-run_eval(
-    [
-        sys.executable, "-m", f"{EVAL_PKG}.retrieval_eval",
-        "--mode", "API",
-        "--model", "deepseek-chat",
-        "--base_url", BASE_URL,
-        "--embedding_model", "BAAI/bge-large-en-v1.5",
-        "--data_file", DATA,
-        "--output_file", "results/retrieval_scores.json",
-        "--detailed_output",
-    ],
-    "results/retrieval_scores.json",
-)
+#     with open(metrics_path, "w") as f:
+#         json.dump({"run_meta": run_metrics}, f, indent=2)
+#     print(f"✓ wrote metrics         → {metrics_path}")
 
-# generation evaluator
-run_eval(
-    [
-        sys.executable, "-m", f"{EVAL_PKG}.generation_eval",
-        "--mode", "API",
-        "--model", "deepseek-chat",
-        "--base_url", BASE_URL,
-        "--data_file", DATA,
-        "--output_file", "results/generation_scores.json",
-        "--detailed_output",
-    ],
-    "results/generation_scores.json",
-)
 
-print("🎉  Benchmark complete — score files are in results/")
+# print("» Answering evaluation questions …")
+# dump_results(test_questions, out_path= "results/compressrag_medical_data.json", metrics_path ="results/compressrag_medical_metrics.json")
+
+
+# import os, subprocess, sys, pathlib
+
+# DATA      = "results/compressrag_medical_data.json"
+# BASE_URL  = "https://api.deepseek.com/v1"
+# API_KEY   = pathlib.Path("deepseek_key.txt").read_text().strip()
+
+# ROOT_DIR  = pathlib.Path(
+#     "/home/ra_daniel/bilby/relational_graph_llm/py_files/GraphRAG_Benchmark"
+# )
+# PKG_PARENT = str(ROOT_DIR.parent)  # .../py_files
+
+# env = os.environ.copy()
+# env["OPENAI_API_BASE"] = BASE_URL
+# env["OPENAI_API_KEY"]  = API_KEY
+# env["LLM_API_KEY"]     = API_KEY
+# env["PYTHONPATH"]      = PKG_PARENT + os.pathsep + env.get("PYTHONPATH", "")
+
+# def run_eval(cmd, outfile):
+#     proc = subprocess.run(cmd, env=env, text=True)
+#     if proc.returncode != 0:
+#         print("----- evaluator stdout -----\n", proc.stdout)
+#         print("----- evaluator stderr -----\n", proc.stderr)
+#         proc.check_returncode()
+#     else:
+#         print(f"✅ wrote {outfile}")
+
+# EVAL_PKG = "GraphRAG_Benchmark.Evaluation"
+
+# # retrieval evaluator
+# run_eval(
+#     [
+#         sys.executable, "-m", f"{EVAL_PKG}.retrieval_eval",
+#         "--mode", "API",
+#         "--model", "deepseek-chat",
+#         "--base_url", BASE_URL,
+#         "--embedding_model", "BAAI/bge-large-en-v1.5",
+#         "--data_file", DATA,
+#         "--output_file", "results/retrieval_scores.json",
+#         "--detailed_output",
+#     ],
+#     "results/retrieval_scores.json",
+# )
+
+# # generation evaluator
+# run_eval(
+#     [
+#         sys.executable, "-m", f"{EVAL_PKG}.generation_eval",
+#         "--mode", "API",
+#         "--model", "deepseek-chat",
+#         "--base_url", BASE_URL,
+#         "--data_file", DATA,
+#         "--output_file", "results/generation_scores.json",
+#         "--detailed_output",
+#     ],
+#     "results/generation_scores.json",
+# )
+
+# print("🎉  Benchmark complete — score files are in results/")
