@@ -755,7 +755,7 @@ def get_code_book(prompt, type='questions', rule="Answer questions.", factparser
     codebook, ent2id, rel2id = build_codebook_from_triples(triples, rule)
     edges = edges_from_triples(triples, ent2id, rel2id)
 
-    feat_name = f"{type}(edges[i])"  
+    feat_name = f"{type}([[e,r,e], ...])"  
 
     dict_2 = {
         "edges([e,r,e])": edges,
@@ -899,7 +899,7 @@ def merging_codebook(codebook_main, codebook_sub, type='questions', word_emb=wor
     if type == 'fact':
         type = 'facts'
 
-    feat_name = type + '(edges[i])'
+    feat_name = type + '([[e,r,e], ...])'
 
     if type == 'questions':
         main_feat_name = 'questions_lst'
@@ -3482,3 +3482,10 @@ class CompressRag_rl:
         # print(f'new_result {new_result}')
 
         return new_result,metrics_from_llm,ft_txt
+    
+
+# if __name__ == "__main__":
+#     prompt = "Punta Cana is a resort town in the municipality of Higuey, in La Altagracia Province, the eastern most province of the Dominican Republic"
+#     q_json = get_code_book(prompt, type='questions', rule="Answer questions.")
+#     # q_json['q'] - decode_question()
+#     print(q_json)
