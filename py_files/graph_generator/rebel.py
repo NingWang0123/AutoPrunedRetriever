@@ -37,7 +37,8 @@ def extract_triplets(text):
     return triplets
 
 def triplet_parser(text):
-    triplet_extractor = pipeline('text2text-generation', model='Babelscape/rebel-large', tokenizer='Babelscape/rebel-large')
+    triplet_extractor = pipeline('text2text-generation', model='Babelscape/rebel-large',
+                                  tokenizer='Babelscape/rebel-large', device=0)
     extracted_text = triplet_extractor.tokenizer.batch_decode([triplet_extractor(text, return_tensors=True, return_text=False)[0]["generated_token_ids"]])
     extracted_triplets = extract_triplets(extracted_text[0])
     return extracted_triplets
