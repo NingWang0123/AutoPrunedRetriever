@@ -3425,7 +3425,7 @@ class CompressRag_rl:
         return new_result
     
     # dpo version for run work_flow, same process but return the collected metrics from the llm
-    def run_work_flow_for_dpo(self, q_prompt, rule="Answer questions", facts_json_path: str = None, chunk_chars: int = 800, overlap: int = 120, warm_start = "knn"): #coarse
+    def run_work_flow_for_dpo(self, q_prompt, rule="Answer questions", facts_json_path: str = None, chunk_chars: int = 1024, overlap: int = 0, warm_start = "knn"): #coarse
 
         #prevent dpo change choice but not change includings
         self.set_includings()

@@ -3611,7 +3611,7 @@ class CompressRag_rl:
                 )
         return combined_facts_cb
 
-    def run_work_flow(self, q_prompt, rule="Answer questions", facts_json_path: list = None, chunk_chars: int = 800, overlap: int = 120, warm_start = "knn"): #coarse
+    def run_work_flow(self, q_prompt, rule="Answer questions", facts_json_path: list = None, chunk_chars: int = 1024, overlap: int = 0, warm_start = "knn"): #coarse
 
         #prevent dpo change choice but not change includings
         self.set_includings()
