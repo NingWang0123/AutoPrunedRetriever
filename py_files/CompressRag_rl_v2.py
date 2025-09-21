@@ -1938,6 +1938,8 @@ def get_json_with_given_knowledge(flat_answers_lsts,codebook_main,codebook_sub_q
 
         entitie_index_dict_q[ent_pos] = new_ent_pos
 
+        ent_pos+=1
+
     # update relation index
     r_pos = 0
     for r in codebook_sub_q['r']:
@@ -1947,7 +1949,11 @@ def get_json_with_given_knowledge(flat_answers_lsts,codebook_main,codebook_sub_q
             new_r_pos = r_set_len
             r_set.append(r)
             r_set_len+=1
+
+
         r_index_dict_q[r_pos] = new_r_pos
+
+        r_pos+=1
 
     # map the q edge matrix
     edge_mat_for_q_sub = remap_edges(codebook_sub_q['edges([e,r,e])'], entitie_index_dict_q, r_index_dict_q)
@@ -2278,6 +2284,8 @@ def get_json_with_given_thinkings(flat_thinkings_lsts,codebook_main,codebook_sub
 
         entitie_index_dict_q[ent_pos] = new_ent_pos
 
+        ent_pos+=1
+
     # update relation index
     r_pos = 0
     for r in codebook_sub_q['r']:
@@ -2287,7 +2295,10 @@ def get_json_with_given_thinkings(flat_thinkings_lsts,codebook_main,codebook_sub
             r_set_len+=1
             new_r_pos = r_set_len
             r_set.append(r)
+
         r_index_dict_q[r_pos] = new_r_pos
+
+        r_pos+=1
 
     # map the q edge matrix
     edge_mat_for_q_sub = remap_edges(codebook_sub_q['edges([e,r,e])'], entitie_index_dict_q, r_index_dict_q)
