@@ -3195,22 +3195,22 @@ class CompressRag_rl:
             flat_facts_lsts = domain_knowledge_lst[ptr]
             ptr += 1
 
-        if self.include_answers and self.include_thinkings:
+        if self.include_answers and self.include_thinkings and flat_answers_lsts and flat_thinkings_lsts:
             final_merged_json = get_json_with_given_knowledge_and_thinkings(
-                flat_answers_lsts or [], 
-                flat_thinkings_lsts or [],
+                flat_answers_lsts , 
+                flat_thinkings_lsts ,
                 self.meta_codebook, 
                 codebook_sub_q
             )
-        elif self.include_answers:
+        elif self.include_answers and flat_answers_lsts:
             final_merged_json = get_json_with_given_knowledge(
-                flat_answers_lsts or [], 
+                flat_answers_lsts , 
                 self.meta_codebook, 
                 codebook_sub_q
             )
-        elif self.include_thinkings:
+        elif self.include_thinkings and flat_thinkings_lsts:
             final_merged_json = get_json_with_given_thinkings(
-                flat_thinkings_lsts or [], 
+                flat_thinkings_lsts , 
                 self.meta_codebook, 
                 codebook_sub_q
             )
