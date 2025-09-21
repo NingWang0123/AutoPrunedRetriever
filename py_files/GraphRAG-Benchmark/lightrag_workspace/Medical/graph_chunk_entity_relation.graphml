@@ -1,0 +1,987 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+  <key id="d11" for="edge" attr.name="created_at" attr.type="long" />
+  <key id="d10" for="edge" attr.name="file_path" attr.type="string" />
+  <key id="d9" for="edge" attr.name="source_id" attr.type="string" />
+  <key id="d8" for="edge" attr.name="keywords" attr.type="string" />
+  <key id="d7" for="edge" attr.name="description" attr.type="string" />
+  <key id="d6" for="edge" attr.name="weight" attr.type="double" />
+  <key id="d5" for="node" attr.name="created_at" attr.type="long" />
+  <key id="d4" for="node" attr.name="file_path" attr.type="string" />
+  <key id="d3" for="node" attr.name="source_id" attr.type="string" />
+  <key id="d2" for="node" attr.name="description" attr.type="string" />
+  <key id="d1" for="node" attr.name="entity_type" attr.type="string" />
+  <key id="d0" for="node" attr.name="entity_id" attr.type="string" />
+  <graph edgedefault="undirected">
+    <node id="NCCN Guidelines for Patients">
+      <data key="d0">NCCN Guidelines for Patients</data>
+      <data key="d1">Document</data>
+      <data key="d2">The NCCN Guidelines for Patients are trusted by patients and providers; they clearly explain current care recommendations made by respected experts in the field, based on the latest research and practices at leading cancer centers.&lt;SEP&gt;A patient-focused document published by the National Comprehensive Cancer Network that provides guidance on cancer care and family health history.&lt;SEP&gt;A set of guidelines provided by the National Comprehensive Cancer Network for patients with skin cancer.</data>
+      <data key="d3">chunk-66dd071b6c2be50e36cee1a1c1bd3b33&lt;SEP&gt;chunk-f8eae4d6dadf6a6fbd339efa4dec2172&lt;SEP&gt;chunk-aa14ecd19e2d721cb99ea9590f0ede3a</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460576</data>
+    </node>
+    <node id="Basal Cell Skin Cancer">
+      <data key="d0">Basal Cell Skin Cancer</data>
+      <data key="d1">Category</data>
+      <data key="d2">Basal cell skin cancer is a type of skin cancer that can return to the area where it was originally found or metastasize to lymph nodes or distant parts of the body.&lt;SEP&gt;Basal cell skin cancer is the most common type of skin cancer, diagnosed in about 3 million cases annually in the United States, and is typically curable when detected early.</data>
+      <data key="d3">chunk-66dd071b6c2be50e36cee1a1c1bd3b33&lt;SEP&gt;chunk-f8eae4d6dadf6a6fbd339efa4dec2172</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460576</data>
+    </node>
+    <node id="Chapter 3: Types of treatment">
+      <data key="d0">Chapter 3: Types of treatment</data>
+      <data key="d1">Category</data>
+      <data key="d2">Chapter 3 of the book covers the types of treatment available for cancer patients.</data>
+      <data key="d3">chunk-f8eae4d6dadf6a6fbd339efa4dec2172</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460576</data>
+    </node>
+    <node id="Chapter 4: Treatment by risk and recurrence">
+      <data key="d0">Chapter 4: Treatment by risk and recurrence</data>
+      <data key="d1">Category</data>
+      <data key="d2">Chapter 4 of the book focuses on how treatment is tailored based on the risk level and recurrence of cancer.</data>
+      <data key="d3">chunk-f8eae4d6dadf6a6fbd339efa4dec2172</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460576</data>
+    </node>
+    <node id="Questions to ask">
+      <data key="d0">Questions to ask</data>
+      <data key="d1">Category</data>
+      <data key="d2">A section in each chapter of the book that provides suggested questions to help patients understand their care.</data>
+      <data key="d3">chunk-f8eae4d6dadf6a6fbd339efa4dec2172</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460576</data>
+    </node>
+    <node id="Adrenal glands">
+      <data key="d0">Adrenal glands</data>
+      <data key="d1">Category</data>
+      <data key="d2">Adrenal glands are small, yellow glands located on top of each kidney, part of the endocrine system that produce hormones.</data>
+      <data key="d3">chunk-f8eae4d6dadf6a6fbd339efa4dec2172</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460576</data>
+    </node>
+    <node id="Adrenal tumors">
+      <data key="d0">Adrenal tumors</data>
+      <data key="d1">Category</data>
+      <data key="d2">Adrenal tumors can occur in one or both adrenal glands and are categorized as benign, functional, or malignant.</data>
+      <data key="d3">chunk-f8eae4d6dadf6a6fbd339efa4dec2172</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460576</data>
+    </node>
+    <node id="Adrenocortical carcinoma">
+      <data key="d0">Adrenocortical carcinoma</data>
+      <data key="d1">Category</data>
+      <data key="d2">Adrenocortical carcinoma is a rare type of adrenal gland cancer that begins in the adrenal cortex.</data>
+      <data key="d3">chunk-f8eae4d6dadf6a6fbd339efa4dec2172</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460576</data>
+    </node>
+    <node id="Neuroblastoma">
+      <data key="d0">Neuroblastoma</data>
+      <data key="d1">Category</data>
+      <data key="d2">Neuroblastoma is a rare type of adrenal tumor that affects children under 5 years of age and can spread.&lt;SEP&gt;Neuroblastoma is a rare type of adrenal tumor that is cancerous, affecting children under 5, and can spread to bones and other parts of the body.</data>
+      <data key="d3">chunk-f8eae4d6dadf6a6fbd339efa4dec2172&lt;SEP&gt;chunk-7102a43dfb62e649d725bc95ba292688</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460577</data>
+    </node>
+    <node id="Cushing syndrome">
+      <data key="d0">Cushing syndrome</data>
+      <data key="d1">Category</data>
+      <data key="d2">Cushing syndrome is a condition caused by an adrenal tumor producing excess cortisol.</data>
+      <data key="d3">chunk-f8eae4d6dadf6a6fbd339efa4dec2172</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460577</data>
+    </node>
+    <node id="Recurrence">
+      <data key="d0">Recurrence</data>
+      <data key="d1">Category</data>
+      <data key="d2">Recurrence in cancer refers to when the cancer returns to the area where it was originally found or has metastasized to lymph nodes or distant parts of the body.</data>
+      <data key="d3">chunk-f8eae4d6dadf6a6fbd339efa4dec2172</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460577</data>
+    </node>
+    <node id="Testing for basal cell skin cancer">
+      <data key="d0">Testing for basal cell skin cancer</data>
+      <data key="d1">Category</data>
+      <data key="d2">Testing for basal cell skin cancer involves medical history, physical exam, skin exam, biopsy, and imaging studies to diagnose the condition.</data>
+      <data key="d3">chunk-f8eae4d6dadf6a6fbd339efa4dec2172</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460577</data>
+    </node>
+    <node id="Biopsy">
+      <data key="d0">Biopsy</data>
+      <data key="d1">Category</data>
+      <data key="d2">Biopsy is a medical procedure to remove a small sample of tissue for examination to diagnose cancer.</data>
+      <data key="d3">chunk-f8eae4d6dadf6a6fbd339efa4dec2172</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460577</data>
+    </node>
+    <node id="Imaging">
+      <data key="d0">Imaging</data>
+      <data key="d1">Category</data>
+      <data key="d2">Imaging refers to medical tests such as CT or MRI scans that visualize internal structures.</data>
+      <data key="d3">chunk-f8eae4d6dadf6a6fbd339efa4dec2172</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460577</data>
+    </node>
+    <node id="Medical Binder">
+      <data key="d0">Medical Binder</data>
+      <data key="d1">Product</data>
+      <data key="d2">A physical notebook or binder used to organize medical records, including test results, insurance cards, and other health documents.</data>
+      <data key="d3">chunk-aa14ecd19e2d721cb99ea9590f0ede3a</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460577</data>
+    </node>
+    <node id="Blood Test Results">
+      <data key="d0">Blood Test Results</data>
+      <data key="d1">Category</data>
+      <data key="d2">Results from blood tests that are used to monitor health conditions and detect diseases.</data>
+      <data key="d3">chunk-aa14ecd19e2d721cb99ea9590f0ede3a</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460577</data>
+    </node>
+    <node id="Imaging Results">
+      <data key="d0">Imaging Results</data>
+      <data key="d1">Category</data>
+      <data key="d2">Results from imaging tests (such as X-rays, CT, MRI) that provide visual images of the body's internal structures.</data>
+      <data key="d3">chunk-aa14ecd19e2d721cb99ea9590f0ede3a</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460577</data>
+    </node>
+    <node id="Cancer Reports">
+      <data key="d0">Cancer Reports</data>
+      <data key="d1">Category</data>
+      <data key="d2">Reports related to specific types of cancer, including diagnosis and treatment details.</data>
+      <data key="d3">chunk-aa14ecd19e2d721cb99ea9590f0ede3a</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460577</data>
+    </node>
+    <node id="Second Medical Opinion">
+      <data key="d0">Second Medical Opinion</data>
+      <data key="d1">Category</data>
+      <data key="d2">A consultation with a second healthcare provider to review a patient's condition and treatment plan.</data>
+      <data key="d3">chunk-aa14ecd19e2d721cb99ea9590f0ede3a</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460577</data>
+    </node>
+    <node id="Medical History">
+      <data key="d0">Medical History</data>
+      <data key="d1">Category</data>
+      <data key="d2">A record of a person's health issues, treatments, and medical conditions throughout their life.</data>
+      <data key="d3">chunk-aa14ecd19e2d721cb99ea9590f0ede3a</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460577</data>
+    </node>
+    <node id="Family History">
+      <data key="d0">Family History</data>
+      <data key="d1">Category</data>
+      <data key="d2">Information about the health conditions and diseases that run in a family, including genetic predispositions.</data>
+      <data key="d3">chunk-aa14ecd19e2d721cb99ea9590f0ede3a</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460577</data>
+    </node>
+    <node id="Physical Examination">
+      <data key="d0">Physical Examination</data>
+      <data key="d1">Category</data>
+      <data key="d2">A comprehensive health assessment by a healthcare provider that includes checking vital signs and physical symptoms.</data>
+      <data key="d3">chunk-aa14ecd19e2d721cb99ea9590f0ede3a</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460577</data>
+    </node>
+    <node id="CT Scan">
+      <data key="d0">CT Scan</data>
+      <data key="d1">Technology</data>
+      <data key="d2">A computed tomography scan that uses X-rays and computer technology to create detailed 3D images of the body.</data>
+      <data key="d3">chunk-aa14ecd19e2d721cb99ea9590f0ede3a</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460577</data>
+    </node>
+    <node id="MRI Scan">
+      <data key="d0">MRI Scan</data>
+      <data key="d1">Technology</data>
+      <data key="d2">A magnetic resonance imaging scan that uses radio waves and magnets to produce detailed images of the body without X-rays.</data>
+      <data key="d3">chunk-aa14ecd19e2d721cb99ea9590f0ede3a</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460577</data>
+    </node>
+    <node id="PET Scan">
+      <data key="d0">PET Scan</data>
+      <data key="d1">Technology</data>
+      <data key="d2">A positron emission tomography scan that uses a radioactive tracer to detect cancer cells and other abnormalities.</data>
+      <data key="d3">chunk-aa14ecd19e2d721cb99ea9590f0ede3a</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460577</data>
+    </node>
+    <node id="FDG-PET/CT Scan">
+      <data key="d0">FDG-PET/CT Scan</data>
+      <data key="d1">Technology</data>
+      <data key="d2">A combined scan that uses a PET scan with a CT scan to provide detailed images of cancer cells and their spread.</data>
+      <data key="d3">chunk-aa14ecd19e2d721cb99ea9590f0ede3a</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460577</data>
+    </node>
+    <node id="Adrenal Tumors">
+      <data key="d0">Adrenal Tumors</data>
+      <data key="d1">Category</data>
+      <data key="d2">Tumors that develop in the adrenal glands, which can be associated with various health conditions including cancer.&lt;SEP&gt;Adrenal tumors are growths that can occur in the adrenal glands, and most are noncancerous (benign), but some can be cancerous.</data>
+      <data key="d3">chunk-7102a43dfb62e649d725bc95ba292688&lt;SEP&gt;chunk-aa14ecd19e2d721cb99ea9590f0ede3a</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460578</data>
+    </node>
+    <node id="Family Health History">
+      <data key="d0">Family Health History</data>
+      <data key="d1">Category</data>
+      <data key="d2">The medical history of blood relatives that helps identify genetic conditions and diseases.</data>
+      <data key="d3">chunk-aa14ecd19e2d721cb99ea9590f0ede3a</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460578</data>
+    </node>
+    <node id="Diphenhydramine">
+      <data key="d0">Diphenhydramine</data>
+      <data key="d1">Product</data>
+      <data key="d2">An over-the-counter antihistamine medication (sold under the brand name Benadryl) used to treat allergies and as a sleep aid.</data>
+      <data key="d3">chunk-aa14ecd19e2d721cb99ea9590f0ede3a</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460578</data>
+    </node>
+    <node id="Prednisone">
+      <data key="d0">Prednisone</data>
+      <data key="d1">Product</data>
+      <data key="d2">A corticosteroid medication used to reduce inflammation and treat various autoimmune conditions.</data>
+      <data key="d3">chunk-aa14ecd19e2d721cb99ea9590f0ede3a</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460578</data>
+    </node>
+    <node id="Contrast">
+      <data key="d0">Contrast</data>
+      <data key="d1">Product</data>
+      <data key="d2">A substance used in medical imaging to enhance the visibility of internal structures, administered orally or intravenously, and may cause allergic reactions.</data>
+      <data key="d3">chunk-aa14ecd19e2d721cb99ea9590f0ede3a</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460578</data>
+    </node>
+    <node id="FDG-PET">
+      <data key="d0">FDG-PET</data>
+      <data key="d1">Technology</data>
+      <data key="d2">A type of PET scan that uses 18-Fluorodeoxyglucose as a tracer to detect cancer cells by their increased glucose metabolism.</data>
+      <data key="d3">chunk-aa14ecd19e2d721cb99ea9590f0ede3a</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460578</data>
+    </node>
+    <node id="SSTRPET">
+      <data key="d0">SSTRPET</data>
+      <data key="d1">Technology</data>
+      <data key="d2">A type of PET scan that uses somatostatin receptors to target tumors, particularly useful in adrenal tumors.</data>
+      <data key="d3">chunk-aa14ecd19e2d721cb99ea9590f0ede3a</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460578</data>
+    </node>
+    <node id="Radiologist">
+      <data key="d0">Radiologist</data>
+      <data key="d1">Person</data>
+      <data key="d2">A medical professional who interprets medical images and reports on test results.</data>
+      <data key="d3">chunk-aa14ecd19e2d721cb99ea9590f0ede3a</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460578</data>
+    </node>
+    <node id="18-Fluorodeoxyglucose">
+      <data key="d0">18-Fluorodeoxyglucose</data>
+      <data key="d1">Product</data>
+      <data key="d2">A radioactive sugar compound used as a tracer in FDG-PET scans to detect cancer cells by their increased metabolic activity.</data>
+      <data key="d3">chunk-aa14ecd19e2d721cb99ea9590f0ede3a</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460578</data>
+    </node>
+    <node id="Tracer">
+      <data key="d0">Tracer</data>
+      <data key="d1">Product</data>
+      <data key="d2">A radioactive substance injected into the vein to help locate cancer cells in PET scans.</data>
+      <data key="d3">chunk-aa14ecd19e2d721cb99ea9590f0ede3a</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460578</data>
+    </node>
+    <node id="Allergic Reaction">
+      <data key="d0">Allergic Reaction</data>
+      <data key="d1">Category</data>
+      <data key="d2">A reaction to a substance that causes an immune system response, which can be life-threatening and requires medical attention.</data>
+      <data key="d3">chunk-aa14ecd19e2d721cb99ea9590f0ede3a</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460578</data>
+    </node>
+    <node id="United States">
+      <data key="d0">United States</data>
+      <data key="d1">Location</data>
+      <data key="d2">The country where about 3 million cases of basal cell skin cancer are diagnosed each year.</data>
+      <data key="d3">chunk-66dd071b6c2be50e36cee1a1c1bd3b33</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460578</data>
+    </node>
+    <node id="Epidermis">
+      <data key="d0">Epidermis</data>
+      <data key="d1">Category</data>
+      <data key="d2">The top layer of skin that provides a waterproof barrier and creates skin color (melanin).</data>
+      <data key="d3">chunk-66dd071b6c2be50e36cee1a1c1bd3b33</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460578</data>
+    </node>
+    <node id="Dermis">
+      <data key="d0">Dermis</data>
+      <data key="d1">Category</data>
+      <data key="d2">The middle layer of skin that contains connective tissue, blood vessels, oil and sweat glands, nerves, and hair follicles.</data>
+      <data key="d3">chunk-66dd071b6c2be50e36cee1a1c1bd3b33</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460578</data>
+    </node>
+    <node id="Hypodermis">
+      <data key="d0">Hypodermis</data>
+      <data key="d1">Category</data>
+      <data key="d2">The deepest layer of skin composed of fat and connective tissue.</data>
+      <data key="d3">chunk-66dd071b6c2be50e36cee1a1c1bd3b33</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460578</data>
+    </node>
+    <node id="Squamous cells">
+      <data key="d0">Squamous cells</data>
+      <data key="d1">Category</data>
+      <data key="d2">Flat cells found in the upper part of the epidermis that form the outer layer of skin.</data>
+      <data key="d3">chunk-66dd071b6c2be50e36cee1a1c1bd3b33</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460578</data>
+    </node>
+    <node id="Basal cells">
+      <data key="d0">Basal cells</data>
+      <data key="d1">Category</data>
+      <data key="d2">Cells found in the lower part of the epidermis that constantly divide to form new skin cells.</data>
+      <data key="d3">chunk-66dd071b6c2be50e36cee1a1c1bd3b33</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460578</data>
+    </node>
+    <node id="Melanocytes">
+      <data key="d0">Melanocytes</data>
+      <data key="d1">Category</data>
+      <data key="d2">Cells in the lower part of the epidermis that produce melanin, responsible for skin, hair, and eye color.</data>
+      <data key="d3">chunk-66dd071b6c2be50e36cee1a1c1bd3b33</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460578</data>
+    </node>
+    <node id="Melanin">
+      <data key="d0">Melanin</data>
+      <data key="d1">Other</data>
+      <data key="d2">A pigment that gives color to skin, hair, and eyes and protects against harmful ultraviolet (UV) rays.</data>
+      <data key="d3">chunk-66dd071b6c2be50e36cee1a1c1bd3b33</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460578</data>
+    </node>
+    <node id="Tanning beds">
+      <data key="d0">Tanning beds</data>
+      <data key="d1">Product</data>
+      <data key="d2">Devices that emit UV radiation for tanning, which can increase the risk of skin cancer.</data>
+      <data key="d3">chunk-66dd071b6c2be50e36cee1a1c1bd3b33</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460578</data>
+    </node>
+    <node id="NCCN Patient Guides for Cancer app">
+      <data key="d0">NCCN Patient Guides for Cancer app</data>
+      <data key="d1">Product</data>
+      <data key="d2">A mobile application developed by the National Comprehensive Cancer Network that provides patient guides for cancer.</data>
+      <data key="d3">chunk-66dd071b6c2be50e36cee1a1c1bd3b33</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460578</data>
+    </node>
+    <node id="Basal Cell Skin Cancer Book">
+      <data key="d0">Basal Cell Skin Cancer Book</data>
+      <data key="d1">Document</data>
+      <data key="d2">A book that focuses exclusively on basal cell skin cancer, including information on diagnosis, treatment, and prevention.</data>
+      <data key="d3">chunk-66dd071b6c2be50e36cee1a1c1bd3b33</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460578</data>
+    </node>
+    <node id="National Comprehensive Cancer Network">
+      <data key="d0">National Comprehensive Cancer Network</data>
+      <data key="d1">Organization</data>
+      <data key="d2">A non-profit organization that provides evidence-based guidelines for cancer care.</data>
+      <data key="d3">chunk-66dd071b6c2be50e36cee1a1c1bd3b33</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460578</data>
+    </node>
+    <node id="Sun">
+      <data key="d0">Sun</data>
+      <data key="d1">Other</data>
+      <data key="d2">The celestial body that emits UV radiation which can cause skin cancer.</data>
+      <data key="d3">chunk-66dd071b6c2be50e36cee1a1c1bd3b33</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460578</data>
+    </node>
+    <node id="Skin lesions">
+      <data key="d0">Skin lesions</data>
+      <data key="d1">Category</data>
+      <data key="d2">Abnormal skin growths that can be a sign of basal cell skin cancer, including flat, pale areas, red patches, bumps, or open sores.</data>
+      <data key="d3">chunk-66dd071b6c2be50e36cee1a1c1bd3b33</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460578</data>
+    </node>
+    <node id="UV radiation">
+      <data key="d0">UV radiation</data>
+      <data key="d1">Other</data>
+      <data key="d2">Radiation from the sun or artificial sources that can damage skin cells and lead to skin cancer.</data>
+      <data key="d3">chunk-66dd071b6c2be50e36cee1a1c1bd3b33</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460578</data>
+    </node>
+    <node id="Adrenal Cancer">
+      <data key="d0">Adrenal Cancer</data>
+      <data key="d1">Category</data>
+      <data key="d2">Adrenal cancer is a rare cancer that starts in one or both of the adrenal glands, affecting children under 5 and adults in their 40s and 50s, and can be cured if caught early.</data>
+      <data key="d3">chunk-7102a43dfb62e649d725bc95ba292688</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460578</data>
+    </node>
+    <node id="Adrenocortical Carcinoma">
+      <data key="d0">Adrenocortical Carcinoma</data>
+      <data key="d1">Category</data>
+      <data key="d2">Adrenocortical carcinoma (ACC) is a type of adrenal cancer that starts in the adrenal cortex, occurring in children under 5 and adults in their 40s and 50s, and can be cured if detected early.</data>
+      <data key="d3">chunk-7102a43dfb62e649d725bc95ba292688</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460578</data>
+    </node>
+    <node id="Pheochromocytoma">
+      <data key="d0">Pheochromocytoma</data>
+      <data key="d1">Category</data>
+      <data key="d2">Pheochromocytoma is a tumor that begins in the adrenal medulla, characterized by symptoms of high blood pressure, headache, rapid heartbeat, and sweating, and can be benign or cancerous.</data>
+      <data key="d3">chunk-7102a43dfb62e649d725bc95ba292688</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460578</data>
+    </node>
+    <node id="Adenoma">
+      <data key="d0">Adenoma</data>
+      <data key="d1">Category</data>
+      <data key="d2">Adenoma is the most common type of adrenal tumor, noncancerous, and can be functioning or nonfunctioning, and may not require treatment if small and not causing symptoms.</data>
+      <data key="d3">chunk-7102a43dfb62e649d725bc95ba292688</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460578</data>
+    </node>
+    <node id="Adrenal Glands">
+      <data key="d0">Adrenal Glands</data>
+      <data key="d1">Other</data>
+      <data key="d2">Adrenal glands are small, yellow glands that are part of the endocrine system and produce hormones.</data>
+      <data key="d3">chunk-7102a43dfb62e649d725bc95ba292688</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460579</data>
+    </node>
+    <node id="Endocrine System">
+      <data key="d0">Endocrine System</data>
+      <data key="d1">Other</data>
+      <data key="d2">The endocrine system is a network of tissues and organs that produce hormones to regulate body functions.</data>
+      <data key="d3">chunk-7102a43dfb62e649d725bc95ba292688</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460579</data>
+    </node>
+    <node id="Hormones">
+      <data key="d0">Hormones</data>
+      <data key="d1">Other</data>
+      <data key="d2">Hormones are chemical substances produced by glands that travel through the bloodstream to control body functions.</data>
+      <data key="d3">chunk-7102a43dfb62e649d725bc95ba292688</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460579</data>
+    </node>
+    <node id="Beckwith-Wiedemann Syndrome">
+      <data key="d0">Beckwith-Wiedemann Syndrome</data>
+      <data key="d1">Category</data>
+      <data key="d2">Beckwith-Wiedemann syndrome is a hereditary condition that increases the risk of developing adrenal tumors.</data>
+      <data key="d3">chunk-7102a43dfb62e649d725bc95ba292688</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460579</data>
+    </node>
+    <node id="Carney Complex">
+      <data key="d0">Carney Complex</data>
+      <data key="d1">Category</data>
+      <data key="d2">Carney complex is a hereditary condition that increases the risk of adrenal tumors.</data>
+      <data key="d3">chunk-7102a43dfb62e649d725bc95ba292688</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460579</data>
+    </node>
+    <node id="Familial Adenomatous Polyposis (FAP)">
+      <data key="d0">Familial Adenomatous Polyposis (FAP)</data>
+      <data key="d1">Category</data>
+      <data key="d2">Familial adenomatous polyposis (FAP) is a hereditary condition that increases the risk of adrenal tumors.</data>
+      <data key="d3">chunk-7102a43dfb62e649d725bc95ba292688</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460579</data>
+    </node>
+    <node id="Hereditary Paragangliomapheochromocytoma (PGL/PCC) Syndrome">
+      <data key="d0">Hereditary Paragangliomapheochromocytoma (PGL/PCC) Syndrome</data>
+      <data key="d1">Category</data>
+      <data key="d2">Hereditary paragangliomapheochromocytoma (PGL/PCC) syndrome is a hereditary condition that increases the risk of adrenal tumors.</data>
+      <data key="d3">chunk-7102a43dfb62e649d725bc95ba292688</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460579</data>
+    </node>
+    <node id="Li-Fraumeni Syndrome">
+      <data key="d0">Li-Fraumeni Syndrome</data>
+      <data key="d1">Category</data>
+      <data key="d2">Li-Fraumeni syndrome is a hereditary condition that increases the risk of adrenal tumors.</data>
+      <data key="d3">chunk-7102a43dfb62e649d725bc95ba292688</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460579</data>
+    </node>
+    <node id="Lynch Syndrome">
+      <data key="d0">Lynch Syndrome</data>
+      <data key="d1">Category</data>
+      <data key="d2">Lynch syndrome is a hereditary condition that increases the risk of adrenal tumors.</data>
+      <data key="d3">chunk-7102a43dfb62e649d725bc95ba292688</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460579</data>
+    </node>
+    <node id="Multiple Endocrine Neoplasia Type 1 (MEN 1)">
+      <data key="d0">Multiple Endocrine Neoplasia Type 1 (MEN 1)</data>
+      <data key="d1">Category</data>
+      <data key="d2">Multiple endocrine neoplasia type 1 (MEN 1) is a hereditary condition that increases the risk of adrenal tumors.</data>
+      <data key="d3">chunk-7102a43dfb62e649d725bc95ba292688</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460579</data>
+    </node>
+    <node id="Multiple Endocrine Neoplasia Type 2 (MEN 2)">
+      <data key="d0">Multiple Endocrine Neoplasia Type 2 (MEN 2)</data>
+      <data key="d1">Category</data>
+      <data key="d2">Multiple endocrine neoplasia type 2 (MEN 2) is a hereditary condition that increases the risk of adrenal tumors.</data>
+      <data key="d3">chunk-7102a43dfb62e649d725bc95ba292688</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460579</data>
+    </node>
+    <node id="Neurofibromatosis Type 1 (NF1)">
+      <data key="d0">Neurofibromatosis Type 1 (NF1)</data>
+      <data key="d1">Category</data>
+      <data key="d2">Neurofibromatosis type 1 (NF1) is a hereditary condition that increases the risk of adrenal tumors.</data>
+      <data key="d3">chunk-7102a43dfb62e649d725bc95ba292688</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460579</data>
+    </node>
+    <node id="Von Hippel-Lindau Syndrome (VHL)">
+      <data key="d0">Von Hippel-Lindau Syndrome (VHL)</data>
+      <data key="d1">Category</data>
+      <data key="d2">Von Hippel-Lindau syndrome (VHL) is a hereditary condition that increases the risk of adrenal tumors.</data>
+      <data key="d3">chunk-7102a43dfb62e649d725bc95ba292688</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460579</data>
+    </node>
+    <node id="NCCN">
+      <data key="d0">NCCN</data>
+      <data key="d1">Organization</data>
+      <data key="d2">NCCN (National Comprehensive Cancer Network) is an organization that provides guidelines for cancer patients.</data>
+      <data key="d3">chunk-7102a43dfb62e649d725bc95ba292688</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460579</data>
+    </node>
+    <node id="NCCN Guidelines for Patients: Kidney Cancer">
+      <data key="d0">NCCN Guidelines for Patients: Kidney Cancer</data>
+      <data key="d1">Document</data>
+      <data key="d2">NCCN Guidelines for Patients: Kidney Cancer is a document available at NCCN.org/patientguidelines for information on kidney cancer treatment and management.</data>
+      <data key="d3">chunk-7102a43dfb62e649d725bc95ba292688</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460579</data>
+    </node>
+    <node id="&lt;entity_name&gt;">
+      <data key="d0">&lt;entity_name&gt;</data>
+      <data key="d3">chunk-5fa7c7369d88ae71c842152510867223</data>
+      <data key="d2">&lt;source_entity&gt;</data>
+      <data key="d1">UNKNOWN</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460579</data>
+    </node>
+    <node id="&lt;entity_type&gt;">
+      <data key="d0">&lt;entity_type&gt;</data>
+      <data key="d3">chunk-5fa7c7369d88ae71c842152510867223</data>
+      <data key="d2">&lt;source_entity&gt;</data>
+      <data key="d1">UNKNOWN</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1758460579</data>
+    </node>
+    <edge source="NCCN Guidelines for Patients" target="Chapter 3: Types of treatment">
+      <data key="d6">1.0</data>
+      <data key="d7">Chapter 3 is a section of the NCCN Guidelines for Patients that covers the types of treatment for cancer.</data>
+      <data key="d8">document section,treatment guidance</data>
+      <data key="d9">chunk-f8eae4d6dadf6a6fbd339efa4dec2172</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460579</data>
+    </edge>
+    <edge source="NCCN Guidelines for Patients" target="Chapter 4: Treatment by risk and recurrence">
+      <data key="d6">1.0</data>
+      <data key="d7">Chapter 4 is a section of the NCCN Guidelines for Patients that focuses on how treatment is tailored based on the risk level and recurrence of cancer.</data>
+      <data key="d8">document section,recurrence guidance</data>
+      <data key="d9">chunk-f8eae4d6dadf6a6fbd339efa4dec2172</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460580</data>
+    </edge>
+    <edge source="NCCN Guidelines for Patients" target="Questions to ask">
+      <data key="d6">1.0</data>
+      <data key="d7">The 'Questions to ask' section is part of each chapter in the NCCN Guidelines for Patients and provides suggested questions for patients to understand their care.</data>
+      <data key="d8">document section,patient engagement</data>
+      <data key="d9">chunk-f8eae4d6dadf6a6fbd339efa4dec2172</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460580</data>
+    </edge>
+    <edge source="NCCN Guidelines for Patients" target="Family Health History">
+      <data key="d6">1.0</data>
+      <data key="d7">The NCCN Guidelines for Patients provide instructions on how to gather family health history information for cancer risk assessment.</data>
+      <data key="d8">guidance,health education</data>
+      <data key="d9">chunk-aa14ecd19e2d721cb99ea9590f0ede3a</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460580</data>
+    </edge>
+    <edge source="NCCN Guidelines for Patients" target="National Comprehensive Cancer Network">
+      <data key="d6">1.0</data>
+      <data key="d7">The National Comprehensive Cancer Network provides the NCCN Guidelines for Patients for skin cancer.</data>
+      <data key="d8">guideline provision,medical resource</data>
+      <data key="d9">chunk-66dd071b6c2be50e36cee1a1c1bd3b33</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460581</data>
+    </edge>
+    <edge source="Basal Cell Skin Cancer" target="United States">
+      <data key="d6">1.0</data>
+      <data key="d7">Basal cell skin cancer is diagnosed in about 3 million cases annually in the United States.</data>
+      <data key="d8">geographic scope,prevalence</data>
+      <data key="d9">chunk-66dd071b6c2be50e36cee1a1c1bd3b33</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460580</data>
+    </edge>
+    <edge source="Basal Cell Skin Cancer" target="Epidermis">
+      <data key="d6">1.0</data>
+      <data key="d7">Basal cell skin cancer typically develops in the epidermis, the top layer of skin.</data>
+      <data key="d8">anatomical location,skin layer</data>
+      <data key="d9">chunk-66dd071b6c2be50e36cee1a1c1bd3b33</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460581</data>
+    </edge>
+    <edge source="Basal Cell Skin Cancer" target="Basal cells">
+      <data key="d6">1.0</data>
+      <data key="d7">Basal cell skin cancer occurs when basal cells become abnormal and grow out of control.</data>
+      <data key="d8">cellular origin,pathogenesis</data>
+      <data key="d9">chunk-66dd071b6c2be50e36cee1a1c1bd3b33</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460581</data>
+    </edge>
+    <edge source="Basal Cell Skin Cancer" target="Basal Cell Skin Cancer Book">
+      <data key="d6">1.0</data>
+      <data key="d7">The Basal Cell Skin Cancer Book focuses exclusively on basal cell skin cancer.</data>
+      <data key="d8">document focus,topic</data>
+      <data key="d9">chunk-66dd071b6c2be50e36cee1a1c1bd3b33</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460581</data>
+    </edge>
+    <edge source="Basal Cell Skin Cancer" target="Skin lesions">
+      <data key="d6">1.0</data>
+      <data key="d7">Skin lesions can be a sign of basal cell skin cancer, including flat, pale areas, red patches, bumps, or open sores.</data>
+      <data key="d8">clinical sign,symptom manifestation</data>
+      <data key="d9">chunk-66dd071b6c2be50e36cee1a1c1bd3b33</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460582</data>
+    </edge>
+    <edge source="Basal Cell Skin Cancer" target="UV radiation">
+      <data key="d6">1.0</data>
+      <data key="d7">Exposure to UV radiation is a cause of basal cell skin cancer.</data>
+      <data key="d8">causation,risk factor</data>
+      <data key="d9">chunk-66dd071b6c2be50e36cee1a1c1bd3b33</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460582</data>
+    </edge>
+    <edge source="Basal Cell Skin Cancer" target="Sun">
+      <data key="d6">1.0</data>
+      <data key="d7">Basal cell skin cancer can develop in areas exposed to the sun.</data>
+      <data key="d8">environmental factor,exposure</data>
+      <data key="d9">chunk-66dd071b6c2be50e36cee1a1c1bd3b33</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460582</data>
+    </edge>
+    <edge source="Adrenal glands" target="Adrenal tumors">
+      <data key="d6">1.0</data>
+      <data key="d7">Adrenal tumors form in the adrenal glands.</data>
+      <data key="d8">anatomical structure,tumor formation</data>
+      <data key="d9">chunk-f8eae4d6dadf6a6fbd339efa4dec2172</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460579</data>
+    </edge>
+    <edge source="Adrenal tumors" target="Adrenocortical carcinoma">
+      <data key="d6">1.0</data>
+      <data key="d7">Adrenocortical carcinoma is a type of adrenal tumor that is cancerous.</data>
+      <data key="d8">cancerous,tumor subtype</data>
+      <data key="d9">chunk-f8eae4d6dadf6a6fbd339efa4dec2172</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460580</data>
+    </edge>
+    <edge source="Adrenal tumors" target="Neuroblastoma">
+      <data key="d6">1.0</data>
+      <data key="d7">Neuroblastoma is a type of adrenal tumor that primarily affects children under 5 years of age and can spread.</data>
+      <data key="d8">pediatric,tumor subtype</data>
+      <data key="d9">chunk-f8eae4d6dadf6a6fbd339efa4dec2172</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460580</data>
+    </edge>
+    <edge source="Neuroblastoma" target="Adrenal Tumors">
+      <data key="d6">1.0</data>
+      <data key="d7">Neuroblastoma is a type of adrenal tumor that is cancerous.</data>
+      <data key="d8">cancerous,tumor type</data>
+      <data key="d9">chunk-7102a43dfb62e649d725bc95ba292688</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460582</data>
+    </edge>
+    <edge source="Medical Binder" target="Blood Test Results">
+      <data key="d6">1.0</data>
+      <data key="d7">The medical binder stores blood test results for easy access during medical appointments.</data>
+      <data key="d8">health documentation,record storage</data>
+      <data key="d9">chunk-aa14ecd19e2d721cb99ea9590f0ede3a</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460579</data>
+    </edge>
+    <edge source="Medical Binder" target="Imaging Results">
+      <data key="d6">1.0</data>
+      <data key="d7">The medical binder stores imaging results for easy access during medical appointments.</data>
+      <data key="d8">health documentation,record storage</data>
+      <data key="d9">chunk-aa14ecd19e2d721cb99ea9590f0ede3a</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460580</data>
+    </edge>
+    <edge source="Medical Binder" target="Cancer Reports">
+      <data key="d6">1.0</data>
+      <data key="d7">The medical binder stores cancer reports for easy access during medical appointments.</data>
+      <data key="d8">health documentation,record storage</data>
+      <data key="d9">chunk-aa14ecd19e2d721cb99ea9590f0ede3a</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460580</data>
+    </edge>
+    <edge source="Second Medical Opinion" target="Medical History">
+      <data key="d6">1.0</data>
+      <data key="d7">A medical history is used to provide context for a second medical opinion to help the patient understand their condition and treatment options.</data>
+      <data key="d8">consultation,health management</data>
+      <data key="d9">chunk-aa14ecd19e2d721cb99ea9590f0ede3a</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460580</data>
+    </edge>
+    <edge source="Medical History" target="Diphenhydramine">
+      <data key="d6">1.0</data>
+      <data key="d7">Diphenhydramine is recorded in the medical history as an over-the-counter medication taken by the patient.</data>
+      <data key="d8">health management,medication record</data>
+      <data key="d9">chunk-aa14ecd19e2d721cb99ea9590f0ede3a</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460580</data>
+    </edge>
+    <edge source="Medical History" target="Prednisone">
+      <data key="d6">1.0</data>
+      <data key="d7">Prednisone is recorded in the medical history as a corticosteroid medication taken by the patient.</data>
+      <data key="d8">health management,medication record</data>
+      <data key="d9">chunk-aa14ecd19e2d721cb99ea9590f0ede3a</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460580</data>
+    </edge>
+    <edge source="Family History" target="Family Health History">
+      <data key="d6">1.0</data>
+      <data key="d7">Family health history is the medical component of family history that focuses on diseases and conditions, such as cancer, heart disease, and diabetes.</data>
+      <data key="d8">health assessment,medical focus</data>
+      <data key="d9">chunk-aa14ecd19e2d721cb99ea9590f0ede3a</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460580</data>
+    </edge>
+    <edge source="CT Scan" target="Adrenal Tumors">
+      <data key="d6">1.0</data>
+      <data key="d7">CT scans can be used to detect adrenal tumors and assess their size and location.</data>
+      <data key="d8">diagnostic imaging,tumor detection</data>
+      <data key="d9">chunk-aa14ecd19e2d721cb99ea9590f0ede3a</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460581</data>
+    </edge>
+    <edge source="MRI Scan" target="Adrenal Tumors">
+      <data key="d6">1.0</data>
+      <data key="d7">MRI scans can be used to detect adrenal tumors and assess their size and location.</data>
+      <data key="d8">diagnostic imaging,tumor detection</data>
+      <data key="d9">chunk-aa14ecd19e2d721cb99ea9590f0ede3a</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460581</data>
+    </edge>
+    <edge source="PET Scan" target="Adrenal Tumors">
+      <data key="d6">1.0</data>
+      <data key="d7">PET scans can be used to detect adrenal tumors and assess their spread.</data>
+      <data key="d8">diagnostic imaging,tumor detection</data>
+      <data key="d9">chunk-aa14ecd19e2d721cb99ea9590f0ede3a</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460582</data>
+    </edge>
+    <edge source="FDG-PET/CT Scan" target="Adrenal Tumors">
+      <data key="d6">1.0</data>
+      <data key="d7">FDG-PET/CT scans are used to evaluate adrenal tumors for cancer staging and to determine if cancer has spread to other parts of the body.</data>
+      <data key="d8">advanced imaging,cancer staging</data>
+      <data key="d9">chunk-aa14ecd19e2d721cb99ea9590f0ede3a</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460582</data>
+    </edge>
+    <edge source="Adrenal Tumors" target="Family Health History">
+      <data key="d6">1.0</data>
+      <data key="d7">Adrenal tumors can be part of a family health history if they run in families, indicating a genetic predisposition.</data>
+      <data key="d8">disease pattern,genetic risk</data>
+      <data key="d9">chunk-aa14ecd19e2d721cb99ea9590f0ede3a</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460581</data>
+    </edge>
+    <edge source="Adrenal Tumors" target="Pheochromocytoma">
+      <data key="d6">1.0</data>
+      <data key="d7">Pheochromocytoma is a type of adrenal tumor that can be cancerous.</data>
+      <data key="d8">cancerous,tumor type</data>
+      <data key="d9">chunk-7102a43dfb62e649d725bc95ba292688</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460583</data>
+    </edge>
+    <edge source="Adrenal Tumors" target="Adenoma">
+      <data key="d6">1.0</data>
+      <data key="d7">Adenoma is a type of adrenal tumor that is noncancerous.</data>
+      <data key="d8">benign,tumor type</data>
+      <data key="d9">chunk-7102a43dfb62e649d725bc95ba292688</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460583</data>
+    </edge>
+    <edge source="Adrenal Tumors" target="Beckwith-Wiedemann Syndrome">
+      <data key="d6">1.0</data>
+      <data key="d7">Beckwith-Wiedemann syndrome increases the risk of developing adrenal tumors.</data>
+      <data key="d8">hereditary,risk factor</data>
+      <data key="d9">chunk-7102a43dfb62e649d725bc95ba292688</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460583</data>
+    </edge>
+    <edge source="Adrenal Tumors" target="Carney Complex">
+      <data key="d6">1.0</data>
+      <data key="d7">Carney complex increases the risk of adrenal tumors.</data>
+      <data key="d8">hereditary,risk factor</data>
+      <data key="d9">chunk-7102a43dfb62e649d725bc95ba292688</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460583</data>
+    </edge>
+    <edge source="Adrenal Tumors" target="Familial Adenomatous Polyposis (FAP)">
+      <data key="d6">1.0</data>
+      <data key="d7">Familial adenomatous polyposis (FAP) increases the risk of adrenal tumors.</data>
+      <data key="d8">hereditary,risk factor</data>
+      <data key="d9">chunk-7102a43dfb62e649d725bc95ba292688</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460584</data>
+    </edge>
+    <edge source="Adrenal Tumors" target="Hereditary Paragangliomapheochromocytoma (PGL/PCC) Syndrome">
+      <data key="d6">1.0</data>
+      <data key="d7">Hereditary paragangliomapheochromocytoma (PGL/PCC) syndrome increases the risk of adrenal tumors.</data>
+      <data key="d8">hereditary,risk factor</data>
+      <data key="d9">chunk-7102a43dfb62e649d725bc95ba292688</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460584</data>
+    </edge>
+    <edge source="Adrenal Tumors" target="Li-Fraumeni Syndrome">
+      <data key="d6">1.0</data>
+      <data key="d7">Li-Fraumeni syndrome increases the risk of adrenal tumors.</data>
+      <data key="d8">hereditary,risk factor</data>
+      <data key="d9">chunk-7102a43dfb62e649d725bc95ba292688</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460584</data>
+    </edge>
+    <edge source="Adrenal Tumors" target="Lynch Syndrome">
+      <data key="d6">1.0</data>
+      <data key="d7">Lynch syndrome increases the risk of adrenal tumors.</data>
+      <data key="d8">hereditary,risk factor</data>
+      <data key="d9">chunk-7102a43dfb62e649d725bc95ba292688</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460585</data>
+    </edge>
+    <edge source="Adrenal Tumors" target="Multiple Endocrine Neoplasia Type 1 (MEN 1)">
+      <data key="d6">1.0</data>
+      <data key="d7">Multiple endocrine neoplasia type 1 (MEN 1) increases the risk of adrenal tumors.</data>
+      <data key="d8">hereditary,risk factor</data>
+      <data key="d9">chunk-7102a43dfb62e649d725bc95ba292688</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460585</data>
+    </edge>
+    <edge source="Adrenal Tumors" target="Multiple Endocrine Neoplasia Type 2 (MEN 2)">
+      <data key="d6">1.0</data>
+      <data key="d7">Multiple endocrine neoplasia type 2 (MEN 2) increases the risk of adrenal tumors.</data>
+      <data key="d8">hereditary,risk factor</data>
+      <data key="d9">chunk-7102a43dfb62e649d725bc95ba292688</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460585</data>
+    </edge>
+    <edge source="Adrenal Tumors" target="Neurofibromatosis Type 1 (NF1)">
+      <data key="d6">1.0</data>
+      <data key="d7">Neurofibromatosis type 1 (NF1) increases the risk of adrenal tumors.</data>
+      <data key="d8">hereditary,risk factor</data>
+      <data key="d9">chunk-7102a43dfb62e649d725bc95ba292688</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460586</data>
+    </edge>
+    <edge source="Adrenal Tumors" target="Von Hippel-Lindau Syndrome (VHL)">
+      <data key="d6">1.0</data>
+      <data key="d7">Von Hippel-Lindau syndrome (VHL) increases the risk of adrenal tumors.</data>
+      <data key="d8">hereditary,risk factor</data>
+      <data key="d9">chunk-7102a43dfb62e649d725bc95ba292688</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460586</data>
+    </edge>
+    <edge source="Adrenal Tumors" target="Adrenal Glands">
+      <data key="d6">1.0</data>
+      <data key="d7">Adrenal tumors are found in the adrenal glands.</data>
+      <data key="d8">anatomical,location</data>
+      <data key="d9">chunk-7102a43dfb62e649d725bc95ba292688</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460587</data>
+    </edge>
+    <edge source="Tanning beds" target="UV radiation">
+      <data key="d6">1.0</data>
+      <data key="d7">Tanning beds emit UV radiation that can cause skin cancer.</data>
+      <data key="d8">emission source,radiation type</data>
+      <data key="d9">chunk-66dd071b6c2be50e36cee1a1c1bd3b33</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460581</data>
+    </edge>
+    <edge source="NCCN Patient Guides for Cancer app" target="National Comprehensive Cancer Network">
+      <data key="d6">1.0</data>
+      <data key="d7">The National Comprehensive Cancer Network provides the NCCN Patient Guides for Cancer app.</data>
+      <data key="d8">application provision,medical resource</data>
+      <data key="d9">chunk-66dd071b6c2be50e36cee1a1c1bd3b33</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460581</data>
+    </edge>
+    <edge source="Sun" target="UV radiation">
+      <data key="d6">1.0</data>
+      <data key="d7">The sun emits UV radiation that can cause skin cancer.</data>
+      <data key="d8">natural source,radiation type</data>
+      <data key="d9">chunk-66dd071b6c2be50e36cee1a1c1bd3b33</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460582</data>
+    </edge>
+    <edge source="Adrenal Cancer" target="Adrenocortical Carcinoma">
+      <data key="d6">1.0</data>
+      <data key="d7">Adrenocortical carcinoma is a specific type of adrenal cancer.</data>
+      <data key="d8">classification,subtype</data>
+      <data key="d9">chunk-7102a43dfb62e649d725bc95ba292688</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460582</data>
+    </edge>
+    <edge source="Adrenal Glands" target="Endocrine System">
+      <data key="d6">1.0</data>
+      <data key="d7">Adrenal glands are part of the endocrine system.</data>
+      <data key="d8">biological system,organ component</data>
+      <data key="d9">chunk-7102a43dfb62e649d725bc95ba292688</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460584</data>
+    </edge>
+    <edge source="Endocrine System" target="Hormones">
+      <data key="d6">1.0</data>
+      <data key="d7">The endocrine system produces hormones that regulate body functions.</data>
+      <data key="d8">biological process,system output</data>
+      <data key="d9">chunk-7102a43dfb62e649d725bc95ba292688</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460584</data>
+    </edge>
+    <edge source="&lt;entity_name&gt;" target="&lt;entity_type&gt;">
+      <data key="d6">1.0</data>
+      <data key="d7">&lt;source_entity&gt;</data>
+      <data key="d8">&lt;entity_description&gt;)
+ - Then,identify relationships between entities (direct and clear) and create:
+        (relationship</data>
+      <data key="d9">chunk-5fa7c7369d88ae71c842152510867223</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1758460579</data>
+    </edge>
+  </graph>
+</graphml>

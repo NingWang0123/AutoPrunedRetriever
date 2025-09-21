@@ -129,7 +129,15 @@ async def initialize_rag(
         )
         llm_kwargs = {
             "host": ollama_host,
-            "options": {"num_ctx": 32768},
+            # "options": {"num_ctx": 32768},
+            "options": {
+                "num_ctx": 4096,      # smaller ctx = faster
+                "num_predict": 256,   # cap generation length
+                "temperature": 0,
+                "top_p": 0.9,
+                "num_gpu": 999,       # offload as many layers as possible
+                # "num_thread": 8,    # optional CPU threads pin
+            },
         }
         llm_model_func_input = ollama_model_complete
 
@@ -202,8 +210,48 @@ async def process_corpus(
 
     
     # Index the corpus content
-    rag.insert(context)
+
+    # rag.insert(context)
+    # logging.info(f"✅ Indexed corpus: {corpus_name} ({len(context.split())} words)")
+    # Index the corpus content (await if coroutine) and wait until ingested
+    ins = rag.insert(context)
+    if asyncio.iscoroutine(ins):
+        await ins
+
+    # Some LightRAG builds process ingestion via an internal async pipeline.
+    # Wait until the pipeline is idle (or documents exist) before querying.
+    try:
+        # Prefer an explicit helper if available
+        if hasattr(rag, "wait_for_idle"):
+            w = rag.wait_for_idle()
+            if asyncio.iscoroutine(w):
+                await w
+        else:
+            # Fallback: poll the doc / chunk counts until > 0 or timeout
+            import time as _t
+            start = _t.time()
+            while _t.time() - start < 30:
+                # adapt these to your storage API names if different
+                num_chunks = 0
+                if hasattr(rag, "text_sotre"):   # typo guard
+                    pass
+                try:
+                    # Common names seen in LightRAG variants:
+                    if hasattr(rag, "text_store"):
+                        num_chunks = await rag.text_store.count() if asyncio.iscoroutinefunction(rag.text_store.count) else rag.text_store.count()
+                    elif hasattr(rag, "chunk_store"):
+                        num_chunks = await rag.chunk_store.count() if asyncio.iscoroutinefunction(rag.chunk_store.count) else rag.chunk_store.count()
+                except Exception:
+                    pass
+                if num_chunks and num_chunks > 0:
+                    break
+                await asyncio.sleep(0.25)
+    except Exception:
+        # If waiting fails, continue—querying will still work if ingestion already completed
+        pass
+
     logging.info(f"✅ Indexed corpus: {corpus_name} ({len(context.split())} words)")
+
     
     corpus_questions = questions.get(corpus_name, [])
     
