@@ -25,20 +25,19 @@ def norm(q: str) -> str:
 lg_set = set(questions_lg)
 cg_set = set(questions_cg)
 shared_q = lg_set & cg_set
-lg_only_q = lg_set - cg_set
-cg_only_q = cg_set - lg_set
 # --- Filtered lists (preserve order) ---
 lg_shared   = [d for d in lg_results if norm(d.get("question", "")) in shared_q]
 cg_shared   = [d for d in cg_results if norm(d.get("question", "")) in shared_q]
 
-
+# filter out lg_results and cg_results with shared question
 print(f"LightRAG:  total={len(lg_results)} shared={len(lg_shared)}")
 print(f"CompressRAG: total={len(cg_results)} shared={len(cg_shared)}")
 
 lg_results_only_shared = lg_shared
 cg_results_only_shared = cg_shared
 
-# filter out lg_results and cg_results with shared question
+# evaluate lg_results_only_shared and cg_results_only_shared through api
+
 
 
 #  python evaluation_only_api.py
