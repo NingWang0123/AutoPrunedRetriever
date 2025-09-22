@@ -1,0 +1,379 @@
+[
+  {
+    "id": "Medical-965ad8a8",
+    "question": "What is a common presentation of BCC on the skin?",
+    "source": "Medical",
+    "context": "fallopian tubes part of female reproductive system, female reproductive system has part fallopian tubes",
+    "evidence": [
+      "BCC may present as a shiny bump."
+    ],
+    "question_type": "Fact Retrieval",
+    "generated_answer": "Basal cell carcinoma (BCC) commonly appears as a pearly or waxy bump on the skin, often with a scaley surface and a central ulceration. It may also present as a red patch or a non-healing sore, typically found on sun-exposed areas like the face, neck, or ears. The lesion grows slowly and rarely spreads to other parts of the body.",
+    "ground_truth": "BCC may present as a shiny bump."
+  },
+  {
+    "id": "Medical-5175a85e",
+    "question": "What is the role of biopsy in BCC diagnosis?",
+    "source": "Medical",
+    "context": "biopsy subclass of Bone marrow tests, Bone marrow tests has part biopsy",
+    "evidence": [
+      "Biopsy is used as a diagnostic method for BCC."
+    ],
+    "question_type": "Fact Retrieval",
+    "generated_answer": "A biopsy is essential for confirming Basal Cell Carcinoma (BCC) by analyzing tissue samples under a microscope to identify cancerous cells. It helps distinguish BCC from other skin conditions and determines the specific subtype, which influences treatment decisions. Biopsy results guide surgical removal and ensure accurate diagnosis for effective management.",
+    "ground_truth": "Biopsy is used as a diagnostic method for BCC."
+  },
+  {
+    "id": "Medical-5f2cb8a5",
+    "question": "Which systemic therapy may be considered for BCC?",
+    "source": "Medical",
+    "context": "systemic therapy medical condition treated Cancer, Cancer drug used for treatment systemic therapy | systemic therapy medical condition treated Cancer, Cancer drug used for treatment Radiation therapy, Radiation therapy medical condition treated Cancer, Cancer drug used for treatment systemic therapy | systemic therapy medical condition treated Cancer, Cancer drug used for treatment systemic therapy | systemic therapy medical condition treated Cancer, Cancer drug used for treatment Radiation therapy, Radiation therapy medical condition treated Cancer, Cancer drug used for treatment systemic therapy",
+    "evidence": [
+      "Systemic therapy may be used in some cases of BCC."
+    ],
+    "question_type": "Fact Retrieval",
+    "generated_answer": "Systemic therapy for Basal Cell Carcinoma (BCC) is typically reserved for advanced or metastatic cases. Immunotherapy, such as checkpoint inhibitors (e.g., pembrolizumab), and targeted therapies (e.g., vismodegib) are commonly considered. These approaches work by inhibiting cancer growth pathways or enhancing immune response.",
+    "ground_truth": "Systemic therapy may be used in some cases of BCC."
+  },
+  {
+    "id": "Medical-0429f83c",
+    "question": "What is included in the management of BCC recurrence?",
+    "source": "Medical",
+    "context": "Side effects of systemic therapy facet of systemic therapy | Side effects of radiation therapy facet of radiation therapy",
+    "evidence": [
+      "Management of BCC recurrence involves treatment options.",
+      "Treatment options for BCC recurrence are based on risk and recurrence."
+    ],
+    "question_type": "Fact Retrieval",
+    "generated_answer": "The management of BCC (Basal Cell Carcinoma) recurrence typically involves surgical excision with clear margins, curettage followed by electrodessication, or radiation therapy. Topical treatments like imiquimod or 5-fluorouracil may also be used, depending on tumor characteristics and patient factors. The choice of approach depends on the location, size, and prior treatment history of the recurrence.",
+    "ground_truth": "Management of recurrence involves treatment options based on risk and recurrence."
+  },
+  {
+    "id": "Medical-152bec6a",
+    "question": "What is the recommended frequency for full skin exams in BCC follow-up?",
+    "source": "Medical",
+    "context": "Skin exams by your doctor subclass of skin exams | Surveillance for the return of anal canal cancer and perianal cancer subclass of anoscopy",
+    "evidence": [
+      "Full skin exams with a doctor are recommended at least once a year."
+    ],
+    "question_type": "Fact Retrieval",
+    "generated_answer": "The recommended frequency for full skin exams in BCC follow-up is every 6 months for the first year after treatment, followed by every 6 months for at least 2 years. After that, the frequency may be adjusted based on individual risk factors, such as the number of prior BCCs or recurrence history. Regular exams help detect new lesions or recurrence early.",
+    "ground_truth": "Full skin exams with a doctor are recommended at least once a year."
+  },
+  {
+    "id": "Medical-e3923e5f",
+    "question": "Can BCC spread to lymph nodes?",
+    "source": "Medical",
+    "context": "Breast cancer has cause lymph node, lymph node has effect Breast cancer, Breast cancer has effect lymph node | Breast cancer has effect lymph node, lymph node has effect Breast cancer, Breast cancer has cause lymph node",
+    "evidence": [
+      "BCC recurrence can involve spread to lymph nodes."
+    ],
+    "question_type": "Fact Retrieval",
+    "generated_answer": "Basal cell carcinoma (BCC) rarely spreads to lymph nodes, as it typically grows locally and has low metastatic potential. However, in rare cases\u2014such as with large or aggressive tumors\u2014it may metastasize, though this is uncommon. Lymph node involvement is more frequently associated with other skin cancers like melanoma.",
+    "ground_truth": "BCC recurrence can involve spread to lymph nodes."
+  },
+  {
+    "id": "Medical-0c2f999d",
+    "question": "What is a brown or glossy black bump with rolled border a symptom of?",
+    "source": "Medical",
+    "context": "Unusual or frequent headaches subclass of symptom | symptoms facet of Quality of life | symptoms facet of Quality of life | pain instance of side effect",
+    "evidence": [
+      "A brown or glossy black bump with rolled border is a symptom of BCC."
+    ],
+    "question_type": "Fact Retrieval",
+    "generated_answer": "A brown or glossy black bump with a rolled border is often a sign of melanoma, a type of skin cancer, especially if it changes in size, color, or texture. It may also indicate a seborrheic keratosis, a benign growth, but both require medical evaluation to confirm the cause. Persistent or unusual skin changes should be checked by a healthcare professional.",
+    "ground_truth": "A brown or glossy black bump with rolled border is a symptom of BCC."
+  },
+  {
+    "id": "Medical-b6dc1118",
+    "question": "What is the relationship between organ transplant and BCC risk?",
+    "source": "Medical",
+    "context": "risk factor has effect Skin cancer, Skin cancer has cause risk factor | Skin cancer has cause risk factor, risk factor has effect Skin cancer | risk factor has effect Skin cancer, Skin cancer has cause risk factor | Skin cancer has cause risk factor, risk factor has effect Skin cancer",
+    "evidence": [
+      "Organ transplant is a risk factor for BCC."
+    ],
+    "question_type": "Fact Retrieval",
+    "generated_answer": "Organ transplant recipients are at increased risk of Basal Cell Carcinoma (BCC) due to long-term immunosuppressive therapy, which impairs the body's ability to detect and eliminate precancerous cells. Additionally, many transplant patients receive photosensitizing medications, and sun exposure remains a significant contributing factor. Studies show a higher incidence of BCC in this population compared to the general public.",
+    "ground_truth": "Organ transplant is a risk factor for BCC."
+  },
+  {
+    "id": "Medical-ba2c8007",
+    "question": "Is autoimmune disease associated with increased BCC risk?",
+    "source": "Medical",
+    "context": "disease has cause infection, infection has effect disease | infection has effect disease, disease has cause infection",
+    "evidence": [
+      "Autoimmune disease is a risk factor for BCC."
+    ],
+    "question_type": "Fact Retrieval",
+    "generated_answer": "Autoimmune diseases may slightly increase the risk of Basal Cell Carcinoma (BCC) due to chronic inflammation and immune system dysregulation, which can promote tumor growth. However, UV radiation remains the primary cause of BCC, and the association is generally weaker compared to other risk factors. Studies suggest a modest elevating effect, but individual risk depends on multiple interacting factors.",
+    "ground_truth": "Autoimmune disease is a risk factor for BCC."
+  },
+  {
+    "id": "Medical-5c30dd24",
+    "question": "What is the role of imaging in BCC diagnosis?",
+    "source": "Medical",
+    "context": "contrast use Imaging test | contrast use Imaging test",
+    "evidence": [
+      "Imaging may be used in the diagnosis of BCC."
+    ],
+    "question_type": "Fact Retrieval",
+    "generated_answer": "Imaging is used to assess the depth and extent of BCC lesions, particularly when tumors are large, deep, or located in cosmetically sensitive areas. It also helps evaluate for metastasis or recurrence by identifying suspicious regional lymph nodes. While not the first-line diagnostic tool, imaging supports clinical decision-making and guides biopsy strategies in complex cases.",
+    "ground_truth": "Imaging may be used in the diagnosis of BCC."
+  },
+  {
+    "id": "Medical-8622e4cc",
+    "question": "Can BCC occur anywhere on the body?",
+    "source": "Medical",
+    "context": "fallopian tubes part of female reproductive system, female reproductive system has part fallopian tubes",
+    "evidence": [
+      "BCC can occur anywhere on the body.",
+      "BCC most commonly occurs in sun-exposed areas."
+    ],
+    "question_type": "Fact Retrieval",
+    "generated_answer": "Basal cell carcinoma (BCC) most commonly occurs on sun-exposed areas like the face, neck, and hands. While rare, it can develop in non-exposed regions, though this is less frequent. Its occurrence elsewhere is often linked to factors like prolonged sun exposure or genetic predispositions.",
+    "ground_truth": "BCC can occur anywhere on the body, but most commonly in sun-exposed areas."
+  },
+  {
+    "id": "Medical-90704d0a",
+    "question": "From which cells does basal cell carcinoma arise?",
+    "source": "Medical",
+    "context": "basal cell carcinoma subclass of skin cancer | squamous cell carcinoma subclass of lung cancer",
+    "evidence": [
+      "BCC arises from basal cells.",
+      "BCC arises from cells in the lower part of the epidermis."
+    ],
+    "question_type": "Fact Retrieval",
+    "generated_answer": "Basal cell carcinoma arises from basal cells in the epidermis, specifically in the stratum basale layer of the skin. These cells are responsible for producing new skin cells, and their uncontrolled growth leads to the development of this type of malignancy. It is the most common form of skin cancer, typically linked to prolonged sun exposure.",
+    "ground_truth": "BCC arises from basal cells in the lower part of the epidermis."
+  },
+  {
+    "id": "Medical-941c0004",
+    "question": "Which anatomical locations are most commonly affected by BCC?",
+    "source": "Medical",
+    "context": "Sarcomatoid features facet of sarcomatoid | Genetic risk testing facet of Genetic",
+    "evidence": [
+      "BCC most commonly develops in sun-exposed areas.",
+      "Common anatomical locations affected by BCC include the face.",
+      "Common anatomical locations affected by BCC include the head.",
+      "Common anatomical locations affected by BCC include the neck."
+    ],
+    "question_type": "Fact Retrieval",
+    "generated_answer": "Basal cell carcinoma (BCC) most commonly affects sun-exposed anatomical locations such as the face (including the nose, ears, and forehead), neck, and shoulders. These areas are prone to UV radiation damage, which is a primary risk factor for BCC. The disease rarely metastasizes but often develops in areas with prolonged sun exposure.",
+    "ground_truth": "BCC most commonly develops in sun-exposed areas such as the face, head, and neck."
+  },
+  {
+    "id": "Medical-4bb300c3",
+    "question": "What is the primary risk factor for developing basal cell carcinoma?",
+    "source": "Medical",
+    "context": "Low blood cell counts subclass of Systemic therapy side effects | Large cell carcinoma subclass of lung cancer",
+    "evidence": [
+      "UV radiation exposure is a primary risk factor for BCC."
+    ],
+    "question_type": "Fact Retrieval",
+    "generated_answer": "The primary risk factor for developing basal cell carcinoma is prolonged exposure to ultraviolet (UV) radiation, such as sunlight or tanning beds. UV radiation damages skin cells' DNA, leading to mutations that can cause cancer. Individuals with fair skin, a history of sunburns, or prolonged outdoor exposure are particularly at higher risk.",
+    "ground_truth": "UV radiation exposure is a primary risk factor for BCC."
+  },
+  {
+    "id": "Medical-acec9fa2",
+    "question": "How does fair skin affect the risk of basal cell carcinoma?",
+    "source": "Medical",
+    "context": "basal cell skin cancer has cause UV light, UV light has effect basal cell skin cancer | UV light has effect basal cell skin cancer, basal cell skin cancer has cause UV light",
+    "evidence": [
+      "Fair skin increases the risk of BCC."
+    ],
+    "question_type": "Fact Retrieval",
+    "generated_answer": "Fair skin, which contains less melanin, offers reduced natural protection against ultraviolet (UV) radiation. This increased susceptibility to UV damage raises the risk of basal cell carcinoma, a skin cancer linked to prolonged sun exposure. People with fair skin are more likely to develop severe sunburns and cumulative UV damage, both of which are major contributors to skin cancer risk.",
+    "ground_truth": "Fair skin increases the risk of BCC."
+  },
+  {
+    "id": "Medical-7c81f966",
+    "question": "Does older age influence the risk of BCC?",
+    "source": "Medical",
+    "context": "ovaries part of female reproductive system, female reproductive system has part fallopian tubes | fallopian tubes part of female reproductive system, female reproductive system has part ovaries",
+    "evidence": [
+      "Older age is associated with a higher risk of BCC."
+    ],
+    "question_type": "Fact Retrieval",
+    "generated_answer": "Yes, older age is associated with an increased risk of Basal Cell Carcinoma (BCC). As people age, cumulative sun exposure and reduced skin repair mechanisms contribute to higher susceptibility. While age is a key factor, other risks like UV exposure and skin type also play roles.",
+    "ground_truth": "Older age is associated with higher risk of BCC."
+  },
+  {
+    "id": "Medical-f6b5155a",
+    "question": "Does a family history of skin cancer affect the risk of BCC?",
+    "source": "Medical",
+    "context": "Blood in the urine has cause infection in the urinary tract, infection in the urinary tract has effect Blood in the urine | infection in the urinary tract has effect Blood in the urine, Blood in the urine has cause infection in the urinary tract | Blood in the urine has cause infection in the urinary tract, infection in the urinary tract has effect Blood in the urine | infection in the urinary tract has effect Blood in the urine, Blood in the urine has cause infection in the urinary tract",
+    "evidence": [
+      "Family history of skin cancer increases the risk of BCC."
+    ],
+    "question_type": "Fact Retrieval",
+    "generated_answer": "Yes, a family history of skin cancer may increase the risk of basal cell carcinoma (BCC) due to potential genetic predispositions or shared environmental factors. While most BCC cases are linked to sun exposure, inherited mutations (e.g., in the TP53 gene) or conditions like Gorlin syndrome can elevate susceptibility. However, the majority of BCC cases still arise from external factors like UV radiation.",
+    "ground_truth": "Family history of skin cancer increases risk of BCC."
+  },
+  {
+    "id": "Medical-4061f8c4",
+    "question": "Is immune suppression a risk factor for basal cell carcinoma?",
+    "source": "Medical",
+    "context": "basal cell skin cancer has cause UV light, UV light has effect basal cell skin cancer",
+    "evidence": [
+      "Immune suppression is a risk factor for BCC."
+    ],
+    "question_type": "Fact Retrieval",
+    "generated_answer": "Immune suppression is a known risk factor for basal cell carcinoma (BCC) because it impairs the body's ability to detect and eliminate precancerous cells. Patients on long-term immunosuppressive therapy, such as those with organ transplants, have an increased risk due to reduced immune surveillance. This connection is supported by epidemiological studies linking immunosuppression to higher BCC incidence.",
+    "ground_truth": "Immune suppression is a risk factor for BCC."
+  },
+  {
+    "id": "Medical-624c452d",
+    "question": "What diagnostic methods are used for BCC?",
+    "source": "Medical",
+    "context": "Genetic risk testing facet of Genetic | Imaging subclass of Imaging",
+    "evidence": [
+      "Diagnosis of BCC involves medical history.",
+      "Diagnosis of BCC involves family history.",
+      "Diagnosis of BCC involves a physical exam.",
+      "Diagnosis of BCC involves a skin exam.",
+      "Diagnosis of BCC involves a biopsy.",
+      "Diagnosis of BCC sometimes involves imaging."
+    ],
+    "question_type": "Fact Retrieval",
+    "generated_answer": "Basal Cell Carcinoma (BCC) is typically diagnosed through a skin biopsy, where a sample is examined under a microscope to confirm cancerous cells. Dermatoscopy, a non-invasive imaging technique, is also used to analyze skin lesions for suspicious patterns. In some cases, imaging tests like ultrasound or MRI may be employed to assess tumor depth or detect metastasis.",
+    "ground_truth": "Diagnosis of BCC involves medical and family history, physical exam, skin exam, biopsy, and sometimes imaging."
+  },
+  {
+    "id": "Medical-bc412bb6",
+    "question": "When might radiation therapy or systemic therapy be used for BCC?",
+    "source": "Medical",
+    "context": "Systemic therapy subclass of Radiation therapy | Systemic therapy subclass of cancer treatment",
+    "evidence": [
+      "Radiation therapy may be used in some cases of BCC.",
+      "Systemic therapy may be used in some cases of BCC."
+    ],
+    "question_type": "Fact Retrieval",
+    "generated_answer": "Radiation therapy may be used for BCC when the tumor is in a cosmetically sensitive area (e.g., face) or if surgery is not feasible. Systemic therapy is typically reserved for rare, aggressive subtypes of BCC or when the cancer has recurred after initial treatment. Both approaches are less common than surgical management but address specific clinical challenges.",
+    "ground_truth": "Radiation therapy or systemic therapy may be used in some cases of BCC."
+  },
+  {
+    "id": "Medical-cb249d9b",
+    "question": "What does recurrence mean in the context of BCC?",
+    "source": "Medical",
+    "context": "premenopause said to be the same as Premenopause, Premenopause said to be the same as premenopause | Premenopause said to be the same as premenopause, premenopause said to be the same as Premenopause",
+    "evidence": [
+      "Recurrence refers to BCC returning to the original site.",
+      "Recurrence refers to BCC spreading to lymph nodes.",
+      "Recurrence refers to BCC spreading to distant sites."
+    ],
+    "question_type": "Fact Retrieval",
+    "generated_answer": "In the context of Basal Cell Carcinoma (BCC), recurrence refers to the return of cancer after initial treatment. It can occur in the same area or a different part of the body and may require additional therapies like surgery or radiation. Recurrence is possible even after successful initial treatment, highlighting the importance of ongoing monitoring.",
+    "ground_truth": "Recurrence refers to BCC returning to the original site or spreading to lymph nodes or distant sites."
+  },
+  {
+    "id": "Medical-e506aa4e",
+    "question": "What is recommended for follow-up after BCC treatment?",
+    "source": "Medical",
+    "context": "Clinical trial subclass of treatment plan | Surveillance for the return of anal canal cancer and perianal cancer subclass of anoscopy",
+    "evidence": [
+      "Follow-up after BCC treatment includes full skin exams.",
+      "Follow-up after BCC treatment should be done with a doctor.",
+      "Follow-up after BCC treatment is recommended at least once a year."
+    ],
+    "question_type": "Fact Retrieval",
+    "generated_answer": "After BCC (Basal Cell Carcinoma) treatment, regular follow-up with a dermatologist is recommended to monitor for recurrence. Patients should undergo periodic skin exams, typically every 6 months, and report any new or changing skin lesions. Avoiding sun exposure and using sunscreen are also advised to reduce the risk of new skin cancers.",
+    "ground_truth": "Follow-up includes full skin exams with a doctor at least once a year."
+  },
+  {
+    "id": "Medical-14cee623",
+    "question": "Which cell type is affected in basal cell carcinoma?",
+    "source": "Medical",
+    "context": "stem cell subclass of cell | Large cell carcinoma subclass of lung cancer",
+    "evidence": [
+      "Basal cells are the cell type affected in BCC."
+    ],
+    "question_type": "Fact Retrieval",
+    "generated_answer": "Basal cell carcinoma affects basal cells, which are found in the basal layer of the epidermis. These cells are responsible for producing new skin cells, and their uncontrolled growth leads to the development of the tumor.",
+    "ground_truth": "Basal cells are the cell type affected in BCC."
+  },
+  {
+    "id": "Medical-2bef6940",
+    "question": "Are tanning beds considered a risk factor for BCC?",
+    "source": "Medical",
+    "context": "ovaries part of female reproductive system, female reproductive system has part fallopian tubes, fallopian tubes part of female reproductive system, female reproductive system has part ovaries | fallopian tubes part of female reproductive system, female reproductive system has part ovaries, ovaries part of female reproductive system, female reproductive system has part fallopian tubes",
+    "evidence": [
+      "Tanning beds are a risk factor for BCC."
+    ],
+    "question_type": "Fact Retrieval",
+    "generated_answer": "Tanning beds are considered a risk factor for Basal Cell Carcinoma (BCC) due to their emission of ultraviolet (UV) radiation, which damages skin DNA and increases mutation risks. Prolonged exposure to UV light from tanning beds is linked to skin cancer development, including BCC, as UV radiation is a well-established contributor to this malignancy. While the exact mechanism varies, the association between UV exposure and BCC underscores tanning beds as a significant risk factor.",
+    "ground_truth": "Tanning beds are a risk factor for BCC."
+  },
+  {
+    "id": "Medical-0047c320",
+    "question": "Does having red or blond hair increase the risk of BCC?",
+    "source": "Medical",
+    "context": "red blood cell part of blood, blood has part red blood cell",
+    "evidence": [
+      "Red hair increases the risk of BCC.",
+      "Blond hair increases the risk of BCC."
+    ],
+    "question_type": "Fact Retrieval",
+    "generated_answer": "Having red or blond hair is associated with a higher risk of Basal Cell Carcinoma (BCC) due to lower melanin levels, which provide less natural protection against UV radiation. Fair skin, often linked to lighter hair colors, further increases susceptibility to sun damage. However, other factors like sun exposure and skin type also play significant roles in BCC development.",
+    "ground_truth": "Red hair and blond hair increase the risk of BCC."
+  },
+  {
+    "id": "Medical-ca377f8d",
+    "question": "Is light eye color associated with increased risk of BCC?",
+    "source": "Medical",
+    "context": "basal cell skin cancer has cause UV light, UV light has effect basal cell skin cancer | UV light has effect basal cell skin cancer, basal cell skin cancer has cause UV light | basal cell skin cancer has cause UV light, UV light has effect basal cell skin cancer | UV light has effect basal cell skin cancer, basal cell skin cancer has cause UV light",
+    "evidence": [
+      "Light eye color increases the risk of BCC."
+    ],
+    "question_type": "Fact Retrieval",
+    "generated_answer": "Light eye color is not directly linked to BCC risk, but individuals with light eyes often have fairer skin, which is associated with higher BCC risk due to lower melanin levels that provide UV protection. While eye color itself does not cause BCC, the correlation with skin pigmentation highlights that lighter eye colors may indirectly contribute to increased risk through related skin characteristics.",
+    "ground_truth": "Light eye color increases the risk of BCC."
+  },
+  {
+    "id": "Medical-de0b30b1",
+    "question": "Are organ transplant recipients at higher risk for BCC?",
+    "source": "Medical",
+    "context": "hepatobiliary system has part liver, liver part of hepatobiliary system | liver part of hepatobiliary system, hepatobiliary system has part liver | hepatobiliary system has part liver, liver part of hepatobiliary system | liver part of hepatobiliary system, hepatobiliary system has part liver",
+    "evidence": [
+      "Organ transplant is a risk factor for BCC."
+    ],
+    "question_type": "Fact Retrieval",
+    "generated_answer": "Yes, organ transplant recipients are at higher risk for Basal Cell Carcinoma (BCC) due to immunosuppressive medications, which weaken the immune system\u2019s ability to detect and fight cancer. Additionally, long-term sun exposure and other environmental factors may contribute to this increased risk.",
+    "ground_truth": "Organ transplant is a risk factor for BCC."
+  },
+  {
+    "id": "Medical-4f1779a5",
+    "question": "Is autoimmune disease a risk factor for BCC?",
+    "source": "Medical",
+    "context": "Risk factors has effect cancer, cancer has cause Risk factors | cancer has cause Risk factors, Risk factors has effect cancer",
+    "evidence": [
+      "Autoimmune disease is a risk factor for BCC."
+    ],
+    "question_type": "Fact Retrieval",
+    "generated_answer": "Autoimmune diseases may slightly increase the risk of basal cell carcinoma (BCC) due to chronic inflammation or immunosuppressive treatments, but UV radiation remains the primary risk factor. While some studies suggest a weak association, the link is not as strong or well-established as with sun exposure. BCC is most commonly caused by prolonged UV exposure, and autoimmune conditions generally do not significantly elevate risk compared to other factors.",
+    "ground_truth": "Autoimmune disease is a risk factor for BCC."
+  },
+  {
+    "id": "Medical-d675eecd",
+    "question": "What is a flat, pale or yellow area on the skin indicative of in BCC?",
+    "source": "Medical",
+    "context": "myeloblast subclass of white blood cell | myeloblast subclass of white blood cell",
+    "evidence": [
+      "A flat, pale or yellow area is a symptom of BCC."
+    ],
+    "question_type": "Fact Retrieval",
+    "generated_answer": "A flat, pale or yellow area on the skin in Basal Cell Carcinoma (BCC) is indicative of the cancer. This lesion is often non-pigmented and may appear on sun-exposed areas like the face or neck. It is a common early sign of BCC, which typically grows slowly and rarely spreads to other parts of the body.",
+    "ground_truth": "A flat, pale or yellow area is a symptom of BCC."
+  },
+  {
+    "id": "Medical-7e4192af",
+    "question": "What does a shiny bump on the skin suggest in the context of BCC?",
+    "source": "Medical",
+    "context": "Sperm banking subclass of sperm banking | Sperm banking product or material produced semen",
+    "evidence": [
+      "A shiny bump is a symptom of BCC."
+    ],
+    "question_type": "Fact Retrieval",
+    "generated_answer": "A shiny, pearly bump with a central crater is a common sign of Basal Cell Carcinoma (BCC). This type of lesion often appears on sun-exposed skin and may bleed or crust over. However, other skin conditions can mimic BCC, so a healthcare professional should evaluate it for accurate diagnosis.",
+    "ground_truth": "A shiny bump is a symptom of BCC."
+  }
+]
