@@ -2813,7 +2813,8 @@ def slice_for_final_merged_json(final_merged_json: Dict[str, Any],use_word_forma
     elif features_contain_ere_exact > features_contain_per_edge_exact:
       data['rule'] = rule_edge_exact
       final_format = _drop_keys(data, per_edge_exact)
-      final_format.pop('edge_matrix')
+      if 'edge_matrix' in final_format:
+        final_format.pop('edge_matrix')
 
       if use_word_format:
         word_format,all_transformed_feats = decode_into_words_for_ere_and_edge(final_format,format = 'ere',choices =ere_exact )
@@ -3159,23 +3160,25 @@ class CompressRag_rl:
         # answers
         if self.include_answers:
             final_flat_answers_lsts = self.answers_extract_function(all_answers)
-            print(f'self.thinkings_choice  {self.thinkings_choice}')
-            if not final_flat_answers_lsts:
+            print(f'self.answers_choice  {self.answers_choice}')
+            print(f'final_flat_answers_lsts {final_flat_answers_lsts}')
+            if final_flat_answers_lsts:
                 domain_knowledge_lst.append(final_flat_answers_lsts)
+            else:
+                domain_knowledge_lst.append([])
+
 
         # thinkings
         if self.include_thinkings:
-            print(self.include_thinkings)
+            print(f'self.thinkings_choice  {self.thinkings_choice}')
             final_flat_thinkings_lsts = self.thinking_extract_function(all_q_indices, self.meta_codebook)
-            domain_knowledge_lst.append(final_flat_thinkings_lsts)
+            if final_flat_thinkings_lsts:
+                domain_knowledge_lst.append(final_flat_thinkings_lsts)
+            else:
+                domain_knowledge_lst.append([])
 
         if all_f_indices:
             facts_lsts = self._gather_facts_by_indices(all_f_indices, self.meta_codebook)
-            # print(f'facts_lsts{facts_lsts}')
-            # print(f'facts_lsts chocie 1 include ans{self.answers_extract_function(facts_lsts)}')
-            # print(f'facts_lsts chocie 2 not include{get_flat_answers_lsts(facts_lsts)}')
-            # final_flat_facts_lsts = (self.answers_extract_function(facts_lsts)
-            #                         if self.include_answers else get_flat_answers_lsts(facts_lsts))
 
             final_flat_facts_lsts = self.answers_extract_function(facts_lsts)
             if not final_flat_facts_lsts:
@@ -3184,6 +3187,8 @@ class CompressRag_rl:
             print(f'final_flat_facts_lsts{final_flat_facts_lsts}')
             if final_flat_facts_lsts:                
                 domain_knowledge_lst.append(final_flat_facts_lsts)
+            else:
+                domain_knowledge_lst.append([])
 
         return domain_knowledge_lst
 
