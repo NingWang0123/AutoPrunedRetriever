@@ -3058,48 +3058,45 @@ class CompressRag_rl:
             return None
         
         combined = None  
+        fact_cb = get_code_book(
+            all_chunks,
+            type='facts',
+            rule="Store factual statements.",
+            # batch_size=64, 
+        )
+        if combined is None:
+            combined = {
+                "e": list(fact_cb.get("e", [])),
+                "r": list(fact_cb.get("r", [])),
+                "edge_matrix": list(fact_cb.get("edges([e,r,e])", [])),
+                "facts(edges[i])": [lst for lst in fact_cb.get("facts(edges[i])", [])],
+                "questions_lst": [],
+                "answers_lst": [],
+                "thinkings_lst": [],
+                "rule": fact_cb.get("rule", "Store factual statements."),
+                "e_embeddings": [],
+                "r_embeddings": [],
+            }
+        else:
+            ent_map, _, new_ents = update_the_index(combined, fact_cb, "e")
+            rel_map, _, new_rels = update_the_index(combined, fact_cb, "r")
 
-        for item in items:
-            ctx = (item.get("context") or "").strip()
-            if not ctx:
-                continue
-            count = 0
-            for ch in _chunk_text(ctx, chunk_chars=chunk_chars, overlap=overlap):
-                count += 1
-                fact_cb = get_code_book(ch, type='facts', rule="Store factual statements.", factparser= True)
-                if combined is None:
-                    combined = {
-                        "e": list(fact_cb["e"]),
-                        "r": list(fact_cb["r"]),
-                        "edge_matrix": list(fact_cb["edges([e,r,e])"]),
-                        "facts(edges[i])": [lst for lst in fact_cb["facts(edges[i])"]],
-                        "questions_lst": [],    
-                        "answers_lst": [],
-                        "thinkings_lst": [],
-                        "rule": fact_cb.get("rule", "Store factual statements."),
-                        "e_embeddings": [],
-                        "r_embeddings": [],
-                    }
-                else:
-                    ent_map, _, new_ents = update_the_index(combined, fact_cb, "e")
-                    rel_map, _, new_rels = update_the_index(combined, fact_cb, "r")
+            edges_remapped = remap_edges_matrix(
+                fact_cb["edges([e,r,e])"], ent_map, rel_map
+            )
 
-                    edges_remapped = remap_edges_matrix(
-                        fact_cb["edges([e,r,e])"], ent_map, rel_map
-                    )
+            edge_map, new_edge_matrix = combine_updated_edges(
+                combined["edge_matrix"], edges_remapped
+            )
 
-                    edge_map, new_edge_matrix = combine_updated_edges(
-                        combined["edge_matrix"], edges_remapped
-                    )
+            facts_runs = fact_cb["facts(edges[i])"]
+            facts_runs_mapped = remap_question_indices(facts_runs, edge_map)
+            combined["facts(edges[i])"].extend(facts_runs_mapped)
 
-                    facts_runs = fact_cb["facts(edges[i])"]
-                    facts_runs_mapped = remap_question_indices(facts_runs, edge_map)
-                    combined["facts(edges[i])"].extend(facts_runs_mapped)
-
-                    combined["e"].extend(new_ents)
-                    combined["r"].extend(new_rels)
-                    combined["edge_matrix"] = new_edge_matrix
-        print(f"{json_path} chunk num:", count)
+            combined["e"].extend(new_ents)
+            combined["r"].extend(new_rels)
+            combined["edge_matrix"] = new_edge_matrix
+        print(f"{json_path} chunk num:", total_chunks)
         return combined
 
 
