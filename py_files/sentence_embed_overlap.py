@@ -265,7 +265,7 @@ class DSU:
             self.r[ra] += 1
 
 
-def get_overped_edge_lists_sentence_emebed(codebook_main, edge_lists,sent_emb,sim_threshold = 0.8):
+def get_overped_edge_lists_sentence_emebed(codebook_main, edge_lists,sent_emb,sim_threshold):
     """
     Input:
       codebook_main:
@@ -303,8 +303,6 @@ def get_overped_edge_lists_sentence_emebed(codebook_main, edge_lists,sent_emb,si
 
 
     # calculate cos sim
-    # Union-Find over global indices; add edge if sim >= threshold
-    dsu = DSU(N)
 
     # Helper to convert local (li, i) -> global index
     def gid(li, i): return offsets[li] + i
@@ -319,6 +317,9 @@ def get_overped_edge_lists_sentence_emebed(codebook_main, edge_lists,sent_emb,si
     N = len(all_triples)
     if N == 0:
         return [], {}
+
+    # Union-Find over global indices; add edge if sim >= threshold
+    dsu = DSU(N)
 
     L = len(edge_lists)
     for a in range(L):
@@ -361,6 +362,8 @@ def get_overped_edge_lists_sentence_emebed(codebook_main, edge_lists,sent_emb,si
             print(t)
 
             print((li, i))
+
+    # get lists of sentence embeddings
 
 # ---------------------------
 # Example usage
