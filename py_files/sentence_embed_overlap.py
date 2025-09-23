@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import torch
 from langchain_community.embeddings import HuggingFaceEmbeddings
+from CompressRag_rl_v3 import decode_question
 
 
 def _cosine_matrix(a: torch.Tensor, b: torch.Tensor) -> np.ndarray:
@@ -172,22 +173,171 @@ def get_overped_or_unique_edge_lists_sentence_emebed(
     return kept_edge_lists
 
 
+############# optimized ver
+def _to_vec(x):
+    return x if isinstance(x, np.ndarray) else np.asarray(x, dtype=np.float32)
+
+
+
+def _avg_vec_from_decoded(decoded_q, dim: int) -> np.ndarray:
+    """
+    decoded_q: [[e_vec, r_vec, e_vec], ...] where each vec is list[float] or np.ndarray
+    Returns one vector (float32) = mean over all component vectors across all edges.
+    If no vectors found, returns a zero vector of length `dim`.
+    """
+    parts = []
+    for triple in decoded_q:
+        for v in triple:
+            if v is not None:
+                vv = _to_vec(v)
+                if vv.size:
+                    parts.append(vv.astype(np.float32, copy=False))
+    if not parts:
+        return np.zeros(dim, dtype=np.float32)
+    return np.mean(np.stack(parts, axis=0), axis=0)
+
+def _cosine_sim_word(A: np.ndarray, B: np.ndarray) -> np.ndarray:
+    """
+    A: (n, d), B: (m, d) -> (n, m) cosine similarity matrix.
+    """
+    A = A.astype(np.float32, copy=False)
+    B = B.astype(np.float32, copy=False)
+    A_norm = A / (np.linalg.norm(A, axis=1, keepdims=True) + 1e-12)
+    B_norm = B / (np.linalg.norm(B, axis=1, keepdims=True) + 1e-12)
+    return A_norm @ B_norm.T
+
+def get_overped_or_unique_edge_lists_sentence_emebed_optimized(
+    codebook_main: Dict,
+    edge_lists: List[List[int]],
+    sent_emb,  # must have .embed_documents(List[str]) -> List[List[float]]
+    sim_threshold: float = 0.8,
+    unique = False,
+) -> Tuple[List[List[int]], Dict[int, List[Tuple[int, int, int]]]]:
+    """
+    Keep exactly one overlapping triple (by longest text) across lists based on sentence-embedding similarity.
+
+    Returns:
+      kept_edge_lists: same shape as edge_lists, but with overlaps collapsed (only the chosen representative kept).
+      groups: {rep_edge_id: [(list_id, local_idx, edge_id), ...]} membership per connected component.
+    """
+
+    # ---- 1) Gather all unique edge ids we need
+    uniq_edge_ids = sorted({eid for lst in edge_lists for eid in lst})
+    if not uniq_edge_ids:
+        return [[] for _ in edge_lists], {}
+
+
+    # instead of using sent_emb only, use word embedding sim first to sort the matrix
+    word_embeds = []
+    dim = len(codebook_main["e_embeddings"][0])
+
+    for q_edges in uniq_edge_ids:
+        decoded = decode_question(q_edges, codebook_main, fmt='embeddings')
+        word_embeds.append(_avg_vec_from_decoded(decoded, dim))
+
+    # get word embedd matrix
+    word_embedd_len = len(word_embeds)
+    word_sim_matrix = np.zeros((word_embedd_len, word_embedd_len)) 
+
+    for i,word_embed_i in enumerate(word_embeds):
+      for j,word_embed_j in enumerate(word_embeds):
+
+        if i != j:
+          word_sim =_cosine_sim_word(word_embed_i,word_embed_j)
+          word_sim_matrix[i][j] = word_sim
+        else:
+          word_sim_matrix[i][j] = -1
+
+
+    # get all possible pairs and sort them from high to low
+
+    e = codebook_main["e"]
+    r = codebook_main["r"]
+    edge_matrix = codebook_main["edge_matrix"]
+
+    # flatten and get sorted indices (descending)
+    flat = word_sim_matrix.ravel()
+    order = np.argsort(-flat)  # indices of elements sorted high → low
+
+    # convert back to row, col indices
+    rows, cols = np.unravel_index(order, word_sim_matrix.shape)
+    edge_sentemb_dict = {}
+    removed_val = []
+    kept_val = []
+
+    # iterate and pruning
+    for rank, (r, c) in enumerate(zip(rows, cols), start=1):
+
+      edge_r = uniq_edge_ids[r]
+
+      edge_c = uniq_edge_ids[c]
+
+      if edge_r in removed_val or edge_c in removed_val:
+        continue
+
+      else:
+        # get edge_r info
+        if edge_r in edge_sentemb_dict:
+          sent_r_emb,len_sent_r = edge_sentemb_dict[edge_r]
+        else:
+          eh_r, ridx_r, et_r = edge_matrix[edge_r]
+          sent_r = f"{e[eh_r]} {r[ridx_r]} {e[et_r]}".strip()
+          len_sent_r = len(sent_r)
+          sent_r_emb = sent_emb.embed_documents([sent_r])
+          edge_sentemb_dict[edge_r] = (sent_r_emb,len_sent_r)
+
+        # get edge_c info
+        if edge_c in edge_sentemb_dict:
+          sent_c_emb,len_sent_c = edge_sentemb_dict[edge_c]
+        else:
+          eh_c, ridx_c, et_c = edge_matrix[edge_c]
+          sent_c = f"{e[eh_c]} {r[ridx_c]} {e[et_c]}".strip()
+          len_sent_c = len(sent_c)
+          sent_c_emb = sent_emb.embed_documents([sent_c])
+          edge_sentemb_dict[edge_c] = (sent_c_emb,len_sent_c)
+
+        S = _cosine_matrix(sent_r_emb, sent_c_emb)
+
+        if S >= sim_threshold:
+          if len_sent_r>= len_sent_c:
+            removed_val.append(edge_c)
+            kept_val.append(edge_r)
+            if edge_c in kept_val:
+              kept_val.remove(edge_c)
+          else:
+            removed_val.append(edge_r)
+            if edge_r in kept_val:
+              kept_val.remove(edge_r)
+
+    kept_edge_lists = edge_lists.copy()
+
+    if unique:
+      for i,edge_list in enumerate(kept_edge_lists):
+        kept_edge_lists[i] = [edge for edge in edge_list if edge not in removed_val]
+    else:
+      for i,edge_list in enumerate(kept_edge_lists):
+        kept_edge_lists[i] = [edge for edge in edge_list if edge in kept_val]
+
+    return kept_edge_lists
+
+
 # ---------------------------
 # Example usage
 # ---------------------------
-if __name__ == "__main__":
-    sent_emb = HuggingFaceEmbeddings(
-        model_name="sentence-transformers/all-MiniLM-L6-v2"
-    )
+# if __name__ == "__main__":
+#     sent_emb = HuggingFaceEmbeddings(
+#         model_name="sentence-transformers/all-MiniLM-L6-v2"
+#     )
 
 
-    final_merged_json_unsliced = {'e': ['most common', 'skin cancer', 'Treatment by risk and recurrence', 'cancer', 'symptoms', 'Quality of life'], 'r': ['facet of'], 'rule': 'Answer questions', 'questions(edges[i])': [[0]], 'edge_matrix': [[0, 0, 1], [2, 0, 3], [4, 0, 5]], 'facts(edges[i])': [[1], [2]]}
+#     final_merged_json_unsliced = {'e': ['most common', 'skin cancer', 'Treatment by risk and recurrence', 'cancer', 'symptoms', 'Quality of life'], 'r': ['facet of'], 'rule': 'Answer questions', 'questions(edges[i])': [[0]], 'edge_matrix': [[0, 0, 1], [2, 0, 3], [4, 0, 5]], 'facts(edges[i])': [[1], [2]]}
 
-    edge_lists = [[0,1,2],[0,2]]
+#     edge_lists = [[0,1,2],[0,2]]
 
-    kept_edge_lists =get_overped_or_unique_edge_lists_sentence_emebed(final_merged_json_unsliced, edge_lists,sent_emb)
+#     kept_edge_lists =get_overped_or_unique_edge_lists_sentence_emebed(final_merged_json_unsliced, edge_lists,sent_emb)
 
-    print(kept_edge_lists)
+#     print(kept_edge_lists)
+
 
 
 
