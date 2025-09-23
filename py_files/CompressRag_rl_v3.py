@@ -704,12 +704,24 @@ def get_code_book(
         if not texts:
             triples_merged = set()
         elif len(texts) <= batch_size:
-            triples_list: List[Set[Triplet]] = triplet_parser(texts)  # List[Set[Triplet]]
-            triples_merged = _merge_sets(triples_list)
+            parsed = triplet_parser(texts)
+            if isinstance(parsed, set):
+                triples_merged = parsed
+            elif isinstance(parsed, list):
+                triples_merged = _merge_sets(parsed)          
+            else:
+                triples_merged = set(parsed)                 
         else:
-            acc: List[Set[Triplet]] = []
+            acc: List[Iterable[Triplet]] = []
             for i in range(0, len(texts), batch_size):
-                acc.extend(triplet_parser(texts[i:i+batch_size]))
+                parsed = triplet_parser(texts[i:i+batch_size])
+                if isinstance(parsed, set):
+                    acc.append(parsed)  
+                elif isinstance(parsed, list):
+                    for s in parsed:    
+                        acc.append(s if isinstance(s, set) else set(s))
+                else:
+                    acc.append(set(parsed))
             triples_merged = _merge_sets(acc)
 
     if not triples_merged:
