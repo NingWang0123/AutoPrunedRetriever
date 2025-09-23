@@ -1,4 +1,5 @@
-from CompressRag_rl_v1 import CompressRag_rl,WordAvgEmbeddings,decode_questions, get_context
+from CompressRag_rl_v2 import CompressRag_rl,decode_questions, get_context
+from WordEmb import WordAvgEmbeddings, Word2VecEmbeddings
 from langchain.embeddings.base import Embeddings
 from langchain_community.embeddings import HuggingFaceEmbeddings
 import torch
@@ -6,6 +7,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 import re, os
 from typing import List, Tuple
 import time
+from CompressRag_rl_v3 import Word2VecEmbeddings
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
@@ -171,7 +173,7 @@ class Phi4MiniReasoningLLM:
             ctx_lines = [
                 "<<<RETRIEVED_CONTEXT_START>>>",
                 "The system searched for a related question in the database. Below are related question's graph triples and its prior answer as reference. You don't have to follow it completely, just use it as a reference.",
-                #f"{final_merged_json}",
+                f"{final_merged_json}",
             ]
             ctx_lines.append("<<<RETRIEVED_CONTEXT_END>>>")
             user_msg += "\n".join(ctx_lines) + "\n"
@@ -186,7 +188,7 @@ class Phi4MiniReasoningLLM:
                 "[ANSWER]: "
             )
         #print(system_msg)
-        #print(user_msg)
+        print(user_msg)
         return system_msg, user_msg
 
 
@@ -307,13 +309,11 @@ class Phi4MiniReasoningLLM:
 
             s = s.replace("\ufeff", "").strip()
 
-            lines = s.splitlines()
-            role_pat = re.compile(r'\s*[\[\(]?\s*assistant\s*[\]\)]?\s*[:：-]*\s*$', re.IGNORECASE)
-            while lines and role_pat.fullmatch(lines[0]):
-                lines.pop(0)
-                while lines and not lines[0].strip():
-                    lines.pop(0)
+            s = re.sub(r"(?i)(<\|assistant\|>\s*)+", "", s, flags=re.MULTILINE)
+            s = re.sub(r"^\s*assistant\s*[:：-]*\s*", "", s, flags=re.I)
+            s = re.sub(r"^(#+\s*response\s*[:：-]*\s*)", "", s, flags=re.I)
 
+            lines = s.splitlines()
             s = " ".join(l.strip() for l in lines).strip()
             s = re.sub(r'\s+', ' ', s)
 
@@ -358,14 +358,19 @@ class Phi4MiniReasoningLLM:
         self.last_metrics = metrics_wrapped
         self.metrics_runs.append(metrics_wrapped)
 
+
         if self.include_thinkings:
             thinks_str = "\n\n".join(t.strip() for t in last_thinks if t.strip())
+            print("----------ANS:",ans_clean)
             return ans_clean, thinks_str
         else:
+            print("----------ANS:",ans_clean)
             return ans_clean
 
 
-word_emb = WordAvgEmbeddings(model_path="gensim-data/glove-wiki-gigaword-100/glove-wiki-gigaword-100.model")
+#word_emb = WordAvgEmbeddings(model_path="gensim-data/glove-wiki-gigaword-100/glove-wiki-gigaword-100.model")
+
+word_emb = Word2VecEmbeddings(model_name="word2vec-google-news-300")
 sentence_emb = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
 include_thinking = True
@@ -385,8 +390,7 @@ rag = CompressRag_rl(
     ini_meta_codebook = ini,
     sentence_emb=sentence_emb,
     word_emb=word_emb,
-    llm=phi_llm,
-    combine_ents_rounds=1,        
+    llm=phi_llm,    
     thinkings_choice='overlap',  
     answers_choice='unique'       
 )
@@ -414,11 +418,11 @@ def to_serializable(obj):
 
 i = 0
 
-# for q in questions:
-#     print(f'q {i}')
-#     result = rag.run_work_flow(q, facts_json_path=["context/novel copy.json", "context/medical_sub.json"], warm_start="auto")
-#     print(rag.llm.metrics_runs)  
-#     #print(result)
+for q in questions:
+     print(f'q {i}')
+     result = rag.run_work_flow(q, facts_json_path=["context/novel copy.json", "context/medical_sub.json"], warm_start="auto")
+     print(rag.llm.metrics_runs)  
+     #print(result)
 
 #     #with open(f"meta_codebook_{i}.json", "w", encoding="utf-8") as f:
 #     #    json.dump(rag.meta_codebook, f, ensure_ascii=False, indent=2, default=to_serializable)
