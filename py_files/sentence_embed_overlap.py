@@ -185,7 +185,7 @@ if __name__ == "__main__":
 
     edge_lists = [[0,1,2],[0,2]]
 
-    kept_edge_lists =get_overped_edge_lists_sentence_emebed(final_merged_json_unsliced, edge_lists,sent_emb)
+    kept_edge_lists =get_overped_or_unique_edge_lists_sentence_emebed(final_merged_json_unsliced, edge_lists,sent_emb)
 
     print(kept_edge_lists)
 
