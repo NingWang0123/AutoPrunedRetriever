@@ -699,20 +699,23 @@ def get_code_book(
         if not texts:
             triples_merged = set()
         elif len(texts) <= batch_size:
-            triples_list: List[Set[Triplet]] = triplet_parser(texts)  # List[Set[Triplet]]
-            triples_merged = _merge_sets(triples_list)
+            parsed = triplet_parser(texts)
+            if isinstance(parsed, set):
+                triples_merged = parsed
+            elif isinstance(parsed, list):
+                triples_merged = _merge_sets(parsed)          
+            else:
+                triples_merged = set(parsed)                 
         else:
             acc: List[Iterable[Triplet]] = []
             for i in range(0, len(texts), batch_size):
                 parsed = triplet_parser(texts[i:i+batch_size])
-                # 兼容两种返回：Set[Triplet] 或 List[Set[Triplet]] / List[List[Triplet]]
                 if isinstance(parsed, set):
-                    acc.append(parsed)  # 单个集合
+                    acc.append(parsed)  
                 elif isinstance(parsed, list):
-                    for s in parsed:    # 多个集合
+                    for s in parsed:    
                         acc.append(s if isinstance(s, set) else set(s))
                 else:
-                    # 极端兜底：当作一批三元组序列
                     acc.append(set(parsed))
             triples_merged = _merge_sets(acc)
 
