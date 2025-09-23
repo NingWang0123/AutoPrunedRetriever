@@ -20,8 +20,10 @@ from huggingface_hub import hf_hub_download
 from langchain_community.embeddings import HuggingFaceEmbeddings
 
 from CompressRag_rl_v2 import (
-    CompressRag_rl, WordAvgEmbeddings, merging_codebook, get_word_embeddings
+    CompressRag_rl, merging_codebook, get_word_embeddings
 )
+from WordEmb import WordAvgEmbeddings, Word2VecEmbeddings
+
 from dpo_compressrag_v2 import (    
     make_preference_dataset_2head, train_dpo_2head,make_preference_dataset_2head_using_llm,
     default_reward, answer_with_auto_strategy,save_pref_examples,load_pref_examples,ANSWERS_CHOICES,THINKINGS_CHOICES
@@ -47,9 +49,8 @@ TOPK_CTX     = 5
 # 1) Initialise embeddings & LLM
 # ---------------------------------------------------------------------
 print("» Initialising embeddings & LLM …")
-word_emb = WordAvgEmbeddings(
-    model_path="gensim-data/glove-wiki-gigaword-100/glove-wiki-gigaword-100.model"
-)
+#word_emb = WordAvgEmbeddings(model_path="gensim-data/glove-wiki-gigaword-100/glove-wiki-gigaword-100.model")
+word_emb = Word2VecEmbeddings(model_name="word2vec-google-news-300")
 sent_emb = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-MiniLM-L6-v2"
 )
@@ -60,7 +61,6 @@ phi_llm  = Phi4MiniReasoningLLM(
     temperature=0.2,
     top_p=0.9,
 )
-
 
 
 ini_meta_json = pathlib.Path("meta_codebook.json")

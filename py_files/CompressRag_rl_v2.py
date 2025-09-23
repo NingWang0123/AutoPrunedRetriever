@@ -20,10 +20,14 @@ from copy import deepcopy
 from textwrap import dedent
 from graph_generator.rebel import triplet_parser
 import time
+from WordEmb import WordAvgEmbeddings, Word2VecEmbeddings
 
 Triplet = Tuple[str, str, str]
 
 nlp = spacy.load("en_core_web_sm")
+
+#word_emb = WordAvgEmbeddings(model_path="gensim-data/glove-wiki-gigaword-100/glove-wiki-gigaword-100.model")
+word_emb = Word2VecEmbeddings(model_name="word2vec-google-news-300")
 
 SUBJ_DEPS = {"nsubj", "nsubjpass", "csubj", "csubjpass"}
 OBJ_DEPS  = {"dobj", "obj", "attr", "oprd", "dative"}
@@ -652,75 +656,6 @@ def get_merged_message(question_prompt,use_full_edges = True):
 
 
 ########### Aug 30-31,2025: merging code book method
-
-
-class WordAvgEmbeddings(Embeddings):
-    """
-    A simple word-averaging embedding for LangChain.
-    - 输入文本会被正则分词（只保留 a-zA-Z），并转小写
-    - 每个词用 KeyedVectors 查词向量，取均值
-    - OOV 时返回全零向量
-    - 支持可选 L2 归一化，返回 Python list（FAISS 友好）
-    """
-    def __init__(
-        self,
-        model_path: Optional[str] = None,
-        *,
-        kv: Optional[KeyedVectors] = None,
-        l2_normalize: bool = True,
-        token_pattern: str = r"[A-Za-z]+"
-    ):
-        """
-        Args:
-            model_path: 本地 KeyedVectors 路径（.kv / .bin / word2vec 格式）。
-                        例如：'gensim-data/glove-wiki-gigaword-100/glove-wiki-gigaword-100.model'
-            kv:         也可以直接传入已加载的 KeyedVectors（与 model_path 二选一）
-            l2_normalize: 是否对平均向量做 L2 归一化
-            token_pattern: 分词正则
-        """
-        if kv is not None:
-            self.kv = kv
-        elif model_path:
-            # 尝试用 KeyedVectors.load 加载；失败则回退到 word2vec 格式加载
-            try:
-                self.kv = KeyedVectors.load(model_path, mmap='r')
-            except Exception:
-                # 如果是 word2vec / text 格式
-                self.kv = KeyedVectors.load_word2vec_format(model_path, binary=False)
-        else:
-            raise ValueError("Provide either `model_path` or `kv`.")
-
-        self.dim = self.kv.vector_size
-        self.l2_normalize = l2_normalize
-        self.token_pat = re.compile(token_pattern)
-
-    # ---- 内部：单条文本向量化 ----
-    def _embed_text(self, text: str) -> np.ndarray:
-        toks = [t.lower() for t in self.token_pat.findall(text)]
-        vecs = [self.kv[w] for w in toks if w in self.kv]
-        if not vecs:
-            v = np.zeros(self.dim, dtype=np.float32)
-        else:
-            v = np.mean(vecs, axis=0).astype(np.float32)
-        if self.l2_normalize:
-            n = np.linalg.norm(v)
-            if n > 0:
-                v = v / n
-        return v
-
-    # ---- LangChain 抽象方法：多文档 ----
-    def embed_documents(self, texts: List[str]) -> List[List[float]]:
-        # LangChain 期望返回 List[List[float]]
-        out = [self._embed_text(t).tolist() for t in texts]
-        return out
-
-    # ---- LangChain 抽象方法：单查询 ----
-    def embed_query(self, text: str) -> List[float]:
-        return self._embed_text(text).tolist()
-    
-# change back to your own path
-
-word_emb = WordAvgEmbeddings(model_path="gensim-data/glove-wiki-gigaword-100/glove-wiki-gigaword-100.model")
 
 
 def get_word_embeddings(list_of_text,word_emb):
