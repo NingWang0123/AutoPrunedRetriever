@@ -3448,6 +3448,8 @@ class CompressRag_rl:
             final_merged_json = combined_facts_cb if combined_facts_cb else q_json.copy()
             retrieval_time = 0
 
+        print(f'final_merged_json unsliced{final_merged_json}')
+
         q_txt, gk_txt, st_txt, ft_txt = select_best_context_by_keys(final_merged_json)
 
         final_merged_json = slice_for_final_merged_json(final_merged_json,self.use_word)
@@ -3462,17 +3464,7 @@ class CompressRag_rl:
 
         # replace the learning periodical combine ents with trapped by ram
 
-        # self.combine_ents_func(mode=warm_start) 
-
-        # if self.round % self.combine_ents_rounds == 0:
-        #     if self.round == 1:
-        #         self.combine_ents_func(mode=warm_start) 
-        #     else:
-        #         #change to coarse combine for effieciency
-        #         self.combine_ents_func(mode=warm_start)
-        # self.round += 1
-
-        # print(f'new_result {new_result}')
+        self.combine_ents_func(mode=warm_start) 
 
         return new_result
     
@@ -3507,6 +3499,8 @@ class CompressRag_rl:
             final_merged_json = combined_facts_cb if combined_facts_cb else q_json.copy()
             retrieval_time = 0
 
+        print(f'final_merged_json unsliced{final_merged_json}')
+
         q_txt, gk_txt, st_txt, ft_txt = select_best_context_by_keys(final_merged_json)
 
         final_merged_json = slice_for_final_merged_json(final_merged_json,self.use_word)
@@ -3523,15 +3517,6 @@ class CompressRag_rl:
         # replace the learning periodical combine ents with trapped by ram
         self.combine_ents_func(mode=warm_start) 
 
-        # if self.round % self.combine_ents_rounds == 0:
-        #     if self.round == 1:
-        #         self.combine_ents_func(mode=warm_start) 
-        #     else:
-        #         #change to coarse combine for effieciency
-        #         self.combine_ents_func(mode=warm_start)
-        # self.round += 1
-
-        # print(f'new_result {new_result}')
 
         return new_result,metrics_from_llm,ft_txt
     

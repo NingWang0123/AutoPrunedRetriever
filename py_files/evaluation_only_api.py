@@ -36,6 +36,8 @@ print(f"CompressRAG: total={len(cg_results)} shared={len(cg_shared)}")
 lg_results_only_shared = lg_shared
 cg_results_only_shared = cg_shared
 
+print(cg_results_only_shared)
+
 # evaluate lg_results_only_shared and cg_results_only_shared through api
 
 
