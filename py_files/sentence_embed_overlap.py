@@ -265,7 +265,7 @@ class DSU:
             self.r[ra] += 1
 
 
-def get_overped_edge_lists_sentence_emebed(codebook_main, edge_lists,sent_emb,sim_threshold):
+def get_overped_edge_lists_sentence_emebed(codebook_main, edge_lists,sent_emb,sim_threshold = 0.5):
     """
     Input:
       codebook_main:
