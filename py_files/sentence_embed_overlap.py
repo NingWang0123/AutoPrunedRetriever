@@ -233,6 +233,135 @@ def select_informative_overlaps(
     # Optional: sort kept by group size (desc) then text_len (desc)
     kept.sort(key=lambda d: (d["group_size"], d["text_len"]), reverse=True)
     return kept, groups
+
+
+# 
+
+def _cosine_matrix(a: torch.Tensor, b: torch.Tensor) -> np.ndarray:
+    if a.numel() == 0 or b.numel() == 0:
+        return np.zeros((a.shape[0], b.shape[0]), dtype=np.float32)
+    a = torch.nn.functional.normalize(a, dim=1)
+    b = torch.nn.functional.normalize(b, dim=1)
+    return (a @ b.T).cpu().numpy().astype(np.float32)
+
+class DSU:
+    def __init__(self, n: int):
+        self.p = list(range(n))
+        self.r = [0]*n
+    def find(self, x):
+        while self.p[x] != x:
+            self.p[x] = self.p[self.p[x]]
+            x = self.p[x]
+        return x
+    def union(self, a, b):
+        ra, rb = self.find(a), self.find(b)
+        if ra == rb: return
+        if self.r[ra] < self.r[rb]:
+            self.p[ra] = rb
+        elif self.r[ra] > self.r[rb]:
+            self.p[rb] = ra
+        else:
+            self.p[rb] = ra
+            self.r[ra] += 1
+
+
+def get_overped_edge_lists_sentence_emebed(codebook_main, edge_lists,sent_emb,sim_threshold = 0.8):
+    """
+    Input:
+      codebook_main:
+          {
+              "e": [str, ...],
+              "r": [str, ...],
+              "edge_matrix": [[e_idx, r_idx, e_idx], ...],  # list or np.ndarray
+              "questions": [[edges index,...],...]
+              "e_embeddings": [vec, ...], 
+              "r_embeddings": [vec, ...], }
+      edge_lists: list[List[edge_matrix index,...],...] edge_matrix index here is the  
+
+    Output:
+      kept_edge_lists: list[List[edge_matrix index,...],...] edge_matrix index here is the 
+
+    """
+
+    # get the edge matrix belongs to edge_lists
+
+    unique_edge_lists_flat = list(set([x for sublist in edge_lists for x in sublist]))
+
+    # get corresponds sentence embeddings
+    all_ere_sent = {}
+    all_ere_len = {}
+
+    for i in unique_edge_lists_flat:
+      edge_mat_i = codebook_main['edge_matrix'][i]
+      e_index_h,r_index,e_index_t = edge_mat_i
+      e_h = codebook_main['e'][e_index_h]
+      r = codebook_main['r'][r_index]
+      e_t = codebook_main['e'][e_index_t]
+      ere_sent = f"{e_h} {r} {e_t}"
+      all_ere_sent[i] = sent_emb.embed_documents(ere_sent) 
+      all_ere_len[i] = len(ere_sent)
+
+
+    # calculate cos sim
+    # Union-Find over global indices; add edge if sim >= threshold
+    dsu = DSU(N)
+
+    # Helper to convert local (li, i) -> global index
+    def gid(li, i): return offsets[li] + i
+
+    # Pairwise list sims (cross-list only)
+    # Flatten index mapping
+    offsets = []
+    all_triples = []
+    for li, lst in enumerate(edge_lists):
+        offsets.append(len(all_triples))
+        all_triples.extend(lst)
+    N = len(all_triples)
+    if N == 0:
+        return [], {}
+
+    L = len(edge_lists)
+    for a in range(L):
+        for b in range(a+1, L):
+            Ei, Ej = all_ere_sent[a], all_ere_sent[b]
+            if Ei.numel() == 0 or Ej.numel() == 0: 
+                continue
+            S = _cosine_matrix(Ei, Ej)  # [Na, Nb]
+            # Find all pairs meeting the threshold (vectorized)
+            ai, bj = np.where(S >= sim_threshold)
+            for i_local, j_local in zip(ai.tolist(), bj.tolist()):
+                dsu.union(gid(a, i_local), gid(b, j_local))
+
+    # Build components
+    comps: Dict[int, List[int]] = {}
+    for g in range(N):
+        r = dsu.find(g)
+        comps.setdefault(r, []).append(g)
+
+    kept = []
+    groups = {}
+    # For reverse lookup: global -> (list_id, local_id)
+    rev = []
+    for li, lst in enumerate(edge_lists):
+        for i in range(len(lst)):
+            rev.append((li, i))  # aligns with global order
+
+    for root, members in comps.items():
+        # choose by longest text
+        best_g = max(members, key=lambda i: all_ere_len[i])
+        rep_li, rep_i = rev[best_g]
+        rep_triple = edge_lists[rep_li][rep_i]
+
+        # record group members (with where they came from)
+        group_detail = []
+        for g in members:
+            li, i = rev[g]
+            t = edge_lists[li][i]
+
+            print(t)
+
+            print((li, i))
+
 # ---------------------------
 # Example usage
 # ---------------------------
@@ -241,25 +370,12 @@ if __name__ == "__main__":
         model_name="sentence-transformers/all-MiniLM-L6-v2"
     )
 
-    lists = [
-        [("BRCA1", "interacts_with", "RAD51"),
-         ("p53", "inhibits", "cell_cycle")],
-        [("TP53", "negatively_regulates", "cell cycle"),
-         ("BRCA1 protein", "binds", "RAD51 recombinase")],
-    ]
 
-    pair_mats = compute_overlap_with_langchain(sent_emb, lists, mode="concat")
-    df = top_matches(lists[0], lists[1], pair_mats[(0,1)], topk=3)
-    print(df)
+    final_merged_json_unsliced = {'e': ['most common', 'skin cancer', 'Treatment by risk and recurrence', 'cancer', 'symptoms', 'Quality of life'], 'r': ['facet of'], 'rule': 'Answer questions', 'questions(edges[i])': [[0]], 'edge_matrix': [[0, 0, 1], [2, 0, 3], [4, 0, 5]], 'facts(edges[i])': [[1], [2]]}
 
-    kept, groups = select_informative_overlaps(
-    sent_emb, lists, mode="concat", sim_threshold=0.8)
+    edge_lists = [[0,1],[0,2]]
 
-    # kept = one representative per overlap cluster
-    for r in kept:
-        print("REP:", r)
-
-    final_merged_json_unsliced = {'e': ['most common', 'skin cancer', 'Treatment by risk and recurrence', 'cancer', 'symptoms', 'Quality of life'], 'r': ['facet of'], 'rule': 'Answer questions', 'questions(edges[i])': [[0]], 'edge_matrix': [[0, 0, 1], [2, 0, 3], [4, 0, 5]], 'facts(edges[i])': [[1], [2]], 'facts([[e,r,e], ...])': [[[2, 0, 3]], [[4, 0, 5]]]}
+    get_overped_edge_lists_sentence_emebed(final_merged_json_unsliced, edge_lists,sent_emb)
 
 
 
