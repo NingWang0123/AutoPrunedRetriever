@@ -46,11 +46,12 @@ class DSU:
             self.r[ra] += 1
 
 
-def get_overped_edge_lists_sentence_emebed(
+def get_overped_or_unique_edge_lists_sentence_emebed(
     codebook_main: Dict,
     edge_lists: List[List[int]],
     sent_emb,  # must have .embed_documents(List[str]) -> List[List[float]]
-    sim_threshold: float = 0.5
+    sim_threshold: float = 0.8,
+    unique = False,
 ) -> Tuple[List[List[int]], Dict[int, List[Tuple[int, int, int]]]]:
     """
     Keep exactly one overlapping triple (by longest text) across lists based on sentence-embedding similarity.
@@ -143,10 +144,15 @@ def get_overped_edge_lists_sentence_emebed(
     kept_edge_lists: List[List[int]] = [[] for _ in edge_lists]
     print(kept_edge_lists)
 
+    if unique:
+        min_len_m = 1
+    else:
+        min_len_m = 2
+
     for _, members in comps.items():
         # choose best by longest text
         # compute length for each member
-        if len(members)>=2:
+        if len(members)>=min_len_m:
             def member_len(gidx: int) -> int:
                 li, i_local = rev[gidx]
                 eid = edge_lists[li][i_local]
