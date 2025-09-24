@@ -361,6 +361,19 @@ def get_overped_or_unique_edge_lists_sentence_emebed_optimized(
     return kept_edge_lists
 
 
+
+def get_unique_or_overlap_by_sentence_embedded(codebook_main,edge_lists,sent_emb,sim_threshold=0.8,unique=False,optimized=False):
+    
+    if optimized:
+        kept_edge_lists = get_overped_or_unique_edge_lists_sentence_emebed_optimized(codebook_main,edge_lists,sent_emb,sim_threshold,unique)
+
+    else:
+        kept_edge_lists = get_overped_or_unique_edge_lists_sentence_emebed(codebook_main,edge_lists,sent_emb,sim_threshold,unique)
+
+    return kept_edge_lists
+       
+       
+
 # ---------------------------
 # Example usage
 # ---------------------------

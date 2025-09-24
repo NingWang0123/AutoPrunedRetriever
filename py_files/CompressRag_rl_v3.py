@@ -20,9 +20,10 @@ from copy import deepcopy
 from textwrap import dedent
 from graph_generator.rebel import triplet_parser
 import time
-from sentence_embed_overlap import get_overped_or_unique_edge_lists_sentence_emebed
+from sentence_embed_overlap import get_unique_or_overlap_by_sentence_embedded
 import gensim.downloader as api
 from WordEmb import Word2VecEmbeddings, WordAvgEmbeddings
+from functools import partial
 
 
 Triplet = Tuple[str, str, str]
@@ -1733,6 +1734,18 @@ def find_overlapped_thinkings(all_q_indices,codebook_main):
 
     return final_flat_thinkings_lsts
 
+##### new function for getting selected_thinkings_lsts
+def get_thinkings_lsts(all_q_indices,codebook_main):
+    selected_thinkings_lsts = []
+    questions_to_thinkings_dict = codebook_main['questions_to_thinkings']
+
+    for q_index in all_q_indices:
+        if q_index in questions_to_thinkings_dict.keys():
+            selected_thinkings_lsts.append(codebook_main['thinkings_lst'][questions_to_thinkings_dict[q_index]])
+
+    return selected_thinkings_lsts
+
+
 def _list_from_index_map(index_map: Dict[str, int]) -> List[str]:
     """把 {item -> idx} 映射还原为按 idx 排序的列表"""
     out = [None] * len(index_map)
@@ -2864,6 +2877,7 @@ thinkings_choice = ['overlap','unique','not_include']
 answers_choice = ['overlap','unique','not_include']
 combine_ents_choice = [0,1,2]
 
+
 def skip_func(a,b):
     return None
 
@@ -2874,7 +2888,6 @@ class CompressRag_rl:
         sentence_emb: Optional[Embeddings] = None,
         word_emb: Optional[Embeddings] = None,
         llm = None,
-        # combine_ents_rounds = 1, # params to control the combine ents # remove the combine ents rounds
         thinkings_choice = 'not_include',
         answers_choice = 'overlap',
         use_word = False
@@ -2926,9 +2939,9 @@ class CompressRag_rl:
         else:
             self.include_thinkings = True
             if thinkings_choice == "overlap":
-                self.thinking_extract_function = find_overlapped_thinkings
+                self.thinking_extract_function = get_unique_or_overlap_by_sentence_embedded
             elif thinkings_choice == "unique":
-                self.thinking_extract_function = find_unique_thinkings
+                self.thinking_extract_function = partial(get_unique_or_overlap_by_sentence_embedded,unique=True, optimized = False)
 
         self.llm.include_thinkings = self.include_thinkings
         ### answers param
@@ -2938,9 +2951,9 @@ class CompressRag_rl:
         else:
             self.include_answers = True
             if answers_choice == "overlap":
-                self.answers_extract_function = find_overlapped_answers
+                self.answers_extract_function = get_unique_or_overlap_by_sentence_embedded
             elif answers_choice == "unique":
-                self.answers_extract_function = find_unique_answers
+                self.answers_extract_function = partial(get_unique_or_overlap_by_sentence_embedded,unique=True, optimized = False)
 
         ### context fact param
         self.context_json_path = None  
@@ -2956,9 +2969,9 @@ class CompressRag_rl:
             self.llm.include_thinkings = True
 
             if thinkings_choice == "overlap":
-                self.thinking_extract_function = find_overlapped_thinkings
+                self.thinking_extract_function = get_unique_or_overlap_by_sentence_embedded
             elif thinkings_choice == "unique":
-                self.thinking_extract_function = find_unique_thinkings
+                self.thinking_extract_function = partial(get_unique_or_overlap_by_sentence_embedded,unique=True, optimized = False)
 
     def set_include_answers(self):
         if self.answers_choice == "not_include":
@@ -2967,9 +2980,10 @@ class CompressRag_rl:
         else:
             self.include_answers = True
             if answers_choice == "overlap":
-                self.answers_extract_function = find_overlapped_answers
+                self.answers_extract_function = get_unique_or_overlap_by_sentence_embedded
             elif answers_choice == "unique":
-                self.answers_extract_function = find_unique_answers
+                self.answers_extract_function = partial(get_unique_or_overlap_by_sentence_embedded,unique=True, optimized = False)
+
 
     def set_includings(self):
         self.set_include_thinkings()
@@ -3148,34 +3162,38 @@ class CompressRag_rl:
 
         # answers
         if self.include_answers:
-            final_flat_answers_lsts = self.answers_extract_function(all_answers)
+            final_answers_lsts = self.answers_extract_function(self.meta_codebook,all_answers,self.sentence_emb)
             print(f'self.answers_choice  {self.answers_choice}')
-            print(f'final_flat_answers_lsts {final_flat_answers_lsts}')
-            if final_flat_answers_lsts:
-                domain_knowledge_lst.append(final_flat_answers_lsts)
+            print(f'final_answers_lsts {final_answers_lsts}')
+            if final_answers_lsts:
+                domain_knowledge_lst.append(final_answers_lsts)
             else:
                 domain_knowledge_lst.append([])
 
 
         # thinkings
         if self.include_thinkings:
+            thinkings_lsts = get_thinkings_lsts(all_q_indices, self.meta_codebook)
+            final_thinkings_lsts = self.thinking_extract_function(self.meta_codebook,thinkings_lsts,self.sentence_emb)
             print(f'self.thinkings_choice  {self.thinkings_choice}')
-            final_flat_thinkings_lsts = self.thinking_extract_function(all_q_indices, self.meta_codebook)
-            if final_flat_thinkings_lsts:
-                domain_knowledge_lst.append(final_flat_thinkings_lsts)
+            print(f'final_thinkings_lsts {final_thinkings_lsts}')
+            if final_thinkings_lsts:
+                domain_knowledge_lst.append(final_thinkings_lsts)
             else:
                 domain_knowledge_lst.append([])
 
         if all_f_indices:
             facts_lsts = self._gather_facts_by_indices(all_f_indices, self.meta_codebook)
 
-            final_flat_facts_lsts = self.answers_extract_function(facts_lsts)
-            if not final_flat_facts_lsts:
-                final_flat_facts_lsts = get_flat_answers_lsts(facts_lsts)
+            final_facts_lsts = self.answers_extract_function(facts_lsts)
+
+            if not final_facts_lsts:
+                final_facts_lsts = facts_lsts
                 
-            print(f'final_flat_facts_lsts{final_flat_facts_lsts}')
-            if final_flat_facts_lsts:                
-                domain_knowledge_lst.append(final_flat_facts_lsts)
+            print(f'final_facts_lsts{final_facts_lsts}')
+            
+            if final_facts_lsts:                
+                domain_knowledge_lst.append(final_facts_lsts)
             else:
                 domain_knowledge_lst.append([])
 
