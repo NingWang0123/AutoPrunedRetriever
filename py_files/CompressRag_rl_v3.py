@@ -3197,6 +3197,8 @@ class CompressRag_rl:
             else:
                 domain_knowledge_lst.append([])
 
+            print(f'updated final_facts_lsts{final_facts_lsts}')
+
         return domain_knowledge_lst
 
     def compact_indicies_for_prompt(self, codebook_sub_q, domain_knowledge_lst):
