@@ -418,10 +418,10 @@ def to_serializable(obj):
 
 i = 0
 
-for q in questions:
-     print(f'q {i}')
-     result = rag.run_work_flow(q, facts_json_path=["context/novel copy.json", "context/medical_sub.json"], warm_start="auto")
-     print(rag.llm.metrics_runs)  
+# for q in questions:
+#      print(f'q {i}')
+#      result = rag.run_work_flow(q, facts_json_path=["context/novel copy.json", "context/medical_sub.json"], warm_start="auto")
+#      print(rag.llm.metrics_runs)  
      #print(result)
 
 #     #with open(f"meta_codebook_{i}.json", "w", encoding="utf-8") as f:

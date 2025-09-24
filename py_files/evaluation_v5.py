@@ -19,7 +19,7 @@ import torch
 from huggingface_hub import hf_hub_download
 from langchain_community.embeddings import HuggingFaceEmbeddings
 
-from CompressRag_rl_v2 import (
+from CompressRag_rl_v3 import (
     CompressRag_rl, WordAvgEmbeddings, merging_codebook, get_word_embeddings
 )
 from dpo_compressrag_v2 import (    

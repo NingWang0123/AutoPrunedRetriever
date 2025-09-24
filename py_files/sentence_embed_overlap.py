@@ -3,7 +3,47 @@ import numpy as np
 import pandas as pd
 import torch
 from langchain_community.embeddings import HuggingFaceEmbeddings
-from CompressRag_rl_v3 import decode_question
+
+def decode_question(question, codebook_main, fmt='words'):
+    """
+    question: list[int] of edge indices
+    codebook_main:
+        {
+            "e": [str, ...],
+            "r": [str, ...],
+            "edge_matrix": [[e_idx, r_idx, e_idx], ...],  # list or np.ndarray
+            "questions": [[edges index,...],...]
+            "e_embeddings": [vec, ...], 
+            "r_embeddings": [vec, ...], 
+        }
+    fmt: 'words' -> [[e, r, e], ...]
+         'embeddings' -> [[e_vec, r_vec, e_vec], ...]
+         'edges' -> [[e index, r index, e index], ...]
+    """
+    edges = codebook_main["edge_matrix"]
+
+    idxs = list(question)
+
+    def get_edge(i):
+        # works for both list and numpy array
+        return edges[i]
+
+    if fmt == 'words':
+        E, R = codebook_main["e"], codebook_main["r"]
+        decoded = [[E[h], R[r], E[t]] for (h, r, t) in (get_edge(i) for i in idxs)]
+    elif fmt == 'embeddings':
+        Ee = codebook_main.get("e_embeddings")
+        Re = codebook_main.get("r_embeddings")
+        if Ee is None or Re is None:
+            raise KeyError("e_embeddings and r_embeddings are required for fmt='embeddings'.")
+        decoded = [[Ee[h], Re[r], Ee[t]] for (h, r, t) in (get_edge(i) for i in idxs)]
+    elif fmt == 'edges':
+        decoded = [[h,r,t] for (h, r, t) in (get_edge(i) for i in idxs)]
+
+    else:
+        raise ValueError("fmt must be 'words', 'embeddings' or 'edges'.")
+
+    return decoded
 
 
 def _cosine_matrix(a: torch.Tensor, b: torch.Tensor) -> np.ndarray:

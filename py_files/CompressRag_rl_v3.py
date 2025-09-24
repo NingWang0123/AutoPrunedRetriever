@@ -3143,6 +3143,9 @@ class CompressRag_rl:
     def find_related_knowledge(self, all_answers, all_q_indices, all_f_indices=None):
         domain_knowledge_lst = []
 
+        # remove the flatten part
+        # get_overped_or_unique_edge_lists_sentence_emebed
+
         # answers
         if self.include_answers:
             final_flat_answers_lsts = self.answers_extract_function(all_answers)
