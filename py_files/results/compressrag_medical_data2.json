@@ -3,7 +3,7 @@
     "id": "Medical-965ad8a8",
     "question": "What is a common presentation of BCC on the skin?",
     "source": "Medical",
-    "context": "fallopian tubes part of female reproductive system, female reproductive system has part fallopian tubes",
+    "context": "PSA density facet of basal cell | bleeding from the anus subclass of Anal cancer",
     "evidence": [
       "BCC may present as a shiny bump."
     ],
@@ -15,7 +15,7 @@
     "id": "Medical-5175a85e",
     "question": "What is the role of biopsy in BCC diagnosis?",
     "source": "Medical",
-    "context": "biopsy subclass of Bone marrow tests, Bone marrow tests has part biopsy",
+    "context": "genetic testing studies genetic abnormality, genetic abnormality studied by genetic testing",
     "evidence": [
       "Biopsy is used as a diagnostic method for BCC."
     ],
@@ -27,7 +27,7 @@
     "id": "Medical-5f2cb8a5",
     "question": "Which systemic therapy may be considered for BCC?",
     "source": "Medical",
-    "context": "systemic therapy medical condition treated Cancer, Cancer drug used for treatment systemic therapy | systemic therapy medical condition treated Cancer, Cancer drug used for treatment Radiation therapy, Radiation therapy medical condition treated Cancer, Cancer drug used for treatment systemic therapy | systemic therapy medical condition treated Cancer, Cancer drug used for treatment systemic therapy | systemic therapy medical condition treated Cancer, Cancer drug used for treatment Radiation therapy, Radiation therapy medical condition treated Cancer, Cancer drug used for treatment systemic therapy",
+    "context": "immunotherapy subclass of Systemic therapy | High-dose chemotherapy subclass of High-dose chemotherapy | immunotherapy subclass of Systemic therapy | High-dose chemotherapy subclass of High-dose chemotherapy",
     "evidence": [
       "Systemic therapy may be used in some cases of BCC."
     ],
@@ -39,7 +39,7 @@
     "id": "Medical-0429f83c",
     "question": "What is included in the management of BCC recurrence?",
     "source": "Medical",
-    "context": "Side effects of systemic therapy facet of systemic therapy | Side effects of radiation therapy facet of radiation therapy",
+    "context": "PSA density facet of basal cell | Thyroid nodule part of Thyroid nodule",
     "evidence": [
       "Management of BCC recurrence involves treatment options.",
       "Treatment options for BCC recurrence are based on risk and recurrence."
@@ -52,7 +52,7 @@
     "id": "Medical-152bec6a",
     "question": "What is the recommended frequency for full skin exams in BCC follow-up?",
     "source": "Medical",
-    "context": "Skin exams by your doctor subclass of skin exams | Surveillance for the return of anal canal cancer and perianal cancer subclass of anoscopy",
+    "context": "bleeding from the anus subclass of Anal cancer | General health test subclass of test",
     "evidence": [
       "Full skin exams with a doctor are recommended at least once a year."
     ],
@@ -64,7 +64,7 @@
     "id": "Medical-e3923e5f",
     "question": "Can BCC spread to lymph nodes?",
     "source": "Medical",
-    "context": "Breast cancer has cause lymph node, lymph node has effect Breast cancer, Breast cancer has effect lymph node | Breast cancer has effect lymph node, lymph node has effect Breast cancer, Breast cancer has cause lymph node",
+    "context": "HPV has effect sexually transmitted infection, sexually transmitted infection has cause HPV | sexually transmitted infection has cause HPV, HPV has effect sexually transmitted infection",
     "evidence": [
       "BCC recurrence can involve spread to lymph nodes."
     ],
@@ -76,7 +76,7 @@
     "id": "Medical-0c2f999d",
     "question": "What is a brown or glossy black bump with rolled border a symptom of?",
     "source": "Medical",
-    "context": "Unusual or frequent headaches subclass of symptom | symptoms facet of Quality of life | symptoms facet of Quality of life | pain instance of side effect",
+    "context": "PSA density facet of basal cell | cervix part of female reproductive system, female reproductive system has part fallopian tube, fallopian tube part of female reproductive system, female reproductive system has part cervix | PSA density facet of basal cell | HPV has effect sexually transmitted infection, sexually transmitted infection has cause HPV",
     "evidence": [
       "A brown or glossy black bump with rolled border is a symptom of BCC."
     ],
@@ -88,7 +88,7 @@
     "id": "Medical-b6dc1118",
     "question": "What is the relationship between organ transplant and BCC risk?",
     "source": "Medical",
-    "context": "risk factor has effect Skin cancer, Skin cancer has cause risk factor | Skin cancer has cause risk factor, risk factor has effect Skin cancer | risk factor has effect Skin cancer, Skin cancer has cause risk factor | Skin cancer has cause risk factor, risk factor has effect Skin cancer",
+    "context": "sexually transmitted infection has cause HPV, HPV has effect sexually transmitted infection | HPV has effect sexually transmitted infection, sexually transmitted infection has cause HPV | sexually transmitted infection has cause HPV, HPV has effect sexually transmitted infection | HPV has effect sexually transmitted infection, sexually transmitted infection has cause HPV",
     "evidence": [
       "Organ transplant is a risk factor for BCC."
     ],
@@ -100,7 +100,7 @@
     "id": "Medical-ba2c8007",
     "question": "Is autoimmune disease associated with increased BCC risk?",
     "source": "Medical",
-    "context": "disease has cause infection, infection has effect disease | infection has effect disease, disease has cause infection",
+    "context": "HPV has effect sexually transmitted infection, sexually transmitted infection has cause HPV | sexually transmitted infection has cause HPV, HPV has effect sexually transmitted infection",
     "evidence": [
       "Autoimmune disease is a risk factor for BCC."
     ],
@@ -112,7 +112,7 @@
     "id": "Medical-5c30dd24",
     "question": "What is the role of imaging in BCC diagnosis?",
     "source": "Medical",
-    "context": "contrast use Imaging test | contrast use Imaging test",
+    "context": "genetic abnormality studied by genetic testing, genetic testing studies genetic abnormality",
     "evidence": [
       "Imaging may be used in the diagnosis of BCC."
     ],
@@ -124,7 +124,7 @@
     "id": "Medical-8622e4cc",
     "question": "Can BCC occur anywhere on the body?",
     "source": "Medical",
-    "context": "fallopian tubes part of female reproductive system, female reproductive system has part fallopian tubes",
+    "context": "PSA density facet of basal cell | bleeding from the anus subclass of Anal cancer",
     "evidence": [
       "BCC can occur anywhere on the body.",
       "BCC most commonly occurs in sun-exposed areas."
@@ -137,7 +137,7 @@
     "id": "Medical-90704d0a",
     "question": "From which cells does basal cell carcinoma arise?",
     "source": "Medical",
-    "context": "basal cell carcinoma subclass of skin cancer | squamous cell carcinoma subclass of lung cancer",
+    "context": "basal cell subclass of mouth cancer, mouth cancer subclass of head and neck cancers",
     "evidence": [
       "BCC arises from basal cells.",
       "BCC arises from cells in the lower part of the epidermis."
@@ -150,7 +150,7 @@
     "id": "Medical-941c0004",
     "question": "Which anatomical locations are most commonly affected by BCC?",
     "source": "Medical",
-    "context": "Sarcomatoid features facet of sarcomatoid | Genetic risk testing facet of Genetic",
+    "context": "vagina part of female reproductive system, female reproductive system has part fallopian tube, fallopian tube part of female reproductive system, female reproductive system has part vagina",
     "evidence": [
       "BCC most commonly develops in sun-exposed areas.",
       "Common anatomical locations affected by BCC include the face.",
@@ -165,7 +165,7 @@
     "id": "Medical-4bb300c3",
     "question": "What is the primary risk factor for developing basal cell carcinoma?",
     "source": "Medical",
-    "context": "Low blood cell counts subclass of Systemic therapy side effects | Large cell carcinoma subclass of lung cancer",
+    "context": "PSA density facet of basal cell carcinoma | basal cell carcinoma subclass of basal cell carcinoma",
     "evidence": [
       "UV radiation exposure is a primary risk factor for BCC."
     ],
@@ -177,7 +177,7 @@
     "id": "Medical-acec9fa2",
     "question": "How does fair skin affect the risk of basal cell carcinoma?",
     "source": "Medical",
-    "context": "basal cell skin cancer has cause UV light, UV light has effect basal cell skin cancer | UV light has effect basal cell skin cancer, basal cell skin cancer has cause UV light",
+    "context": "basal cell carcinoma subclass of mouth cancer, mouth cancer subclass of head and neck cancers",
     "evidence": [
       "Fair skin increases the risk of BCC."
     ],
@@ -189,7 +189,7 @@
     "id": "Medical-7c81f966",
     "question": "Does older age influence the risk of BCC?",
     "source": "Medical",
-    "context": "ovaries part of female reproductive system, female reproductive system has part fallopian tubes | fallopian tubes part of female reproductive system, female reproductive system has part ovaries",
+    "context": "HPV has effect sexually transmitted infection, sexually transmitted infection has cause HPV | sexually transmitted infection has cause HPV, HPV has effect sexually transmitted infection | HPV has effect sexually transmitted infection, sexually transmitted infection has cause HPV | sexually transmitted infection has cause HPV, HPV has effect sexually transmitted infection",
     "evidence": [
       "Older age is associated with a higher risk of BCC."
     ],
@@ -201,7 +201,7 @@
     "id": "Medical-f6b5155a",
     "question": "Does a family history of skin cancer affect the risk of BCC?",
     "source": "Medical",
-    "context": "Blood in the urine has cause infection in the urinary tract, infection in the urinary tract has effect Blood in the urine | infection in the urinary tract has effect Blood in the urine, Blood in the urine has cause infection in the urinary tract | Blood in the urine has cause infection in the urinary tract, infection in the urinary tract has effect Blood in the urine | infection in the urinary tract has effect Blood in the urine, Blood in the urine has cause infection in the urinary tract",
+    "context": "HPV has effect sexually transmitted infection, sexually transmitted infection has cause HPV | sexually transmitted infection has cause HPV, HPV has effect sexually transmitted infection | HPV has effect sexually transmitted infection, sexually transmitted infection has cause HPV | sexually transmitted infection has cause HPV, HPV has effect sexually transmitted infection",
     "evidence": [
       "Family history of skin cancer increases the risk of BCC."
     ],
@@ -213,7 +213,7 @@
     "id": "Medical-4061f8c4",
     "question": "Is immune suppression a risk factor for basal cell carcinoma?",
     "source": "Medical",
-    "context": "basal cell skin cancer has cause UV light, UV light has effect basal cell skin cancer",
+    "context": "basal cell carcinoma subclass of basal cell carcinoma | PSA density facet of basal cell carcinoma",
     "evidence": [
       "Immune suppression is a risk factor for BCC."
     ],
@@ -225,7 +225,7 @@
     "id": "Medical-624c452d",
     "question": "What diagnostic methods are used for BCC?",
     "source": "Medical",
-    "context": "Genetic risk testing facet of Genetic | Imaging subclass of Imaging",
+    "context": "PSA density facet of basal cell carcinoma | immunotherapy subclass of Systemic therapy",
     "evidence": [
       "Diagnosis of BCC involves medical history.",
       "Diagnosis of BCC involves family history.",
@@ -242,7 +242,7 @@
     "id": "Medical-bc412bb6",
     "question": "When might radiation therapy or systemic therapy be used for BCC?",
     "source": "Medical",
-    "context": "Systemic therapy subclass of Radiation therapy | Systemic therapy subclass of cancer treatment",
+    "context": "immunotherapy subclass of Systemic therapy | High-dose chemotherapy subclass of High-dose chemotherapy",
     "evidence": [
       "Radiation therapy may be used in some cases of BCC.",
       "Systemic therapy may be used in some cases of BCC."
@@ -255,7 +255,7 @@
     "id": "Medical-cb249d9b",
     "question": "What does recurrence mean in the context of BCC?",
     "source": "Medical",
-    "context": "premenopause said to be the same as Premenopause, Premenopause said to be the same as premenopause | Premenopause said to be the same as premenopause, premenopause said to be the same as Premenopause",
+    "context": "vagina part of female reproductive system, female reproductive system has part cervix, cervix part of female reproductive system, female reproductive system has part vagina | cervix part of female reproductive system, female reproductive system has part vagina, vagina part of female reproductive system, female reproductive system has part cervix",
     "evidence": [
       "Recurrence refers to BCC returning to the original site.",
       "Recurrence refers to BCC spreading to lymph nodes.",
@@ -269,7 +269,7 @@
     "id": "Medical-e506aa4e",
     "question": "What is recommended for follow-up after BCC treatment?",
     "source": "Medical",
-    "context": "Clinical trial subclass of treatment plan | Surveillance for the return of anal canal cancer and perianal cancer subclass of anoscopy",
+    "context": "immunotherapy subclass of Systemic therapy | High-dose chemotherapy subclass of High-dose chemotherapy",
     "evidence": [
       "Follow-up after BCC treatment includes full skin exams.",
       "Follow-up after BCC treatment should be done with a doctor.",
@@ -283,7 +283,7 @@
     "id": "Medical-14cee623",
     "question": "Which cell type is affected in basal cell carcinoma?",
     "source": "Medical",
-    "context": "stem cell subclass of cell | Large cell carcinoma subclass of lung cancer",
+    "context": "basal cell carcinoma subclass of basal cell carcinoma | PSA density facet of basal cell carcinoma",
     "evidence": [
       "Basal cells are the cell type affected in BCC."
     ],
@@ -295,7 +295,7 @@
     "id": "Medical-2bef6940",
     "question": "Are tanning beds considered a risk factor for BCC?",
     "source": "Medical",
-    "context": "ovaries part of female reproductive system, female reproductive system has part fallopian tubes, fallopian tubes part of female reproductive system, female reproductive system has part ovaries | fallopian tubes part of female reproductive system, female reproductive system has part ovaries, ovaries part of female reproductive system, female reproductive system has part fallopian tubes",
+    "context": "HPV has effect sexually transmitted infection, sexually transmitted infection has cause HPV | sexually transmitted infection has cause HPV, HPV has effect sexually transmitted infection",
     "evidence": [
       "Tanning beds are a risk factor for BCC."
     ],
@@ -307,7 +307,7 @@
     "id": "Medical-0047c320",
     "question": "Does having red or blond hair increase the risk of BCC?",
     "source": "Medical",
-    "context": "red blood cell part of blood, blood has part red blood cell",
+    "context": "blood has part white blood cell, white blood cell part of blood | white blood cell part of blood, blood has part white blood cell | blood has part white blood cell, white blood cell part of blood | white blood cell part of blood, blood has part white blood cell",
     "evidence": [
       "Red hair increases the risk of BCC.",
       "Blond hair increases the risk of BCC."
@@ -320,7 +320,7 @@
     "id": "Medical-ca377f8d",
     "question": "Is light eye color associated with increased risk of BCC?",
     "source": "Medical",
-    "context": "basal cell skin cancer has cause UV light, UV light has effect basal cell skin cancer | UV light has effect basal cell skin cancer, basal cell skin cancer has cause UV light | basal cell skin cancer has cause UV light, UV light has effect basal cell skin cancer | UV light has effect basal cell skin cancer, basal cell skin cancer has cause UV light",
+    "context": "HPV has effect sexually transmitted infection, sexually transmitted infection has cause HPV | sexually transmitted infection has cause HPV, HPV has effect sexually transmitted infection | HPV has effect sexually transmitted infection, sexually transmitted infection has cause HPV | sexually transmitted infection has cause HPV, HPV has effect sexually transmitted infection",
     "evidence": [
       "Light eye color increases the risk of BCC."
     ],
@@ -332,7 +332,7 @@
     "id": "Medical-de0b30b1",
     "question": "Are organ transplant recipients at higher risk for BCC?",
     "source": "Medical",
-    "context": "hepatobiliary system has part liver, liver part of hepatobiliary system | liver part of hepatobiliary system, hepatobiliary system has part liver | hepatobiliary system has part liver, liver part of hepatobiliary system | liver part of hepatobiliary system, hepatobiliary system has part liver",
+    "context": "uterus part of female reproductive system, female reproductive system has part fallopian tube, fallopian tube part of female reproductive system, female reproductive system has part ovaries | female reproductive system has part uterus, uterus part of female reproductive system | ovaries part of female reproductive system, female reproductive system has part uterus",
     "evidence": [
       "Organ transplant is a risk factor for BCC."
     ],
@@ -344,7 +344,7 @@
     "id": "Medical-4f1779a5",
     "question": "Is autoimmune disease a risk factor for BCC?",
     "source": "Medical",
-    "context": "Risk factors has effect cancer, cancer has cause Risk factors | cancer has cause Risk factors, Risk factors has effect cancer",
+    "context": "genetic abnormality studied by genetic testing, genetic testing studies genetic abnormality",
     "evidence": [
       "Autoimmune disease is a risk factor for BCC."
     ],
@@ -356,7 +356,7 @@
     "id": "Medical-d675eecd",
     "question": "What is a flat, pale or yellow area on the skin indicative of in BCC?",
     "source": "Medical",
-    "context": "myeloblast subclass of white blood cell | myeloblast subclass of white blood cell",
+    "context": "basal cell carcinoma subclass of basal cell carcinoma | bleeding from the anus subclass of Anal cancer",
     "evidence": [
       "A flat, pale or yellow area is a symptom of BCC."
     ],
@@ -368,7 +368,7 @@
     "id": "Medical-7e4192af",
     "question": "What does a shiny bump on the skin suggest in the context of BCC?",
     "source": "Medical",
-    "context": "Sperm banking subclass of sperm banking | Sperm banking product or material produced semen",
+    "context": "HPV has effect sexually transmitted infection, sexually transmitted infection has cause HPV | sexually transmitted infection has cause HPV, HPV has effect sexually transmitted infection",
     "evidence": [
       "A shiny bump is a symptom of BCC."
     ],

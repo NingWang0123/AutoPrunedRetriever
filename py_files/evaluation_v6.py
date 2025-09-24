@@ -38,7 +38,7 @@ from evaluation_func_graphrag import compute_answer_correctness
 # 0) Paths / constants
 # ---------------------------------------------------------------------
 REPO_ID      = "GraphRAG-Bench/GraphRAG-Bench"
-CORPUS_FILE  = "/home/ra_daniel/bilby/relational_graph_llm/py_files/context/medical.json"
+CORPUS_FILE  = "context/medical.json"
 QUEST_FILE   = "Datasets/Questions/medical_questions.json"
 
 SEED_N       = 20    # first 30 rows → bootstrap + DPO train
@@ -63,7 +63,7 @@ phi_llm  = Phi4MiniReasoningLLM(
 )
 
 
-ini_meta_json = pathlib.Path("meta_codebook.json")
+ini_meta_json = Path("meta_codebook.json")
 pre_loaded_meta = False
 
 if ini_meta_json.is_file():
