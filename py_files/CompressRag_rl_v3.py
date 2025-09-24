@@ -3163,7 +3163,7 @@ class CompressRag_rl:
 
         # answers
         if self.include_answers:
-            final_answers_lsts = self.answers_extract_function(self.meta_codebook,all_answers,self.sentence_emb)
+            final_answers_lsts = self.answers_extract_function(self.meta_codebook, get_flat_answers_lsts(all_answers),self.sentence_emb)
             print(f'self.answers_choice  {self.answers_choice}')
             print(f'final_answers_lsts {final_answers_lsts}')
             if final_answers_lsts:
@@ -3175,7 +3175,7 @@ class CompressRag_rl:
         # thinkings
         if self.include_thinkings:
             thinkings_lsts = get_thinkings_lsts(all_q_indices, self.meta_codebook)
-            final_thinkings_lsts = self.thinking_extract_function(self.meta_codebook,thinkings_lsts,self.sentence_emb)
+            final_thinkings_lsts = self.thinking_extract_function(self.meta_codebook,get_flat_answers_lsts(thinkings_lsts),self.sentence_emb)
             print(f'self.thinkings_choice  {self.thinkings_choice}')
             print(f'final_thinkings_lsts {final_thinkings_lsts}')
             if final_thinkings_lsts:
