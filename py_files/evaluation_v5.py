@@ -27,7 +27,7 @@ from dpo_compressrag_v2 import (
     default_reward, answer_with_auto_strategy,save_pref_examples,load_pref_examples,ANSWERS_CHOICES,THINKINGS_CHOICES
 )
 
-from test_for_compressrag import Phi4MiniReasoningLLM
+from test_for_compressrag import Phi4MiniReasoningLLM,Word2VecEmbeddings
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings
 from langchain_openai import ChatOpenAI
 # from evaluation_func_graphrag import compute_answer_correctness
@@ -40,16 +40,14 @@ CORPUS_FILE  = "Datasets/Corpus/medical.json"
 QUEST_FILE   = "Datasets/Questions/medical_questions.json"
 
 SEED_N       = 20    # first 30 rows → bootstrap + DPO train
-TEST_N       = 30     # next 20 rows  → evaluation
+TEST_N       = 5     # next 20 rows  → evaluation
 TOPK_CTX     = 5
 
 # ---------------------------------------------------------------------
 # 1) Initialise embeddings & LLM
 # ---------------------------------------------------------------------
 print("» Initialising embeddings & LLM …")
-word_emb = WordAvgEmbeddings(
-    model_path="gensim-data/glove-wiki-gigaword-100/glove-wiki-gigaword-100.model"
-)
+word_emb = Word2VecEmbeddings(model_name="word2vec-google-news-300")
 sent_emb = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-MiniLM-L6-v2"
 )

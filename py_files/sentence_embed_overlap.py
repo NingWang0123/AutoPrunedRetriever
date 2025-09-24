@@ -105,7 +105,7 @@ def get_overped_or_unique_edge_lists_sentence_emebed(
     # ---- 1) Gather all unique edge ids we need
     uniq_edge_ids = sorted({eid for lst in edge_lists for eid in lst})
     if not uniq_edge_ids:
-        return [[] for _ in edge_lists], {}
+        return [[] for _ in edge_lists]
 
     # ---- 2) Build text for each edge id and batch-embed
     e = codebook_main["e"]
@@ -149,7 +149,7 @@ def get_overped_or_unique_edge_lists_sentence_emebed(
         return offsets[li] + local_i
 
     if total == 0:
-        return [[] for _ in edge_lists], {}
+        return [[] for _ in edge_lists]
 
     dsu = DSU(total)
 
@@ -264,7 +264,7 @@ def get_overped_or_unique_edge_lists_sentence_emebed_optimized(
     # ---- 1) Gather all unique edge ids we need
     uniq_edge_ids = sorted({eid for lst in edge_lists for eid in lst})
     if not uniq_edge_ids:
-        return [[] for _ in edge_lists], {}
+        return [[] for _ in edge_lists]
 
 
     # instead of using sent_emb only, use word embedding sim first to sort the matrix

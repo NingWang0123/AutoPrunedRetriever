@@ -3185,7 +3185,7 @@ class CompressRag_rl:
         if all_f_indices:
             facts_lsts = self._gather_facts_by_indices(all_f_indices, self.meta_codebook)
 
-            final_facts_lsts = self.answers_extract_function(facts_lsts)
+            final_facts_lsts = self.answers_extract_function(self.meta_codebook,facts_lsts,self.sentence_emb)
 
             if not final_facts_lsts:
                 final_facts_lsts = facts_lsts
