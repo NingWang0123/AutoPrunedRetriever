@@ -24,6 +24,7 @@ from sentence_embed_overlap import get_unique_or_overlap_by_sentence_embedded
 import gensim.downloader as api
 from WordEmb import Word2VecEmbeddings, WordAvgEmbeddings
 from functools import partial
+import copy
 
 
 Triplet = Tuple[str, str, str]
@@ -3183,21 +3184,37 @@ class CompressRag_rl:
                 domain_knowledge_lst.append([])
 
         if all_f_indices:
-            facts_lsts = self._gather_facts_by_indices(all_f_indices, self.meta_codebook)
 
-            final_facts_lsts = self.answers_extract_function(self.meta_codebook,facts_lsts,self.sentence_emb)
-
-            if not final_facts_lsts:
-                final_facts_lsts = facts_lsts
-                
-            print(f'final_facts_lsts{final_facts_lsts}')
+            def is_effectively_empty(x):
+                # empty, None, or all inner items are empty
+                if not x:
+                    return True
+                if isinstance(x, list):
+                    return all(is_effectively_empty(i) for i in x)
+                return False
             
+            facts_lsts = self._gather_facts_by_indices(all_f_indices, self.meta_codebook)
+            print(f'facts_lsts {facts_lsts}')
+            facts_lsts_copy = copy.deepcopy(facts_lsts) 
+            
+
+            extracted_facts_lsts = self.answers_extract_function(self.meta_codebook,facts_lsts,self.sentence_emb)
+
+            print(f'extracted_facts_lsts{extracted_facts_lsts}')
+
+            # if empty takes oriiginal
+            if  is_effectively_empty(extracted_facts_lsts):
+                final_facts_lsts = facts_lsts_copy
+            else:
+                final_facts_lsts = extracted_facts_lsts
+
+                
             if final_facts_lsts:                
                 domain_knowledge_lst.append(final_facts_lsts)
             else:
                 domain_knowledge_lst.append([])
 
-            print(f'updated final_facts_lsts{final_facts_lsts}')
+            print(f'final_facts_lsts{final_facts_lsts}')
 
         return domain_knowledge_lst
 
