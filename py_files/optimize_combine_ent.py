@@ -1,4 +1,3 @@
-# ===== Benchmark: Original vs Fast combine_ents =====
 import time, numpy as np
 from copy import deepcopy
 from sklearn.cluster import KMeans, MiniBatchKMeans
