@@ -26,7 +26,8 @@ from WordEmb import Word2VecEmbeddings, WordAvgEmbeddings
 from functools import partial
 import copy
 from optimize_combine_storage import ann_feat_combine,ann_merge_questions_answer_gated
-
+from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
+from rouge_score import rouge_scorer
 
 Triplet = Tuple[str, str, str]
 
@@ -3493,7 +3494,9 @@ class CompressRag_rl:
                 )
         return combined_facts_cb
 
-    def run_work_flow(self, q_prompt, rule="Answer questions", facts_json_path: list = None, chunk_chars: int = 800, overlap: int = 120, warm_start = "knn"): #coarse
+    def run_work_flow(self, q_prompt, rule="Answer questions", 
+                      facts_json_path: list = None, chunk_chars: int = 800, 
+                      overlap: int = 120, warm_start = "knn",return_metrics: bool = False, gold_ref: str | None = None ): #coarse
 
         #prevent dpo change choice but not change includings
         self.set_includings()
@@ -3534,6 +3537,35 @@ class CompressRag_rl:
         print(f'{ft_txt} ft_txt')
 
         new_result, new_json_lst = self.collect_results(final_merged_json, questions=q_prompt, retrieval_time=retrieval_time)
+        metrics_map = self.llm.last_metrics or {}           # {question: gen_info}
+        # enrich gen_info with helpful fields
+        if metrics_map:
+            (qk, gen_info) = next(iter(metrics_map.items()))
+            # retrieval stats
+            try:
+                retrieved_count = sum(len(bucket) for bucket in all_answers) if all_answers else 0
+            except Exception:
+                retrieved_count = 0
+            gen_info["retrieved_count"] = int(retrieved_count)
+            gen_info["fact_context"] = self.cur_fact_context
+            gen_info["total_latency_sec"] = float(
+                gen_info.get("latency_sec", 0.0) + gen_info.get("retrieval_latency_sec", 0.0)
+            )
+        
+            # (optional) BLEU/ROUGE here if you pass gold_ref
+            if gold_ref is not None:
+                try:
+                    smooth = SmoothingFunction().method1
+                    bleu = sentence_bleu([gold_ref.split()], str(new_result).split(), smoothing_function=smooth)
+                    rouge = rouge_scorer.RougeScorer(["rouge1","rouge2","rougeL"], use_stemmer=True)
+                    rs = rouge.score(gold_ref, str(new_result))
+                    gen_info["BLEU"]    = float(bleu)
+                    gen_info["ROUGE-1"] = float(rs["rouge1"].fmeasure)
+                    gen_info["ROUGE-2"] = float(rs["rouge2"].fmeasure)
+                    gen_info["ROUGE-L"] = float(rs["rougeL"].fmeasure)
+                except Exception:
+                    pass
+            metrics_map = {qk: gen_info}
 
         self.update_meta(new_json_lst, facts_cb=combined_facts_cb)
 
@@ -3567,7 +3599,7 @@ class CompressRag_rl:
                 
                 self.meta_codebook['thinkings_lst'] = new_thinkings
 
-        return new_result
+        return (new_result, metrics_map, self.cur_fact_context) if return_metrics else new_result
     
     # dpo version for run work_flow, same process but return the collected metrics from the llm
     def run_work_flow_for_dpo(self, q_prompt, rule="Answer questions", facts_json_path: str = None, chunk_chars: int = 1024, overlap: int = 0, warm_start = "knn"): #coarse
