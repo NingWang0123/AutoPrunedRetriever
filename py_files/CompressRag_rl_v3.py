@@ -25,6 +25,7 @@ import gensim.downloader as api
 from WordEmb import Word2VecEmbeddings, WordAvgEmbeddings
 from functools import partial
 import copy
+from optimize_combine_storage import ann_feat_combine,ann_merge_questions_answer_gated
 
 
 Triplet = Tuple[str, str, str]
@@ -3540,6 +3541,32 @@ class CompressRag_rl:
 
         self.combine_ents_func(mode=warm_start) 
 
+        # after combine ents combine others
+        # combine qas if avaliable
+        if 'questions_lst' in self.meta_codebook and 'answers_lst' in self.meta_codebook:
+            if len(self.meta_codebook['questions_lst'])>=2:
+                new_q, new_a, q_old_to_new, q_clusters, kept = ann_merge_questions_answer_gated(self.meta_codebook,
+                                                                                                self.meta_codebook['questions_lst'],
+                                                                                                self.meta_codebook['answers_lst'])
+                
+                self.meta_codebook['questions_lst'] = new_q
+                self.meta_codebook['answers_lst'] = new_a
+
+        if 'facts_lst' in self.meta_codebook:
+            if len(self.meta_codebook['facts_lst'])>=2:
+                new_facts, f_old2new, f_clusters, kept = ann_merge_questions_answer_gated(self.meta_codebook,
+                                                                                                self.meta_codebook['facts_lst'])
+                
+                self.meta_codebook['facts_lst'] = new_facts
+
+
+        if 'thinkings_lst' in self.meta_codebook:
+            if len(self.meta_codebook['thinkings_lst'])>=2:
+                new_thinkings, f_old2new, f_clusters, kept = ann_merge_questions_answer_gated(self.meta_codebook,
+                                                                                                self.meta_codebook['thinkings_lst'])
+                
+                self.meta_codebook['thinkings_lst'] = new_thinkings
+
         return new_result
     
     # dpo version for run work_flow, same process but return the collected metrics from the llm
@@ -3590,6 +3617,33 @@ class CompressRag_rl:
 
         # replace the learning periodical combine ents with trapped by ram
         self.combine_ents_func(mode=warm_start) 
+
+        # after combine ents combine others
+        # after combine ents combine others
+        # combine qas if avaliable
+        if 'questions_lst' in self.meta_codebook and 'answers_lst' in self.meta_codebook:
+            if len(self.meta_codebook['questions_lst'])>=2:
+                new_q, new_a, q_old_to_new, q_clusters, kept = ann_merge_questions_answer_gated(self.meta_codebook,
+                                                                                                self.meta_codebook['questions_lst'],
+                                                                                                self.meta_codebook['answers_lst'])
+                
+                self.meta_codebook['questions_lst'] = new_q
+                self.meta_codebook['answers_lst'] = new_a
+
+        if 'facts_lst' in self.meta_codebook:
+            if len(self.meta_codebook['facts_lst'])>=2:
+                new_facts, f_old2new, f_clusters, kept = ann_merge_questions_answer_gated(self.meta_codebook,
+                                                                                                self.meta_codebook['facts_lst'])
+                
+                self.meta_codebook['facts_lst'] = new_facts
+
+
+        if 'thinkings_lst' in self.meta_codebook:
+            if len(self.meta_codebook['thinkings_lst'])>=2:
+                new_thinkings, f_old2new, f_clusters, kept = ann_merge_questions_answer_gated(self.meta_codebook,
+                                                                                                self.meta_codebook['thinkings_lst'])
+                
+                self.meta_codebook['thinkings_lst'] = new_thinkings
 
 
         return new_result,metrics_from_llm,ft_txt

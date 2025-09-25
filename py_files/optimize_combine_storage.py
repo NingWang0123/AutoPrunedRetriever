@@ -268,11 +268,16 @@ class QAnnMergeConfig:
     ann: ANNConfig = ANNConfig()
     gate: QMergeGate = QMergeGate()
 
+qa_cfg_default=QAnnMergeConfig(
+            ann=ANNConfig(k_neighbors=5, representative_method="medoid"),
+            gate=QMergeGate(q_sim_threshold=0.90, a_sim_threshold=0.80, combine_strategy="representative"),
+        )
+
 def ann_merge_questions_answer_gated(
     codebook_main: Dict[str, Any],
     questions_lst: List[List[List[int]]],
     answers_lst:   List[List[List[int]]],
-    cfg: Optional[QAnnMergeConfig] = None,
+    cfg: Optional[QAnnMergeConfig] = qa_cfg_default,
 ) -> Tuple[List[List[List[int]]], List[List[List[int]]], List[int], List[List[int]], List[int]]:
     """
     Returns:
@@ -376,6 +381,12 @@ class FactsAnnConfig:
     sim_threshold: float = 0.85          # threshold on cosine(sim) in [0,1]
     combine_strategy: str = "representative"  # or "union"
 
+f_cfg_default=FactsAnnConfig(
+    ann=ANNConfig(k_neighbors=5, representative_method="medoid"),
+    sim_threshold=0.90,                 # tighten/loosen here
+    combine_strategy="representative",  # or "union"
+)
+
 # ===== Representative selection =====
 def _select_rep_medoid_cos(X_unit: np.ndarray, members: List[int]) -> int:
     if len(members) == 1:
@@ -401,7 +412,7 @@ def _select_rep_density_cos(X_unit: np.ndarray, members: List[int], k: int = 5) 
 def ann_feat_combine(
     codebook_main: Dict[str, Any],
     feat_lst: List[List[List[int]]],
-    cfg: Optional[FactsAnnConfig] = None,
+    cfg: Optional[FactsAnnConfig] = f_cfg_default,
 ) -> Tuple[List[List[List[int]]], List[int], List[List[int]], List[int]]:
     """
     Merge near-duplicate fact bundles using ANN over embeddings decoded from edge ids.
