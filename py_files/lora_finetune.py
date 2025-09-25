@@ -12,8 +12,9 @@ from peft import LoraConfig, get_peft_model
 
 
 from CompressRag_rl_v2 import (
-    get_code_book, merging_codebook, WordAvgEmbeddings, slice_for_final_merged_json
+    get_code_book, merging_codebook, slice_for_final_merged_json
 )
+from WordEmb import Word2VecEmbeddings
 
 if torch.cuda.is_available():
     device = "cuda"
@@ -30,10 +31,14 @@ BASE_MODEL_ID = "Qwen/Qwen3-4B"
 DATA_PATH     = "context/medical_questions.json"
 OUTPUT_DIR    = "lora_qwen_sft_adapter"   
 LOG_DIR       = os.path.join(OUTPUT_DIR, "logs")
+DATA_SLICE    = 100
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 with open(DATA_PATH, "r", encoding="utf-8") as f:
     raw_data = json.load(f)
+
+raw_data = raw_data[:DATA_SLICE]
+print(f"[INFO] Loaded {len(raw_data)} samples for training")
 
 def build_prompt(question: str, evidence_list) -> str:
     system_msg = (
@@ -51,9 +56,7 @@ def build_prompt(question: str, evidence_list) -> str:
 
     # evidence -> codebook -> 压缩 JSON 片段
     fact_cb = get_code_book(ev_lines, type='facts', rule="Store factual statements.")
-    word_emb = WordAvgEmbeddings(
-        model_path="gensim-data/glove-wiki-gigaword-100/glove-wiki-gigaword-100.model"
-    )
+    word_emb = Word2VecEmbeddings(model_name="word2vec-google-news-300")
 
     combined = {
         "e": list(fact_cb.get("e", [])),
@@ -135,19 +138,23 @@ sft_args = SFTConfig(
     # ========== 基础保存 ==========
     output_dir=OUTPUT_DIR,
     save_strategy="epoch",
-    save_total_limit=3,  
+    save_total_limit=5,  
 
     # ========== 训练超参 ==========
     per_device_train_batch_size=1,   # 每个设备上的 batch size
     gradient_accumulation_steps=16,  # 梯度累积 → 等效大 batch
-    num_train_epochs=10,              # 训练轮数
+    num_train_epochs=500,              # 训练轮数
     learning_rate=2e-4,              # 学习率
 
     # ========== 日志 & 监控 ==========
     logging_steps=1,                # 每 1 step 打印一次日志
-    report_to="tensorboard",                # 可选: "tensorboard", "wandb", "none"
+    report_to=["tensorboard"],                # 可选: "tensorboard", "wandb", "none"
     logging_dir=LOG_DIR,             # 日志存放目录
 
+    # ===== 验证评估 =====
+    eval_strategy="epoch",        
+    eval_steps=None,              
+    
     # ========== 其他 ==========
     max_length=768,                  # 最大输入长度
     packing=False,                   # 不拼接多个样本
@@ -170,7 +177,7 @@ trainer = SFTTrainer(
 
 
 #trainer.train()
-trainer.train(resume_from_checkpoint="lora_qwen_sft_adapter/checkpoint-575")
+trainer.train(resume_from_checkpoint="lora_qwen_sft_adapter/checkpoint-900")
 
 model.save_pretrained(OUTPUT_DIR)
 tokenizer.save_pretrained(OUTPUT_DIR)
