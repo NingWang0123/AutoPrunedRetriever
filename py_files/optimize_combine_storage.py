@@ -414,7 +414,7 @@ if __name__ == "__main__":
         [[1]],                     # a0 matches a1
         [[1]],                     # a1 matches a0
         [[8, 3], [3, 8]],          # a2 matches a3
-        [[8, 3], [3, 8]],          # a3 matches a2
+        [[8, 3], [3, 8],[0]],          # a3 matches a2
         [[6]],                     # a4
         [[5]],                     # a5
     ]
