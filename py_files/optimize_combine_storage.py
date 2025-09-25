@@ -369,77 +369,211 @@ def ann_merge_questions_answer_gated(
 
     return new_questions_lst, new_answers_lst, q_old_to_new, q_clusters, kept_indices
 
-# ===================== Minimal Example =====================
-if __name__ == "__main__":
-    rng = np.random.default_rng(42)
+# ===== The facts-only ANN merger =====
+@dataclass
+class FactsAnnConfig:
+    ann: ANNConfig = ANNConfig()
+    sim_threshold: float = 0.85          # threshold on cosine(sim) in [0,1]
+    combine_strategy: str = "representative"  # or "union"
 
-    # Tiny codebook with embeddings for entities/relations
-    E = ["fair skin", "BCC", "UV", "melanin", "dermis"]
-    R = ["has effect", "causes", "modulates"]
-    e_dim, r_dim = 8, 6
-    e_embeddings = rng.normal(size=(len(E), e_dim)).astype(np.float32).tolist()
-    r_embeddings = rng.normal(size=(len(R), r_dim)).astype(np.float32).tolist()
+# ===== Representative selection =====
+def _select_rep_medoid_cos(X_unit: np.ndarray, members: List[int]) -> int:
+    if len(members) == 1:
+        return members[0]
+    sub = X_unit[members]
+    sims = sub @ sub.T
+    norms = np.linalg.norm(sub, axis=1, keepdims=True)
+    cos = sims / ((norms @ norms.T) + 1e-12)
+    dmat = 1.0 - cos
+    return members[int(np.argmin(dmat.sum(axis=1)))]
 
-    # Edges [h, r, t] with small ids
-    edge_matrix = [
-        [0, 1, 1],  # 0  fair skin causes BCC
-        [2, 1, 1],  # 1  UV causes BCC
-        [3, 2, 2],  # 2  melanin modulates UV
-        [1, 0, 4],  # 3  BCC has effect dermis
-        [0, 0, 3],  # 4  fair skin has effect melanin
-        [2, 0, 0],  # 5  UV has effect fair skin
-        [3, 0, 0],  # 6  melanin has effect fair skin
-        [2, 1, 0],  # 7  UV causes fair skin (nonsense, demo)
-        [4, 2, 1],  # 8  dermis modulates BCC
-    ]
-    codebook_main = {
-        "e": E, "r": R,
-        "edge_matrix": edge_matrix,
-        "e_embeddings": e_embeddings,
-        "r_embeddings": r_embeddings,
-    }
+def _select_rep_density_cos(X_unit: np.ndarray, members: List[int], k: int = 5) -> int:
+    if len(members) == 1:
+        return members[0]
+    sub = X_unit[members]
+    k = min(k, len(members)-1)
+    nn = NearestNeighbors(n_neighbors=k+1, metric="cosine", algorithm="brute")
+    nn.fit(sub)
+    dists, _ = nn.kneighbors(sub)
+    densities = 1.0 / (dists[:,1:].mean(axis=1) + 1e-10)
+    return members[int(np.argmax(densities))]
 
-    # Questions: list of small-questions (each is list[int] of edge ids)
-    questions_lst = [
-        [[0]],                     # q0
-        [[0]],                     # q1  ~ dup of q0
-        [[1, 2], [2, 1]],          # q2
-        [[1, 2], [2, 1]],          # q3  ~ dup of q2
-        [[4]],                     # q4 unique
-        [[7]],                     # q5 unique
-    ]
+def ann_feat_combine(
+    codebook_main: Dict[str, Any],
+    feat_lst: List[List[List[int]]],
+    cfg: Optional[FactsAnnConfig] = None,
+) -> Tuple[List[List[List[int]]], List[int], List[List[int]], List[int]]:
+    """
+    Merge near-duplicate fact bundles using ANN over embeddings decoded from edge ids.
 
-    # Answers: same sub-count per question, but different edge ids
-    answers_lst = [
-        [[1]],                     # a0 matches a1
-        [[1]],                     # a1 matches a0
-        [[8, 3], [3, 8]],          # a2 matches a3
-        [[8, 3], [3, 8],[0]],          # a3 matches a2
-        [[6]],                     # a4
-        [[5]],                     # a5
-    ]
+    Inputs:
+      - codebook_main: read-only; NOT modified
+      - feat_lst: list of facts items; each item is a list of "small facts"; each small fact is a list[int] edge ids
 
-    print("=== BEFORE ===")
-    print("Q count:", len(questions_lst))
-    print("questions_lst:", questions_lst)
-    print("answers_lst:",   answers_lst)
+    Returns:
+      - new_feat_lst           (merged, order = kept representatives)
+      - facts_old_to_new        (list[int], mapping each original index -> new index)
+      - facts_clusters          (list[list[int]], original indices per kept representative)
+      - kept_indices            (list[int], original indices that were kept)
+    """
+    n = len(feat_lst)
+    if n == 0:
+        return [], [], [], []
 
-    # Adaptive k; strict-ish thresholds
-    new_q, new_a, q_old_to_new, q_clusters, kept = ann_merge_questions_answer_gated(
-        codebook_main,
-        questions_lst,
-        answers_lst,
-        cfg=QAnnMergeConfig(
-            ann=ANNConfig(k_neighbors=5, representative_method="medoid"),
-            gate=QMergeGate(q_sim_threshold=0.90, a_sim_threshold=0.80, combine_strategy="representative"),
-        )
-    )
+    if cfg is None:
+        k = min(50, max(5, int(np.sqrt(max(1, n)))))
+        cfg = FactsAnnConfig(ann=ANNConfig(k_neighbors=k))
 
-    print("\n=== AFTER ===")
-    print("Q kept:", len(new_q))
-    print("q_old_to_new:", q_old_to_new)
-    print("q_clusters:", q_clusters)
-    print("questions_lst (merged):", new_q)
-    print("answers_lst   (merged):", new_a)
+    # 1) Build vectors for each facts item
+    F_vecs = []
+    for i in range(n):
+        fv = _embed_nested(feat_lst[i], codebook_main)
+        if fv is None:
+            # Put a zero vec of the same size as first available
+            if F_vecs:
+                fv = np.zeros_like(F_vecs[0])
+            else:
+                # Try to synthesize a dimension by decoding one subfact from i (if exists)
+                probe = None
+                for sub in (feat_lst[i] or []):
+                    probe = _embed_small_item(sub, codebook_main)
+                    if probe is not None:
+                        break
+                fv = probe if probe is not None else np.zeros(32, dtype=np.float32)
+        F_vecs.append(fv.astype(np.float32))
+    F = np.stack(F_vecs, axis=0)
+
+    # 2) Normalize & ANN kNN
+    F_unit = F / (np.linalg.norm(F, axis=1, keepdims=True) + 1e-12)
+    gb = ANNGraphBuilder(cfg.ann)
+    idx, sims = gb.build_graph(F_unit, k=cfg.ann.k_neighbors)
+    # sims are cosine IPs; map to [0,1] if needed (ensure bounds)
+    sims01 = np.clip(sims, -1.0, 1.0) * 0.5 + 0.5
+
+    # 3) Union-Find on similarity threshold
+    uf = UnionFind(n)
+    thr = float(cfg.sim_threshold)
+    for i in range(n):
+        for j, s01 in zip(idx[i], sims01[i]):
+            j = int(j)
+            if j == i: 
+                continue
+            if s01 >= thr:
+                uf.union(i, j)
+
+    # 4) Clusters
+    roots: Dict[int, List[int]] = {}
+    for i in range(n):
+        r = uf.find(i)
+        roots.setdefault(r, []).append(i)
+    clusters = list(roots.values())
+
+    # 5) Representatives
+    kept_indices: List[int] = []
+    rep_of: Dict[int, int] = {}
+    for members in clusters:
+        if cfg.ann.representative_method == "density":
+            rep = _select_rep_density_cos(F_unit, members, k=min(5, len(members)-1))
+        else:
+            rep = _select_rep_medoid_cos(F_unit, members)
+        kept_indices.append(rep)
+        for m in members:
+            rep_of[m] = rep
+    kept_indices = sorted(set(kept_indices))
+    rep_to_new = {old: new for new, old in enumerate(kept_indices)}
+    facts_old_to_new = [rep_to_new[rep_of[i]] for i in range(n)]
+    facts_clusters = [sorted([i for i in range(n) if rep_of[i] == rep]) for rep in kept_indices]
+
+    # 6) Rebuild facts list (no mutation to codebook_main)
+    def members_of(rep_old: int) -> List[int]:
+        return [i for i in range(n) if rep_of[i] == rep_old]
+
+    if cfg.combine_strategy == "representative":
+        new_feat_lst = [feat_lst[i] for i in kept_indices]
+    else:
+        # union of subfacts (dedup as tuples)
+        new_feat_lst = []
+        for rep in kept_indices:
+            mids = members_of(rep)
+            aset: Set[Tuple[int, ...]] = set()
+            for i in mids:
+                for sub in (feat_lst[i] or []):
+                    aset.add(tuple(int(v) for v in sub))
+            new_feat_lst.append([list(t) for t in sorted(aset)])
+
+    return new_feat_lst, facts_old_to_new, facts_clusters, kept_indices
+
+# # ===================== Minimal Example =====================
+# if __name__ == "__main__":
+#     rng = np.random.default_rng(42)
+
+#     # Tiny codebook with embeddings for entities/relations
+#     E = ["fair skin", "BCC", "UV", "melanin", "dermis"]
+#     R = ["has effect", "causes", "modulates"]
+#     e_dim, r_dim = 8, 6
+#     e_embeddings = rng.normal(size=(len(E), e_dim)).astype(np.float32).tolist()
+#     r_embeddings = rng.normal(size=(len(R), r_dim)).astype(np.float32).tolist()
+
+#     # Edges [h, r, t] with small ids
+#     edge_matrix = [
+#         [0, 1, 1],  # 0  fair skin causes BCC
+#         [2, 1, 1],  # 1  UV causes BCC
+#         [3, 2, 2],  # 2  melanin modulates UV
+#         [1, 0, 4],  # 3  BCC has effect dermis
+#         [0, 0, 3],  # 4  fair skin has effect melanin
+#         [2, 0, 0],  # 5  UV has effect fair skin
+#         [3, 0, 0],  # 6  melanin has effect fair skin
+#         [2, 1, 0],  # 7  UV causes fair skin (nonsense, demo)
+#         [4, 2, 1],  # 8  dermis modulates BCC
+#     ]
+#     codebook_main = {
+#         "e": E, "r": R,
+#         "edge_matrix": edge_matrix,
+#         "e_embeddings": e_embeddings,
+#         "r_embeddings": r_embeddings,
+#     }
+
+#     # Questions: list of small-questions (each is list[int] of edge ids)
+#     questions_lst = [
+#         [[0]],                     # q0
+#         [[0]],                     # q1  ~ dup of q0
+#         [[1, 2], [2, 1]],          # q2
+#         [[1, 2], [2, 1]],          # q3  ~ dup of q2
+#         [[4]],                     # q4 unique
+#         [[7]],                     # q5 unique
+#     ]
+
+#     # Answers: same sub-count per question, but different edge ids
+#     answers_lst = [
+#         [[1]],                     # a0 matches a1
+#         [[1]],                     # a1 matches a0
+#         [[8, 3], [3, 8]],          # a2 matches a3
+#         [[8, 3], [3, 8],[0]],          # a3 matches a2
+#         [[6]],                     # a4
+#         [[5]],                     # a5
+#     ]
+
+#     print("=== BEFORE ===")
+#     print("Q count:", len(questions_lst))
+#     print("questions_lst:", questions_lst)
+#     print("answers_lst:",   answers_lst)
+
+#     # Adaptive k; strict-ish thresholds
+#     new_q, new_a, q_old_to_new, q_clusters, kept = ann_merge_questions_answer_gated(
+#         codebook_main,
+#         questions_lst,
+#         answers_lst,
+#         cfg=QAnnMergeConfig(
+#             ann=ANNConfig(k_neighbors=5, representative_method="medoid"),
+#             gate=QMergeGate(q_sim_threshold=0.90, a_sim_threshold=0.80, combine_strategy="representative"),
+#         )
+#     )
+
+#     print("\n=== AFTER ===")
+#     print("Q kept:", len(new_q))
+#     print("q_old_to_new:", q_old_to_new)
+#     print("q_clusters:", q_clusters)
+#     print("questions_lst (merged):", new_q)
+#     print("answers_lst   (merged):", new_a)
 
 # python optimize_combine_storage.py
