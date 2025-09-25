@@ -4,575 +4,62 @@ import logging
 from dataclasses import dataclass, replace
 from enum import Enum
 
-# Configure logging
+# ann_merge_questions_answer_gated.py
+from typing import Any, Dict, List, Tuple, Optional, Set
+from dataclasses import dataclass, replace
+import logging
+import numpy as np
+
+# ===================== Logging =====================
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Try importing various ANN libraries
+# ===================== Optional ANN backends =====================
 FAISS_AVAILABLE = False
 HNSWLIB_AVAILABLE = False
 PYNNDESCENT_AVAILABLE = False
 ANNOY_AVAILABLE = False
 
 try:
-    import faiss
+    import faiss  # type: ignore
     FAISS_AVAILABLE = True
-    logger.info("FAISS available for ANN search")
-except ImportError:
+    logger.info("FAISS available")
+except Exception:
     pass
 
 try:
-    import hnswlib
+    import hnswlib  # type: ignore
     HNSWLIB_AVAILABLE = True
-    logger.info("HNSWlib available for ANN search")
-except ImportError:
+    logger.info("HNSWlib available")
+except Exception:
     pass
 
 try:
-    import pynndescent
+    import pynndescent  # type: ignore
     PYNNDESCENT_AVAILABLE = True
-    logger.info("PyNNDescent available for ANN search")
-except ImportError:
+    logger.info("PyNNDescent available")
+except Exception:
     pass
 
 try:
-    import annoy
+    import annoy  # type: ignore
     ANNOY_AVAILABLE = True
-    logger.info("Annoy available for ANN search")
-except ImportError:
+    logger.info("Annoy available")
+except Exception:
     pass
 
-from sklearn.neighbors import NearestNeighbors  # Fallback
+from sklearn.neighbors import NearestNeighbors  # fallback
 
-
-class ANNBackend(Enum):
-    FAISS = "faiss"
-    HNSWLIB = "hnswlib"
-    PYNNDESCENT = "pynndescent"
-    ANNOY = "annoy"
-    SKLEARN = "sklearn"
-
-
-@dataclass
-class ClusteringConfig:
-    """Configuration for ANN k-NN clustering"""
-    k_neighbors: int = 10          # Number of nearest neighbors
-    similarity_threshold: float = 0.8  # Minimum similarity to connect
-    min_cluster_size: int = 2      # Minimum size to keep cluster
-    ann_backend: str = "auto"      # ANN backend to use
-    metric: str = "cosine"         # Distance metric
-    representative_method: str = "medoid"  # "medoid" or "density"
-    use_gpu: bool = True           # Use GPU if available
-    n_trees: int = 50              # For Annoy
-    ef_construction: int = 200     # For HNSW
-    ef_search: int = 100           # For HNSW search
-    
-
-class UnionFind:
-    """Efficient Union-Find (Disjoint Set) data structure"""
-    
-    def __init__(self, n: int):
-        self.parent = list(range(n))
-        self.rank = [0] * n
-        self.size = [1] * n
-    
-    def find(self, x: int) -> int:
-        """Find with path compression"""
-        if self.parent[x] != x:
-            self.parent[x] = self.find(self.parent[x])
-        return self.parent[x]
-    
-    def union(self, x: int, y: int) -> bool:
-        """Union by rank, returns True if merged"""
-        px, py = self.find(x), self.find(y)
-        if px == py:
-            return False
-        
-        # Union by rank
-        if self.rank[px] < self.rank[py]:
-            px, py = py, px
-        self.parent[py] = px
-        self.size[px] += self.size[py]
-        
-        if self.rank[px] == self.rank[py]:
-            self.rank[px] += 1
-        return True
-    
-    def get_clusters(self) -> Dict[int, List[int]]:
-        """Get all clusters as dict of root -> members"""
-        clusters = {}
-        for i in range(len(self.parent)):
-            root = self.find(i)
-            if root not in clusters:
-                clusters[root] = []
-            clusters[root].append(i)
-        return clusters
-    
-    def get_cluster_size(self, x: int) -> int:
-        """Get size of cluster containing x"""
-        return self.size[self.find(x)]
-
-
-class ANNGraphBuilder:
-    """Build approximate nearest neighbor graph using various backends"""
-    
-    def __init__(self, config: ClusteringConfig):
-        self.config = config
-        self.backend = self._select_backend()
-        logger.info(f"Using ANN backend: {self.backend}")
-    
-    def _select_backend(self) -> ANNBackend:
-        """Select best available backend"""
-        backend_map = {
-            "faiss": ANNBackend.FAISS,
-            "hnswlib": ANNBackend.HNSWLIB,
-            "pynndescent": ANNBackend.PYNNDESCENT,
-            "annoy": ANNBackend.ANNOY,
-            "sklearn": ANNBackend.SKLEARN
-        }
-        
-        if self.config.ann_backend != "auto":
-            return backend_map.get(self.config.ann_backend, ANNBackend.SKLEARN)
-        
-        # Auto-select best available
-        if FAISS_AVAILABLE:
-            return ANNBackend.FAISS
-        elif HNSWLIB_AVAILABLE:
-            return ANNBackend.HNSWLIB
-        elif PYNNDESCENT_AVAILABLE:
-            return ANNBackend.PYNNDESCENT
-        elif ANNOY_AVAILABLE:
-            return ANNBackend.ANNOY
-        else:
-            return ANNBackend.SKLEARN
-    
-    def build_graph(self, X: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
-        """
-        Build k-NN graph.
-        Returns: (indices, distances) where each row i contains k neighbors of point i
-        """
-        if self.backend == ANNBackend.FAISS:
-            return self._build_faiss(X)
-        elif self.backend == ANNBackend.HNSWLIB:
-            return self._build_hnswlib(X)
-        elif self.backend == ANNBackend.PYNNDESCENT:
-            return self._build_pynndescent(X)
-        elif self.backend == ANNBackend.ANNOY:
-            return self._build_annoy(X)
-        else:
-            return self._build_sklearn(X)
-    
-    def _build_faiss(self, X: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
-        """Build graph using FAISS"""
-        X = np.ascontiguousarray(X.astype(np.float32))
-        d = X.shape[1]
-        
-        # Normalize for cosine similarity
-        if self.config.metric == "cosine":
-            X = X / (np.linalg.norm(X, axis=1, keepdims=True) + 1e-12)
-            index = faiss.IndexFlatIP(d)  # Inner product = cosine for normalized
-        else:
-            index = faiss.IndexFlatL2(d)
-        
-        # Try to use GPU if available and requested
-        if self.config.use_gpu and faiss.get_num_gpus() > 0:
-            logger.info("Using FAISS GPU")
-            res = faiss.StandardGpuResources()
-            index = faiss.index_cpu_to_gpu(res, 0, index)
-        
-        # Use HNSW for large datasets
-        if len(X) > 10000:
-            index = faiss.IndexHNSWFlat(d, 32)
-            index.hnsw.efConstruction = self.config.ef_construction
-            index.hnsw.efSearch = self.config.ef_search
-        
-        index.add(X)
-        
-        # Search for k+1 neighbors (including self)
-        distances, indices = index.search(X, self.config.k_neighbors + 1)
-        
-        # Remove self-loops (first neighbor is always self)
-        return indices[:, 1:], distances[:, 1:]
-    
-    def _build_hnswlib(self, X: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
-        """Build graph using HNSWlib"""
-        import hnswlib
-        
-        X = np.ascontiguousarray(X.astype(np.float32))
-        n, d = X.shape
-        
-        # Normalize for cosine
-        if self.config.metric == "cosine":
-            X = X / (np.linalg.norm(X, axis=1, keepdims=True) + 1e-12)
-            space = "cosinesimil"
-        else:
-            space = "l2"
-        
-        # Build index
-        index = hnswlib.Index(space=space, dim=d)
-        index.init_index(max_elements=n, ef_construction=self.config.ef_construction, M=16)
-        index.add_items(X, np.arange(n))
-        index.set_ef(self.config.ef_search)
-        
-        # Query
-        indices, distances = index.knn_query(X, k=self.config.k_neighbors + 1)
-        
-        # Remove self-loops
-        return indices[:, 1:], distances[:, 1:]
-    
-    def _build_pynndescent(self, X: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
-        """Build graph using PyNNDescent"""
-        import pynndescent
-        
-        # Normalize for cosine
-        if self.config.metric == "cosine":
-            X = X / (np.linalg.norm(X, axis=1, keepdims=True) + 1e-12)
-            metric = "cosine"
-        else:
-            metric = "euclidean"
-        
-        # Build index
-        index = pynndescent.NNDescent(
-            X,
-            n_neighbors=self.config.k_neighbors + 1,
-            metric=metric,
-            random_state=42,
-            n_jobs=-1
-        )
-        
-        indices, distances = index.neighbor_graph
-        
-        # Remove self-loops
-        return indices[:, 1:], distances[:, 1:]
-    
-    def _build_annoy(self, X: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
-        """Build graph using Annoy"""
-        from annoy import AnnoyIndex
-        
-        n, d = X.shape
-        metric = "angular" if self.config.metric == "cosine" else "euclidean"
-        
-        # Build index
-        index = AnnoyIndex(d, metric)
-        for i in range(n):
-            index.add_item(i, X[i])
-        index.build(self.config.n_trees)
-        
-        # Query
-        indices = np.zeros((n, self.config.k_neighbors), dtype=np.int32)
-        distances = np.zeros((n, self.config.k_neighbors), dtype=np.float32)
-        
-        for i in range(n):
-            # Get k+1 to exclude self
-            idx, dist = index.get_nns_by_item(i, self.config.k_neighbors + 1, include_distances=True)
-            # Remove self
-            idx = [j for j in idx if j != i][:self.config.k_neighbors]
-            dist = dist[1:self.config.k_neighbors + 1]
-            
-            indices[i] = idx
-            distances[i] = dist
-        
-        return indices, distances
-    
-    def _build_sklearn(self, X: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
-        """Fallback to sklearn NearestNeighbors"""
-        metric = self.config.metric if self.config.metric != "cosine" else "cosine"
-        
-        nbrs = NearestNeighbors(
-            n_neighbors=self.config.k_neighbors + 1,
-            metric=metric,
-            n_jobs=-1
-        )
-        nbrs.fit(X)
-        
-        distances, indices = nbrs.kneighbors(X)
-        
-        # Remove self-loops
-        return indices[:, 1:], distances[:, 1:]
-
-
-# -----------------------
-# Fixed RepresentativeSelector (metric-aware)
-# -----------------------
-class RepresentativeSelector:
-    """Select representatives from clusters"""
-
-    @staticmethod
-    def select_medoid(X: np.ndarray, cluster_indices: List[int], metric: str = "euclidean") -> int:
-        """Select point with minimum distance to all others (medoid)"""
-        if len(cluster_indices) == 1:
-            return cluster_indices[0]
-        from sklearn.metrics.pairwise import pairwise_distances
-        dists = pairwise_distances(X[cluster_indices], metric=("cosine" if metric == "cosine" else "euclidean"))
-        medoid_idx = np.argmin(dists.sum(axis=1))
-        return cluster_indices[medoid_idx]
-
-    @staticmethod
-    def select_density_peak(X: np.ndarray, cluster_indices: List[int], k: int = 5, metric: str = "euclidean") -> int:
-        """Select point with highest local density"""
-        if len(cluster_indices) == 1:
-            return cluster_indices[0]
-        Xc = X[cluster_indices]
-        k = min(k, len(cluster_indices) - 1)
-        from sklearn.neighbors import NearestNeighbors
-        nn = NearestNeighbors(n_neighbors=k + 1, metric=("cosine" if metric == "cosine" else "euclidean"))
-        nn.fit(Xc)
-        dists, _ = nn.kneighbors(Xc)
-        densities = 1.0 / (dists[:, 1:].mean(axis=1) + 1e-10)
-        return cluster_indices[int(np.argmax(densities))]
-
-
-# -----------------------
-# Fixed ANNGraphBuilder (always returns SIMILARITIES for cosine)
-# -----------------------
-class ANNGraphBuilder:
-    """Build approximate nearest neighbor graph using various backends"""
-
-    def __init__(self, config: ClusteringConfig):
-        self.config = config
-        self.backend = self._select_backend()
-        logger.info(f"Using ANN backend: {self.backend}")
-
-    def _select_backend(self) -> ANNBackend:
-        backend_map = {
-            "faiss": ANNBackend.FAISS,
-            "hnswlib": ANNBackend.HNSWLIB,
-            "pynndescent": ANNBackend.PYNNDESCENT,
-            "annoy": ANNBackend.ANNOY,
-            "sklearn": ANNBackend.SKLEARN
-        }
-        if self.config.ann_backend != "auto":
-            return backend_map.get(self.config.ann_backend, ANNBackend.SKLEARN)
-
-        if FAISS_AVAILABLE:
-            return ANNBackend.FAISS
-        elif HNSWLIB_AVAILABLE:
-            return ANNBackend.HNSWLIB
-        elif PYNNDESCENT_AVAILABLE:
-            return ANNBackend.PYNNDESCENT
-        elif ANNOY_AVAILABLE:
-            return ANNBackend.ANNOY
-        else:
-            return ANNBackend.SKLEARN
-
-    def build_graph(self, X_unit: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
-        """
-        Build k-NN graph.
-        Returns: (indices, sims) where sims are COSINE SIMILARITIES if metric=='cosine'.
-        """
-        n = X_unit.shape[0]
-        k = min(self.config.k_neighbors, max(1, n - 1))
-
-        if self.backend == ANNBackend.FAISS:
-            idx, sims = self._build_faiss_cosine(X_unit, k) if self.config.metric == "cosine" else self._build_faiss_l2(X_unit, k)
-        elif self.backend == ANNBackend.HNSWLIB:
-            idx, sims = self._build_hnswlib(X_unit, k)
-        elif self.backend == ANNBackend.PYNNDESCENT:
-            idx, sims = self._build_pynndescent(X_unit, k)
-        elif self.backend == ANNBackend.ANNOY:
-            idx, sims = self._build_annoy(X_unit, k)
-        else:
-            idx, sims = self._build_sklearn(X_unit, k)
-
-
-        # Robustly remove self and pad/truncate to exactly k
-        clean_idx = np.empty((n, k), dtype=np.int32)
-        clean_sims = np.empty((n, k), dtype=np.float32)
-
-        for i in range(n):
-            row_idx = np.asarray(idx[i], dtype=np.int32)
-            row_sims = np.asarray(sims[i], dtype=np.float32)
-
-            # drop self wherever it appears
-            keep = row_idx != i
-            row_idx = row_idx[keep]
-            row_sims = row_sims[keep]
-
-            # if not enough neighbors remain, pad
-            if row_idx.shape[0] < k:
-                missing = k - row_idx.shape[0]
-                if row_idx.shape[0] > 0:
-                    pad_idx = np.full(missing, row_idx[-1], dtype=np.int32)
-                    pad_sims = np.full(missing, row_sims[-1], dtype=np.float32)
-                else:
-                    # pathological case: no neighbors returned; pad with self and a very low sim
-                    pad_idx = np.full(missing, i, dtype=np.int32)
-                    pad_sims = np.full(missing, -1.0, dtype=np.float32)
-                row_idx = np.concatenate([row_idx, pad_idx], axis=0)
-                row_sims = np.concatenate([row_sims, pad_sims], axis=0)
-
-            # enforce exact length k
-            clean_idx[i, :] = row_idx[:k]
-            clean_sims[i, :] = row_sims[:k]
-
-        return clean_idx, clean_sims
-
-    # ---------- FAISS helpers ----------
-    def _build_faiss_cosine(self, X_unit: np.ndarray, k: int) -> Tuple[np.ndarray, np.ndarray]:
-        """FAISS (cosine) via inner product on unit vectors -> returns cosine SIMILARITIES."""
-        import faiss
-        Xf = np.ascontiguousarray(X_unit.astype(np.float32))
-        d = Xf.shape[1]
-        index = faiss.IndexFlatIP(d)  # IP on unit vectors = cosine similarity
-        if self.config.use_gpu and faiss.get_num_gpus() > 0:
-            logger.info("Using FAISS GPU (IP)")
-            res = faiss.StandardGpuResources()
-            index = faiss.index_cpu_to_gpu(res, 0, index)
-        index.add(Xf)
-        sims, idx = index.search(Xf, k + 1)  # sims are inner products
-        # Drop first col (self) assuming exact search; still self-cleaned again later
-        return idx[:, 1:], sims[:, 1:]
-
-    def _build_faiss_l2(self, X: np.ndarray, k: int) -> Tuple[np.ndarray, np.ndarray]:
-        """FAISS (L2) -> convert to similarities via Gaussian kernel."""
-        import faiss
-        Xf = np.ascontiguousarray(X.astype(np.float32))
-        d = Xf.shape[1]
-        index = faiss.IndexFlatL2(d)
-        if self.config.use_gpu and faiss.get_num_gpus() > 0:
-            logger.info("Using FAISS GPU (L2)")
-            res = faiss.StandardGpuResources()
-            index = faiss.index_cpu_to_gpu(res, 0, index)
-        index.add(Xf)
-        dists, idx = index.search(Xf, k + 1)
-        d2 = dists[:, 1:]
-        # Gaussian kernel similarity
-        sigma = np.median(d2)
-        sigma = float(sigma if sigma > 1e-12 else 1.0)
-        sims = np.exp(-d2 / (2 * sigma ** 2)).astype(np.float32)
-        return idx[:, 1:], sims
-
-    # ---------- HNSWlib ----------
-    def _build_hnswlib(self, X_unit: np.ndarray, k: int) -> Tuple[np.ndarray, np.ndarray]:
-        import hnswlib
-        n, d = X_unit.shape
-        if self.config.metric == "cosine":
-            space = "cosine"  # correct name
-        else:
-            space = "l2"
-        index = hnswlib.Index(space=space, dim=d)
-        index.init_index(max_elements=n, ef_construction=self.config.ef_construction, M=16)
-        index.add_items(X_unit, np.arange(n))
-        index.set_ef(self.config.ef_search)
-        idx, dists = index.knn_query(X_unit, k=k + 1)
-        if self.config.metric == "cosine":
-            sims = (1.0 - dists[:, 1:]).astype(np.float32)
-            return idx[:, 1:], sims
-        else:
-            d2 = dists[:, 1:]
-            sigma = np.median(d2)
-            sigma = float(sigma if sigma > 1e-12 else 1.0)
-            sims = np.exp(-d2 / (2 * sigma ** 2)).astype(np.float32)
-            return idx[:, 1:], sims
-
-    # ---------- PyNNDescent ----------
-    def _build_pynndescent(self, X_unit: np.ndarray, k: int) -> Tuple[np.ndarray, np.ndarray]:
-        import pynndescent
-        if self.config.metric == "cosine":
-            metric = "cosine"
-        else:
-            metric = "euclidean"
-        index = pynndescent.NNDescent(
-            X_unit if self.config.metric == "cosine" else X_unit,  # X_unit ok both ways
-            n_neighbors=k + 1,
-            metric=metric,
-            random_state=42
-        )
-        idx, dists = index.neighbor_graph
-        if self.config.metric == "cosine":
-            sims = (1.0 - dists[:, 1:]).astype(np.float32)
-        else:
-            d2 = dists[:, 1:]
-            sigma = np.median(d2)
-            sigma = float(sigma if sigma > 1e-12 else 1.0)
-            sims = np.exp(-d2 / (2 * sigma ** 2)).astype(np.float32)
-        return idx[:, 1:], sims
-
-    # ---------- Annoy ----------
-    def _build_annoy(self, X_unit: np.ndarray, k: int) -> Tuple[np.ndarray, np.ndarray]:
-        from annoy import AnnoyIndex
-        n, d = X_unit.shape
-        metric = "angular" if self.config.metric == "cosine" else "euclidean"
-        index = AnnoyIndex(d, metric)
-        for i in range(n):
-            index.add_item(i, X_unit[i])
-        index.build(self.config.n_trees)
-        idx = np.empty((n, k + 1), dtype=np.int32)
-        sims = np.empty((n, k + 1), dtype=np.float32)
-        for i in range(n):
-            nn_idx, _ = index.get_nns_by_item(i, k + 1, include_distances=True)
-            # compute cosine sim directly to avoid Annoy's distance conversions
-            nn_idx = np.array(nn_idx, dtype=np.int32)
-            sim_row = (X_unit[i] @ X_unit[nn_idx].T).astype(np.float32)
-            idx[i] = nn_idx
-            sims[i] = sim_row
-        return idx[:, 1:], sims[:, 1:]
-
-    # ---------- sklearn ----------
-    def _build_sklearn(self, X_unit: np.ndarray, k: int) -> Tuple[np.ndarray, np.ndarray]:
-        from sklearn.neighbors import NearestNeighbors
-        if self.config.metric == "cosine":
-            nn = NearestNeighbors(n_neighbors=k + 1, metric="cosine", algorithm="brute")
-            nn.fit(X_unit)
-            dists, idx = nn.kneighbors(X_unit)
-            sims = (1.0 - dists[:, 1:]).astype(np.float32)
-            return idx[:, 1:], sims
-        else:
-            nn = NearestNeighbors(n_neighbors=k + 1, metric="euclidean", algorithm="auto")
-            nn.fit(X_unit)
-            dists, idx = nn.kneighbors(X_unit)
-            d2 = dists[:, 1:]
-            sigma = np.median(d2)
-            sigma = float(sigma if sigma > 1e-12 else 1.0)
-            sims = np.exp(-d2 / (2 * sigma ** 2)).astype(np.float32)
-            return idx[:, 1:], sims
-
-
-# -----------------------
-# Fixed combine_ents_ann_knn (cosine similarities used correctly)
-# -----------------------
-def _to_vec(x):
-    return x if isinstance(x, np.ndarray) else np.asarray(x, dtype=np.float32)
-
-def _avg_vec_from_decoded(decoded_q, dim: int) -> np.ndarray:
-    """
-    decoded_q: [[e_vec, r_vec, e_vec], ...] where each vec is list[float] or np.ndarray
-    Returns one vector (float32) = mean over all component vectors across all edges.
-    If no vectors found, returns a zero vector of length `dim`.
-    """
-    parts = []
-    for triple in decoded_q:
-        for v in triple:
-            if v is not None:
-                vv = _to_vec(v)
-                if vv.size:
-                    parts.append(vv.astype(np.float32, copy=False))
-    if not parts:
-        return np.zeros(dim, dtype=np.float32)
-    return np.mean(np.stack(parts, axis=0), axis=0)
-
+# ===================== Your decoders (unchanged) =====================
 def decode_question(question, codebook_main, fmt='words'):
     """
     question: list[int] of edge indices
-    codebook_main:
-        {
-            "e": [str, ...],
-            "r": [str, ...],
-            "edge_matrix": [[e_idx, r_idx, e_idx], ...],  # list or np.ndarray
-            "questions": [[edges index,...],...]
-            "e_embeddings": [vec, ...], 
-            "r_embeddings": [vec, ...], 
-        }
-    fmt: 'words' -> [[e, r, e], ...]
-         'embeddings' -> [[e_vec, r_vec, e_vec], ...]
-         'edges' -> [[e index, r index, e index], ...]
+    fmt: 'words' | 'embeddings' | 'edges'
     """
     edges = codebook_main["edge_matrix"]
-
     idxs = list(question)
 
     def get_edge(i):
-        # works for both list and numpy array
         return edges[i]
 
     if fmt == 'words':
@@ -585,168 +72,374 @@ def decode_question(question, codebook_main, fmt='words'):
             raise KeyError("e_embeddings and r_embeddings are required for fmt='embeddings'.")
         decoded = [[Ee[h], Re[r], Ee[t]] for (h, r, t) in (get_edge(i) for i in idxs)]
     elif fmt == 'edges':
-        decoded = [[h,r,t] for (h, r, t) in (get_edge(i) for i in idxs)]
-
+        decoded = [[h, r, t] for (h, r, t) in (get_edge(i) for i in idxs)]
     else:
         raise ValueError("fmt must be 'words', 'embeddings' or 'edges'.")
-
     return decoded
 
 def decode_questions(questions, questions_source_codebook, fmt='words'):
-
-    """
-    questions_source_codebook must be the codebook that contain the questions
-    Decode a list of questions using decode_question.
-    
-    questions: list of list[int]
-        Each inner list is a sequence of edge indices.
-    """
     return [decode_question(q, questions_source_codebook, fmt=fmt) for q in questions]
 
-def combine_storage_ann_knn(
-    codebook_main: Dict[str, Any],
-    config: Optional[ClusteringConfig] = None,
-    use_thinking: bool = True,
-    use_facts: bool = True
-) -> Dict[str, Any]:
-    """
-    Entity clustering using ANN k-NN graph + Union-Find with consistent cosine handling.
-    """
-    # Initialize configuration
-    q_word_embeds = []
-    dim = len(codebook_main["e_embeddings"][0])
+# ===================== Configs & Structures =====================
+class ANNBackend:
+    FAISS = "faiss"
+    HNSWLIB = "hnswlib"
+    PYNNDESCENT = "pynndescent"
+    ANNOY = "annoy"
+    SKLEARN = "sklearn"
 
+@dataclass
+class ANNConfig:
+    k_neighbors: int = 10
+    metric: str = "cosine"             # we’ll use cosine
+    representative_method: str = "medoid"
+    use_gpu: bool = True
+    n_trees: int = 50                  # Annoy
+    ef_construction: int = 200         # HNSW
+    ef_search: int = 100               # HNSW
 
-    # combine questions first
-    all_qs = codebook_main["questions_lst"]
+@dataclass
+class QMergeGate:
+    q_sim_threshold: float = 0.85
+    a_sim_threshold: float = 0.80
+    combine_strategy: str = "representative"  # or "union"
 
-    for q_edges in all_qs:
-        decoded = decode_questions(q_edges, codebook_main, fmt='embeddings')
-        q_word_embeds.append(_avg_vec_from_decoded(decoded, dim))
+# ===================== Union-Find =====================
+class UnionFind:
+    def __init__(self, n: int):
+        self.p = list(range(n))
+        self.r = [0]*n
+    def find(self, x: int) -> int:
+        while self.p[x] != x:
+            self.p[x] = self.p[self.p[x]]
+            x = self.p[x]
+        return x
+    def union(self, a: int, b: int) -> bool:
+        ra, rb = self.find(a), self.find(b)
+        if ra == rb: return False
+        if self.r[ra] < self.r[rb]:
+            ra, rb = rb, ra
+        self.p[rb] = ra
+        if self.r[ra] == self.r[rb]:
+            self.r[ra] += 1
+        return True
 
-    if config is None:
-        n = len(codebook_main.get('e', []))
-        k = min(50, max(5, int(np.sqrt(max(1, n)))))  # Adaptive k
-        config = ClusteringConfig(k_neighbors=k, similarity_threshold=0.8, min_cluster_size=2)
+# ===================== ANN Graph Builder (cosine sims) =====================
+class ANNGraphBuilder:
+    def __init__(self, config: ANNConfig):
+        self.config = config
+        self.backend = self._select_backend()
+        logger.info(f"Using ANN backend: {self.backend}")
 
-    # Get entities/embeddings
-    E = list(codebook_main.get('e', []))
-    X = np.asarray(codebook_main.get('e_embeddings', []), dtype=np.float32)
-    n, d = X.shape if X.ndim == 2 else (len(X), 1)
+    def _select_backend(self) -> str:
+        if FAISS_AVAILABLE:      return ANNBackend.FAISS
+        if HNSWLIB_AVAILABLE:    return ANNBackend.HNSWLIB
+        if PYNNDESCENT_AVAILABLE:return ANNBackend.PYNNDESCENT
+        if ANNOY_AVAILABLE:      return ANNBackend.ANNOY
+        return ANNBackend.SKLEARN
 
-    if n <= 2:
-        codebook_main['e'] = list(E)
-        codebook_main['e_embeddings'] = [np.asarray(v, dtype=np.float32) for v in X]
-        codebook_main['edge_matrix'] = [list(map(int, e)) for e in codebook_main.get('edge_matrix', [])]
-        return codebook_main
-
-    # 1D + cosine is degenerate -> switch to euclidean just for this call
-    metric = config.metric
-    if metric == "cosine" and d == 1:
-        logger.info("Detected d=1 with cosine metric; switching to 'euclidean' for this run to avoid ±1 collapse.")
-        metric = "euclidean"
-
-    logger.info(f"Clustering {n} entities (metric={metric}) using ANN k-NN + Union-Find")
-
-    # Normalize for cosine
-    if metric == "cosine":
-        X_unit = X / (np.linalg.norm(X, axis=1, keepdims=True) + 1e-12)
-    else:
-        X_unit = X  # for euclidean, use raw
-
-    # Build ANN graph -> indices, SIMILARITIES (if cosine) or kernel sims (if euclidean)
-    gb = ANNGraphBuilder(replace(config, metric=metric))
-    indices, sims = gb.build_graph(X_unit)
-
-    # Union-Find merge with similarity threshold
-    uf = UnionFind(n)
-    edges_created = 0
-    if metric == "cosine":
-        thr = float(config.similarity_threshold)
-        for i in range(n):
-            for j, s in zip(indices[i], sims[i]):
-                if s >= thr:
-                    if uf.union(i, int(j)):
-                        edges_created += 1
-    else:
-        # euclidean path: sims are kernel similarities in (0,1]; interpret threshold in [0,1]
-        thr = float(config.similarity_threshold)
-        if not (0.0 <= thr <= 1.0):
-            thr = 0.5  # safe default if user passed cosine-like value
-        for i in range(n):
-            for j, s in zip(indices[i], sims[i]):
-                if s >= thr:
-                    if uf.union(i, int(j)):
-                        edges_created += 1
-
-    logger.info(f"Created {edges_created} union edges at threshold {config.similarity_threshold}")
-
-    # Build clusters
-    clusters = uf.get_clusters()
-
-    # Representative selection (metric-aware)
-    rep_selector = RepresentativeSelector()
-    representatives: Dict[int, int] = {}
-    kept_indices: List[int] = []
-
-    for _, members in clusters.items():
-        if len(members) < config.min_cluster_size:
-            for m in members:
-                representatives[m] = m
-                kept_indices.append(m)
+    def build_graph(self, X_unit: np.ndarray, k: int) -> Tuple[np.ndarray, np.ndarray]:
+        """Return (indices, similarities) with cosine similarities in [−1,1] (we’ll map to [0,1] later)."""
+        n, d = X_unit.shape
+        k = min(k, max(1, n-1))
+        if self.backend == ANNBackend.FAISS:
+            return self._faiss_ip(X_unit, k)
+        elif self.backend == ANNBackend.HNSWLIB:
+            return self._hnsw_cos(X_unit, k)
+        elif self.backend == ANNBackend.PYNNDESCENT:
+            return self._pynnd_cos(X_unit, k)
+        elif self.backend == ANNBackend.ANNOY:
+            return self._annoy_cos(X_unit, k)
         else:
-            if config.representative_method == "medoid":
-                rep = rep_selector.select_medoid(X_unit, members, metric=metric)
-            else:
-                rep = rep_selector.select_density_peak(X_unit, members, k=min(5, len(members)-1), metric=metric)
-            kept_indices.append(rep)
-            for m in members:
-                representatives[m] = rep
+            return self._sklearn_cos(X_unit, k)
 
+    def _faiss_ip(self, X_unit: np.ndarray, k: int):
+        import faiss
+        Xf = np.ascontiguousarray(X_unit.astype(np.float32))
+        index = faiss.IndexFlatIP(Xf.shape[1])
+        if self.config.use_gpu and faiss.get_num_gpus() > 0:
+            res = faiss.StandardGpuResources()
+            index = faiss.index_cpu_to_gpu(res, 0, index)
+        index.add(Xf)
+        sims, idx = index.search(Xf, k+1)  # inner products = cosine because unit
+        return idx[:, 1:], sims[:, 1:]
+
+    def _hnsw_cos(self, X_unit: np.ndarray, k: int):
+        import hnswlib
+        n, d = X_unit.shape
+        index = hnswlib.Index(space="cosine", dim=d)
+        index.init_index(max_elements=n, ef_construction=self.config.ef_construction, M=16)
+        index.add_items(X_unit, np.arange(n))
+        index.set_ef(self.config.ef_search)
+        idx, dists = index.knn_query(X_unit, k=k+1)
+        sims = 1.0 - dists[:, 1:]
+        return idx[:, 1:], sims
+
+    def _pynnd_cos(self, X_unit: np.ndarray, k: int):
+        import pynndescent
+        index = pynndescent.NNDescent(X_unit, n_neighbors=k+1, metric="cosine", random_state=42)
+        idx, dists = index.neighbor_graph
+        sims = 1.0 - dists[:, 1:]
+        return idx[:, 1:], sims
+
+    def _annoy_cos(self, X_unit: np.ndarray, k: int):
+        from annoy import AnnoyIndex
+        n, d = X_unit.shape
+        index = AnnoyIndex(d, "angular")
+        for i in range(n):
+            index.add_item(i, X_unit[i])
+        index.build(self.config.n_trees)
+        idx = np.empty((n, k+1), dtype=np.int32)
+        sims = np.empty((n, k+1), dtype=np.float32)
+        for i in range(n):
+            nn_idx, _ = index.get_nns_by_item(i, k+1, include_distances=True)
+            nn_idx = np.array(nn_idx, dtype=np.int32)
+            sim_row = (X_unit[i] @ X_unit[nn_idx].T).astype(np.float32)
+            idx[i] = nn_idx
+            sims[i] = sim_row
+        return idx[:, 1:], sims[:, 1:]
+
+    def _sklearn_cos(self, X_unit: np.ndarray, k: int):
+        nn = NearestNeighbors(n_neighbors=k+1, metric="cosine", algorithm="brute")
+        nn.fit(X_unit)
+        dists, idx = nn.kneighbors(X_unit)
+        sims = (1.0 - dists[:, 1:]).astype(np.float32)
+        return idx[:, 1:], sims
+
+# ===================== Embedding builders (from decoded edges) =====================
+def _flatten_edge_triplet_to_vec(edge_triplet) -> np.ndarray:
+    """edge_triplet: [e_vec, r_vec, e_vec] → concat vector"""
+    e1, r, e2 = edge_triplet
+    return np.concatenate([np.asarray(e1, np.float32),
+                           np.asarray(r,  np.float32),
+                           np.asarray(e2, np.float32)], axis=0)
+
+def _embed_small_item(edge_indices: List[int], codebook_main: Dict[str, Any]) -> Optional[np.ndarray]:
+    """One small question/answer (list[int] edges) → average of concatenated edge vectors."""
+    decoded = decode_question(edge_indices, codebook_main, fmt='embeddings')
+    if not decoded:
+        return None
+    mats = [_flatten_edge_triplet_to_vec(t) for t in decoded]
+    return np.mean(np.stack(mats, axis=0), axis=0)
+
+def _embed_nested(items_nested: List[List[int]], codebook_main: Dict[str, Any]) -> Optional[np.ndarray]:
+    """Question/Answer as list of small items → average of their vectors."""
+    vecs = []
+    for sub in (items_nested or []):
+        v = _embed_small_item(sub, codebook_main)
+        if v is not None:
+            vecs.append(v)
+    if not vecs:
+        return None
+    return np.mean(np.stack(vecs, axis=0), axis=0)
+
+def _cos_sim(a: np.ndarray, b: np.ndarray) -> float:
+    na = float(np.linalg.norm(a)); nb = float(np.linalg.norm(b))
+    if na < 1e-12 or nb < 1e-12:
+        return 0.0
+    return float((a @ b) / (na * nb))
+
+# ===================== Representative selection (medoid/density) =====================
+from sklearn.neighbors import NearestNeighbors
+def _select_rep_medoid(X_unit: np.ndarray, members: List[int]) -> int:
+    if len(members) == 1:
+        return members[0]
+    sub = X_unit[members]
+    sims = sub @ sub.T
+    norms = np.linalg.norm(sub, axis=1, keepdims=True)
+    cos = sims / ((norms @ norms.T) + 1e-12)
+    dmat = 1.0 - cos
+    return members[int(np.argmin(dmat.sum(axis=1)))]
+
+def _select_rep_density(X_unit: np.ndarray, members: List[int], k: int = 5) -> int:
+    if len(members) == 1:
+        return members[0]
+    sub = X_unit[members]
+    k = min(k, len(members)-1)
+    nn = NearestNeighbors(n_neighbors=k+1, metric="cosine", algorithm="brute")
+    nn.fit(sub)
+    dists, _ = nn.kneighbors(sub)
+    densities = 1.0 / (dists[:, 1:].mean(axis=1) + 1e-10)
+    return members[int(np.argmax(densities))]
+
+# ===================== MAIN: ANN + answer-gated merging =====================
+@dataclass
+class QAnnMergeConfig:
+    ann: ANNConfig = ANNConfig()
+    gate: QMergeGate = QMergeGate()
+
+def ann_merge_questions_answer_gated(
+    codebook_main: Dict[str, Any],
+    questions_lst: List[List[List[int]]],
+    answers_lst:   List[List[List[int]]],
+    cfg: Optional[QAnnMergeConfig] = None,
+) -> Tuple[List[List[List[int]]], List[List[List[int]]], List[int], List[List[int]], List[int]]:
+    """
+    Returns:
+      new_questions_lst, new_answers_lst, q_old_to_new, q_clusters, kept_indices
+    Note: codebook_main is NOT modified.
+    """
+    assert len(questions_lst) == len(answers_lst), "questions_lst and answers_lst must align in length"
+    n = len(questions_lst)
+    if cfg is None:
+        k = min(50, max(5, int(np.sqrt(max(1, n)))))
+        cfg = QAnnMergeConfig(ann=ANNConfig(k_neighbors=k), gate=QMergeGate())
+
+    # 1) Build question & answer vectors from decoded embeddings
+    Q_vecs, A_vecs = [], []
+    for i in range(n):
+        qv = _embed_nested(questions_lst[i], codebook_main)
+        av = _embed_nested(answers_lst[i],   codebook_main)
+        if qv is None or av is None:
+            # robust fallback (keeps them from merging due to low sims)
+            if qv is None and A_vecs:  # reuse known dimension
+                qv = np.zeros_like(A_vecs[0])
+            if av is None and Q_vecs:
+                av = np.zeros_like(Q_vecs[0])
+        Q_vecs.append(qv.astype(np.float32))
+        A_vecs.append(av.astype(np.float32))
+    Q = np.stack(Q_vecs, axis=0)  # (n, d)
+    A = np.stack(A_vecs, axis=0)
+
+    # Normalize Q for cosine ANN
+    Q_unit = Q / (np.linalg.norm(Q, axis=1, keepdims=True) + 1e-12)
+
+    # 2) ANN kNN graph on questions
+    gb = ANNGraphBuilder(cfg.ann)
+    idx, sims_cos = gb.build_graph(Q_unit, k=cfg.ann.k_neighbors)  # cosine sims in [-1,1] (or [0,1] depending backend)
+    # Clamp to [-1,1] then map to [0,1] for thresholding
+    q_sims01 = np.clip(sims_cos, -1.0, 1.0) * 0.5 + 0.5
+
+    # 3) Union-Find with double gate (question & answer sim)
+    uf = UnionFind(n)
+    for i in range(n):
+        for j, qsim01 in zip(idx[i], q_sims01[i]):
+            j = int(j)
+            if j == i:
+                continue
+            if qsim01 >= cfg.gate.q_sim_threshold:
+                asim = _cos_sim(A[i], A[j])  # in [-1,1]
+                asim01 = 0.5 * (asim + 1.0)
+                if asim01 >= cfg.gate.a_sim_threshold:
+                    uf.union(i, j)
+
+    # 4) Build clusters
+    roots: Dict[int, List[int]] = {}
+    for i in range(n):
+        r = uf.find(i)
+        roots.setdefault(r, []).append(i)
+    clusters = list(roots.values())
+
+    # 5) Representatives
+    kept_indices: List[int] = []
+    rep_of: Dict[int, int] = {}
+    for members in clusters:
+        if cfg.ann.representative_method == "density":
+            rep = _select_rep_density(Q_unit, members, k=min(5, len(members)-1))
+        else:  # medoid
+            rep = _select_rep_medoid(Q_unit, members)
+        kept_indices.append(rep)
+        for m in members:
+            rep_of[m] = rep
     kept_indices = sorted(set(kept_indices))
-    logger.info(f"Reduced from {n} to {len(kept_indices)} entities (clusters={len(clusters)})")
-
-    # Create mappings
     rep_to_new = {old: new for new, old in enumerate(kept_indices)}
-    old_ent_to_new = {i: rep_to_new[representatives[i]] for i in range(n)}
+    q_old_to_new = [rep_to_new[rep_of[i]] for i in range(n)]
+    q_clusters = [sorted([i for i in range(n) if rep_of[i] == rep]) for rep in kept_indices]
 
-    # Rebuild entities/embeddings
-    new_e = [E[i] for i in kept_indices]
-    new_e_emb = [np.asarray(codebook_main['e_embeddings'][i], dtype=np.float32) for i in kept_indices]
+    # 6) Rebuild outputs (no codebook_main mutation)
+    def members_of(rep_old: int) -> List[int]:
+        return [i for i in range(n) if rep_of[i] == rep_old]
 
-    # Remap edges
-    old_edges = [list(map(int, e)) for e in codebook_main.get('edge_matrix', [])]
-    tuple_to_new_edge_idx: Dict[Tuple[int, int, int], int] = {}
-    new_edges: List[List[int]] = []
-    old_edge_to_new_edge: Dict[int, int] = {}
+    if cfg.gate.combine_strategy == "representative":
+        new_questions_lst = [questions_lst[i] for i in kept_indices]
+        new_answers_lst   = [answers_lst[i]   for i in kept_indices]
+    else:  # "union"
+        new_questions_lst, new_answers_lst = [], []
+        for rep in kept_indices:
+            mids = members_of(rep)
+            qset: Set[Tuple[int, ...]] = set()
+            aset: Set[Tuple[int, ...]] = set()
+            for i in mids:
+                for subq in (questions_lst[i] or []):
+                    qset.add(tuple(int(v) for v in subq))
+                for suba in (answers_lst[i] or []):
+                    aset.add(tuple(int(v) for v in suba))
+            new_questions_lst.append([list(t) for t in sorted(qset)])
+            new_answers_lst.append([list(t) for t in sorted(aset)])
 
-    for old_idx, (e1, r, e2) in enumerate(old_edges):
-        ne1 = old_ent_to_new.get(e1, e1)
-        ne2 = old_ent_to_new.get(e2, e2)
-        tup = (ne1, int(r), ne2)
-        if tup not in tuple_to_new_edge_idx:
-            tuple_to_new_edge_idx[tup] = len(new_edges)
-            new_edges.append([ne1, int(r), ne2])
-        old_edge_to_new_edge[old_idx] = tuple_to_new_edge_idx[tup]
+    return new_questions_lst, new_answers_lst, q_old_to_new, q_clusters, kept_indices
 
-    def remap_edge_indices(struct):
-        if isinstance(struct, list):
-            return [remap_edge_indices(x) for x in struct]
-        try:
-            return old_edge_to_new_edge.get(int(struct), int(struct))
-        except (ValueError, TypeError):
-            return struct
+# ===================== Minimal Example =====================
+if __name__ == "__main__":
+    rng = np.random.default_rng(42)
 
-    if codebook_main.get('questions_lst') is not None:
-        codebook_main['questions_lst'] = remap_edge_indices(codebook_main['questions_lst'])
-    if codebook_main.get('answers_lst') is not None:
-        codebook_main['answers_lst'] = remap_edge_indices(codebook_main['answers_lst'])
-    if use_thinking and codebook_main.get('thinkings_lst') is not None:
-        codebook_main['thinkings_lst'] = remap_edge_indices(codebook_main['thinkings_lst'])
-    if use_facts and codebook_main.get('facts_lst') is not None:
-        codebook_main['facts_lst'] = remap_edge_indices(codebook_main['facts_lst'])
+    # Tiny codebook with embeddings for entities/relations
+    E = ["fair skin", "BCC", "UV", "melanin", "dermis"]
+    R = ["has effect", "causes", "modulates"]
+    e_dim, r_dim = 8, 6
+    e_embeddings = rng.normal(size=(len(E), e_dim)).astype(np.float32).tolist()
+    r_embeddings = rng.normal(size=(len(R), r_dim)).astype(np.float32).tolist()
 
-    codebook_main['e'] = list(new_e)
-    codebook_main['e_embeddings'] = list(new_e_emb)
-    codebook_main['edge_matrix'] = [list(map(int, e)) for e in new_edges]
-    return codebook_main
+    # Edges [h, r, t] with small ids
+    edge_matrix = [
+        [0, 1, 1],  # 0  fair skin causes BCC
+        [2, 1, 1],  # 1  UV causes BCC
+        [3, 2, 2],  # 2  melanin modulates UV
+        [1, 0, 4],  # 3  BCC has effect dermis
+        [0, 0, 3],  # 4  fair skin has effect melanin
+        [2, 0, 0],  # 5  UV has effect fair skin
+        [3, 0, 0],  # 6  melanin has effect fair skin
+        [2, 1, 0],  # 7  UV causes fair skin (nonsense, demo)
+        [4, 2, 1],  # 8  dermis modulates BCC
+    ]
+    codebook_main = {
+        "e": E, "r": R,
+        "edge_matrix": edge_matrix,
+        "e_embeddings": e_embeddings,
+        "r_embeddings": r_embeddings,
+    }
+
+    # Questions: list of small-questions (each is list[int] of edge ids)
+    questions_lst = [
+        [[0]],                     # q0
+        [[0]],                     # q1  ~ dup of q0
+        [[1, 2], [2, 1]],          # q2
+        [[1, 2], [2, 1]],          # q3  ~ dup of q2
+        [[4]],                     # q4 unique
+        [[7]],                     # q5 unique
+    ]
+
+    # Answers: same sub-count per question, but different edge ids
+    answers_lst = [
+        [[1]],                     # a0 matches a1
+        [[1]],                     # a1 matches a0
+        [[8, 3], [3, 8]],          # a2 matches a3
+        [[8, 3], [3, 8]],          # a3 matches a2
+        [[6]],                     # a4
+        [[5]],                     # a5
+    ]
+
+    print("=== BEFORE ===")
+    print("Q count:", len(questions_lst))
+    print("questions_lst:", questions_lst)
+    print("answers_lst:",   answers_lst)
+
+    # Adaptive k; strict-ish thresholds
+    new_q, new_a, q_old_to_new, q_clusters, kept = ann_merge_questions_answer_gated(
+        codebook_main,
+        questions_lst,
+        answers_lst,
+        cfg=QAnnMergeConfig(
+            ann=ANNConfig(k_neighbors=5, representative_method="medoid"),
+            gate=QMergeGate(q_sim_threshold=0.90, a_sim_threshold=0.80, combine_strategy="representative"),
+        )
+    )
+
+    print("\n=== AFTER ===")
+    print("Q kept:", len(new_q))
+    print("q_old_to_new:", q_old_to_new)
+    print("q_clusters:", q_clusters)
+    print("questions_lst (merged):", new_q)
+    print("answers_lst   (merged):", new_a)
+
+# python optimize_combine_storage.py

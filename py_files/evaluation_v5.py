@@ -40,7 +40,7 @@ CORPUS_FILE  = "Datasets/Corpus/medical.json"
 QUEST_FILE   = "Datasets/Questions/medical_questions.json"
 
 SEED_N       = 20    # first 30 rows → bootstrap + DPO train
-TEST_N       = 5     # next 20 rows  → evaluation
+TEST_N       = 15     # next 20 rows  → evaluation
 TOPK_CTX     = 5
 
 # ---------------------------------------------------------------------
@@ -137,6 +137,10 @@ if not pre_loaded_meta:
 
 for q in seed_questions:
     a = cr.run_work_flow(q)
+    print('==============================================')
+    print('question lst')
+    print(cr.meta_codebook['questions_lst'])
+    print('==============================================')
     print(a)
 
 # # ---------------------------------------------------------------------
