@@ -3554,7 +3554,7 @@ class CompressRag_rl:
 
         if 'facts_lst' in self.meta_codebook:
             if len(self.meta_codebook['facts_lst'])>=2:
-                new_facts, f_old2new, f_clusters, kept = ann_merge_questions_answer_gated(self.meta_codebook,
+                new_facts, f_old2new, f_clusters, kept = ann_feat_combine(self.meta_codebook,
                                                                                                 self.meta_codebook['facts_lst'])
                 
                 self.meta_codebook['facts_lst'] = new_facts
@@ -3562,7 +3562,7 @@ class CompressRag_rl:
 
         if 'thinkings_lst' in self.meta_codebook:
             if len(self.meta_codebook['thinkings_lst'])>=2:
-                new_thinkings, f_old2new, f_clusters, kept = ann_merge_questions_answer_gated(self.meta_codebook,
+                new_thinkings, f_old2new, f_clusters, kept = ann_feat_combine(self.meta_codebook,
                                                                                                 self.meta_codebook['thinkings_lst'])
                 
                 self.meta_codebook['thinkings_lst'] = new_thinkings
@@ -3632,7 +3632,7 @@ class CompressRag_rl:
 
         if 'facts_lst' in self.meta_codebook:
             if len(self.meta_codebook['facts_lst'])>=2:
-                new_facts, f_old2new, f_clusters, kept = ann_merge_questions_answer_gated(self.meta_codebook,
+                new_facts, f_old2new, f_clusters, kept = ann_feat_combine(self.meta_codebook,
                                                                                                 self.meta_codebook['facts_lst'])
                 
                 self.meta_codebook['facts_lst'] = new_facts
@@ -3640,7 +3640,7 @@ class CompressRag_rl:
 
         if 'thinkings_lst' in self.meta_codebook:
             if len(self.meta_codebook['thinkings_lst'])>=2:
-                new_thinkings, f_old2new, f_clusters, kept = ann_merge_questions_answer_gated(self.meta_codebook,
+                new_thinkings, f_old2new, f_clusters, kept = ann_feat_combine(self.meta_codebook,
                                                                                                 self.meta_codebook['thinkings_lst'])
                 
                 self.meta_codebook['thinkings_lst'] = new_thinkings
