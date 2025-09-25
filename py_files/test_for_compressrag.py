@@ -1,4 +1,4 @@
-from CompressRag_rl_v2 import CompressRag_rl,decode_questions, get_context
+from CompressRag_rl_v3 import CompressRag_rl,decode_questions, get_context
 from WordEmb import WordAvgEmbeddings, Word2VecEmbeddings
 from langchain.embeddings.base import Embeddings
 from langchain_community.embeddings import HuggingFaceEmbeddings
@@ -429,7 +429,40 @@ def to_serializable(obj):
         return float(obj)     # numpy float -> float
     raise TypeError(f"Type {type(obj)} not serializable")
 
-i = 0
+
+def run_eval_case(question, reference_answer, facts_json_path, rag, work_mode="normal", llm_metrics=True, warm_start="auto"):
+    if work_mode == "dpo":
+        result = rag.run_work_flow_for_dpo(question, facts_json_path=facts_json_path, warm_start=warm_start)
+    else:
+        result = rag.run_work_flow(question, facts_json_path=facts_json_path, warm_start=warm_start)
+    if isinstance(result, tuple):
+        gen_text = result[0]
+    else:
+        gen_text = str(result)
+    # 评测
+    from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
+    from rouge_score import rouge_scorer
+    smooth = SmoothingFunction().method1
+    scorer = rouge_scorer.RougeScorer(["rouge1", "rouge2", "rougeL"], use_stemmer=True)
+    bleu = sentence_bleu([reference_answer.split()], gen_text.split(), smoothing_function=smooth)
+    scores = scorer.score(reference_answer, gen_text)
+    rouge1 = scores["rouge1"].fmeasure
+    rouge2 = scores["rouge2"].fmeasure
+    rougeL = scores["rougeL"].fmeasure
+    # metrics_runs
+    if rag.llm.metrics_runs and isinstance(rag.llm.metrics_runs[-1], dict):
+        last_metrics = list(rag.llm.metrics_runs[-1].values())[0]
+        last_metrics["BLEU"] = bleu
+        last_metrics["ROUGE-1"] = rouge1
+        last_metrics["ROUGE-2"] = rouge2
+        last_metrics["ROUGE-L"] = rougeL
+    if llm_metrics:
+        print(rag.llm.metrics_runs)
+    print(result)
+    print(f'BLEU: {bleu:.4f}, ROUGE-1: {rouge1:.4f}, ROUGE-2: {rouge2:.4f}, ROUGE-L: {rougeL:.4f}')
+    return gen_text, bleu, rouge1, rouge2, rougeL
+
+
 
 DATA_PATH     = "context/medical_questions.json"
 DATA_SLICE    = 2
@@ -439,32 +472,11 @@ with open(DATA_PATH, "r", encoding="utf-8") as f:
 
 raw_data = raw_data[:DATA_SLICE]
 print(f"[INFO] Loaded {len(raw_data)} samples for answering)")
-      
 questions = [item["question"] for item in raw_data if "question" in item]
 answers = [item["answer"] if "answer" in item else "" for item in raw_data if "question" in item]
-scorer = rouge_scorer.RougeScorer(["rouge1", "rouge2", "rougeL"], use_stemmer=True)
-smooth = SmoothingFunction().method1
+i = 0
 for q, ref in zip(questions, answers):
-    print(f'q {i}')
-    result = rag.run_work_flow(q, facts_json_path=["context/novel copy.json", "context/medical_sub.json"], warm_start="auto")
-    if isinstance(result, tuple):
-        gen_text = result[0]
-    else:
-        gen_text = str(result)
-    bleu = sentence_bleu([ref.split()], gen_text.split(), smoothing_function=smooth)
-    scores = scorer.score(ref, gen_text)
-    rouge1 = scores["rouge1"].fmeasure
-    rouge2 = scores["rouge2"].fmeasure
-    rougeL = scores["rougeL"].fmeasure
-    if rag.llm.metrics_runs and isinstance(rag.llm.metrics_runs[-1], dict):
-        last_metrics = list(rag.llm.metrics_runs[-1].values())[0]
-        last_metrics["BLEU"] = bleu
-        last_metrics["ROUGE-1"] = rouge1
-        last_metrics["ROUGE-2"] = rouge2
-        last_metrics["ROUGE-L"] = rougeL
-    print(rag.llm.metrics_runs)
-    print(result)
-    print(f'BLEU: {bleu:.4f}, ROUGE-1: {rouge1:.4f}, ROUGE-2: {rouge2:.4f}, ROUGE-L: {rougeL:.4f}')
+    run_eval_case(q, ref, ["context/novel copy.json", "context/medical_sub.json"], rag, work_mode="normal")
     i += 1
     #with open(f"meta_codebook_{i}.json", "w", encoding="utf-8") as f:
     #    json.dump(rag.meta_codebook, f, ensure_ascii=False, indent=2, default=to_serializable)
