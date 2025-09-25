@@ -255,51 +255,65 @@ class Phi4MiniReasoningLLM:
         return text[cut + len(user_msg):].strip() if cut != -1 else text.strip(), gen_info
     
     def strip_think(self, s: str) -> Tuple[str, List[str]]:
-        """Remove <think>...</think> blocks; also handle dangling <think> at EOF."""
-        if not s:
-            return "", []
-        s_lower = s.lower()
-        thinks: List[str] = []
-        spans: List[Tuple[int, int]] = []
+            """提取思考并返回干净答案；支持 <think>...</think> 与多段 <|assistant|>。"""
+            if not s:
+                return "", []
 
-        for m in re.finditer(r"<think>(.*?)</think>", s, flags=re.S | re.I):
-            thinks.append(m.group(1).strip())
-            spans.append((m.start(), m.end()))
+            thinks: List[str] = []
+            s_lower = s.lower()
+            spans = []
+            for m in re.finditer(r"<think>(.*?)</think>", s, flags=re.S | re.I):
+                thinks.append(m.group(1).strip())
+                spans.append((m.start(), m.end()))
 
-        last_open = s_lower.rfind("<think>")
-        if last_open != -1 and s_lower.find("</think>", last_open) == -1:
-            content_start = last_open + len("<think>")
-            dangling_text = s[content_start:].strip()
-            if dangling_text:
-                thinks.append(dangling_text)
-            spans.append((last_open, len(s)))
+            last_open = s_lower.rfind("<think>")
+            if last_open != -1 and s_lower.find("</think>", last_open) == -1:
+                content_start = last_open + len("<think>")
+                dangling_text = s[content_start:].strip()
+                if dangling_text:
+                    thinks.append(dangling_text)
+                spans.append((last_open, len(s)))
+            if spans:
+                spans.sort()
+                merged = []
+                cur_s, cur_e = spans[0]
+                for st, en in spans[1:]:
+                    if st <= cur_e:
+                        cur_e = max(cur_e, en)
+                    else:
+                        merged.append((cur_s, cur_e))
+                        cur_s, cur_e = st, en
+                merged.append((cur_s, cur_e))
+            else:
+                merged = []
 
-        if spans:
-            spans.sort()
-            merged = []
-            cur_s, cur_e = spans[0]
-            for st, en in spans[1:]:
-                if st <= cur_e:
-                    cur_e = max(cur_e, en)
-                else:
-                    merged.append((cur_s, cur_e))
-                    cur_s, cur_e = st, en
-            merged.append((cur_s, cur_e))
-        else:
-            merged = []
+            parts = []
+            prev = 0
+            for st, en in merged:
+                if prev < st:
+                    parts.append(s[prev:st])
+                prev = en
+            if prev < len(s):
+                parts.append(s[prev:])
+            no_think_text = "".join(parts)
 
-        parts = []
-        prev = 0
-        for st, en in merged:
-            if prev < st:
-                parts.append(s[prev:st])
-            prev = en
-        if prev < len(s):
-            parts.append(s[prev:])
+            blocks = [blk.strip()
+                    for blk in re.split(r"(?i)<\|assistant\|>", no_think_text)
+                    if blk and blk.strip()]
 
-        clean = "".join(parts)
-        clean = re.sub(r"(?:^|\n)\s*(Okay,|Let’s|Let's|Step by step|Thought:).*", "", clean, flags=re.I)
-        return clean.strip(), thinks
+            if blocks:
+                if len(blocks) >= 2:
+                    thinks.extend(blocks[:-1])
+                clean = blocks[-1].strip()
+            else:
+                clean = no_think_text.strip()
+
+            clean = re.sub(r"(?:^|\n)\s*(Okay,|Let’s|Let's|Step by step|Thought:).*",
+                        "", clean, flags=re.I)
+            clean = re.sub(r"(?i)<\|assistant\|>", "", clean).strip()
+
+            return clean, thinks
+        
         
     def take_questions(self, final_merged_json, question, *, max_regen: int = 3, retrieval_time):
         def _clean_answer(s: str, limit=4):
@@ -400,12 +414,11 @@ rag.top_m = 2
 rag.question_batch_size = 2
 rag.questions_db_batch_size = 16
 
-questions = [
-    "From which cell type does basal cell carcinoma arise?",
-    "From which cell type does basal cell carcinoma arise?",
-]
+
 import json
 import numpy as np
+from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
+from rouge_score import rouge_scorer
 
 def to_serializable(obj):
     if isinstance(obj, np.ndarray):
@@ -418,15 +431,44 @@ def to_serializable(obj):
 
 i = 0
 
-# for q in questions:
-#      print(f'q {i}')
-#      result = rag.run_work_flow(q, facts_json_path=["context/novel copy.json", "context/medical_sub.json"], warm_start="auto")
-#      print(rag.llm.metrics_runs)  
-     #print(result)
+DATA_PATH     = "context/medical_questions.json"
+DATA_SLICE    = 2
 
-#     #with open(f"meta_codebook_{i}.json", "w", encoding="utf-8") as f:
-#     #    json.dump(rag.meta_codebook, f, ensure_ascii=False, indent=2, default=to_serializable)
-#     i += 1
+with open(DATA_PATH, "r", encoding="utf-8") as f:
+    raw_data = json.load(f)
+
+raw_data = raw_data[:DATA_SLICE]
+print(f"[INFO] Loaded {len(raw_data)} samples for answering)")
+      
+questions = [item["question"] for item in raw_data if "question" in item]
+answers = [item["answer"] if "answer" in item else "" for item in raw_data if "question" in item]
+scorer = rouge_scorer.RougeScorer(["rouge1", "rouge2", "rougeL"], use_stemmer=True)
+smooth = SmoothingFunction().method1
+for q, ref in zip(questions, answers):
+    print(f'q {i}')
+    result = rag.run_work_flow(q, facts_json_path=["context/novel copy.json", "context/medical_sub.json"], warm_start="auto")
+    if isinstance(result, tuple):
+        gen_text = result[0]
+    else:
+        gen_text = str(result)
+    bleu = sentence_bleu([ref.split()], gen_text.split(), smoothing_function=smooth)
+    scores = scorer.score(ref, gen_text)
+    rouge1 = scores["rouge1"].fmeasure
+    rouge2 = scores["rouge2"].fmeasure
+    rougeL = scores["rougeL"].fmeasure
+    if rag.llm.metrics_runs and isinstance(rag.llm.metrics_runs[-1], dict):
+        last_metrics = list(rag.llm.metrics_runs[-1].values())[0]
+        last_metrics["BLEU"] = bleu
+        last_metrics["ROUGE-1"] = rouge1
+        last_metrics["ROUGE-2"] = rouge2
+        last_metrics["ROUGE-L"] = rougeL
+    print(rag.llm.metrics_runs)
+    print(result)
+    print(f'BLEU: {bleu:.4f}, ROUGE-1: {rouge1:.4f}, ROUGE-2: {rouge2:.4f}, ROUGE-L: {rougeL:.4f}')
+    i += 1
+    #with open(f"meta_codebook_{i}.json", "w", encoding="utf-8") as f:
+    #    json.dump(rag.meta_codebook, f, ensure_ascii=False, indent=2, default=to_serializable)
+    
 
 
 
