@@ -276,7 +276,7 @@ async def make_preference_dataset_2head_using_llm(
     examples: List["PrefExample2"] = []
 
     for q in questions:
-        x = featurize_query(cr, q, dims=feature_dim)
+        x = featurize_query(q, dims=feature_dim)
         tried = rng.sample(all_pairs, k=min(per_q_samples, len(all_pairs)))
 
         # (optional) parallelize scoring for this question
@@ -466,7 +466,7 @@ class LinUCBArm:
 # ===============================
 @torch.no_grad()
 def select_ans_th(policy: StrategyPolicy2Head, cr, q: str, feature_dim: int = 384, greedy: bool = True,  ANSWERS_CHOICES = ANSWERS_CHOICES,THINKINGS_CHOICES = THINKINGS_CHOICES,):
-    x = torch.tensor(featurize_query(cr, q, dims=feature_dim),dtype=torch.float32).unsqueeze(0).to(next(policy.parameters()).device)
+    x = torch.tensor(featurize_query(q, dims=feature_dim),dtype=torch.float32).unsqueeze(0).to(next(policy.parameters()).device)
     y = policy.sample(x, greedy=greedy)[0].cpu().numpy().tolist()
     ai, ti = int(y[0]), int(y[1])
     return (ANSWERS_CHOICES[ai], THINKINGS_CHOICES[ti])
