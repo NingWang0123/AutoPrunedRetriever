@@ -3,6 +3,9 @@ from rouge_score import rouge_scorer
 from bert_score import score
 import numpy as np
 from sentence_transformers import SentenceTransformer
+from collections import Counter
+import re
+from dpo_compressrag_v2 import answer_with_auto_strategy
 
 ### all the reward func takes the pred and the gold_answer (ground truth), output reward value
 
@@ -16,7 +19,7 @@ def f1_overlap(pred: str, gold: str) -> float:
     tp = len(P & G); prec = tp/(len(P)+1e-8); rec = tp/(len(G)+1e-8)
     return 0.0 if prec+rec == 0 else 2*prec*rec/(prec+rec)
 
-def default_reward(pred_answer: str, gold_answer: Optional[str]) -> float:
+def default_reward(pred_answer: str, gold_answer:str) -> float:
     base = f1_overlap(pred_answer, gold_answer or "")
     toks = len((pred_answer or "").split())
     return base - 0.0005*max(0, toks-256)
@@ -26,8 +29,6 @@ def reward_token_f1(pred: str, gold_answer: str) -> float:
     """
     Reward = token-level F1 score between prediction and gold answer
     """
-    from collections import Counter
-    import re
     def normalize(s): 
         return re.sub(r"\W+", " ", s.lower()).strip()
     p_toks, g_toks = normalize(pred).split(), normalize(gold_answer).split()
@@ -86,3 +87,24 @@ def reward_sbert(pred: str, gold_answer: str, model=None) -> float:
     emb_pred /= (np.linalg.norm(emb_pred) + 1e-9)
     emb_gold /= (np.linalg.norm(emb_gold) + 1e-9)
     return float((emb_pred * emb_gold).sum())
+
+
+
+def evaluation_for_correctness(question, gold_answer, rag, policy=None, work_mode="normal", eval_func = reward_sbert):
+    if work_mode == "dpo":
+        result = answer_with_auto_strategy(cr =rag, 
+                                            policy =policy, 
+                                            q = question,
+                                            reward_fn       = None,
+                                            gold_answer     = None,
+                                            greedy          = True) # evaluation don't need groundtruth and reward_fn
+    else:
+        result = rag.run_work_flow(question)
+    if isinstance(result, tuple):
+        pred = result[0]
+    else:
+        pred = str(result)
+
+    eval_result = eval_func(pred,gold_answer)
+
+    return eval_result
