@@ -266,7 +266,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,ini_meta_
 
 
 if __name__ == "__main__":
-    compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N, Path("meta_codebook.json") ,"pref_examples_medical.json",reward_func_dpo.reward_sbert,reward_func_mode = 'non_llm',final_csv_path = "results/sbert_result")
+    compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N, Path("meta_codebook.json") ,"pref_examples_medical_s2.json",reward_func_dpo.reward_sbert_inclusive,reward_func_mode = 'non_llm',final_csv_path = "results/sbert_result")
 
 
 # python pipeline_for_test.py
