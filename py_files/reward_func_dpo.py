@@ -171,4 +171,20 @@ def evaluation_for_correctness_and_context(question, gold_answer,context_ground_
     return eval_result_correctness,eval_result_context
 
 
+def evaluation_for_correctness_and_context_for_giving_results(all_generated_dicts,pred,ground_truth,context,ground_truth_context, eval_func = reward_sbert):
+
+    eval_result_correctness_lst = []
+    eval_result_context_lst = []
+
+
+
+    for generated_dict in all_generated_dicts:
+        eval_result_context = eval_func(generated_dict[context],generated_dict[ground_truth_context])
+        eval_result_correctness = eval_func(generated_dict[pred],generated_dict[ground_truth])
+        eval_result_correctness_lst.append(eval_result_correctness)
+        eval_result_context_lst.append(eval_result_context)
+
+    return eval_result_correctness_lst,eval_result_context_lst
+
+
 
