@@ -108,3 +108,40 @@ def evaluation_for_correctness(question, gold_answer, rag, policy=None, work_mod
     eval_result = eval_func(pred,gold_answer)
 
     return eval_result
+
+
+def evaluation_for_context(question, context_ground_truth, rag, policy=None, eval_func = reward_sbert):
+    result,_meta = answer_with_auto_strategy(cr =rag, 
+                                        policy =policy, 
+                                        q = question,
+                                        reward_fn       = None,
+                                        gold_answer     = None,
+                                        greedy          = True) # evaluation don't need groundtruth and reward_fn
+
+
+    eval_result = eval_func(_meta['fact_context'],context_ground_truth)
+
+    return eval_result
+
+
+def evaluation_for_correctness_and_context(question, gold_answer,context_ground_truth, rag, policy=None, eval_func = reward_sbert):
+    result,_meta = answer_with_auto_strategy(cr =rag, 
+                                        policy =policy, 
+                                        q = question,
+                                        reward_fn       = None,
+                                        gold_answer     = None,
+                                        greedy          = True) # evaluation don't need groundtruth and reward_fn
+    
+    if isinstance(result, tuple):
+        pred = result[0]
+    else:
+        pred = str(result)
+
+
+    eval_result_context = eval_func(_meta['fact_context'],context_ground_truth)
+    eval_result_correctness = eval_func(pred,gold_answer)
+
+    return eval_result_correctness,eval_result_context
+
+
+
