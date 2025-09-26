@@ -11,8 +11,9 @@ from huggingface_hub import hf_hub_download
 from langchain_community.embeddings import HuggingFaceEmbeddings
 
 from CompressRag_rl_v3 import (
-    CompressRag_rl, WordAvgEmbeddings, merging_codebook, get_word_embeddings
+    CompressRag_rl, merging_codebook
 )
+
 from dpo_compressrag_v2 import (    
     make_preference_dataset_2head, train_dpo_2head,make_preference_dataset_2head_using_llm,
     default_reward, answer_with_auto_strategy,save_pref_examples,load_pref_examples,ANSWERS_CHOICES,THINKINGS_CHOICES
@@ -265,3 +266,9 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,ini_meta_
     print(df)
 
     df.to_csv(final_csv_path)
+
+
+if __name__ == "__main__":
+    compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N, Path("meta_codebook.json") ,"pref_examples_medical.json",reward_func_dpo.reward_sbert,reward_func_mode = 'non_llm',final_csv_path = "results/sbert_result")
+
+
