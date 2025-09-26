@@ -465,10 +465,7 @@ def run_eval_case(question, reference_answer, facts_json_path, rag, work_mode="n
 
 from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 from rouge_score import rouge_scorer
-from dpo_compressrag_v2 import (    
-    make_preference_dataset_2head, train_dpo_2head,make_preference_dataset_2head_using_llm,
-    default_reward, answer_with_auto_strategy,save_pref_examples,load_pref_examples,ANSWERS_CHOICES,THINKINGS_CHOICES
-)
+from dpo_compressrag_v2 import answer_with_auto_strategy
 
 
 def run_eval_case_regular_and_dpo(question, reference_answer, facts_json_path, rag, policy=None, work_mode="normal", llm_metrics=True, warm_start="coarse"):
