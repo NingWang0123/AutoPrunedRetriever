@@ -36,9 +36,6 @@ SEED_N       = 20    # first 30 rows → bootstrap + DPO train
 TEST_N       = 15     # next 20 rows  → evaluation
 TOPK_CTX     = 5
 
-reward_func = reward_func_dpo.default_reward
-reward_func_mode = 'non_llm'
-
 # ---------------------------------------------------------------------
 # 1) Initialise embeddings & LLM
 # ---------------------------------------------------------------------
