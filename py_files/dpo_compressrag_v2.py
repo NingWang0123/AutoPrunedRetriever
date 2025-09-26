@@ -22,7 +22,8 @@ import asyncio,inspect
 
 # THINKINGS_CHOICES = ['overlap','not_include']
 THINKINGS_CHOICES = ['not_include']
-ANSWERS_CHOICES   = ['overlap','not_include']
+# ANSWERS_CHOICES   = ['overlap','not_include']
+ANSWERS_CHOICES   = ['overlap','unique','not_include']
 
 
 TH2I = {v:i for i,v in enumerate(THINKINGS_CHOICES)}
