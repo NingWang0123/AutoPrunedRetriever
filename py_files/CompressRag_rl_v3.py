@@ -3113,12 +3113,9 @@ class CompressRag_rl:
             return self.custom_linearizer
         return lambda run, cb: self._default_linearizer(run, cb)
 
-    def _rank_facts_for_query(self, query_edges, facts_runs, codebook_main, top_m=2,
+    def _rank_facts_for_query(self, query_edges, facts_runs, codebook_main,
+                            pre_topk=50, final_topm=5,
                             rerank_with_sentence=True, alpha=0.5):
-        """
-        先用 edge-run(代码本/word) 向量召回，再可选用句向量重排。
-        - 若 sentence_emb 不可用或没有 linearizer，则自动关闭句向量重排。
-        """
         import numpy as np
 
         if not facts_runs:
@@ -3131,7 +3128,7 @@ class CompressRag_rl:
         fn = F  / (np.linalg.norm(F,  axis=1, keepdims=True)  + 1e-12)
         sims_w = (qn @ fn.T).ravel()
 
-        k1 = int(min(max(top_m * 5, top_m), sims_w.shape[0]))
+        k1 = min(pre_topk, sims_w.shape[0])
         idx1 = np.argpartition(-sims_w, k1 - 1)[:k1]
 
         lin = self._get_linearizer()
@@ -3141,22 +3138,22 @@ class CompressRag_rl:
             and hasattr(self, "sentence_emb")
             and self.sentence_emb is not None
             and (
-                hasattr(self.sentence_emb, "embed_query") or hasattr(self.sentence_emb, "encode")  # 常见接口
+                hasattr(self.sentence_emb, "embed_query") or hasattr(self.sentence_emb, "encode")
             )
         )
 
         if not sent_ok:
-
             order = idx1[np.argsort(-sims_w[idx1])]
-            k = min(top_m, order.size)
+            k = min(final_topm, order.size)   
             order = order[:k]
             return [(int(i), float(sims_w[i])) for i in order]
+
         try:
             q_text = lin(query_edges, codebook_main)
             cand_texts = [lin(facts_runs[i], codebook_main) for i in idx1]
         except Exception:
             order = idx1[np.argsort(-sims_w[idx1])]
-            k = min(top_m, order.size)
+            k = min(final_topm, order.size)
             order = order[:k]
             return [(int(i), float(sims_w[i])) for i in order]
 
@@ -3174,8 +3171,9 @@ class CompressRag_rl:
         sims_mix = alpha * sims_w[idx1] + (1 - alpha) * sims_s
 
         order_local = np.argsort(-sims_mix)
-        chosen = [int(idx1[i]) for i in order_local[:min(top_m, len(order_local))]]
+        chosen = [int(idx1[i]) for i in order_local[:min(final_topm, len(order_local))]]
         return [(i, float(sims_mix[order_local[j]])) for j, i in enumerate(chosen)]
+
 
     def _flatten_facts(self, meta):
         flat, map_idx = [], []
