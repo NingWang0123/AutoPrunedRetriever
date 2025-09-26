@@ -430,7 +430,7 @@ def to_serializable(obj):
     raise TypeError(f"Type {type(obj)} not serializable")
 
 
-def run_eval_case(question, reference_answer, facts_json_path, rag, work_mode="normal", llm_metrics=True, warm_start="auto"):
+def run_eval_case(question, reference_answer, facts_json_path, rag, work_mode="normal", llm_metrics=True, warm_start="coarse"):
     if work_mode == "dpo":
         result = rag.run_work_flow_for_dpo(question, facts_json_path=facts_json_path, warm_start=warm_start)
     else:
@@ -463,21 +463,66 @@ def run_eval_case(question, reference_answer, facts_json_path, rag, work_mode="n
     return gen_text, bleu, rouge1, rouge2, rougeL
 
 
+from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
+from rouge_score import rouge_scorer
+from dpo_compressrag_v2 import (    
+    make_preference_dataset_2head, train_dpo_2head,make_preference_dataset_2head_using_llm,
+    default_reward, answer_with_auto_strategy,save_pref_examples,load_pref_examples,ANSWERS_CHOICES,THINKINGS_CHOICES
+)
 
-DATA_PATH     = "context/medical_questions.json"
-DATA_SLICE    = 2
 
-with open(DATA_PATH, "r", encoding="utf-8") as f:
-    raw_data = json.load(f)
+def run_eval_case_regular_and_dpo(question, reference_answer, facts_json_path, rag, policy=None, work_mode="normal", llm_metrics=True, warm_start="coarse"):
+    if work_mode == "dpo":
+        result = answer_with_auto_strategy(cr =rag, 
+                                            policy =policy, 
+                                            q = question,
+                                            reward_fn       = None,
+                                            gold_answer     = None,
+                                            greedy          = True) # evaluation don't need groundtruth and reward_fn
+    else:
+        result = rag.run_work_flow(question, facts_json_path=facts_json_path, warm_start=warm_start)
+    if isinstance(result, tuple):
+        gen_text = result[0]
+    else:
+        gen_text = str(result)
 
-raw_data = raw_data[:DATA_SLICE]
-print(f"[INFO] Loaded {len(raw_data)} samples for answering)")
-questions = [item["question"] for item in raw_data if "question" in item]
-answers = [item["answer"] if "answer" in item else "" for item in raw_data if "question" in item]
-i = 0
-for q, ref in zip(questions, answers):
-    run_eval_case(q, ref, ["context/novel copy.json", "context/medical_sub.json"], rag, work_mode="normal")
-    i += 1
+    smooth = SmoothingFunction().method1
+    scorer = rouge_scorer.RougeScorer(["rouge1", "rouge2", "rougeL"], use_stemmer=True)
+    bleu = sentence_bleu([reference_answer.split()], gen_text.split(), smoothing_function=smooth)
+    scores = scorer.score(reference_answer, gen_text)
+    rouge1 = scores["rouge1"].fmeasure
+    rouge2 = scores["rouge2"].fmeasure
+    rougeL = scores["rougeL"].fmeasure
+    # metrics_runs
+    if rag.llm.metrics_runs and isinstance(rag.llm.metrics_runs[-1], dict):
+        last_metrics = list(rag.llm.metrics_runs[-1].values())[0]
+        last_metrics["BLEU"] = bleu
+        last_metrics["ROUGE-1"] = rouge1
+        last_metrics["ROUGE-2"] = rouge2
+        last_metrics["ROUGE-L"] = rougeL
+    if llm_metrics:
+        print(rag.llm.metrics_runs)
+    print(result)
+    print(f'BLEU: {bleu:.4f}, ROUGE-1: {rouge1:.4f}, ROUGE-2: {rouge2:.4f}, ROUGE-L: {rougeL:.4f}')
+    return gen_text, bleu, rouge1, rouge2, rougeL
+
+
+
+
+# DATA_PATH     = "context/medical_questions.json"
+# DATA_SLICE    = 2
+
+# with open(DATA_PATH, "r", encoding="utf-8") as f:
+#     raw_data = json.load(f)
+
+# raw_data = raw_data[:DATA_SLICE]
+# print(f"[INFO] Loaded {len(raw_data)} samples for answering)")
+# questions = [item["question"] for item in raw_data if "question" in item]
+# answers = [item["answer"] if "answer" in item else "" for item in raw_data if "question" in item]
+# i = 0
+# for q, ref in zip(questions, answers):
+#     run_eval_case(q, ref, ["context/novel copy.json", "context/medical_sub.json"], rag, work_mode="normal")
+#     i += 1
     #with open(f"meta_codebook_{i}.json", "w", encoding="utf-8") as f:
     #    json.dump(rag.meta_codebook, f, ensure_ascii=False, indent=2, default=to_serializable)
     
