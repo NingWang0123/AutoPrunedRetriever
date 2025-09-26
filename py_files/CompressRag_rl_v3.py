@@ -3115,7 +3115,7 @@ class CompressRag_rl:
 
     def _rank_facts_for_query(self, query_edges, facts_runs, codebook_main,
                             pre_topk=50, final_topm=5,
-                            rerank_with_sentence=True, alpha=0.5):
+                            rerank_with_sentence=True):
         import numpy as np
 
         if not facts_runs:
@@ -3130,6 +3130,7 @@ class CompressRag_rl:
 
         k1 = min(pre_topk, sims_w.shape[0])
         idx1 = np.argpartition(-sims_w, k1 - 1)[:k1]
+        idx1_sorted = idx1[np.argsort(-sims_w[idx1])]
 
         lin = self._get_linearizer()
         sent_ok = (
@@ -3137,42 +3138,39 @@ class CompressRag_rl:
             and callable(lin)
             and hasattr(self, "sentence_emb")
             and self.sentence_emb is not None
-            and (
-                hasattr(self.sentence_emb, "embed_query") or hasattr(self.sentence_emb, "encode")
-            )
+            and (hasattr(self.sentence_emb, "embed_query") or hasattr(self.sentence_emb, "encode"))
         )
 
         if not sent_ok:
-            order = idx1[np.argsort(-sims_w[idx1])]
-            k = min(final_topm, order.size)   
-            order = order[:k]
-            return [(int(i), float(sims_w[i])) for i in order]
+            take = idx1_sorted[:min(final_topm, idx1_sorted.size)]
+            return [(int(i), float(sims_w[i])) for i in take]
 
         try:
             q_text = lin(query_edges, codebook_main)
-            cand_texts = [lin(facts_runs[i], codebook_main) for i in idx1]
+            cand_texts = [lin(facts_runs[i], codebook_main) for i in idx1_sorted]
         except Exception:
-            order = idx1[np.argsort(-sims_w[idx1])]
-            k = min(final_topm, order.size)
-            order = order[:k]
-            return [(int(i), float(sims_w[i])) for i in order]
+            take = idx1_sorted[:min(final_topm, idx1_sorted.size)]
+            return [(int(i), float(sims_w[i])) for i in take]
 
         if hasattr(self.sentence_emb, "embed_query"):
+            import numpy as np
             qv_s = np.asarray(self.sentence_emb.embed_query(q_text), dtype=np.float32)
             F_s  = np.asarray(self.sentence_emb.embed_documents(cand_texts), dtype=np.float32)
         else:
+            import numpy as np
             qv_s = np.asarray(self.sentence_emb.encode([q_text])[0], dtype=np.float32)
             F_s  = np.asarray(self.sentence_emb.encode(cand_texts), dtype=np.float32)
 
         qv_s = qv_s / (np.linalg.norm(qv_s) + 1e-12)
         F_s  = F_s / (np.linalg.norm(F_s, axis=1, keepdims=True) + 1e-12)
-        sims_s = F_s @ qv_s
+        sims_s = F_s @ qv_s  
 
-        sims_mix = alpha * sims_w[idx1] + (1 - alpha) * sims_s
+        order_local = np.argsort(-sims_s)
+        chosen_local = order_local[:min(final_topm, order_local.size)]
+        chosen_global = [int(idx1_sorted[i]) for i in chosen_local]
 
-        order_local = np.argsort(-sims_mix)
-        chosen = [int(idx1[i]) for i in order_local[:min(final_topm, len(order_local))]]
-        return [(i, float(sims_mix[order_local[j]])) for j, i in enumerate(chosen)]
+        return [(i, float(sims_s[j])) for j, i in zip(chosen_local, chosen_global)]
+
 
 
     def _flatten_facts(self, meta):
