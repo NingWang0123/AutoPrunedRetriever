@@ -204,7 +204,7 @@ def make_preference_dataset_2head(
     examples: List[PrefExample2] = []
 
     for q in questions:
-        x = featurize_query(cr, q, dims=feature_dim)
+        x = featurize_query(q, dims=feature_dim)
         tried = rng.sample(all_pairs, k=min(per_q_samples, len(all_pairs)))
 
         scored: List[Tuple[Tuple[int,int], float]] = []
