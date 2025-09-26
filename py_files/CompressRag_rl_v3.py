@@ -3215,7 +3215,7 @@ class CompressRag_rl:
         all_f_indices = []   
 
         for q_edges in questions_edges_index:
-            ranked = self._rank_facts_for_query(q_edges, flat_facts, self.meta_codebook, top_m=self.top_m)
+            ranked = self._rank_facts_for_query(q_edges, flat_facts, self.meta_codebook, final_topm=self.top_m)
             for fact_idx, _score in ranked:
                 all_facts.append(flat_facts[fact_idx])
                 all_f_indices.append(facts_map[fact_idx])
