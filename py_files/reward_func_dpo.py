@@ -89,6 +89,33 @@ def reward_sbert(pred: str, gold_answer: str, model=None) -> float:
     return float((emb_pred * emb_gold).sum())
 
 
+def reward_sbert_inclusive(pred: str, gold_answer: str, model=None, threshold: float = 0.85) -> float:
+    """
+    Reward = 1.0 if the gold_answer is semantically included in pred (similarity >= threshold).
+             Otherwise, cosine similarity between SBERT embeddings (0–1).
+
+    pred: system prediction
+    gold_answer: reference answer
+    model: optional pre-loaded SentenceTransformer
+    threshold: similarity cutoff for "full credit"
+    """
+
+    model = model or SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+
+    # Encode both separately
+    emb_pred, emb_gold = model.encode([pred, gold_answer])
+    emb_pred /= (np.linalg.norm(emb_pred) + 1e-9)
+    emb_gold /= (np.linalg.norm(emb_gold) + 1e-9)
+
+    cosine_sim = float((emb_pred * emb_gold).sum())
+
+    # If gold is semantically included in pred, give full credit
+    if cosine_sim >= threshold:
+        return 1.0
+    else:
+        return cosine_sim
+
+
 
 def evaluation_for_correctness(question, gold_answer, rag, policy=None, work_mode="normal", eval_func = reward_sbert):
     if work_mode == "dpo":
