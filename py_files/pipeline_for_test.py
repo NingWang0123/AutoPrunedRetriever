@@ -22,7 +22,7 @@ from dpo_compressrag_v3 import (
 from test_for_compressrag import Phi4MiniReasoningLLM,Word2VecEmbeddings
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings
 from langchain_openai import ChatOpenAI
-from evaluation_func_graphrag import compute_answer_correctness
+# from evaluation_func_graphrag import compute_answer_correctness
 import reward_func_dpo
 
 # ---------------------------------------------------------------------
@@ -32,8 +32,8 @@ REPO_ID      = "GraphRAG-Bench/GraphRAG-Bench"
 CORPUS_FILE  = "Datasets/Corpus/medical.json"
 QUEST_FILE   = "Datasets/Questions/medical_questions.json"
 
-SEED_N       = 20    # first 30 rows → bootstrap + DPO train
-TEST_N       = 15     # next 20 rows  → evaluation
+SEED_N       = 5    # first 30 rows → bootstrap + DPO train
+TEST_N       = 5     # next 20 rows  → evaluation
 TOPK_CTX     = 5
 
 # ---------------------------------------------------------------------
@@ -269,3 +269,4 @@ if __name__ == "__main__":
     compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N, Path("meta_codebook.json") ,"pref_examples_medical.json",reward_func_dpo.reward_sbert,reward_func_mode = 'non_llm',final_csv_path = "results/sbert_result")
 
 
+# python pipeline_for_test.py
