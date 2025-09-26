@@ -14,7 +14,7 @@ from CompressRag_rl_v3 import (
     CompressRag_rl, merging_codebook
 )
 
-from dpo_compressrag_v2 import (    
+from dpo_compressrag_v3 import (    
     make_preference_dataset_2head, train_dpo_2head,make_preference_dataset_2head_using_llm,
     default_reward, answer_with_auto_strategy,save_pref_examples,load_pref_examples,ANSWERS_CHOICES,THINKINGS_CHOICES
 )
