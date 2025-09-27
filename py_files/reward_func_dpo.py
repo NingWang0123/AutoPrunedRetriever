@@ -177,10 +177,24 @@ def evaluation_for_correctness_and_context_for_giving_results(all_generated_dict
     eval_result_context_lst = []
 
 
+    def make_sure_str(result):
+        if isinstance(result, tuple):
+            return result[0]
+        else:
+            return str(result)
+
+
 
     for generated_dict in all_generated_dicts:
-        eval_result_context = eval_func(generated_dict[context],generated_dict[ground_truth_context])
-        eval_result_correctness = eval_func(generated_dict[pred],generated_dict[ground_truth])
+        
+        context_pred_str = make_sure_str(generated_dict[context])
+        ground_truth_context_str = make_sure_str(generated_dict[ground_truth_context])
+        pred_str = make_sure_str(generated_dict[pred])
+        ground_truth_str =make_sure_str(generated_dict[ground_truth])
+
+
+        eval_result_context = eval_func(context_pred_str,ground_truth_context_str)
+        eval_result_correctness = eval_func(pred_str,ground_truth_str)
         eval_result_correctness_lst.append(eval_result_correctness)
         eval_result_context_lst.append(eval_result_context)
 
