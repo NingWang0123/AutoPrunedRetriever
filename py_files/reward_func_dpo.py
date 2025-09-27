@@ -71,7 +71,7 @@ def reward_rougeL(pred: str, gold_answer: str) -> float:
     scorer = rouge_scorer.RougeScorer(["rougeL"], use_stemmer=True)
     return scorer.score(gold_answer, pred)["rougeL"].fmeasure
 
-def reward_bertscore(pred: str, gold_answer: str, model_name: str = "microsoft/deberta-xlarge-mnli") -> float:
+def reward_bertscore(pred: str, gold_answer: str, model_name: str = "microsoft/deberta-base-mnli") -> float:
     """
     Reward = BERTScore F1 (semantic similarity using embeddings)
     """
