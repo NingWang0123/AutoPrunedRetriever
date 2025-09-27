@@ -287,7 +287,7 @@ if __name__ == "__main__":
     top_ms = [5,10,20,50]
     aft_combine_sim_lst = [0.8,0.85,0.9,0.95,1.0]
     i = 0
-    reward_funcs = [reward_func_dpo.reward_sbert_inclusive,reward_func_dpo.reward_sbert,reward_func_dpo.reward_bertscore]
+    reward_funcs = [reward_func_dpo.reward_sbert]
     for top_m in top_ms:
         for aft_combine_sim in aft_combine_sim_lst:
             for reward_func in reward_funcs:
@@ -312,10 +312,4 @@ if __name__ == "__main__":
 
     df_results = pd.DataFrame(df_results)
 
-    df_results.to_csv('results/all_result_info.csv')
-
-
-                    
-
-
-# python pipeline_for_test.py
+    df_results.to_csv('results/all_result_sbert.csv')
