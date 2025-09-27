@@ -183,10 +183,8 @@ def evaluation_for_correctness_and_context_for_giving_results(all_generated_dict
         else:
             return str(result)
 
-
-
     for generated_dict in all_generated_dicts:
-        
+
         context_pred_str = make_sure_str(generated_dict[context])
         ground_truth_context_str = make_sure_str(generated_dict[ground_truth_context])
         pred_str = make_sure_str(generated_dict[pred])
