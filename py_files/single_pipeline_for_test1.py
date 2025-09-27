@@ -25,6 +25,7 @@ from langchain_openai import ChatOpenAI
 # from evaluation_func_graphrag import compute_answer_correctness
 import reward_func_dpo
 from functools import partial
+from sentence_transformers import SentenceTransformer
 
 # ---------------------------------------------------------------------
 # 0) Paths / constants
@@ -33,8 +34,8 @@ REPO_ID      = "GraphRAG-Bench/GraphRAG-Bench"
 CORPUS_FILE  = "Datasets/Corpus/medical.json"
 QUEST_FILE   = "Datasets/Questions/medical_questions.json"
 
-SEED_N       = 50    # first 30 rows → bootstrap + DPO train
-TEST_N       = 950     # next 20 rows  → evaluation
+SEED_N       = 2    # first 30 rows → bootstrap + DPO train
+TEST_N       = 3     # next 20 rows  → evaluation
 TOPK_CTX     = 5
 
 # ---------------------------------------------------------------------
@@ -258,11 +259,13 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
 
 
     print("» Answering evaluation questions …")
-    generated_rows = dump_results(test_questions, out_path= "results/compressrag_medical_data.json", metrics_path ="results/compressrag_medical_metrics.json")
+    # generated_rows = dump_results(test_questions, out_path= "results/compressrag_medical_data.json", metrics_path ="results/compressrag_medical_metrics.json")
+
+    sent_embed_eval = SentenceTransformer("BAAI/bge-base-en")
 
     eval_result_correctness_lst,eval_result_context_lst = reward_func_dpo.evaluation_for_correctness_and_context_for_giving_results(generated_rows,"generated_answer","ground_truth",
                                                                                                                                     "context","evidence",
-                                                                                                                                      eval_func = partial(reward_func,model = sent_emb))
+                                                                                                                                      eval_func = partial(reward_func,model = sent_embed_eval))
     
     df = pd.DataFrame({
     "correctness": eval_result_correctness_lst,
@@ -289,3 +292,5 @@ if __name__ == "__main__":
                             reward_func_mode = 'non_llm',final_csv_path = f"results/{str(reward_func.__name__)}_result_new_embed")
 
     df.to_csv('results/result_sbertinclusive_new_embed.csv')
+
+# python single_pipeline_for_test1.py

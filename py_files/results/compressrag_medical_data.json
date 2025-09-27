@@ -1,74 +1,41 @@
 [
   {
-    "id": "Medical-6b0f8bc4",
-    "question": "Does older age influence the risk of basal cell carcinoma?",
+    "id": "Medical-422500d5",
+    "question": "Which anatomical locations are most commonly affected by basal cell carcinoma?",
     "source": "Medical",
-    "context": "Basal cell skin cancer subclass of skin cancer | Squamous cell carcinoma subclass of mouth cancer, mouth cancer subclass of head and neck cancers",
+    "context": "female reproductive system has part fallopian tube",
     "evidence": [
-      "Older age is associated with a higher risk of BCC."
+      "BCC most commonly develops in sun-exposed areas.",
+      "Common sun-exposed areas for BCC include the face.",
+      "Common sun-exposed areas for BCC include the head.",
+      "Common sun-exposed areas for BCC include the neck."
     ],
     "question_type": "Fact Retrieval",
-    "generated_answer": "Yes, older age is a known risk factor for basal cell carcinoma. As people age, their skin becomes more susceptible to UV damage, and cellular repair mechanisms slow down, increasing the likelihood of malignant transformations. Additionally, prolonged sun exposure over a lifetime contributes to this risk.",
-    "ground_truth": "Older age is associated with higher risk of BCC."
+    "generated_answer": "The most commonly affected anatomical locations by basal cell carcinoma are the female reproductive system and the fallopian tube.",
+    "ground_truth": "BCC most commonly develops in sun-exposed areas such as the face, head, and neck."
   },
   {
-    "id": "Medical-75c9949b",
-    "question": "How does family history impact the risk of basal cell carcinoma?",
+    "id": "Medical-6d2a190d",
+    "question": "What is the primary risk factor for basal cell carcinoma?",
     "source": "Medical",
-    "context": "PSA density facet of Basal cell skin cancer | uterus part of female reproductive system, female reproductive system has part vagina, vagina part of female reproductive system, female reproductive system has part cervix, cervix part of female reproductive system, female reproductive system has part uterus",
+    "context": "Squamous cell carcinoma subclass of mouth cancer",
     "evidence": [
-      "Family history of skin cancer increases the risk of BCC."
+      "UV radiation exposure is a primary risk factor for BCC."
     ],
     "question_type": "Fact Retrieval",
-    "generated_answer": "Family history is a known risk factor for basal cell carcinoma, as it contributes to genetic predispositions that increase susceptibility. Individuals with a family history of the disease may have inherited genetic mutations that elevate their risk, making them more likely to develop the condition. This connection underscores the importance of genetic counseling and screening for those with a familial link.",
-    "ground_truth": "Family history of skin cancer increases risk of BCC."
+    "generated_answer": "Basal cell carcinoma is a type of skin cancer that is primarily caused by exposure to ultraviolet (UV) radiation from the sun. The primary risk factor for basal cell carcinoma is prolonged exposure to UV radiation, which can lead to the development of skin lesions and eventually cancer. Other risk factors include fair skin, a history of sunburns, and a weakened immune system.",
+    "ground_truth": "UV radiation exposure is a primary risk factor for BCC."
   },
   {
-    "id": "Medical-ec091b24",
-    "question": "Is immune suppression a risk factor for BCC?",
+    "id": "Medical-5ad931db",
+    "question": "How does fair skin affect the risk of developing BCC?",
     "source": "Medical",
-    "context": "HPV has effect sexually transmitted infection",
+    "context": "female reproductive system has part fallopian tube",
     "evidence": [
-      "Immune suppression is a risk factor for BCC."
+      "Fair skin increases the risk of BCC."
     ],
     "question_type": "Fact Retrieval",
-    "generated_answer": "Immune suppression is a risk factor for Basal Cell Carcinoma (BCC) because it weakens the immune system's ability to detect and eliminate cancerous cells. This compromised immunity increases susceptibility to skin cancers like BCC. Additionally, immune suppression is often linked to conditions that heighten cancer risk.",
-    "ground_truth": "Immune suppression is a risk factor for BCC."
-  },
-  {
-    "id": "Medical-89de49a4",
-    "question": "What are common symptoms of basal cell carcinoma?",
-    "source": "Medical",
-    "context": "PSA density facet of Basal cell skin cancer | Basal cell skin cancer subclass of Basal cell skin cancer",
-    "evidence": [
-      "BCC presents as flat, pale areas.",
-      "BCC presents as yellow areas.",
-      "BCC presents as red patches.",
-      "BCC presents as shiny bumps.",
-      "BCC presents as open sores.",
-      "BCC presents as brown bumps.",
-      "BCC presents as black bumps.",
-      "BCC presents as bumps with rolled borders."
-    ],
-    "question_type": "Fact Retrieval",
-    "generated_answer": "Basal cell carcinoma commonly presents with skin lesions, often appearing as rough, pearly bumps or scaly patches. These lesions may bleed easily or become ulcerated, and they typically develop on sun-exposed areas of the body.",
-    "ground_truth": "BCC presents as flat, pale or yellow areas, red patches, shiny bumps, open sores, or brown/black bumps with rolled borders."
-  },
-  {
-    "id": "Medical-88c0b2ba",
-    "question": "Which diagnostic methods are used for BCC?",
-    "source": "Medical",
-    "context": "PSA density facet of Basal cell skin cancer | immunotherapy subclass of Systemic therapy",
-    "evidence": [
-      "Diagnosis of BCC involves medical history.",
-      "Diagnosis of BCC involves family history.",
-      "Diagnosis of BCC involves a physical exam.",
-      "Diagnosis of BCC involves a skin exam.",
-      "Diagnosis of BCC involves a biopsy.",
-      "Diagnosis of BCC may involve imaging."
-    ],
-    "question_type": "Fact Retrieval",
-    "generated_answer": "Diagnostic methods are used to identify Basal Cell Skin Cancer (BCC). These methods include clinical evaluation, biopsy, and imaging techniques. PSA density is not directly relevant to BCC diagnosis, as it is more associated with prostate-related conditions.",
-    "ground_truth": "Diagnosis of BCC involves medical and family history, physical exam, skin exam, biopsy, and sometimes imaging."
+    "generated_answer": "Fair skin can increase the risk of developing BCC (basal cell carcinoma) due to its reduced ability to protect against UV radiation, which is a major cause of skin cancer.",
+    "ground_truth": "Fair skin increases the risk of BCC."
   }
 ]
