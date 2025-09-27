@@ -40,7 +40,10 @@ TOPK_CTX     = 5
 # 1) Initialise embeddings & LLM
 # ---------------------------------------------------------------------
 
-def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,ini_meta_json = Path("meta_codebook.json") ,saved_examples_name = "sbert_pref_examples_medical.json",reward_func = None,reward_func_mode = 'non_llm',final_csv_path = "results/sbert_result"):
+def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
+                          top_m,top_k,combine_ent_sim,q_combine_sim,aft_combine_sim,  # all the params can be optimized
+                          ini_meta_json = Path("meta_codebook.json") ,saved_examples_name = "sbert_pref_examples_medical.json",
+                          reward_func = None,reward_func_mode = 'non_llm',final_csv_path = "results/sbert_result"):
     print("» Initialising embeddings & LLM …")
     word_emb = Word2VecEmbeddings(model_name="word2vec-google-news-300")
     sent_emb = HuggingFaceEmbeddings(

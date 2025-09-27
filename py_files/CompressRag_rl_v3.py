@@ -2895,7 +2895,7 @@ class CompressRag_rl:
         answers_choice = 'overlap',
         use_word = False,
         top_m = 5,
-        top_k = 10,
+        top_k = 20,
         combine_ent_sim = 0.9,
         q_combine_sim = 0.9,
         aft_combine_sim = 0.9,
