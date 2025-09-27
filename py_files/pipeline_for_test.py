@@ -282,28 +282,33 @@ if __name__ == "__main__":
                   'aft_combine_sim':[],
                   'i':[],
                   'mean_correctness':[],
-                  'mean_context':[]}
+                  'mean_context':[],
+                  'reward_func':[]}
     top_ms = [5,10,20,50]
     aft_combine_sim_lst = [0.8,0.85,0.9,0.95,1.0]
     i = 0
+    reward_funcs = [reward_func_dpo.reward_sbert_inclusive,reward_func_dpo.reward_sbert,reward_func_dpo.reward_bertscore]
     for top_m in top_ms:
         for aft_combine_sim in aft_combine_sim_lst:
-            df = compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N, 
-                                    top_m,top_m*10,aft_combine_sim,aft_combine_sim,aft_combine_sim,
-                                    Path("meta_codebook.json") ,f"pref_examples_medical_ss{i}.json",reward_func_dpo.reward_sbert_inclusive,
-                                    reward_func_mode = 'non_llm',final_csv_path = f"results/sbert_result_{i}")
-            mean_correctness = np.mean(df["correctness"])
-            mean_context = np.mean(df["context"])
+            for reward_func in reward_funcs:
+                df = compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N, 
+                                        top_m,top_m*10,aft_combine_sim,aft_combine_sim,aft_combine_sim,
+                                        Path("meta_codebook.json") ,f"pref_examples_medical_ss{i}.json",reward_func,
+                                        reward_func_mode = 'non_llm',final_csv_path = f"results/sbert_result_{i}")
+                mean_correctness = np.mean(df["correctness"])
+                mean_context = np.mean(df["context"])
 
-            # recording results
-            df_results["top_m"].append(top_m)
-            df_results["combine_ent_sim"].append(aft_combine_sim)
-            df_results["q_combine_sim"].append(aft_combine_sim)
-            df_results["aft_combine_sim"].append(aft_combine_sim)
-            df_results["i"].append(i)
-            df_results["mean_correctness"].append(mean_correctness)
-            df_results["mean_context"].append(mean_context)
-            i+=1
+                # recording results
+                df_results["top_m"].append(top_m)
+                df_results["combine_ent_sim"].append(aft_combine_sim)
+                df_results["q_combine_sim"].append(aft_combine_sim)
+                df_results["aft_combine_sim"].append(aft_combine_sim)
+                df_results["i"].append(i)
+                df_results["mean_correctness"].append(mean_correctness)
+                df_results["mean_context"].append(mean_context)
+                df_results["reward_func"].append(str(reward_func.__name__))
+
+                i+=1
 
     df_results = pd.DataFrame(df_results)
 
