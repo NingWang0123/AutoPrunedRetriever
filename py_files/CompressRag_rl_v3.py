@@ -2893,7 +2893,12 @@ class CompressRag_rl:
         llm = None,
         thinkings_choice = 'not_include',
         answers_choice = 'overlap',
-        use_word = False
+        use_word = False,
+        top_m = 5,
+        top_k = 10,
+        combine_ent_sim = 0.9,
+        q_combine_sim = 0.9,
+        aft_combine_sim = 0.9,
     ):
         """
         thinkings_choice and answers_choice must be one of 'overlap','unique','not_include'
@@ -2914,8 +2919,8 @@ class CompressRag_rl:
         self.word_emb = word_emb 
 
         #coarse filter params
-        self.top_k = 10
-        self.top_m = 2
+        self.top_k = top_k
+        self.top_m = top_m
         self.question_batch_size = 1
         self.questions_db_batch_size = 1
         self.custom_linearizer = None
@@ -2926,6 +2931,10 @@ class CompressRag_rl:
         self.max_exp_num = 10
         self.k_grid_size = 8
         self.sample_size_prop = 20
+
+        self.combine_ent_sim = combine_ent_sim
+        self.q_combine_sim = q_combine_sim
+        self.aft_combine_sim = aft_combine_sim
 
 
 
@@ -3465,9 +3474,9 @@ class CompressRag_rl:
                     k_grid_size = self.k_grid_size
                     ) 
         elif mode == "knn":
-            self.meta_codebook = combine_ents_ann_knn(self.meta_codebook)
+            self.meta_codebook = combine_ents_ann_knn(self.meta_codebook,sim_threshold = self.combine_ent_sim)
         elif mode == "coarse":
-            self.meta_codebook = coarse_combine(self.meta_codebook)           
+            self.meta_codebook = coarse_combine(self.meta_codebook,sim_threshold = self.combine_ent_sim)           
 
     def load_and_merge_facts(self, facts_json_path, chunk_chars=800, overlap=120):
         if not facts_json_path:
@@ -3575,7 +3584,9 @@ class CompressRag_rl:
             if len(self.meta_codebook['questions_lst'])>=2:
                 new_q, new_a, q_old_to_new, q_clusters, kept = ann_merge_questions_answer_gated(self.meta_codebook,
                                                                                                 self.meta_codebook['questions_lst'],
-                                                                                                self.meta_codebook['answers_lst'])
+                                                                                                self.meta_codebook['answers_lst'],
+                                                                                                q_sim_threshold = self.q_combine_sim,
+                                                                                                a_sim_threshold = self.aft_combine_sim)
                 
                 self.meta_codebook['questions_lst'] = new_q
                 self.meta_codebook['answers_lst'] = new_a
@@ -3583,7 +3594,8 @@ class CompressRag_rl:
         if 'facts_lst' in self.meta_codebook:
             if len(self.meta_codebook['facts_lst'])>=2:
                 new_facts, f_old2new, f_clusters, kept = ann_feat_combine(self.meta_codebook,
-                                                                                                self.meta_codebook['facts_lst'])
+                                                                                                self.meta_codebook['facts_lst'],
+                                                                                                sim_threshold = self.aft_combine_sim)
                 
                 self.meta_codebook['facts_lst'] = new_facts
 
@@ -3591,7 +3603,8 @@ class CompressRag_rl:
         if 'thinkings_lst' in self.meta_codebook:
             if len(self.meta_codebook['thinkings_lst'])>=2:
                 new_thinkings, f_old2new, f_clusters, kept = ann_feat_combine(self.meta_codebook,
-                                                                                                self.meta_codebook['thinkings_lst'])
+                                                                                                self.meta_codebook['thinkings_lst'],
+                                                                                                sim_threshold = self.aft_combine_sim)
                 
                 self.meta_codebook['thinkings_lst'] = new_thinkings
 
@@ -3653,7 +3666,9 @@ class CompressRag_rl:
             if len(self.meta_codebook['questions_lst'])>=2:
                 new_q, new_a, q_old_to_new, q_clusters, kept = ann_merge_questions_answer_gated(self.meta_codebook,
                                                                                                 self.meta_codebook['questions_lst'],
-                                                                                                self.meta_codebook['answers_lst'])
+                                                                                                self.meta_codebook['answers_lst'],
+                                                                                                q_sim_threshold = self.q_combine_sim,
+                                                                                                a_sim_threshold = self.aft_combine_sim)
                 
                 self.meta_codebook['questions_lst'] = new_q
                 self.meta_codebook['answers_lst'] = new_a
@@ -3661,7 +3676,8 @@ class CompressRag_rl:
         if 'facts_lst' in self.meta_codebook:
             if len(self.meta_codebook['facts_lst'])>=2:
                 new_facts, f_old2new, f_clusters, kept = ann_feat_combine(self.meta_codebook,
-                                                                                                self.meta_codebook['facts_lst'])
+                                                                                                self.meta_codebook['facts_lst'],
+                                                                                                sim_threshold = self.aft_combine_sim)
                 
                 self.meta_codebook['facts_lst'] = new_facts
 
@@ -3669,7 +3685,8 @@ class CompressRag_rl:
         if 'thinkings_lst' in self.meta_codebook:
             if len(self.meta_codebook['thinkings_lst'])>=2:
                 new_thinkings, f_old2new, f_clusters, kept = ann_feat_combine(self.meta_codebook,
-                                                                                                self.meta_codebook['thinkings_lst'])
+                                                                                                self.meta_codebook['thinkings_lst'],
+                                                                                                sim_threshold = self.aft_combine_sim)
                 
                 self.meta_codebook['thinkings_lst'] = new_thinkings
 

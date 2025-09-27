@@ -1252,7 +1252,8 @@ def combine_ents_ann_knn(
     codebook_main: Dict[str, Any],
     config: Optional[ClusteringConfig] = None,
     use_thinking: bool = True,
-    use_facts: bool = True
+    use_facts: bool = True,
+    sim_threshold = 0.9
 ) -> Dict[str, Any]:
     """
     Entity clustering using ANN k-NN graph + Union-Find with consistent cosine handling.
@@ -1261,7 +1262,7 @@ def combine_ents_ann_knn(
     if config is None:
         n = len(codebook_main.get('e', []))
         k = min(50, max(5, int(np.sqrt(max(1, n)))))  # Adaptive k
-        config = ClusteringConfig(k_neighbors=k, similarity_threshold=0.8, min_cluster_size=2)
+        config = ClusteringConfig(k_neighbors=k, similarity_threshold=sim_threshold, min_cluster_size=2)
 
     # Get entities/embeddings
     E = list(codebook_main.get('e', []))
@@ -1431,7 +1432,8 @@ def coarse_combine(codebook_main: Dict[str, Any],
                    scoring: str = "silhouette",
                    backend: str = 'auto',
                    config: Optional["ClusteringConfig"] = None,
-                   ram_threshold: float = 70.0  # percentage
+                   ram_threshold: float = 70.0,  # percentage,
+                   sim_threshold: float = 0.9
                    ):
     """
     Combines entities in two stages:
@@ -1450,7 +1452,8 @@ def coarse_combine(codebook_main: Dict[str, Any],
         codebook_main,
         config,
         use_thinking,
-        use_facts
+        use_facts,
+        sim_threshold
     )
 
     # Check RAM usage before doing the aggressive combine
@@ -1478,10 +1481,6 @@ def coarse_combine(codebook_main: Dict[str, Any],
 
     return final_codebook_main
     
-
-
-
-
 
     
 # -----------------------

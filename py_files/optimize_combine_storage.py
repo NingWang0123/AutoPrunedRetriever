@@ -277,7 +277,9 @@ def ann_merge_questions_answer_gated(
     codebook_main: Dict[str, Any],
     questions_lst: List[List[List[int]]],
     answers_lst:   List[List[List[int]]],
-    cfg: Optional[QAnnMergeConfig] = qa_cfg_default,
+    cfg: Optional[QAnnMergeConfig] = None,
+    q_sim_threshold = 0.9,
+    a_sim_threshold = 0.8
 ) -> Tuple[List[List[List[int]]], List[List[List[int]]], List[int], List[List[int]], List[int]]:
     """
     Returns:
@@ -288,7 +290,7 @@ def ann_merge_questions_answer_gated(
     n = len(questions_lst)
     if cfg is None:
         k = min(50, max(5, int(np.sqrt(max(1, n)))))
-        cfg = QAnnMergeConfig(ann=ANNConfig(k_neighbors=k), gate=QMergeGate())
+        cfg = QAnnMergeConfig(ann=ANNConfig(k_neighbors=k), gate=QMergeGate(q_sim_threshold=q_sim_threshold, a_sim_threshold=a_sim_threshold))
 
     # 1) Build question & answer vectors from decoded embeddings
     Q_vecs, A_vecs = [], []
@@ -412,7 +414,8 @@ def _select_rep_density_cos(X_unit: np.ndarray, members: List[int], k: int = 5) 
 def ann_feat_combine(
     codebook_main: Dict[str, Any],
     feat_lst: List[List[List[int]]],
-    cfg: Optional[FactsAnnConfig] = f_cfg_default,
+    cfg: Optional[FactsAnnConfig] = None,
+    sim_threshold = 0.95
 ) -> Tuple[List[List[List[int]]], List[int], List[List[int]], List[int]]:
     """
     Merge near-duplicate fact bundles using ANN over embeddings decoded from edge ids.
@@ -433,7 +436,7 @@ def ann_feat_combine(
 
     if cfg is None:
         k = min(50, max(5, int(np.sqrt(max(1, n)))))
-        cfg = FactsAnnConfig(ann=ANNConfig(k_neighbors=k))
+        cfg = FactsAnnConfig(ann=ANNConfig(k_neighbors=k),sim_threshold=sim_threshold)
 
     # 1) Build vectors for each facts item
     F_vecs = []
