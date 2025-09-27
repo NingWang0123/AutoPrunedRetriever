@@ -90,70 +90,61 @@ class DSU:
 def get_overped_or_unique_edge_lists_sentence_emebed(
     codebook_main: Dict,
     edge_lists: List[List[int]],
-    sent_emb,  # must have .embed_documents(List[str]) -> List[List[float]]
-    sim_threshold: float = 0.8,
-    unique = False,
-) -> Tuple[List[List[int]], Dict[int, List[Tuple[int, int, int]]]]:
-    """
-    Keep exactly one overlapping triple (by longest text) across lists based on sentence-embedding similarity.
-
-    Returns:
-      kept_edge_lists: same shape as edge_lists, but with overlaps collapsed (only the chosen representative kept).
-      groups: {rep_edge_id: [(list_id, local_idx, edge_id), ...]} membership per connected component.
-    """
-
-    # ---- 1) Gather all unique edge ids we need
+    sent_emb,                      # must have .embed_documents(List[str]) -> List[List[float]]
+    sim_threshold: float = 0.9,
+    unique: bool = False,
+) -> List[List[int]]:
+    # ---- 1) Collect unique edge IDs
     uniq_edge_ids = sorted({eid for lst in edge_lists for eid in lst})
     if not uniq_edge_ids:
         return [[] for _ in edge_lists]
 
-    # ---- 2) Build text for each edge id and batch-embed
     e = codebook_main["e"]
     r = codebook_main["r"]
     edge_matrix = codebook_main["edge_matrix"]
 
+    # ---- 2) Build text and batch-embed once
     sentences = []
     lengths = []
     for eid in uniq_edge_ids:
-        eh, ridx, et = edge_matrix[eid]
-        sent = f"{e[eh]} {r[ridx]} {e[et]}".strip()
-        sentences.append(sent)
-        lengths.append(len(sent))
-
-    # sent_emb.embed_documents expects a list[str]
-    embs_list = sent_emb.embed_documents(sentences)  # List[List[float]]
-    embs = torch.tensor(embs_list, dtype=torch.float32)
-
-    # Map edge_id -> (embedding row idx, length)
+        h, ridx, t = edge_matrix[eid]
+        s = f"{e[h]} {r[ridx]} {e[t]}".strip()
+        sentences.append(s)
+        lengths.append(len(s))
+    embs_list = sent_emb.embed_documents(sentences)              # List[List[float]]
+    embs = torch.tensor(embs_list, dtype=torch.float32)          # (N, d)
     row_of_edge = {eid: i for i, eid in enumerate(uniq_edge_ids)}
     len_of_edge = {eid: lengths[i] for i, eid in enumerate(uniq_edge_ids)}
 
-    # ---- 3) Build per-list embedding tensors aligned to edge_lists
+    # ---- 3) Per-list embedding tensors aligned to edge_lists
     per_list_embs: List[torch.Tensor] = []
     for lst in edge_lists:
         if lst:
             rows = [row_of_edge[eid] for eid in lst]
-            per_list_embs.append(embs[rows])         # [len(lst), dim]
+            per_list_embs.append(embs[rows])                     # (len(lst), d)
         else:
             per_list_embs.append(torch.empty((0, embs.shape[1]), dtype=torch.float32))
 
-    # ---- 4) Global indexing over all elements for DSU
+    # ---- 4) Global indexing over list items
     offsets = []
     total = 0
     for lst in edge_lists:
         offsets.append(total)
         total += len(lst)
-
-    def gid(li: int, local_i: int) -> int:
-        # Global id of the li-th list's local index
-        return offsets[li] + local_i
-
     if total == 0:
         return [[] for _ in edge_lists]
 
-    dsu = DSU(total)
+    def gid(li: int, local_i: int) -> int:
+        return offsets[li] + local_i
 
-    # ---- 5) Union overlaps across different lists (a < b)
+    # Reverse map: global -> (list_id, local_idx)
+    rev: List[Tuple[int, int]] = []
+    for li, lst in enumerate(edge_lists):
+        for i_local in range(len(lst)):
+            rev.append((li, i_local))
+
+    # ---- 5) Union overlaps **across different lists only**
+    dsu = DSU(total)
     L = len(edge_lists)
     for a in range(L):
         Ei = per_list_embs[a]
@@ -163,68 +154,57 @@ def get_overped_or_unique_edge_lists_sentence_emebed(
             Ej = per_list_embs[b]
             if Ej.numel() == 0:
                 continue
-            S = _cosine_matrix(Ei, Ej)  # [Na, Nb]
+            S = _cosine_matrix(Ei, Ej)                            # (Na, Nb)
             ai, bj = np.where(S >= sim_threshold)
-            # Merge matched pairs
             for i_local, j_local in zip(ai.tolist(), bj.tolist()):
                 dsu.union(gid(a, i_local), gid(b, j_local))
 
-    # ---- 6) Collect components
+    # ---- 6) Components
     comps: Dict[int, List[int]] = {}
     for g in range(total):
-        root = dsu.find(g)
-        comps.setdefault(root, []).append(g)
+        comps.setdefault(dsu.find(g), []).append(g)
 
-    # Reverse mapping global -> (list_id, local_idx)
-    rev: List[Tuple[int, int]] = []
-    for li, lst in enumerate(edge_lists):
-        for i_local in range(len(lst)):
-            rev.append((li, i_local))
-
-    # ---- 7) Pick representative by longest text; record groups
-    kept_edge_lists: List[List[int]] = [[] for _ in edge_lists]
-    print(kept_edge_lists)
+    # ---- 7) Decide which globals to keep
+    chosen_globals: set = set()
 
     if unique:
-        min_len_m = 1
+        # keep ONLY singletons
+        for members in comps.values():
+            if len(members) == 1:
+                chosen_globals.add(members[0])
     else:
-        min_len_m = 2
+        # keep all singletons; for overlaps keep exactly one global representative (longest text)
+        for members in comps.values():
+            if len(members) == 1:
+                chosen_globals.add(members[0])
+            else:
+                def member_key(gidx: int):
+                    li, i_local = rev[gidx]
+                    eid = edge_lists[li][i_local]
+                    return (len_of_edge[eid], -eid)               # length first; deterministic tie-break
+                best_g = max(members, key=member_key)
+                chosen_globals.add(best_g)
 
-    for _, members in comps.items():
-        # choose best by longest text
-        # compute length for each member
-        if len(members)>=min_len_m:
-            def member_len(gidx: int) -> int:
-                li, i_local = rev[gidx]
-                eid = edge_lists[li][i_local]
-                print(f'edge: {len_of_edge[eid]} {eid}')
-                return len_of_edge[eid]
+    # ---- 8) Rebuild kept lists in original order
+    kept_edge_lists: List[List[int]] = [[] for _ in edge_lists]
+    for li, lst in enumerate(edge_lists):
+        for i_local, eid in enumerate(lst):
+            if gid(li, i_local) in chosen_globals:
+                kept_edge_lists[li].append(eid)
 
-            best_g = max(members, key=member_len)
-            rep_li, rep_i = rev[best_g]
-            rep_eid = edge_lists[rep_li][rep_i]
-
-
-            # Keep only the representative in its original list
-            print(rep_eid)
-            print(members)
-            kept_edge_lists[rep_li].append(rep_eid)
+    # ---- 9) Safety fallback: avoid all-empties if inputs were non-empty
+    if all(len(lst) == 0 for lst in kept_edge_lists) and any(len(lst) > 0 for lst in edge_lists):
+        # Too aggressive threshold or everything clustered → return originals
+        return [list(lst) for lst in edge_lists]
 
     return kept_edge_lists
-
 
 ############# optimized ver
 def _to_vec(x):
     return x if isinstance(x, np.ndarray) else np.asarray(x, dtype=np.float32)
 
-
-
 def _avg_vec_from_decoded(decoded_q, dim: int) -> np.ndarray:
-    """
-    decoded_q: [[e_vec, r_vec, e_vec], ...] where each vec is list[float] or np.ndarray
-    Returns one vector (float32) = mean over all component vectors across all edges.
-    If no vectors found, returns a zero vector of length `dim`.
-    """
+    """decoded_q: [[e_vec, r_vec, e_vec], ...] -> mean vector over all parts."""
     parts = []
     for triple in decoded_q:
         for v in triple:
@@ -237,128 +217,102 @@ def _avg_vec_from_decoded(decoded_q, dim: int) -> np.ndarray:
     return np.mean(np.stack(parts, axis=0), axis=0)
 
 def _cosine_sim_word(A: np.ndarray, B: np.ndarray) -> np.ndarray:
-    """
-    A: (n, d), B: (m, d) -> (n, m) cosine similarity matrix.
-    """
-    A = A.astype(np.float32, copy=False)
-    B = B.astype(np.float32, copy=False)
+    """Cosine sim for (n,d) vs (m,d); robust to 1D by reshaping."""
+    A = np.atleast_2d(A.astype(np.float32, copy=False))
+    B = np.atleast_2d(B.astype(np.float32, copy=False))
     A_norm = A / (np.linalg.norm(A, axis=1, keepdims=True) + 1e-12)
     B_norm = B / (np.linalg.norm(B, axis=1, keepdims=True) + 1e-12)
-    return A_norm @ B_norm.T
+    return A_norm @ B_norm.T  # (n,m)
 
 def get_overped_or_unique_edge_lists_sentence_emebed_optimized(
     codebook_main: Dict,
     edge_lists: List[List[int]],
-    sent_emb,  # must have .embed_documents(List[str]) -> List[List[float]]
-    sim_threshold: float = 0.8,
-    unique = False,
-) -> Tuple[List[List[int]], Dict[int, List[Tuple[int, int, int]]]]:
-    """
-    Keep exactly one overlapping triple (by longest text) across lists based on sentence-embedding similarity.
-
-    Returns:
-      kept_edge_lists: same shape as edge_lists, but with overlaps collapsed (only the chosen representative kept).
-      groups: {rep_edge_id: [(list_id, local_idx, edge_id), ...]} membership per connected component.
-    """
-
-    # ---- 1) Gather all unique edge ids we need
+    sent_emb,                   # must have .embed_documents(List[str]) -> List[List[float]]
+    sim_threshold: float = 0.8, # prefilter threshold on avg-emb; final threshold applies on sentence emb
+    unique: bool = False,
+) -> List[List[int]]:
+    # ---- 0) collect uniq ids
     uniq_edge_ids = sorted({eid for lst in edge_lists for eid in lst})
     if not uniq_edge_ids:
         return [[] for _ in edge_lists]
 
-
-    # instead of using sent_emb only, use word embedding sim first to sort the matrix
-    word_embeds = []
+    e = codebook_main["e"]; r = codebook_main["r"]; edge_matrix = codebook_main["edge_matrix"]
     dim = len(codebook_main["e_embeddings"][0])
 
-    for q_edges in uniq_edge_ids:
-        decoded = decode_question(q_edges, codebook_main, fmt='embeddings')
-        word_embeds.append(_avg_vec_from_decoded(decoded, dim))
+    # ---- 1) cheap prefilter embeddings via decoded triples (vectorized)
+    # build decoded avg vec per edge (use [eid] so decode_question returns a single triple)
+    avg_vecs = []
+    for eid in uniq_edge_ids:
+        decoded = decode_question([eid], codebook_main, fmt='embeddings')
+        avg_vecs.append(_avg_vec_from_decoded(decoded, dim))
+    avg_vecs = np.asarray(avg_vecs, dtype=np.float32)            # (N,d)
+    pre_sim = _cosine_sim_word(avg_vecs, avg_vecs)               # (N,N)
+    np.fill_diagonal(pre_sim, -1.0)                              # ignore self
 
-    # get word embedd matrix
-    word_embedd_len = len(word_embeds)
-    word_sim_matrix = np.zeros((word_embedd_len, word_embedd_len)) 
+    # ---- 2) sentences + sentence embeddings (once!)
+    sentences = []
+    lengths = []
+    for eid in uniq_edge_ids:
+        h, ridx, t = edge_matrix[eid]
+        s = f"{e[h]} {r[ridx]} {e[t]}".strip()
+        sentences.append(s)
+        lengths.append(len(s))
+    sen_embs = np.asarray(sent_emb.embed_documents(sentences), dtype=np.float32)  # (N,d2)
 
-    for i,word_embed_i in enumerate(word_embeds):
-      for j,word_embed_j in enumerate(word_embeds):
+    # normalize for cosine
+    sen_embs /= (np.linalg.norm(sen_embs, axis=1, keepdims=True) + 1e-12)
 
-        if i != j:
-          word_sim =_cosine_sim_word(word_embed_i,word_embed_j)
-          word_sim_matrix[i][j] = word_sim
-        else:
-          word_sim_matrix[i][j] = -1
+    # ---- 3) DSU over edges (not per-list yet): connect if similarity ≥ final threshold.
+    # Use prefilter to avoid all pairs; only check pairs where pre_sim >= sim_threshold.
+    N = len(uniq_edge_ids)
+    dsu = DSU(N)
 
+    # Get candidate pairs above prefilter
+    cand_i, cand_j = np.where(pre_sim >= sim_threshold)
+    # Compute precise cosine for only those pairs
+    for i, j in zip(cand_i.tolist(), cand_j.tolist()):
+        # precise cos (single dot since normalized)
+        cos_ij = float(np.dot(sen_embs[i], sen_embs[j]))
+        if cos_ij >= sim_threshold:
+            dsu.union(i, j)
 
-    # get all possible pairs and sort them from high to low
+    # ---- 4) build components of edge ids
+    comps: Dict[int, List[int]] = {}
+    for i in range(N):
+        comps.setdefault(dsu.find(i), []).append(i)  # store indices into uniq_edge_ids
 
-    e = codebook_main["e"]
-    r = codebook_main["r"]
-    edge_matrix = codebook_main["edge_matrix"]
+    # ---- 5) choose keep set by semantics
+    idx_to_eid = {i: eid for i, eid in enumerate(uniq_edge_ids)}
+    len_of_eid = {idx_to_eid[i]: lengths[i] for i in range(N)}
 
-    # flatten and get sorted indices (descending)
-    flat = word_sim_matrix.ravel()
-    order = np.argsort(-flat)  # indices of elements sorted high → low
-
-    # convert back to row, col indices
-    rows, cols = np.unravel_index(order, word_sim_matrix.shape)
-    edge_sentemb_dict = {}
-    removed_val = []
-    kept_val = []
-
-    # iterate and pruning
-    for rank, (r, c) in enumerate(zip(rows, cols), start=1):
-
-      edge_r = uniq_edge_ids[r]
-
-      edge_c = uniq_edge_ids[c]
-
-      if edge_r in removed_val or edge_c in removed_val:
-        continue
-
-      else:
-        # get edge_r info
-        if edge_r in edge_sentemb_dict:
-          sent_r_emb,len_sent_r = edge_sentemb_dict[edge_r]
-        else:
-          eh_r, ridx_r, et_r = edge_matrix[edge_r]
-          sent_r = f"{e[eh_r]} {r[ridx_r]} {e[et_r]}".strip()
-          len_sent_r = len(sent_r)
-          sent_r_emb = sent_emb.embed_documents([sent_r])
-          edge_sentemb_dict[edge_r] = (sent_r_emb,len_sent_r)
-
-        # get edge_c info
-        if edge_c in edge_sentemb_dict:
-          sent_c_emb,len_sent_c = edge_sentemb_dict[edge_c]
-        else:
-          eh_c, ridx_c, et_c = edge_matrix[edge_c]
-          sent_c = f"{e[eh_c]} {r[ridx_c]} {e[et_c]}".strip()
-          len_sent_c = len(sent_c)
-          sent_c_emb = sent_emb.embed_documents([sent_c])
-          edge_sentemb_dict[edge_c] = (sent_c_emb,len_sent_c)
-
-        S = _cosine_matrix(sent_r_emb, sent_c_emb)
-
-        if S >= sim_threshold:
-          if len_sent_r>= len_sent_c:
-            removed_val.append(edge_c)
-            kept_val.append(edge_r)
-            if edge_c in kept_val:
-              kept_val.remove(edge_c)
-          else:
-            removed_val.append(edge_r)
-            if edge_r in kept_val:
-              kept_val.remove(edge_r)
-
-    kept_edge_lists = edge_lists.copy()
-
+    keep_eids: set = set()
     if unique:
-      for i,edge_list in enumerate(kept_edge_lists):
-        kept_edge_lists[i] = [edge for edge in edge_list if edge not in removed_val]
+        # keep only singletons
+        for members in comps.values():
+            if len(members) == 1:
+                keep_eids.add(idx_to_eid[members[0]])
     else:
-      for i,edge_list in enumerate(kept_edge_lists):
-        kept_edge_lists[i] = [edge for edge in edge_list if edge in kept_val]
+        # keep all singletons; for overlaps keep one longest globally
+        for members in comps.values():
+            if len(members) == 1:
+                keep_eids.add(idx_to_eid[members[0]])
+            else:
+                # pick longest text; deterministic tie-break on eid
+                best = max(members, key=lambda i: (lengths[i], -idx_to_eid[i]))
+                keep_eids.add(idx_to_eid[best])
+
+    # ---- 6) rebuild per-list in original order
+    kept_edge_lists: List[List[int]] = []
+    for lst in edge_lists:
+        if unique:
+            # keep only singletons present in this list
+            kept_edge_lists.append([eid for eid in lst if eid in keep_eids])
+        else:
+            # keep representative if it happens to be in this list, plus all singletons
+            kept_edge_lists.append([eid for eid in lst if eid in keep_eids])
 
     return kept_edge_lists
+
 
 
 

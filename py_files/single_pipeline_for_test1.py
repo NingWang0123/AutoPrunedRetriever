@@ -34,8 +34,8 @@ REPO_ID      = "GraphRAG-Bench/GraphRAG-Bench"
 CORPUS_FILE  = "Datasets/Corpus/medical.json"
 QUEST_FILE   = "Datasets/Questions/medical_questions.json"
 
-SEED_N       = 2    # first 30 rows → bootstrap + DPO train
-TEST_N       = 3     # next 20 rows  → evaluation
+SEED_N       = 5    # first 30 rows → bootstrap + DPO train
+TEST_N       = 5     # next 20 rows  → evaluation
 TOPK_CTX     = 5
 
 # ---------------------------------------------------------------------
@@ -84,7 +84,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
         word_emb          = word_emb,
         llm               = phi_llm,
         thinkings_choice    = 'not_include',
-        answers_choice      = 'overlap',
+        answers_choice      = 'unique',
         top_m = top_m,
         top_k = top_k,
         combine_ent_sim = combine_ent_sim,
@@ -259,7 +259,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
 
 
     print("» Answering evaluation questions …")
-    # generated_rows = dump_results(test_questions, out_path= "results/compressrag_medical_data.json", metrics_path ="results/compressrag_medical_metrics.json")
+    generated_rows = dump_results(test_questions, out_path= "results/compressrag_medical_data.json", metrics_path ="results/compressrag_medical_metrics.json")
 
     sent_embed_eval = SentenceTransformer("BAAI/bge-base-en")
 
@@ -288,8 +288,8 @@ if __name__ == "__main__":
 
     df = compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N, 
                             top_m,top_m*10,aft_combine_sim,aft_combine_sim,aft_combine_sim,
-                            Path("meta_codebook.json") ,f"pref_examples_medical_ss_new_embed.json",reward_func,
-                            reward_func_mode = 'non_llm',final_csv_path = f"results/{str(reward_func.__name__)}_result_new_embed")
+                            Path("meta_codebook.json") ,f"pref_examples_medical_ss_new_embed12345.json",reward_func,
+                            reward_func_mode = 'non_llm',final_csv_path = f"results/{str(reward_func.__name__)}_result_new_embed12345")
 
     df.to_csv('results/result_sbertinclusive_new_embed.csv')
 

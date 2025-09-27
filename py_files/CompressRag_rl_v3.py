@@ -3282,13 +3282,18 @@ class CompressRag_rl:
                 return False
             
             facts_lsts = self._gather_facts_by_indices(all_f_indices, self.meta_codebook)
-            print(f'facts_lsts {facts_lsts}')
+            print(f'original facts_lsts {facts_lsts}')
             facts_lsts_copy = copy.deepcopy(facts_lsts) 
-            
 
-            extracted_facts_lsts = self.answers_extract_function(self.meta_codebook,facts_lsts,self.sentence_emb)
 
-            print(f'extracted_facts_lsts{extracted_facts_lsts}')
+            if self.include_answers:
+                extracted_facts_lsts = self.answers_extract_function(self.meta_codebook,facts_lsts,self.sentence_emb)
+
+            else:
+                extracted_facts_lsts = facts_lsts_copy
+
+
+            print(f'extracted_facts_lsts is {extracted_facts_lsts}')
 
             # if empty takes oriiginal
             if  is_effectively_empty(extracted_facts_lsts):
@@ -3523,6 +3528,8 @@ class CompressRag_rl:
             print("all_answers", all_answers)
             print("all_q_indices", all_q_indices)
             print("all_f_indices", all_f_indices)
+
+            print(f'fact choice is {self.answers_choice}')
             domain_knowledge_lst = self.find_related_knowledge(all_answers, all_q_indices, all_f_indices)
             print("domain_knowledge_lst", domain_knowledge_lst)
             print(f'q_json is {q_json}')
