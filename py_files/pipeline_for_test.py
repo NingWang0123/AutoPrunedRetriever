@@ -33,7 +33,7 @@ CORPUS_FILE  = "Datasets/Corpus/medical.json"
 QUEST_FILE   = "Datasets/Questions/medical_questions.json"
 
 SEED_N       = 5    # first 30 rows → bootstrap + DPO train
-TEST_N       = 5     # next 20 rows  → evaluation
+TEST_N       = 10     # next 20 rows  → evaluation
 TOPK_CTX     = 5
 
 # ---------------------------------------------------------------------
@@ -83,6 +83,11 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
         llm               = phi_llm,
         thinkings_choice    = 'not_include',
         answers_choice      = 'overlap',
+        top_m = top_m,
+        top_k = top_k,
+        combine_ent_sim = combine_ent_sim,
+        q_combine_sim = q_combine_sim,
+        aft_combine_sim = aft_combine_sim,
     )
 
     # ---------------------------------------------------------------------
@@ -267,9 +272,45 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
 
     df.to_csv(final_csv_path)
 
+    return df
+
 
 if __name__ == "__main__":
-    compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N, Path("meta_codebook.json") ,"pref_examples_medical_s2.json",reward_func_dpo.reward_sbert_inclusive,reward_func_mode = 'non_llm',final_csv_path = "results/sbert_result")
+    df_results = {'top_m':[],
+                  'combine_ent_sim':[],
+                  'q_combine_sim':[],
+                  'aft_combine_sim':[],
+                  'i':[],
+                  'mean_correctness':[],
+                  'mean_context':[]}
+    top_ms = [5,10,20,50]
+    aft_combine_sim_lst = [0.8,0.85,0.9,0.95,1.0]
+    i = 0
+    for top_m in top_ms:
+        for aft_combine_sim in aft_combine_sim_lst:
+            df = compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N, 
+                                    top_m,top_m*10,aft_combine_sim,aft_combine_sim,aft_combine_sim,
+                                    Path("meta_codebook.json") ,f"pref_examples_medical_ss{i}.json",reward_func_dpo.reward_sbert_inclusive,
+                                    reward_func_mode = 'non_llm',final_csv_path = f"results/sbert_result_{i}")
+            mean_correctness = np.mean(df["correctness"])
+            mean_context = np.mean(df["context"])
+
+            # recording results
+            df_results["top_m"].append(top_m)
+            df_results["combine_ent_sim"].append(aft_combine_sim)
+            df_results["q_combine_sim"].append(aft_combine_sim)
+            df_results["aft_combine_sim"].append(aft_combine_sim)
+            df_results["i"].append(i)
+            df_results["mean_correctness"].append(mean_correctness)
+            df_results["mean_context"].append(mean_context)
+            i+=1
+
+    df_results = pd.DataFrame(df_results)
+
+    df_results.to_csv('results/all_result_info.csv')
+
+
+                    
 
 
 # python pipeline_for_test.py
