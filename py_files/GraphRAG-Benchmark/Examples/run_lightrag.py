@@ -581,7 +581,10 @@ async def process_corpus(
         context_ret_norm      = _normalize_space(context_ret)
         ground_truth_context  = _normalize_space(ground_truth_context)
 
-        eval_result_correctness = reward_sbert_cached(predicted_answer_norm, gold_answer_norm)
+        if "i don't know" in predicted_answer_norm.lower():
+            eval_result_correctness = 0.0
+        else:
+            eval_result_correctness = reward_sbert_cached(predicted_answer_norm, gold_answer_norm)
         eval_result_context     = reward_sbert_cached(context_ret_norm, ground_truth_context)
 
         record["eval"] = {
