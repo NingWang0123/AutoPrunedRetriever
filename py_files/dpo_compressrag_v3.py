@@ -25,7 +25,7 @@ from sentence_transformers import SentenceTransformer
 THINKINGS_CHOICES = ['not_include']
 # ANSWERS_CHOICES   = ['overlap','not_include']
 ANSWERS_CHOICES   = ['unique','not_include']
-ANSWERS_CHOICES   = ['unique']
+# ANSWERS_CHOICES   = ['unique']
 
 TH2I = {v:i for i,v in enumerate(THINKINGS_CHOICES)}
 AN2I = {v:i for i,v in enumerate(ANSWERS_CHOICES)}

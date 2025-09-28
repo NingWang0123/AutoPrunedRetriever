@@ -3,7 +3,7 @@
     "id": "Medical-422500d5",
     "question": "Which anatomical locations are most commonly affected by basal cell carcinoma?",
     "source": "Medical",
-    "context": "female reproductive system has part fallopian tube",
+    "context": "Squamous cell carcinoma subclass of mouth cancer, sentinel lymph node subclass of lymph node(s), Thyroid nodule part of thyroid gland, bleeding from the anus subclass of Anal cancer, High-dose chemotherapy subclass of chemotherapy, PSA density facet of prostate cancer, immunotherapy subclass of Systemic therapy, vagina part of female reproductive system, female reproductive system has part ovaries, ovaries part of female reproductive system, female reproductive system has part cervix, cervix part of female reproductive system, female reproductive system has part fallopian tube, fallopian tube part of female reproductive system, female reproductive system has part vagina",
     "evidence": [
       "BCC most commonly develops in sun-exposed areas.",
       "Common sun-exposed areas for BCC include the face.",
@@ -11,19 +11,19 @@
       "Common sun-exposed areas for BCC include the neck."
     ],
     "question_type": "Fact Retrieval",
-    "generated_answer": "The most commonly affected anatomical locations by basal cell carcinoma are the female reproductive system and the fallopian tube.",
+    "generated_answer": "Basal cell carcinoma is most commonly found on the head and neck, particularly on the face and ears. It can also occur on the trunk, arms, and legs.",
     "ground_truth": "BCC most commonly develops in sun-exposed areas such as the face, head, and neck."
   },
   {
     "id": "Medical-6d2a190d",
     "question": "What is the primary risk factor for basal cell carcinoma?",
     "source": "Medical",
-    "context": "Squamous cell carcinoma subclass of mouth cancer",
+    "context": "Squamous cell carcinoma subclass of mouth cancer, PSA density facet of prostate cancer, genetic abnormality studied by genetic testing, HPV has effect sexually transmitted infection, Thyroid nodule part of thyroid gland, sentinel lymph node subclass of lymph node(s), cervix part of female reproductive system, female reproductive system has part ovaries, ovaries part of female reproductive system, female reproductive system has part cervix",
     "evidence": [
       "UV radiation exposure is a primary risk factor for BCC."
     ],
     "question_type": "Fact Retrieval",
-    "generated_answer": "Basal cell carcinoma is primarily caused by exposure to ultraviolet (UV) radiation from the sun or tanning beds. This is the most significant risk factor for developing this type of skin cancer.",
+    "generated_answer": "Basal cell carcinoma is primarily associated with sun exposure, which can lead to skin damage and increase the risk of developing this type of cancer.",
     "ground_truth": "UV radiation exposure is a primary risk factor for BCC."
   },
   {
@@ -35,7 +35,7 @@
       "Fair skin increases the risk of BCC."
     ],
     "question_type": "Fact Retrieval",
-    "generated_answer": "Fair skin can increase the risk of developing Basal Cell Carcinoma (BCC) due to its reduced ability to protect against ultraviolet (UV) radiation, which is a major risk factor for BCC.",
+    "generated_answer": "Fair skin can increase the risk of developing Basal Cell Carcinoma (BCC) due to its reduced ability to produce melanin, which acts as a natural sunscreen. This vulnerability to UV radiation from the sun can lead to skin damage and potentially cancerous growths.",
     "ground_truth": "Fair skin increases the risk of BCC."
   }
 ]
