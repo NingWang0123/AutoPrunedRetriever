@@ -82,7 +82,7 @@ def reward_sbert(pred: str, gold_answer: str, model=None) -> float:
     """
     Reward = cosine similarity between SBERT embeddings (0–1)
     """
-    model = model or SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+    model = model or SentenceTransformer("BAAI/bge-base-en")
     emb_pred, emb_gold = model.encode([pred, gold_answer])
     emb_pred /= (np.linalg.norm(emb_pred) + 1e-9)
     emb_gold /= (np.linalg.norm(emb_gold) + 1e-9)
@@ -100,7 +100,7 @@ def reward_sbert_inclusive(pred: str, gold_answer: str, model=None, threshold: f
     threshold: similarity cutoff for "full credit"
     """
 
-    model = model or SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+    model = model or SentenceTransformer("BAAI/bge-base-en")
 
     # Encode both separately
     emb_pred, emb_gold = model.encode([pred, gold_answer])
