@@ -39,7 +39,7 @@ _SbertModel = None
 def get_sbert_model():
     global _SbertModel
     if _SbertModel is None:
-        _SbertModel = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+        _SbertModel = SentenceTransformer("BAAI/bge-base-en")
     return _SbertModel
 
 def reward_sbert_cached(pred: str, gold: str) -> float:
