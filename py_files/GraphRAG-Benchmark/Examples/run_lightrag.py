@@ -22,6 +22,7 @@ from lightrag.utils import EmbeddingFunc
 from lightrag.kg.shared_storage import initialize_pipeline_status
 from tqdm import tqdm
 from lightrag.llm.ollama import ollama_model_complete, ollama_embed
+from typing import List, Tuple
 
 # Apply nest_asyncio for Jupyter environments
 nest_asyncio.apply()
@@ -34,6 +35,67 @@ from collections import Counter
 
 def _normalize_space(s: str) -> str:
     return re.sub(r"\s+", " ", (s or "").strip())
+
+
+def strip_think(s: str) -> Tuple[str, List[str]]:
+        """提取思考并返回干净答案；支持 <think>...</think> 与多段 <|assistant|>。"""
+        if not s:
+            return "", []
+
+        thinks: List[str] = []
+        s_lower = s.lower()
+        spans = []
+        for m in re.finditer(r"<think>(.*?)</think>", s, flags=re.S | re.I):
+            thinks.append(m.group(1).strip())
+            spans.append((m.start(), m.end()))
+
+        last_open = s_lower.rfind("<think>")
+        if last_open != -1 and s_lower.find("</think>", last_open) == -1:
+            content_start = last_open + len("<think>")
+            dangling_text = s[content_start:].strip()
+            if dangling_text:
+                thinks.append(dangling_text)
+            spans.append((last_open, len(s)))
+        if spans:
+            spans.sort()
+            merged = []
+            cur_s, cur_e = spans[0]
+            for st, en in spans[1:]:
+                if st <= cur_e:
+                    cur_e = max(cur_e, en)
+                else:
+                    merged.append((cur_s, cur_e))
+                    cur_s, cur_e = st, en
+            merged.append((cur_s, cur_e))
+        else:
+            merged = []
+
+        parts = []
+        prev = 0
+        for st, en in merged:
+            if prev < st:
+                parts.append(s[prev:st])
+            prev = en
+        if prev < len(s):
+            parts.append(s[prev:])
+        no_think_text = "".join(parts)
+
+        blocks = [blk.strip()
+                for blk in re.split(r"(?i)<\|assistant\|>", no_think_text)
+                if blk and blk.strip()]
+
+        if blocks:
+            if len(blocks) >= 2:
+                thinks.extend(blocks[:-1])
+            clean = blocks[-1].strip()
+        else:
+            clean = no_think_text.strip()
+
+        clean = re.sub(r"(?:^|\n)\s*(Okay,|Let’s|Let's|Step by step|Thought:).*",
+                    "", clean, flags=re.I)
+        clean = re.sub(r"(?i)<\|assistant\|>", "", clean).strip()
+
+        return clean, thinks
 
 _SbertModel = None
 def get_sbert_model():
@@ -495,6 +557,9 @@ async def process_corpus(
             "timestamp_start": t_total_start,
             "timestamp_end": t_total_end,
         }
+
+        predicted_answer = strip_think(predicted_answer)[0]
+
         record = {
             "id": q["id"],
             "question": q["question"],
@@ -506,7 +571,7 @@ async def process_corpus(
             "ground_truth": q.get("answer"),
             "gen_info": gen_info,
         }
-
+        
         gold_answer = q.get("answer", "") or ""
         gt_ctx_raw = q.get("evidence", "")
         ground_truth_context = " ".join([str(x) for x in gt_ctx_raw]) if isinstance(gt_ctx_raw, list) else str(gt_ctx_raw or "")
