@@ -22,7 +22,7 @@ from sentence_transformers import SentenceTransformer
 # ANSWERS_CHOICES   = ['overlap','unique','not_include']
 
 
-THINKINGS_CHOICES = ['not_include','overlap']
+THINKINGS_CHOICES = ['not_include']
 ANSWERS_CHOICES   = ['unique','not_include']
 FACTS_CHOICES = ['unique','include_all'] 
 
@@ -42,6 +42,8 @@ def _hashed_char_ngrams(s: str, dims: int = 384, n: int = 3) -> np.ndarray:
 
 
 _ENCODER = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+# _ENCODER = SentenceTransformer("BAAI/bge-base-en")
+
 
 def featurize_query(q: str, dims: int = 384) -> np.ndarray:
     """
@@ -151,24 +153,48 @@ def default_reward(pred_answer: str, gold_answer: Optional[str]) -> float:
     return base - 0.0005*max(0, toks-256)
 
 # ===============================
-# 4) DPO DATA (2-HEAD: ans/th)
+# 4) DPO DATA (3-HEAD: ans/th/facts)
 # ===============================
 @dataclass
 class PrefExample2:
     x: np.ndarray                 # question features
-    y_pos: Tuple[int,int]         # (ans_idx, th_idx)
-    y_neg: Tuple[int,int]
+    y_pos: Tuple[int,int,int]         # (ans_idx, th_idx, facts_idx)
+    y_neg: Tuple[int,int,int]
 
+# class PrefDataset2(torch.utils.data.Dataset):
+#     def __init__(self, examples: List[PrefExample2]):
+#         assert len(examples) > 0, "Empty preference dataset."
+#         self.examples = examples
+#     def __len__(self): return len(self.examples)
+#     def __getitem__(self, i):
+#         ex = self.examples[i]
+#         return (torch.tensor(ex.x, dtype=torch.float32),
+#                 torch.tensor(ex.y_pos, dtype=torch.long),
+#                 torch.tensor(ex.y_neg, dtype=torch.long))
+    
 class PrefDataset2(torch.utils.data.Dataset):
     def __init__(self, examples: List[PrefExample2]):
         assert len(examples) > 0, "Empty preference dataset."
         self.examples = examples
+
     def __len__(self): return len(self.examples)
+
     def __getitem__(self, i):
         ex = self.examples[i]
-        return (torch.tensor(ex.x, dtype=torch.float32),
-                torch.tensor(ex.y_pos, dtype=torch.long),
-                torch.tensor(ex.y_neg, dtype=torch.long))
+
+        def _ensure_triple(t):
+            t = list(t)
+            if len(t) == 2: t.append(0)   # pad facts index
+            return tuple(t[:3])
+
+        y_pos = _ensure_triple(ex.y_pos)
+        y_neg = _ensure_triple(ex.y_neg)
+
+        return (
+            torch.tensor(ex.x, dtype=torch.float32),
+            torch.tensor(y_pos, dtype=torch.long),  # [3]
+            torch.tensor(y_neg, dtype=torch.long),  # [3]
+        )
     
 def make_preference_dataset_2head(
     cr,
@@ -322,12 +348,23 @@ def _pref2_to_dict(e) -> Dict[str, Any]:
         "y_neg": list(e.y_neg),
     }
 
+# def _pref2_from_dict(d):
+#     # Replace with your real PrefExample2(..) if the signature differs
+#     return PrefExample2(
+#         x=np.array(d["x"], dtype=np.float32),
+#         y_pos=tuple(d["y_pos"]),
+#         y_neg=tuple(d["y_neg"]),
+#     )
+
 def _pref2_from_dict(d):
-    # Replace with your real PrefExample2(..) if the signature differs
+    def _ensure_triple(t):
+        t = list(t)
+        if len(t) == 2: t.append(0)
+        return tuple(t[:3])
     return PrefExample2(
         x=np.array(d["x"], dtype=np.float32),
-        y_pos=tuple(d["y_pos"]),
-        y_neg=tuple(d["y_neg"]),
+        y_pos=_ensure_triple(d["y_pos"]),
+        y_neg=_ensure_triple(d["y_neg"]),
     )
 
 def save_pref_examples(path: str, examples: List["PrefExample2"]) -> None:
@@ -360,14 +397,14 @@ class StrategyPolicy2Head(nn.Module):
 
     def forward(self, x):  # x: [B,D]
         h = self.ff(x)
-        return self.ans(h), self.th(h)
+        return self.ans(h), self.th(h), self.facts(h)
 
 
     def log_prob(self, x, y):  # y: [B,3] longs
-        la, lt = self.forward(x)
+        la, lt, lf = self.forward(x)
         logpa = F.log_softmax(la, dim=-1).gather(-1, y[:,0:1]).squeeze(-1)
         logpt = F.log_softmax(lt, dim=-1).gather(-1, y[:,1:2]).squeeze(-1)
-        logpf = F.log_softmax(lt, dim=-1).gather(-1, y[:,2:3]).squeeze(-1)
+        logpf = F.log_softmax(lf, dim=-1).gather(-1, y[:,2:3]).squeeze(-1)
         return logpa + logpt + logpf
 
     @torch.no_grad()

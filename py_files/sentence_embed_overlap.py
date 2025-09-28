@@ -281,8 +281,8 @@ def get_overped_or_unique_edge_lists_sentence_emebed_optimized(
     edge_lists: List[List[int]],
     sent_emb,                         # must have .embed_documents(List[str]) -> List[List[float]]
     sim_threshold: float = 0.90,      # used for both prefilter and final check
+    unique: bool = False,             # if True, merge survivors into list 0
     mode: str = "global_one",           # "per_list" or "global_one"
-    consolidate: bool = False,        # if True, merge survivors into list 0
 ) -> List[List[int]]:
     """
     Optimized dedup with prefilter + final sentence-embedding similarity.
@@ -293,7 +293,7 @@ def get_overped_or_unique_edge_lists_sentence_emebed_optimized(
     - Selection:
         * mode="per_list": keep ONE best per participating list in each DSU component.
         * mode="global_one": keep ONE best globally per component.
-    - consolidate=True -> consolidate survivors into list 0; else keep in original lists.
+    - unique=True -> unique survivors into list 0; else keep in original lists.
     """
     # ---- 0) unique edge ids
     uniq_edge_ids = sorted({eid for lst in edge_lists for eid in lst})
@@ -386,7 +386,7 @@ def get_overped_or_unique_edge_lists_sentence_emebed_optimized(
         raise ValueError("mode must be 'per_list' or 'global_one'")
 
     # ---- 6) rebuild outputs
-    if consolidate:
+    if unique:
         # Merge survivors into list 0 in first-seen order across lists
         merged: List[int] = []
         seen = set()

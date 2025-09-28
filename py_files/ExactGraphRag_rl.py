@@ -2953,12 +2953,11 @@ class ExactGraphRag_rl:
         self.thinkings_choice = thinkings_choice
         if thinkings_choice == "not_include":
             self.include_thinkings = False
-            self.thinking_extract_function = skip_func
         else:
             self.include_thinkings = True
-            if thinkings_choice == "overlap":
+            if self.thinkings_choice == "overlap":
                 self.thinking_extract_function = partial(get_unique_or_overlap_by_sentence_embedded,sim_threshold=self.semantic_overlap_sim)
-            elif thinkings_choice == "unique":
+            elif self.thinkings_choice == "unique":
                 self.thinking_extract_function = partial(get_unique_or_overlap_by_sentence_embedded,unique=True,sim_threshold=self.semantic_overlap_sim)
 
         self.llm.include_thinkings = self.include_thinkings
@@ -2968,9 +2967,9 @@ class ExactGraphRag_rl:
             self.include_answers = False
         else:
             self.include_answers = True
-            if answers_choice == "overlap":
+            if self.answers_choice == "overlap":
                 self.answers_extract_function =  partial(get_unique_or_overlap_by_sentence_embedded,sim_threshold=self.semantic_overlap_sim)
-            elif answers_choice == "unique":
+            elif self.answers_choice == "unique":
                 self.answers_extract_function = partial(get_unique_or_overlap_by_sentence_embedded,unique=True,sim_threshold=self.semantic_overlap_sim)
 
 
@@ -2980,9 +2979,9 @@ class ExactGraphRag_rl:
             self.include_facts = False
         else:
             self.include_facts = True
-            if facts_choice == "overlap":
+            if self.facts_choice == "overlap":
                 self.facts_extract_function =  partial(get_unique_or_overlap_by_sentence_embedded,sim_threshold=self.semantic_overlap_sim)
-            elif facts_choice == "unique":
+            elif self.facts_choice == "unique":
                 self.facts_extract_function = partial(get_unique_or_overlap_by_sentence_embedded,unique=True,sim_threshold=self.semantic_overlap_sim)
 
         ### context fact param
@@ -2998,9 +2997,9 @@ class ExactGraphRag_rl:
             self.include_thinkings = True
             self.llm.include_thinkings = True
 
-            if thinkings_choice == "overlap":
+            if self.thinkings_choice == "overlap":
                 self.thinking_extract_function =  partial(get_unique_or_overlap_by_sentence_embedded,sim_threshold=self.semantic_overlap_sim)
-            elif thinkings_choice == "unique":
+            elif self.thinkings_choice == "unique":
                 self.thinking_extract_function = partial(get_unique_or_overlap_by_sentence_embedded,unique=True,sim_threshold=self.semantic_overlap_sim)
 
     def set_include_answers(self):
@@ -3009,9 +3008,9 @@ class ExactGraphRag_rl:
 
         else:
             self.include_answers = True
-            if answers_choice == "overlap":
+            if self.answers_choice == "overlap":
                 self.answers_extract_function =  partial(get_unique_or_overlap_by_sentence_embedded,sim_threshold=self.semantic_overlap_sim)
-            elif answers_choice == "unique":
+            elif self.answers_choice == "unique":
                 self.answers_extract_function = partial(get_unique_or_overlap_by_sentence_embedded,unique=True,sim_threshold=self.semantic_overlap_sim)
 
 
@@ -3021,9 +3020,9 @@ class ExactGraphRag_rl:
 
         else:
             self.include_answers = True
-            if facts_choice == "overlap":
+            if self.facts_choice == "overlap":
                 self.facts_extract_function =  partial(get_unique_or_overlap_by_sentence_embedded,sim_threshold=self.semantic_overlap_sim)
-            elif facts_choice == "unique":
+            elif self.facts_choice == "unique":
                 self.facts_extract_function = partial(get_unique_or_overlap_by_sentence_embedded,unique=True,sim_threshold=self.semantic_overlap_sim)
 
 
@@ -3562,7 +3561,10 @@ class ExactGraphRag_rl:
             print("all_q_indices", all_q_indices)
             print("all_f_indices", all_f_indices)
 
-            print(f'fact choice is {self.answers_choice}')
+            print(f'answers choice is {self.answers_choice}')
+            print(f'thinkings_choice choice is {self.thinkings_choice}')
+            print(f'facts choice is {self.facts_choice}')
+
             domain_knowledge_lst = self.find_related_knowledge(all_answers, all_q_indices, all_f_indices)
             print("domain_knowledge_lst", domain_knowledge_lst)
             print(f'q_json is {q_json}')

@@ -1,260 +1,50 @@
 [
   {
-    "id": "Medical-6b0f8bc4",
-    "question": "Does older age influence the risk of basal cell carcinoma?",
+    "id": "Medical-422500d5",
+    "question": "Which anatomical locations are most commonly affected by basal cell carcinoma?",
     "source": "Medical",
-    "context": "Squamous cell carcinoma subclass of mouth cancer, bleeding from the anus subclass of Anal cancer, PSA density facet of prostate cancer, genetic abnormality studied by genetic testing, HPV has effect sexually transmitted infection, immunotherapy subclass of Systemic therapy",
+    "context": "Basal cell skin cancer subclass of skin cancer | Squamous cell carcinoma subclass of mouth cancer, mouth cancer subclass of head and neck cancers | Mouth cancer subclass of head and neck cancers | sentinel lymph node subclass of lymph node(s) | Thyroid nodule part of thyroid gland | bleeding from the anus subclass of Anal cancer | High-dose chemotherapy subclass of chemotherapy | PSA density facet of prostate cancer | immunotherapy subclass of Systemic therapy | vagina part of female reproductive system, female reproductive system has part ovaries, ovaries part of female reproductive system, female reproductive system has part cervix, cervix part of female reproductive system, female reproductive system has part fallopian tube, fallopian tube part of female reproductive system, female reproductive system has part vagina",
     "evidence": [
-      "Older age is associated with a higher risk of BCC."
+      "BCC most commonly develops in sun-exposed areas.",
+      "Common sun-exposed areas for BCC include the face.",
+      "Common sun-exposed areas for BCC include the head.",
+      "Common sun-exposed areas for BCC include the neck."
     ],
     "question_type": "Fact Retrieval",
-    "generated_answer": "<<<RETRIEVED_CONTEXT_START>>> The system searched for a related question in the database. Below are related question's graph triples and its prior answer as reference. You don't have to follow it completely, just use it as a reference. {'e': ['basal cell carcinoma', 'risk', 'Squamous cell carcinoma', 'mouth cancer', 'bleeding from the anus', 'Anal cancer', 'PSA density', 'prostate cancer', 'genetic abnormality', 'genetic testing', 'HPV', 'sexually transmitted infection', 'immunotherapy', 'Systemic therapy'], 'r': ['instance of', 'subclass of', 'facet of', 'studied by', 'has effect'], 'rule': '---Knowledge Base---\\n[JSON format]\\n- e: list of entities (e[i] = entity string)\\n- r: list of relations (r[j] = relation string)\\n- [e,r,e]: triple [head_e_idx, r_idx, tail_e_idx]\\n- questions([[e,r,e], ...]): question triples \\n- given knowledge([[e,r,e], ...]): prior answer triples\\n- start thinking with([[e,r,e], ...]): reasoning steps\\n- facts([[e,r,e], ...]): fact triples\\n', 'edge_matrix': [[0, 0, 1], [2, 1, 3], [4, 1, 5], [6, 2, 7], [8, 3, 9], [10, 4, 11], [12, 1, 13]], 'facts([[e,r,e], ...])': [[[2, 1, 3], [4, 1, 5], [6, 2, 7], [8, 3, 9], [10, 4, 11], [12, 1, 13]]]} <<<RETRIEVED_CONTEXT_END>>> [CURRENT QUESTION]: Does older age influence the risk of basal cell carcinoma?",
-    "ground_truth": "Older age is associated with higher risk of BCC."
+    "generated_answer": "The most commonly affected anatomical locations for basal cell carcinoma are the skin, mouth, and vagina.",
+    "ground_truth": "BCC most commonly develops in sun-exposed areas such as the face, head, and neck.",
+    "answers_choice": "not_include",
+    "thinkings_choice": "not_include",
+    "facts_choice": "include_all"
   },
   {
-    "id": "Medical-75c9949b",
-    "question": "How does family history impact the risk of basal cell carcinoma?",
+    "id": "Medical-6d2a190d",
+    "question": "What is the primary risk factor for basal cell carcinoma?",
     "source": "Medical",
-    "context": "PSA density facet of prostate cancer, female reproductive system has part ovaries",
+    "context": "Basal cell skin cancer subclass of skin cancer | Squamous cell carcinoma subclass of mouth cancer, mouth cancer subclass of head and neck cancers | PSA density facet of prostate cancer | genetic abnormality studied by genetic testing, genetic testing studies genetic abnormality | genetic testing studies genetic abnormality, genetic abnormality studied by genetic testing | sexually transmitted infection has cause HPV, HPV has effect sexually transmitted infection | HPV has effect sexually transmitted infection, sexually transmitted infection has cause HPV | Thyroid nodule part of thyroid gland | sentinel lymph node subclass of lymph node(s) | cervix part of female reproductive system, female reproductive system has part ovaries, ovaries part of female reproductive system, female reproductive system has part cervix",
     "evidence": [
-      "Family history of skin cancer increases the risk of BCC."
+      "UV radiation exposure is a primary risk factor for BCC."
     ],
     "question_type": "Fact Retrieval",
-    "generated_answer": "<<<RETRIEVED_CONTEXT_START>>> The system searched for a related question in the database. Below are related question's graph triples and its prior answer as reference. You don't have to follow it completely, just use it as a reference. {'e': ['Squamous cell carcinoma', 'family history', 'risk', 'PSA density', 'prostate cancer', 'female reproductive system', 'ovaries'], 'r': ['subclass of', 'facet of', 'has part'], 'questions([[e,r,e], ...])': [[[1, 1, 2]]], 'given knowledge([[e,r,e], ...])': [[[0, 0, 0]]], 'rule': '---Knowledge Base---\\n[JSON format]\\n- e: list of entities (e[i] = entity string)\\n- r: list of relations (r[j] = relation string)\\n- [e,r,e]: triple [head_e_idx, r_idx, tail_e_idx]\\n- questions([[e,r,e], ...]): question triples \\n- given knowledge([[e,r,e], ...]): prior answer triples\\n- start thinking with([[e,r,e], ...]): reasoning steps\\n- facts([[e,r,e], ...]): fact triples\\n', 'facts([[e,r,e], ...])': [[[3, 1, 4], [5, 2, 6]]]} <<<RETRIEVED_CONTEXT_END>>> [CURRENT QUESTION]: How does family history impact the risk of basal cell carcinoma?",
-    "ground_truth": "Family history of skin cancer increases risk of BCC."
+    "generated_answer": "The primary risk factor for basal cell carcinoma is sun exposure.",
+    "ground_truth": "UV radiation exposure is a primary risk factor for BCC.",
+    "answers_choice": "not_include",
+    "thinkings_choice": "not_include",
+    "facts_choice": "include_all"
   },
   {
-    "id": "Medical-ec091b24",
-    "question": "Is immune suppression a risk factor for BCC?",
+    "id": "Medical-5ad931db",
+    "question": "How does fair skin affect the risk of developing BCC?",
     "source": "Medical",
-    "context": "HPV has effect sexually transmitted infection, female reproductive system has part fallopian tube",
+    "context": "sexually transmitted infection has cause HPV, HPV has effect sexually transmitted infection | Basal cell skin cancer subclass of skin cancer | HPV has effect sexually transmitted infection, sexually transmitted infection has cause HPV | vagina part of female reproductive system, female reproductive system has part vagina | bleeding from the anus subclass of Anal cancer | liver part of digestive system, digestive system has part liver | digestive system has part liver, liver part of digestive system | vagina part of female reproductive system, female reproductive system has part ovaries, ovaries part of female reproductive system, female reproductive system has part fallopian tube, fallopian tube part of female reproductive system, female reproductive system has part vagina | cervix part of female reproductive system, female reproductive system has part ovaries, ovaries part of female reproductive system, female reproductive system has part vagina, vagina part of female reproductive system, female reproductive system has part fallopian tube, fallopian tube part of female reproductive system, female reproductive system has part cervix | cervix part of female reproductive system, female reproductive system has part vagina, vagina part of female reproductive system, female reproductive system has part ovaries, ovaries part of female reproductive system, female reproductive system has part fallopian tube, fallopian tube part of female reproductive system, female reproductive system has part cervix | sexually transmitted infection has cause HPV, HPV has effect sexually transmitted infection | Basal cell skin cancer subclass of skin cancer | HPV has effect sexually transmitted infection, sexually transmitted infection has cause HPV | bleeding from the anus subclass of Anal cancer | vagina part of female reproductive system, female reproductive system has part vagina | liver part of digestive system, digestive system has part liver | digestive system has part liver, liver part of digestive system | vagina part of female reproductive system, female reproductive system has part ovaries, ovaries part of female reproductive system, female reproductive system has part fallopian tube, fallopian tube part of female reproductive system, female reproductive system has part vagina | vagina part of female reproductive system, female reproductive system has part ovaries, ovaries part of female reproductive system, female reproductive system has part cervix, cervix part of female reproductive system, female reproductive system has part fallopian tube, fallopian tube part of female reproductive system, female reproductive system has part vagina | cervix part of female reproductive system, female reproductive system has part ovaries, ovaries part of female reproductive system, female reproductive system has part vagina, vagina part of female reproductive system, female reproductive system has part fallopian tube, fallopian tube part of female reproductive system, female reproductive system has part cervix",
     "evidence": [
-      "Immune suppression is a risk factor for BCC."
+      "Fair skin increases the risk of BCC."
     ],
     "question_type": "Fact Retrieval",
-    "generated_answer": "<<<RETRIEVED_CONTEXT_START>>> The system searched for a related question in the database. Below are related question's graph triples and its prior answer as reference. You don't have to follow it completely, just use it as a reference. {'e': ['Squamous cell carcinoma', 'immune suppression', 'risk factor', 'HPV', 'sexually transmitted infection', 'female reproductive system', 'fallopian tube'], 'r': ['different from', 'instance of', 'has effect', 'has part'], 'questions([[e,r,e], ...])': [[[1, 1, 2]]], 'given knowledge([[e,r,e], ...])': [[[0, 0, 0]]], 'rule': '---Knowledge Base---\\n[JSON format]\\n- e: list of entities (e[i] = entity string)\\n- r: list of relations (r[j] = relation string)\\n- [e,r,e]: triple [head_e_idx, r_idx, tail_e_idx]\\n- questions([[e,r,e], ...]): question triples \\n- given knowledge([[e,r,e], ...]): prior answer triples\\n- start thinking with([[e,r,e], ...]): reasoning steps\\n- facts([[e,r,e], ...]): fact triples\\n', 'facts([[e,r,e], ...])': [[[3, 2, 4], [5, 3, 6]]]} <<<RETRIEVED_CONTEXT_END>>> [CURRENT QUESTION]: Is immune suppression a risk factor for BCC?",
-    "ground_truth": "Immune suppression is a risk factor for BCC."
-  },
-  {
-    "id": "Medical-89de49a4",
-    "question": "What are common symptoms of basal cell carcinoma?",
-    "source": "Medical",
-    "context": "Squamous cell carcinoma subclass of mouth cancer, PSA density facet of prostate cancer, bleeding from the anus subclass of Anal cancer, Thyroid nodule part of thyroid gland, High-dose chemotherapy subclass of chemotherapy, sentinel lymph node subclass of lymph node(s), immunotherapy subclass of Systemic therapy, liver part of digestive system, digestive system has part liver",
-    "evidence": [
-      "BCC presents as flat, pale areas.",
-      "BCC presents as yellow areas.",
-      "BCC presents as red patches.",
-      "BCC presents as shiny bumps.",
-      "BCC presents as open sores.",
-      "BCC presents as brown bumps.",
-      "BCC presents as black bumps.",
-      "BCC presents as bumps with rolled borders."
-    ],
-    "question_type": "Fact Retrieval",
-    "generated_answer": "Basal cell carcinoma is a type of skin cancer that can cause symptoms such as a small, pinkish bump or a sore that doesn't heal, a reddish patch of skin, or a shiny bump on the skin.",
-    "ground_truth": "BCC presents as flat, pale or yellow areas, red patches, shiny bumps, open sores, or brown/black bumps with rolled borders."
-  },
-  {
-    "id": "Medical-88c0b2ba",
-    "question": "Which diagnostic methods are used for BCC?",
-    "source": "Medical",
-    "context": "PSA density facet of prostate cancer, sentinel lymph node subclass of lymph node(s), immunotherapy subclass of Systemic therapy, basal cell carcinoma subclass of mouth cancer, mouth cancer subclass of head and neck cancers, female reproductive system has part fallopian tube",
-    "evidence": [
-      "Diagnosis of BCC involves medical history.",
-      "Diagnosis of BCC involves family history.",
-      "Diagnosis of BCC involves a physical exam.",
-      "Diagnosis of BCC involves a skin exam.",
-      "Diagnosis of BCC involves a biopsy.",
-      "Diagnosis of BCC may involve imaging."
-    ],
-    "question_type": "Fact Retrieval",
-    "generated_answer": "The diagnostic methods used for BCC (basal cell carcinoma) include skin biopsy, dermatoscopy, and Mohs micrographic surgery.",
-    "ground_truth": "Diagnosis of BCC involves medical and family history, physical exam, skin exam, biopsy, and sometimes imaging."
-  },
-  {
-    "id": "Medical-4aab8ef7",
-    "question": "What is the most common treatment for basal cell carcinoma?",
-    "source": "Medical",
-    "context": "Basal cell skin cancer subclass of skin cancer, immunotherapy subclass of Systemic therapy, PSA density facet of prostate cancer, bleeding from the anus subclass of Anal cancer, Thyroid nodule part of thyroid gland, female reproductive system has part fallopian tube",
-    "evidence": [
-      "Surgery is the most common treatment for BCC."
-    ],
-    "question_type": "Fact Retrieval",
-    "generated_answer": "The most common treatment for basal cell carcinoma is Mohs micrographic surgery. This procedure involves removing the cancerous tissue and examining it under a microscope to ensure all cancer cells are removed.",
-    "ground_truth": "Surgery is the most common treatment for BCC."
-  },
-  {
-    "id": "Medical-ec7d8801",
-    "question": "When might radiation therapy be used in BCC?",
-    "source": "Medical",
-    "context": "female reproductive system has part fallopian tube, Thyroid nodule part of thyroid gland",
-    "evidence": [
-      "Radiation therapy may be used in some cases of basal cell carcinoma."
-    ],
-    "question_type": "Fact Retrieval",
-    "generated_answer": "Radiation therapy may be used in BCC when the cancer is localized and has not spread beyond the skin.",
-    "ground_truth": "Radiation therapy may be used in some cases of BCC."
-  },
-  {
-    "id": "Medical-9797af69",
-    "question": "What is recurrence in the context of BCC?",
-    "source": "Medical",
-    "context": "High-dose chemotherapy subclass of chemotherapy, PSA density facet of prostate cancer, Basal cell skin cancer subclass of skin cancer, bleeding from the anus subclass of Anal cancer, sentinel lymph node subclass of lymph node(s), immunotherapy subclass of Systemic therapy, Thyroid nodule part of thyroid gland, sexually transmitted infection has cause HPV, HPV has effect sexually transmitted infection",
-    "evidence": [
-      "Recurrence refers to basal cell carcinoma returning to the original site.",
-      "Recurrence refers to basal cell carcinoma spreading to lymph nodes.",
-      "Recurrence refers to basal cell carcinoma spreading to distant sites."
-    ],
-    "question_type": "Fact Retrieval",
-    "generated_answer": "<<<RETRIEVED_CONTEXT_START>>> The system searched for a related question in the database. Below are related question's graph triples and its prior answer as reference. You don't have to follow it completely, just use it as a reference. {'e': ['basal cell carcinoma', 'Mohs micrographic surgery', 'removing the cancerous tissue and examining it under a microscope', 'radiation therapy', 'localized', 'recurrence', 'BCC', 'High-dose chemotherapy', 'chemotherapy', 'PSA density', 'prostate cancer', 'Basal cell skin cancer', 'skin cancer', 'bleeding from the anus', 'Anal cancer', 'sentinel lymph node', 'lymph node(s)', 'immunotherapy', 'Systemic therapy', 'Thyroid nodule', 'thyroid gland', 'sexually transmitted infection', 'HPV'], 'r': ['different from', 'subclass of', 'facet of', 'part of', 'has cause', 'has effect'], 'questions([[e,r,e], ...])': [[[5, 2, 6]]], 'given knowledge([[e,r,e], ...])': [[[3, 1, 4], [0, 0, 0], [1, 1, 2]]], 'rule': '---Knowledge Base---\\n[JSON format]\\n- e: list of entities (e[i] = entity string)\\n- r: list of relations (r[j] = relation string)\\n- [e,r,e]: triple [head_e_idx, r_idx, tail_e_idx]\\n- questions([[e,r,e], ...]): question triples \\n- given knowledge([[e,r,e], ...]): prior answer triples\\n- start thinking with([[e,r,e], ...]): reasoning steps\\n- facts([[e,r,e], ...]): fact triples\\n', 'facts([[e,r,e], ...])': [[[7, 1, 8], [9, 2, 10], [11, 1, 12], [13, 1, 14], [15, 1, 16], [17, 1, 18], [19, 3, 20], [21, 4, 22], [22, 5, 21]]]} <<<RETRIEVED_CONTEXT_END>>> [CURRENT QUESTION]: What is recurrence in the context of BCC?",
-    "ground_truth": "Recurrence refers to BCC returning to the original site or spreading to lymph nodes or distant sites."
-  },
-  {
-    "id": "Medical-6884d3fa",
-    "question": "What does follow-up for BCC typically include?",
-    "source": "Medical",
-    "context": "female reproductive system has part fallopian tube",
-    "evidence": [
-      "Follow-up for basal cell carcinoma includes full skin exams with a doctor.",
-      "Follow-up for basal cell carcinoma occurs at least once a year."
-    ],
-    "question_type": "Fact Retrieval",
-    "generated_answer": "Follow-up for basal cell carcinoma typically includes removing the cancerous tissue and examining it under a microscope.",
-    "ground_truth": "Follow-up includes full skin exams with a doctor at least once a year."
-  },
-  {
-    "id": "Medical-fc6d1c33",
-    "question": "Which skin cancer subtype arises from basal cells?",
-    "source": "Medical",
-    "context": "Basal cell skin cancer subclass of skin cancer, sentinel lymph node subclass of lymph node(s), High-dose chemotherapy subclass of chemotherapy, General health test subclass of test, bleeding from the anus subclass of Anal cancer, immunotherapy subclass of Systemic therapy, PSA density facet of prostate cancer, Thyroid nodule part of thyroid gland",
-    "evidence": [
-      "Basal cell carcinoma is the skin cancer subtype that arises from basal cells."
-    ],
-    "question_type": "Fact Retrieval",
-    "generated_answer": "Basal cell carcinoma is the skin cancer subtype that arises from basal cells.",
-    "ground_truth": "Basal cell carcinoma is the skin cancer subtype that arises from basal cells."
-  },
-  {
-    "id": "Medical-97abee55",
-    "question": "What anatomical layer do basal cells belong to?",
-    "source": "Medical",
-    "context": "Basal cell skin cancer subclass of skin cancer, sentinel lymph node subclass of lymph node(s), female reproductive system has part fallopian tube",
-    "evidence": [
-      "Basal cells are located in the lower part of the epidermis."
-    ],
-    "question_type": "Fact Retrieval",
-    "generated_answer": "The anatomical layer that basal cells belong to is the basal layer of the skin.",
-    "ground_truth": "Basal cells are located in the lower part of the epidermis."
-  },
-  {
-    "id": "Medical-ae28e711",
-    "question": "Is sun exposure a risk factor for BCC?",
-    "source": "Medical",
-    "context": "HPV has effect sexually transmitted infection, PSA density facet of prostate cancer, female reproductive system has part fallopian tube",
-    "evidence": [
-      "Sun exposure is a risk factor for BCC."
-    ],
-    "question_type": "Fact Retrieval",
-    "generated_answer": "<<<RETRIEVED_CONTEXT_START>>> The system searched for a related question in the database. Below are related question's graph triples and its prior answer as reference. You don't have to follow it completely, just use it as a reference. {'e': ['basal cell carcinoma', 'Mohs micrographic surgery', 'removing the cancerous tissue and examining it under a microscope', 'radiation therapy', 'localized', 'recurrence', 'cancerous tissue', 'skin', 'basal layer', 'sun exposure', 'risk factor', 'HPV', 'sexually transmitted infection', 'PSA density', 'prostate cancer', 'female reproductive system', 'fallopian tube'], 'r': ['has part', 'part of', 'different from', 'subclass of', 'instance of', 'has effect', 'facet of'], 'questions([[e,r,e], ...])': [[[9, 4, 10]]], 'given knowledge([[e,r,e], ...])': [[[0, 2, 0], [7, 0, 8], [8, 1, 7], [1, 3, 2], [3, 3, 4], [5, 3, 6]]], 'rule': '---Knowledge Base---\\n[JSON format]\\n- e: list of entities (e[i] = entity string)\\n- r: list of relations (r[j] = relation string)\\n- [e,r,e]: triple [head_e_idx, r_idx, tail_e_idx]\\n- questions([[e,r,e], ...]): question triples \\n- given knowledge([[e,r,e], ...]): prior answer triples\\n- start thinking with([[e,r,e], ...]): reasoning steps\\n- facts([[e,r,e], ...]): fact triples\\n', 'facts([[e,r,e], ...])': [[[11, 5, 12], [13, 6, 14], [15, 0, 16]]]} <<<RETRIEVED_CONTEXT_END>>> [CURRENT QUESTION]: Is sun exposure a risk factor for BCC?",
-    "ground_truth": "Sun exposure is a risk factor for BCC."
-  },
-  {
-    "id": "Medical-4cf524cb",
-    "question": "Do tanning beds increase the risk of BCC?",
-    "source": "Medical",
-    "context": "HPV has effect sexually transmitted infection, female reproductive system has part fallopian tube",
-    "evidence": [
-      "Tanning beds are a risk factor for basal cell carcinoma."
-    ],
-    "question_type": "Fact Retrieval",
-    "generated_answer": "<<<RETRIEVED_CONTEXT_START>>> The system searched for a related question in the database. Below are related question's graph triples and its prior answer as reference. You don't have to follow it completely, just use it as a reference. {'e': ['risk factor', 'basal cell carcinoma', 'Mohs micrographic surgery', 'removing the cancerous tissue and examining it under a microscope', 'radiation therapy', 'localized', 'recurrence', 'cancerous tissue', 'skin', 'basal layer', 'solar exposure', 'tanning beds', 'BCC', 'HPV', 'sexually transmitted infection', 'female reproductive system', 'fallopian tube'], 'r': ['has part', 'part of', 'subclass of', 'instance of', 'has effect'], 'questions([[e,r,e], ...])': [[[11, 4, 12]]], 'given knowledge([[e,r,e], ...])': [[[1, 2, 1], [4, 2, 5], [10, 3, 0], [6, 2, 7], [2, 2, 3], [8, 0, 9], [9, 1, 8]]], 'rule': '---Knowledge Base---\\n[JSON format]\\n- e: list of entities (e[i] = entity string)\\n- r: list of relations (r[j] = relation string)\\n- [e,r,e]: triple [head_e_idx, r_idx, tail_e_idx]\\n- questions([[e,r,e], ...]): question triples \\n- given knowledge([[e,r,e], ...]): prior answer triples\\n- start thinking with([[e,r,e], ...]): reasoning steps\\n- facts([[e,r,e], ...]): fact triples\\n', 'facts([[e,r,e], ...])': [[[13, 4, 14], [15, 0, 16]]]} <<<RETRIEVED_CONTEXT_END>>> [CURRENT QUESTION]: Do tanning beds increase the risk of BCC?",
-    "ground_truth": "Tanning beds are a risk factor for BCC."
-  },
-  {
-    "id": "Medical-df1408f4",
-    "question": "What hair and eye colors are associated with increased BCC risk?",
-    "source": "Medical",
-    "context": "female reproductive system has part fallopian tube",
-    "evidence": [
-      "Red hair increases the risk of basal cell carcinoma.",
-      "Blond hair increases the risk of basal cell carcinoma.",
-      "Light eye color increases the risk of basal cell carcinoma."
-    ],
-    "question_type": "Fact Retrieval",
-    "generated_answer": "<<<RETRIEVED_CONTEXT_START>>> The system searched for a related question in the database. Below are related question's graph triples and its prior answer as reference. You don't have to follow it completely, just use it as a reference. {'e': ['risk factor', 'basal cell carcinoma', 'BCC', 'Mohs micrographic surgery', 'removing the cancerous tissue and examining it under a microscope', 'radiation therapy', 'localized', 'skin', 'basal layer', 'solar exposure', 'tanning beds', 'hair', 'eye color', 'female reproductive system', 'fallopian tube'], 'r': ['has part', 'part of', 'subclass of', 'instance of', 'different from', 'medical condition treated', 'drug used for treatment'], 'questions([[e,r,e], ...])': [[[11, 0, 12]]], 'given knowledge([[e,r,e], ...])': [[[7, 0, 8], [8, 1, 7], [10, 5, 2], [2, 6, 10], [9, 3, 0], [1, 4, 1], [5, 2, 6], [3, 2, 4]]], 'rule': '---Knowledge Base---\\n[JSON format]\\n- e: list of entities (e[i] = entity string)\\n- r: list of relations (r[j] = relation string)\\n- [e,r,e]: triple [head_e_idx, r_idx, tail_e_idx]\\n- questions([[e,r,e], ...]): question triples \\n- given knowledge([[e,r,e], ...]): prior answer triples\\n- start thinking with([[e,r,e], ...]): reasoning steps\\n- facts([[e,r,e], ...]): fact triples\\n', 'facts([[e,r,e], ...])': [[[13, 0, 14]]]} <<<RETRIEVED_CONTEXT_END>>> [CURRENT QUESTION]: What hair and eye colors are associated with increased BCC risk?",
-    "ground_truth": "Red hair, blond hair, and light eye color increase the risk of BCC."
-  },
-  {
-    "id": "Medical-0b2a33fc",
-    "question": "Can a history of radiation therapy increase BCC risk?",
-    "source": "Medical",
-    "context": "High-dose chemotherapy subclass of chemotherapy, immunotherapy subclass of Systemic therapy, bleeding from the anus subclass of Anal cancer, PSA density facet of prostate cancer, HPV has effect sexually transmitted infection, Basal cell skin cancer subclass of skin cancer, Panoramic dental x-ray uses radiation",
-    "evidence": [
-      "Radiation therapy is a risk factor for BCC."
-    ],
-    "question_type": "Fact Retrieval",
-    "generated_answer": "<<<RETRIEVED_CONTEXT_START>>> The system searched for a related question in the database. Below are related question's graph triples and its prior answer as reference. You don't have to follow it completely, just use it as a reference. {'e': ['basal cell carcinoma', 'BCC', 'Mohs micrographic surgery', 'removing the cancerous tissue and examining it under a microscope', 'radiation therapy', 'localized', 'recurrence', 'cancerous tissue', 'tanning beds', 'High-dose chemotherapy', 'chemotherapy', 'immunotherapy', 'Systemic therapy', 'bleeding from the anus', 'Anal cancer', 'PSA density', 'prostate cancer', 'HPV', 'sexually transmitted infection', 'Basal cell skin cancer', 'skin cancer', 'Panoramic dental x-ray', 'radiation'], 'r': ['subclass of', 'medical condition treated', 'drug used for treatment', 'has effect', 'facet of', 'uses'], 'questions([[e,r,e], ...])': [[[4, 3, 1]]], 'given knowledge([[e,r,e], ...])': [[[4, 0, 5], [8, 1, 1], [1, 2, 8], [6, 0, 7], [2, 0, 3], [0, 0, 0]]], 'rule': '---Knowledge Base---\\n[JSON format]\\n- e: list of entities (e[i] = entity string)\\n- r: list of relations (r[j] = relation string)\\n- [e,r,e]: triple [head_e_idx, r_idx, tail_e_idx]\\n- questions([[e,r,e], ...]): question triples \\n- given knowledge([[e,r,e], ...]): prior answer triples\\n- start thinking with([[e,r,e], ...]): reasoning steps\\n- facts([[e,r,e], ...]): fact triples\\n', 'facts([[e,r,e], ...])': [[[9, 0, 10], [11, 0, 12], [13, 0, 14], [15, 4, 16], [17, 3, 18], [19, 0, 20], [21, 5, 22]]]} <<<RETRIEVED_CONTEXT_END>>> [CURRENT QUESTION]: Can a history of radiation therapy increase BCC risk?",
-    "ground_truth": "Radiation therapy is a risk factor for BCC."
-  },
-  {
-    "id": "Medical-965ad8a8",
-    "question": "What is a common presentation of BCC on the skin?",
-    "source": "Medical",
-    "context": "General health test subclass of test, sentinel lymph node subclass of lymph node(s), High-dose chemotherapy subclass of chemotherapy, Basal cell skin cancer subclass of skin cancer, vagina part of female reproductive system, female reproductive system has part vagina, genetic abnormality studied by genetic testing, sexually transmitted infection has cause HPV, HPV has effect sexually transmitted infection, bleeding from the anus subclass of Anal cancer",
-    "evidence": [
-      "BCC may present as a shiny bump."
-    ],
-    "question_type": "Fact Retrieval",
-    "generated_answer": "<<<RETRIEVED_CONTEXT_START>>> The system searched for a related question in the database. Below are related question's graph triples and its prior answer as reference. You don't have to follow it completely, just use it as a reference. {'e': ['basal cell carcinoma', 'BCC', 'Mohs micrographic surgery', 'dermatoscopy', 'skin cancer', 'radiation therapy', 'localized', 'cancerous tissue', 'examining it under a microscope', 'skin', 'basal layer', 'tanning beds', 'Repeated_CONTEXT_START>>> Can a history of radiation therapy increase BCC risk?', 'graph triples', 'General health test', 'test', 'sentinel lymph node', 'lymph node(s)', 'High-dose chemotherapy', 'chemotherapy', 'Basal cell skin cancer', 'vagina', 'female reproductive system', 'genetic abnormality', 'genetic testing', 'sexually transmitted infection', 'HPV', 'bleeding from the anus', 'Anal cancer'], 'r': ['has part', 'part of', 'subclass of', 'instance of', 'medical condition treated', 'drug used for treatment', 'different from', 'studied by', 'has cause', 'has effect'], 'questions([[e,r,e], ...])': [[[1, 6, 1]]], 'given knowledge([[e,r,e], ...])': [[[2, 2, 3], [12, 3, 13], [5, 2, 6], [11, 4, 1], [1, 5, 11], [9, 0, 10], [10, 1, 9], [8, 2, 7], [0, 2, 4]]], 'rule': '---Knowledge Base---\\n[JSON format]\\n- e: list of entities (e[i] = entity string)\\n- r: list of relations (r[j] = relation string)\\n- [e,r,e]: triple [head_e_idx, r_idx, tail_e_idx]\\n- questions([[e,r,e], ...]): question triples \\n- given knowledge([[e,r,e], ...]): prior answer triples\\n- start thinking with([[e,r,e], ...]): reasoning steps\\n- facts([[e,r,e], ...]): fact triples\\n', 'facts([[e,r,e], ...])': [[[14, 2, 15], [16, 2, 17], [18, 2, 19], [20, 2, 4], [21, 1, 22], [22, 0, 21], [23, 7, 24], [25, 8, 26], [26, 9, 25], [27, 2, 28]]]} <<<RETRIEVED_CONTEXT_END>>> [CURRENT QUESTION]: What is a common presentation of BCC on the skin?",
-    "ground_truth": "BCC may present as a shiny bump."
-  },
-  {
-    "id": "Medical-5175a85e",
-    "question": "What is the role of biopsy in BCC diagnosis?",
-    "source": "Medical",
-    "context": "genetic abnormality studied by genetic testing, General health test subclass of test, PSA density facet of prostate cancer, Thyroid nodule part of thyroid gland, immunotherapy subclass of Systemic therapy, bleeding from the anus subclass of Anal cancer, sexually transmitted infection has cause HPV, HPV has effect sexually transmitted infection, Basal cell skin cancer subclass of skin cancer, High-dose chemotherapy subclass of chemotherapy",
-    "evidence": [
-      "Biopsy is used as a diagnostic method for BCC."
-    ],
-    "question_type": "Fact Retrieval",
-    "generated_answer": "Biopsy is a procedure used to obtain tissue samples for examination under a microscope to diagnose basal cell carcinoma (BCC). It helps in confirming the presence of cancerous cells and determining the appropriate treatment plan.",
-    "ground_truth": "Biopsy is used as a diagnostic method for BCC."
-  },
-  {
-    "id": "Medical-5f2cb8a5",
-    "question": "Which systemic therapy may be considered for BCC?",
-    "source": "Medical",
-    "context": "immunotherapy subclass of Systemic therapy, High-dose chemotherapy subclass of chemotherapy, genetic abnormality studied by genetic testing, digestive system has part liver, Basal cell skin cancer subclass of skin cancer, bleeding from the anus subclass of Anal cancer, fallopian tube part of female reproductive system, female reproductive system has part fallopian tube",
-    "evidence": [
-      "Systemic therapy may be used in some cases of BCC."
-    ],
-    "question_type": "Fact Retrieval",
-    "generated_answer": "systemic therapy may be considered for BCC.",
-    "ground_truth": "Systemic therapy may be used in some cases of BCC."
-  },
-  {
-    "id": "Medical-0429f83c",
-    "question": "What is included in the management of BCC recurrence?",
-    "source": "Medical",
-    "context": "High-dose chemotherapy subclass of chemotherapy, immunotherapy subclass of Systemic therapy, PSA density facet of prostate cancer, bleeding from the anus subclass of Anal cancer, Basal cell skin cancer subclass of skin cancer, sentinel lymph node subclass of lymph node(s), Thyroid nodule part of thyroid gland, sexually transmitted infection has cause HPV, HPV has effect sexually transmitted infection",
-    "evidence": [
-      "Management of BCC recurrence involves treatment options.",
-      "Treatment options for BCC recurrence are based on risk and recurrence."
-    ],
-    "question_type": "Fact Retrieval",
-    "generated_answer": "<<<RETRIEVED_CONTEXT_START>>> The system searched for a related question in the database. Below are related question's graph triples and its prior answer as reference. You don't have to follow it completely, just use it as a reference. {'e': ['biopsy', 'Anal cancer', 'vagina', 'basal cell carcinoma', 'BCC', 'Mohs micrographic surgery', 'removing the cancerous tissue and examining it under a microscope', 'radiation therapy', 'localized', 'recurrence', 'cancerous tissue', 'graph triples', 'Repeated_CONTEXT_START>>> Can a history of radiation therapy increase BCC risk?', 'Systemic therapy', 'management of BCC recurrence', 'High-dose chemotherapy', 'chemotherapy', 'immunotherapy', 'PSA density', 'prostate cancer', 'bleeding from the anus', 'Basal cell skin cancer', 'skin cancer', 'sentinel lymph node', 'lymph node(s)', 'Thyroid nodule', 'thyroid gland', 'sexually transmitted infection', 'HPV'], 'r': ['has part', 'instance of', 'subclass of', 'medical condition treated', 'facet of', 'part of', 'has cause', 'has effect'], 'questions([[e,r,e], ...])': [[[14, 4, 4]]], 'given knowledge([[e,r,e], ...])': [[[9, 2, 10], [12, 1, 11], [4, 0, 13], [7, 2, 8], [1, 2, 2], [5, 2, 6], [0, 3, 3]]], 'rule': '---Knowledge Base---\\n[JSON format]\\n- e: list of entities (e[i] = entity string)\\n- r: list of relations (r[j] = relation string)\\n- [e,r,e]: triple [head_e_idx, r_idx, tail_e_idx]\\n- questions([[e,r,e], ...]): question triples \\n- given knowledge([[e,r,e], ...]): prior answer triples\\n- start thinking with([[e,r,e], ...]): reasoning steps\\n- facts([[e,r,e], ...]): fact triples\\n', 'facts([[e,r,e], ...])': [[[15, 2, 16], [17, 2, 13], [18, 4, 19], [20, 2, 1], [21, 2, 22], [23, 2, 24], [25, 5, 26], [27, 6, 28], [28, 7, 27]]]} <<<RETRIEVED_CONTEXT_END>>> [CURRENT QUESTION]: What is included in the management of BCC recurrence?",
-    "ground_truth": "Management of recurrence involves treatment options based on risk and recurrence."
-  },
-  {
-    "id": "Medical-152bec6a",
-    "question": "What is the recommended frequency for full skin exams in BCC follow-up?",
-    "source": "Medical",
-    "context": "General health test subclass of test, Basal cell skin cancer subclass of skin cancer, sentinel lymph node subclass of lymph node(s), genetic abnormality studied by genetic testing, immunotherapy subclass of Systemic therapy, High-dose chemotherapy subclass of chemotherapy, bleeding from the anus subclass of Anal cancer",
-    "evidence": [
-      "Full skin exams with a doctor are recommended at least once a year."
-    ],
-    "question_type": "Fact Retrieval",
-    "generated_answer": "<<<RETRIEVED_CONTEXT_START>>> The system searched for a related question in the database. Below are related question's graph triples and its prior answer as reference. You don't have to follow it completely, just use it as a reference. {'e': ['biopsy', 'radiotherapy', 'basal cell carcinoma', 'BCC', 'Mohs micrographic surgery', 'removing the cancerous tissue and examining it under a microscope', 'radiation therapy', 'recurrence', 'cancerous tissue', 'skin', 'basal layer', 'tanning beds', 'full skin exams', 'follow-up', 'General health test', 'test', 'Basal cell skin cancer', 'skin cancer', 'sentinel lymph node', 'lymph node(s)', 'genetic abnormality', 'genetic testing', 'immunotherapy', 'Systemic therapy', 'High-dose chemotherapy', 'chemotherapy', 'bleeding from the anus', 'Anal cancer'], 'r': ['has part', 'part of', 'subclass of', 'studied by', 'studies', 'medical condition treated', 'drug used for treatment'], 'questions([[e,r,e], ...])': [[[12, 2, 13]]], 'given knowledge([[e,r,e], ...])': [[[0, 5, 2], [9, 0, 10], [10, 1, 9], [2, 2, 2], [8, 3, 6], [6, 4, 8], [8, 3, 1], [1, 4, 8], [7, 2, 8], [4, 2, 5], [11, 5, 3], [3, 6, 11]]], 'rule': '---Knowledge Base---\\n[JSON format]\\n- e: list of entities (e[i] = entity string)\\n- r: list of relations (r[j] = relation string)\\n- [e,r,e]: triple [head_e_idx, r_idx, tail_e_idx]\\n- questions([[e,r,e], ...]): question triples \\n- given knowledge([[e,r,e], ...]): prior answer triples\\n- start thinking with([[e,r,e], ...]): reasoning steps\\n- facts([[e,r,e], ...]): fact triples\\n', 'facts([[e,r,e], ...])': [[[14, 2, 15], [16, 2, 17], [18, 2, 19], [20, 3, 21], [22, 2, 23], [24, 2, 25], [26, 2, 27]]]} <<<RETRIEVED_CONTEXT_END>>> [CURRENT QUESTION]: What is the recommended frequency for full skin exams in BCC follow-up?",
-    "ground_truth": "Full skin exams with a doctor are recommended at least once a year."
+    "generated_answer": "<<<RETRIEVED_CONTEXT_START>>> The system searched for a related question in the database. Below are related question's graph triples and its prior answer as reference. You don't have to follow it completely, just use it as a reference. {'e': ['Squamous cell carcinoma', 'vagina', 'skin', 'anatomical locations', 'mouth', 'sun exposure', 'BCC', 'fair skin', 'sexually transmitted infection', 'HPV', 'Basal cell skin cancer', 'skin cancer', 'female reproductive system', 'bleeding from the anus', 'Anal cancer', 'liver', 'digestive system', 'ovaries', 'fallopian tube', 'cervix'], 'r': ['has cause', 'instance of', 'has effect', 'subclass of', 'part of', 'has part'], 'questions([[e,r,e], ...])': [[[7, 2, 6], [0, 0, 5]], [[0, 0, 5], [7, 2, 6]]], 'given knowledge([[e,r,e], ...])': [[[0, 0, 5], [2, 1, 3], [1, 1, 3], [4, 1, 3]]], 'rule': '---Knowledge Base---\\n[JSON format]\\n- e: list of entities (e[i] = entity string)\\n- r: list of relations (r[j] = relation string)\\n- [e,r,e]: triple [head_e_idx, r_idx, tail_e_idx]\\n- questions([[e,r,e], ...]): question triples \\n- given knowledge([[e,r,e], ...]): prior answer triples\\n- start thinking with([[e,r,e], ...]): reasoning steps\\n- facts([[e,r,e], ...]): fact triples\\n', 'facts([[e,r,e], ...])': [[[8, 0, 9], [9, 2, 8]], [[10, 3, 11]], [[9, 2, 8], [8, 0, 9]], [[1, 4, 12], [12, 5, 1]], [[13, 3, 14]], [[15, 4, 16], [16, 5, 15]], [[16, 5, 15], [15, 4, 16]], [[1, 4, 12], [12, 5, 17], [17, 4, 12], [12, 5, 18], [18, 4, 12], [12, 5, 1]], [[19, 4, 12], [12, 5, 17], [17, 4, 12], [12, 5, 1], [1, 4, 12], [12, 5, 18], [18, 4, 12], [12, 5, 19]], [[19, 4, 12], [12, 5, 17], [17, 4, 12], [12, 5, 19], [19, 4, 12], [12, 5, 18], [18, 4, 12], [12, 5, 1]], [[8, 0, 9], [9, 2, 8]], [[10, 3, 11]], [[9, 2, 8], [8, 0, 9]], [[13, 3, 14]], [[1, 4, 12], [12, 5, 1]], [[15, 4, 16], [16, 5, 15]], [[16, 5, 15], [15, 4, 16]], [[1, 4, 12], [12, 5, 17], [17, 4, 12], [12, 5, 18], [18, 4, 12], [12, 5, 1]], [[1, 4, 12], [12, 5, 17], [17, 4, 12], [12, 5, 19], [19, 4, 12], [12, 5, 18], [18, 4, 12], [12, 5, 1]], [[19, 4, 12], [12, 5, 17], [17, 4, 12], [12, 5, 1], [1, 4, 12], [12, 5, 18], [18, 4, 12], [12, 5, 19]]]} <<<RETRIEVED_CONTEXT_END>>> [CURRENT QUESTION]: How does fair skin affect the risk of developing BCC?",
+    "ground_truth": "Fair skin increases the risk of BCC.",
+    "answers_choice": "not_include",
+    "thinkings_choice": "not_include",
+    "facts_choice": "include_all"
   }
 ]

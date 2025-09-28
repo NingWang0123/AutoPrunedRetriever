@@ -303,8 +303,8 @@ if __name__ == "__main__":
 
     reward_func = reward_func_dpo.reward_sbert_inclusive
 
-    SEED_N       = 5    # change to 20 for training
-    TEST_N       = 20     # change to 980 for rest
+    SEED_N       = 20    # change to 20 for training
+    TEST_N       = 980     # change to 980 for rest
 
     
 
@@ -312,8 +312,8 @@ if __name__ == "__main__":
 
     df = compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N, 
                             top_m,top_m*10,aft_combine_sim,aft_combine_sim,aft_combine_sim,aft_combine_sim,
-                            Path("meta_codebook.json") ,f"pref_examples_medical_exact_graph_rag_v1.json",reward_func,
-                            reward_func_mode = 'non_llm',final_csv_path = f"results/{str(reward_func.__name__)}_result_for_exact_graph_rag_v1")
+                            Path("meta_codebook.json") ,f"pref_examples_medical_exact_graph_rag_v5.json",reward_func,
+                            reward_func_mode = 'non_llm',final_csv_path = f"results/{str(reward_func.__name__)}_result_for_exact_graph_rag_v5")
 
     df.to_csv('results/result_sbertinclusive_new_embed_for_exactgraphrag.csv')
 
