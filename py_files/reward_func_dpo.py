@@ -109,11 +109,7 @@ def reward_sbert_inclusive(pred: str, gold_answer: str, model=None, threshold: f
 
     cosine_sim = float((emb_pred * emb_gold).sum())
 
-    # If gold is semantically included in pred, give full credit
-    if cosine_sim >= threshold:
-        return 1.0
-    else:
-        return cosine_sim
+    return cosine_sim
 
 
 
