@@ -42,7 +42,7 @@ def _hashed_char_ngrams(s: str, dims: int = 384, n: int = 3) -> np.ndarray:
 
 
 _ENCODER = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
-# _ENCODER = SentenceTransformer("BAAI/bge-base-en")
+_ENCODER = SentenceTransformer("BAAI/bge-base-en")
 
 
 def featurize_query(q: str, dims: int = 384) -> np.ndarray:
