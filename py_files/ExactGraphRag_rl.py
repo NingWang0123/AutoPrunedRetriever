@@ -2957,9 +2957,9 @@ class CompressRag_rl:
         else:
             self.include_thinkings = True
             if thinkings_choice == "overlap":
-                self.thinking_extract_function = get_unique_or_overlap_by_sentence_embedded
+                self.thinking_extract_function = partial(get_unique_or_overlap_by_sentence_embedded,sim_threshold=self.semantic_overlap_sim)
             elif thinkings_choice == "unique":
-                self.thinking_extract_function = partial(get_unique_or_overlap_by_sentence_embedded,unique=True)
+                self.thinking_extract_function = partial(get_unique_or_overlap_by_sentence_embedded,unique=True,sim_threshold=self.semantic_overlap_sim)
 
         self.llm.include_thinkings = self.include_thinkings
         ### answers param
@@ -2969,9 +2969,9 @@ class CompressRag_rl:
         else:
             self.include_answers = True
             if answers_choice == "overlap":
-                self.answers_extract_function = get_unique_or_overlap_by_sentence_embedded
+                self.answers_extract_function =  partial(get_unique_or_overlap_by_sentence_embedded,sim_threshold=self.semantic_overlap_sim)
             elif answers_choice == "unique":
-                self.answers_extract_function = partial(get_unique_or_overlap_by_sentence_embedded,unique=True)
+                self.answers_extract_function = partial(get_unique_or_overlap_by_sentence_embedded,unique=True,sim_threshold=self.semantic_overlap_sim)
 
 
         # facts params
@@ -2981,9 +2981,9 @@ class CompressRag_rl:
         else:
             self.include_facts = True
             if facts_choice == "overlap":
-                self.facts_extract_function = get_unique_or_overlap_by_sentence_embedded
+                self.facts_extract_function =  partial(get_unique_or_overlap_by_sentence_embedded,sim_threshold=self.semantic_overlap_sim)
             elif facts_choice == "unique":
-                self.facts_extract_function = partial(get_unique_or_overlap_by_sentence_embedded,unique=True)
+                self.facts_extract_function = partial(get_unique_or_overlap_by_sentence_embedded,unique=True,sim_threshold=self.semantic_overlap_sim)
 
         ### context fact param
         self.context_json_path = None  
@@ -2999,9 +2999,9 @@ class CompressRag_rl:
             self.llm.include_thinkings = True
 
             if thinkings_choice == "overlap":
-                self.thinking_extract_function = get_unique_or_overlap_by_sentence_embedded
+                self.thinking_extract_function =  partial(get_unique_or_overlap_by_sentence_embedded,sim_threshold=self.semantic_overlap_sim)
             elif thinkings_choice == "unique":
-                self.thinking_extract_function = partial(get_unique_or_overlap_by_sentence_embedded,unique=True)
+                self.thinking_extract_function = partial(get_unique_or_overlap_by_sentence_embedded,unique=True,sim_threshold=self.semantic_overlap_sim)
 
     def set_include_answers(self):
         if self.answers_choice == "not_include":
@@ -3010,9 +3010,9 @@ class CompressRag_rl:
         else:
             self.include_answers = True
             if answers_choice == "overlap":
-                self.answers_extract_function = get_unique_or_overlap_by_sentence_embedded
+                self.answers_extract_function =  partial(get_unique_or_overlap_by_sentence_embedded,sim_threshold=self.semantic_overlap_sim)
             elif answers_choice == "unique":
-                self.answers_extract_function = partial(get_unique_or_overlap_by_sentence_embedded,unique=True)
+                self.answers_extract_function = partial(get_unique_or_overlap_by_sentence_embedded,unique=True,sim_threshold=self.semantic_overlap_sim)
 
 
     def set_include_facts(self):
@@ -3022,9 +3022,9 @@ class CompressRag_rl:
         else:
             self.include_answers = True
             if facts_choice == "overlap":
-                self.facts_extract_function = get_unique_or_overlap_by_sentence_embedded
+                self.facts_extract_function =  partial(get_unique_or_overlap_by_sentence_embedded,sim_threshold=self.semantic_overlap_sim)
             elif facts_choice == "unique":
-                self.facts_extract_function = partial(get_unique_or_overlap_by_sentence_embedded,unique=True)
+                self.facts_extract_function = partial(get_unique_or_overlap_by_sentence_embedded,unique=True,sim_threshold=self.semantic_overlap_sim)
 
 
     def set_includings(self):
@@ -3323,7 +3323,7 @@ class CompressRag_rl:
                     extracted_facts_lsts = facts_lsts_copy
 
                 else:
-                    extracted_facts_lsts = self.answers_extract_function(self.meta_codebook,facts_lsts,self.sentence_emb)
+                    extracted_facts_lsts = self.facts_extract_function(self.meta_codebook,facts_lsts,self.sentence_emb)
 
 
                 print(f'extracted_facts_lsts is {extracted_facts_lsts}')
