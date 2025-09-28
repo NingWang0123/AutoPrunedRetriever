@@ -189,7 +189,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
                     THINKINGS_CHOICES=THINKINGS_CHOICES,
                     FACTS_CHOICES = FACTS_CHOICES,
                     isolate_state = True,
-                    feature_dim = 384
+                    feature_dim = 768
                 )
                 print(f"   generated {len(pref_ds)} preference examples")
                 save_pref_examples(saved_examples_name, pref_ds)
@@ -204,7 +204,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
                     questions= seed_questions,
                     gold_answers=gold_lookup,
                     per_q_samples = 6,
-                    feature_dim = 384,
+                    feature_dim = 768,
                     reward_fn = reward_func,
                     seed = 0,
                     isolate_state = True,
@@ -216,7 +216,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
             
 
 
-    policy, _ = train_dpo_2head(pref_ds, input_dim=384)
+    policy, _ = train_dpo_2head(pref_ds, input_dim=768)
 
     def dump_results(
         questions: List[str],
@@ -312,8 +312,8 @@ if __name__ == "__main__":
 
     df = compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N, 
                             top_m,top_m*10,aft_combine_sim,aft_combine_sim,aft_combine_sim,aft_combine_sim,
-                            Path("meta_codebook.json") ,f"pref_examples_medical_exact_graph_rag_v5.json",reward_func,
-                            reward_func_mode = 'non_llm',final_csv_path = f"results/{str(reward_func.__name__)}_result_for_exact_graph_rag_v5")
+                            Path("meta_codebook.json") ,f"pref_examples_medical_exact_graph_rag_v6.json",reward_func,
+                            reward_func_mode = 'non_llm',final_csv_path = f"results/{str(reward_func.__name__)}_result_for_exact_graph_rag_v6")
 
     df.to_csv('results/result_sbertinclusive_new_embed_for_exactgraphrag.csv')
 
