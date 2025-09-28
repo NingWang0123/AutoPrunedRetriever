@@ -2885,7 +2885,7 @@ combine_ents_choice = [0,1,2]
 def skip_func(a,b):
     return None
 
-class CompressRag_rl:
+class ExactGraphRag_rl:
     def __init__(
         self,
         ini_meta_codebook = {},
