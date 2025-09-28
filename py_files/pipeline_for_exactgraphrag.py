@@ -189,7 +189,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
                     THINKINGS_CHOICES=THINKINGS_CHOICES,
                     FACTS_CHOICES = FACTS_CHOICES,
                     isolate_state = True,
-                    feature_dim = 768
+                    feature_dim = 384
                 )
                 print(f"   generated {len(pref_ds)} preference examples")
                 save_pref_examples(saved_examples_name, pref_ds)
@@ -204,7 +204,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
                     questions= seed_questions,
                     gold_answers=gold_lookup,
                     per_q_samples = 6,
-                    feature_dim = 768,
+                    feature_dim = 384,
                     reward_fn = reward_func,
                     seed = 0,
                     isolate_state = True,
@@ -216,7 +216,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
             
 
 
-    policy, _ = train_dpo_2head(pref_ds, input_dim=768)
+    policy, _ = train_dpo_2head(pref_ds, input_dim=384)
 
     def dump_results(
         questions: List[str],
@@ -277,9 +277,12 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
 
     sent_embed_eval = SentenceTransformer("BAAI/bge-base-en")
 
-    eval_result_correctness_lst,eval_result_context_lst = reward_func_dpo.evaluation_for_correctness_and_context_for_giving_results(generated_rows,"generated_answer","ground_truth",
-                                                                                                                                    "context","evidence",
-                                                                                                                                      eval_func = partial(reward_func,model = sent_embed_eval))
+    eval_result_correctness_lst,eval_result_context_lst = reward_func_dpo.evaluation_for_correctness_and_context_for_giving_results(generated_rows,"generated_answer","ground_truth",                                                                                                                     "context","evidence",
+                                                                                                                             eval_func = partial(reward_func,model = sent_embed_eval))
+    for idx, row in enumerate(generated_rows):
+        ans = str(row.get("generated_answer", "")).lower()
+        if "no answer" in ans:
+            eval_result_correctness_lst[idx] = 0.0
     
     df = pd.DataFrame({
     "correctness": eval_result_correctness_lst,
@@ -312,8 +315,8 @@ if __name__ == "__main__":
 
     df = compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N, 
                             top_m,top_m*10,aft_combine_sim,aft_combine_sim,aft_combine_sim,aft_combine_sim,
-                            Path("meta_codebook.json") ,f"pref_examples_medical_exact_graph_rag_v6.json",reward_func,
-                            reward_func_mode = 'non_llm',final_csv_path = f"results/{str(reward_func.__name__)}_result_for_exact_graph_rag_v6")
+                            Path("meta_codebook.json") ,f"pref_examples_medical_exact_graph_rag_v5.json",reward_func,
+                            reward_func_mode = 'non_llm',final_csv_path = f"results/{str(reward_func.__name__)}_result_for_exact_graph_rag_v5")
 
     df.to_csv('results/result_sbertinclusive_new_embed_for_exactgraphrag.csv')
 
