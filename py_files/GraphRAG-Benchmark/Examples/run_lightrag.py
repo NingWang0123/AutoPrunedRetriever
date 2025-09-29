@@ -32,6 +32,156 @@ from sentence_transformers import SentenceTransformer
 import numpy as np
 import re
 from collections import Counter
+from time import perf_counter
+from lightrag.kg import nano_vector_db_impl as nvdb
+
+# ===== 更稳的 CSV 日志补丁：兼容 datas / ids+vectors 两种 upsert 形式 =====
+import os, csv, asyncio, inspect, logging
+from datetime import datetime
+from collections import defaultdict
+from lightrag.kg import nano_vector_db_impl as _nvdb
+
+_VDB_CUM_COUNTS = defaultdict(int)  # 累计向量条数（按 storage_file）
+
+def _get_dir_size_bytes(path: str) -> int:
+    total = 0
+    for dp, _, fns in os.walk(path):
+        for fn in fns:
+            fp = os.path.join(dp, fn)
+            try:
+                total += os.path.getsize(fp)
+            except OSError:
+                pass
+    return total
+
+def _ensure_csv_with_header(csv_path: str):
+    if not os.path.exists(csv_path):
+        os.makedirs(os.path.dirname(csv_path), exist_ok=True)
+        with open(csv_path, "w", newline="", encoding="utf-8") as f:
+            w = csv.writer(f)
+            w.writerow([
+                "timestamp_utc",
+                "store_kind",          # entities / relations / chunks / unknown
+                "storage_file",
+                "batch_size",
+                "cum_vectors",
+                "file_size_bytes",
+                "file_size_mib",
+                "dir_size_bytes",
+                "dir_size_mib",
+            ])
+
+def _infer_store_kind(storage_file: str) -> str:
+    fn = os.path.basename(storage_file).lower()
+    if "entities" in fn:   return "entities"
+    if "relations" in fn:  return "relations"
+    if "chunks"   in fn:   return "chunks"
+    return "unknown"
+
+def _infer_batch_size(args, kwargs) -> int:
+    """
+    尝试从多种入参形态推断 batch 大小：
+    - upsert(datas=[{id:..., vector:[...]} , ...])
+    - upsert(ids=[...], vectors=[...])
+    - upsert(vectors=[...])
+    - 其他：回退为 1
+    """
+    # 优先 'datas'
+    if "datas" in kwargs and isinstance(kwargs["datas"], (list, tuple)):
+        return len(kwargs["datas"])
+    # 从位置参数里找 datas
+    if args:
+        a0 = args[0]
+        if isinstance(a0, (list, tuple)) and a0 and isinstance(a0[0], dict) and "vector" in a0[0]:
+            return len(a0)
+    # ids + vectors
+    if "vectors" in kwargs and isinstance(kwargs["vectors"], (list, tuple)):
+        return len(kwargs["vectors"])
+    if len(args) >= 2 and isinstance(args[1], (list, tuple)):
+        return len(args[1])
+    # 仅 vectors
+    if args:
+        a0 = args[0]
+        if isinstance(a0, (list, tuple)):
+            return len(a0)
+    return 1
+
+# 保存原始方法
+__ORIG_UPSERT = _nvdb.NanoVectorDB.upsert
+_IS_ORIG_ASYNC = inspect.iscoroutinefunction(__ORIG_UPSERT)
+
+async def __PATCHED_UPSERT(self, *args, **kwargs):
+    """
+    统一签名：*args, **kwargs
+    - 原样转发给原始 upsert（不改变行为）
+    - 写入成功后读取真实文件/目录大小，追加 CSV 一行
+    """
+    batch_size = _infer_batch_size(args, kwargs)
+
+    # 调原方法
+    if _IS_ORIG_ASYNC:
+        result = await __ORIG_UPSERT(self, *args, **kwargs)
+    else:
+        # 保险：如果原方法是同步的，丢到线程里
+        result = await asyncio.to_thread(lambda: __ORIG_UPSERT(self, *args, **kwargs))
+
+    # 统计并记 CSV（尽量不因异常影响主流程）
+    try:
+        storage_file = getattr(self, "storage_file", None)
+        if storage_file:
+            _VDB_CUM_COUNTS[storage_file] += batch_size
+            cum_cnt = _VDB_CUM_COUNTS[storage_file]
+
+            dir_path = os.path.dirname(storage_file)
+            csv_path = os.path.join(dir_path, "storage_growth_log.csv")
+            _ensure_csv_with_header(csv_path)
+
+            try:
+                file_bytes = os.path.getsize(storage_file)
+            except OSError:
+                file_bytes = 0
+            dir_bytes = _get_dir_size_bytes(dir_path)
+
+            row = [
+                datetime.utcnow().isoformat(timespec="seconds") + "Z",
+                _infer_store_kind(storage_file),
+                storage_file,
+                batch_size,
+                cum_cnt,
+                file_bytes,
+                round(file_bytes / (1024**2), 3),
+                dir_bytes,
+                round(dir_bytes / (1024**2), 3),
+            ]
+            with open(csv_path, "a", newline="", encoding="utf-8") as f:
+                csv.writer(f).writerow(row)
+
+            logging.info(
+                f"[VDB LOG] {os.path.basename(storage_file)} +{batch_size} "
+                f"-> cum={cum_cnt}, file={row[6]} MiB, dir={row[8]} MiB"
+            )
+        else:
+            logging.debug("[VDB LOG] self.storage_file not found; skip CSV logging.")
+    except Exception as e:
+        logging.warning(f"[CSV-LOG] failed to write log: {e}")
+
+    return result
+
+# 安装补丁（只需执行一次；放在 LightRAG 初始化之前）
+_nvdb.NanoVectorDB.upsert = __PATCHED_UPSERT
+
+
+def get_dir_size(path: str) -> int:
+    total = 0
+    for dirpath, _, filenames in os.walk(path):
+        for f in filenames:
+            fp = os.path.join(dirpath, f)
+            try:
+                total += os.path.getsize(fp)
+            except OSError:
+                pass
+    return total
+
 
 def _normalize_space(s: str) -> str:
     return re.sub(r"\s+", " ", (s or "").strip())
@@ -159,21 +309,19 @@ async def llm_model_func(
         **kwargs
     )
 
-# =========================
-# HF 本地推理：异步封装
-# =========================
+
 _HF_CACHE = {
     "tokenizer": None,
     "model": None,
     "model_name": None,
 }
 
+
 def _ensure_hf_loaded(model_name: str, torch_dtype: Optional[torch.dtype] = None):
     if _HF_CACHE["model_name"] == model_name and _HF_CACHE["model"] is not None:
         return _HF_CACHE["tokenizer"], _HF_CACHE["model"]
 
     tok = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
-    # dtype 优先 bf16, 次选 fp16, 再 fp32
     if torch_dtype is None:
         if torch.cuda.is_available() and torch.cuda.is_bf16_supported():
             torch_dtype = torch.bfloat16
@@ -197,7 +345,6 @@ def _build_chat_input(tokenizer, system_prompt: Optional[str], history_messages:
     history_messages: list of dicts like [{"role":"user","content":"..."},{"role":"assistant","content":"..."}]
     优先使用 chat_template；否则退化为简单拼接。
     """
-    # 标准化 messages
     messages = []
     if system_prompt:
         messages.append({"role": "system", "content": system_prompt})
@@ -211,7 +358,6 @@ def _build_chat_input(tokenizer, system_prompt: Optional[str], history_messages:
     if hasattr(tokenizer, "apply_chat_template") and tokenizer.chat_template:
         text = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
         return text
-    # fallback：纯文本拼接
     parts = []
     if system_prompt:
         parts.append(f"[SYSTEM]\n{system_prompt}\n")
@@ -257,26 +403,20 @@ async def hf_model_complete(
         )
         out_text = tok.decode(gen_out[0], skip_special_tokens=True)
 
-        # 尝试从拼接文本中裁剪出 assistant 的回复
+
         if hasattr(tok, "apply_chat_template") and tok.chat_template:
-            # 简单做法：取输入长度后的新增片段
             prompt_len = inputs["input_ids"].shape[-1]
             gen_ids = gen_out[0][prompt_len:]
             resp = tok.decode(gen_ids, skip_special_tokens=True).strip()
             return resp
         else:
-            # fallback：截取最后一个 [ASSISTANT] 之后
             if "[ASSISTANT]" in out_text:
                 resp = out_text.split("[ASSISTANT]")[-1].strip()
                 return resp
             return out_text.strip()
 
-    # 放到线程里避免阻塞事件循环
     return await asyncio.to_thread(_sync_generate)
 
-# =========================
-# 初始化 RAG
-# =========================
 async def initialize_rag(
     base_dir: str,
     source: str,
@@ -339,10 +479,8 @@ async def initialize_rag(
         llm_model_func_input = ollama_model_complete
 
     elif mode == "hf":
-        # 嵌入：本地 HF
         tok_embed = AutoTokenizer.from_pretrained(embed_model_name)
         mdl_embed = AutoModel.from_pretrained(embed_model_name)
-        # 简单规则判断维度
         name = embed_model_name.lower()
         if ("minilm" in name) or ("all-minilm-l6-v2" in name):
             embedding_dim = 384
@@ -363,11 +501,8 @@ async def initialize_rag(
             func=lambda texts: hf_embed(texts, tok_embed, mdl_embed),
         )
 
-        # 生成：本地 HF
-        # 你也可以通过 CLI 的 --model_name 指定任意 HF 上游模型
         llm_kwargs = {
             "model_name": model_name,
-            # 这三个参数与 gen_info 的估计也会一致
             "temperature": 0.0,
             "top_p": 0.9,
             "max_new_tokens": 256,
@@ -441,6 +576,7 @@ async def process_corpus(
     ins = rag.insert(context)
     if asyncio.iscoroutine(ins):
         await ins
+        
 
     # 等待内部管线空闲（尽量不改你原来的等待逻辑）
     try:
@@ -496,7 +632,13 @@ async def process_corpus(
         timing_state["sum_kw_sec"] = 0.0
         timing_state["sum_gen_sec"] = 0.0
 
-        t_total_start = time.time()
+        try:
+            if torch.cuda.is_available():
+                torch.cuda.reset_peak_memory_stats()
+        except Exception:
+            pass
+
+        t_total_start = perf_counter()
         result = rag.query(
             q["question"],
             param=query_param,
@@ -504,7 +646,7 @@ async def process_corpus(
         )
         if asyncio.iscoroutine(result):
             result = await result
-        t_total_end = time.time()
+        t_total_end = perf_counter()
 
         context_ret = ""
         if isinstance(result, tuple):
@@ -515,23 +657,16 @@ async def process_corpus(
             response = result
         predicted_answer = str(response)
 
-        total_latency = max(0.0, t_total_end - t_total_start)
+        total_latency = t_total_end - t_total_start
+
         gen_latency_sec = float(timing_state.get("sum_gen_sec", 0.0))
-        retrieval_latency_sec = max(0.0, total_latency - gen_latency_sec)
+        retrieval_latency_sec = total_latency - gen_latency_sec
 
         approx_prompt_chars = len(SYSTEM_PROMPT) + len(context_ret) + len(q["question"])
         input_tokens  = approx_prompt_chars / 4.0
         output_tokens = len(predicted_answer) / 4.0
 
-        peak_vram = 0.0
-        try:
-            if torch.cuda.is_available():
-                peak_vram = float(torch.cuda.max_memory_allocated() / (1024 ** 2))
-        except Exception:
-            peak_vram = 0.0
-
         device = "ollama" if mode.lower() == "ollama" else ("hf" if mode.lower() == "hf" else "api")
-        # 尝试推断 dtype
         try:
             if mode.lower() == "hf" and _HF_CACHE["model"] is not None:
                 dtype = str(_HF_CACHE["model"].dtype)
@@ -547,7 +682,6 @@ async def process_corpus(
             "latency_sec": float(total_latency),
             "gen_latency_sec": float(gen_latency_sec),
             "retrieval_latency_sec": float(retrieval_latency_sec),
-            "peak_vram_MiB": float(peak_vram),
             "prompt_chars": float(approx_prompt_chars),
             "throughput_tok_per_s": float((output_tokens / gen_latency_sec) if gen_latency_sec > 0 else 0.0),
             "prompt_tok_per_s": float((input_tokens / retrieval_latency_sec) if retrieval_latency_sec > 0 else 0.0),
@@ -560,18 +694,6 @@ async def process_corpus(
 
         predicted_answer = strip_think(predicted_answer)[0]
 
-        record = {
-            "id": q["id"],
-            "question": q["question"],
-            "source": corpus_name,
-            "context": context_ret,
-            "evidence": q["evidence"],
-            "question_type": q["question_type"],
-            "generated_answer": predicted_answer,
-            "ground_truth": q.get("answer"),
-            "gen_info": gen_info,
-        }
-        
         gold_answer = q.get("answer", "") or ""
         gt_ctx_raw = q.get("evidence", "")
         ground_truth_context = " ".join([str(x) for x in gt_ctx_raw]) if isinstance(gt_ctx_raw, list) else str(gt_ctx_raw or "")
@@ -587,10 +709,22 @@ async def process_corpus(
             eval_result_correctness = reward_sbert_cached(predicted_answer_norm, gold_answer_norm)
         eval_result_context     = reward_sbert_cached(context_ret_norm, ground_truth_context)
 
-        record["eval"] = {
+        record = {
+            "id": q["id"],
+            "question": q["question"],
+            "source": corpus_name,
+            "context": context_ret,
+            "evidence": q["evidence"],
+            "question_type": q["question_type"],
+            "generated_answer": predicted_answer,
+            "ground_truth": q.get("answer"),
+
+            **gen_info,
+
             "correctness_sbert": float(eval_result_correctness),
             "context_similarity_sbert": float(eval_result_context),
         }
+
         results.append(record)
                                                                                                                    
     with open(output_path, "w", encoding="utf-8") as f:
@@ -621,7 +755,7 @@ def main():
     parser.add_argument("--mode", required=True, choices=["API", "ollama", "hf"], help="Use API, ollama, or hf (local transformers)")
     parser.add_argument("--model_name", default="qwen2.5-14b-instruct", help="LLM model identifier (HF 模式下是 HF repo id)")
     parser.add_argument("--embed_model", default="bge-base-en", help="Embedding model name (HF/ollama 的名称)")
-    parser.add_argument("--retrieve_topk", type=int, default=5, help="Number of top documents to retrieve")
+    parser.add_argument("--retrieve_topk", type=int, default=10, help="Number of top documents to retrieve")
     parser.add_argument("--sample", type=int, default=None, help="Number of questions to sample per corpus")
 
     parser.add_argument("--llm_base_url", default="https://api.openai.com/v1", help="Base URL for LLM API / ollama host")
