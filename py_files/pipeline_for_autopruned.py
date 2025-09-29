@@ -290,7 +290,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
                 "thinkings_choice": _meta['thinkings_choice'],
                 "facts_choice":     _meta['facts_choice'],
                 "correctness": eval_result_correctness,
-                "context": eval_result_context,
+                "context_similarity": eval_result_context,
             })
 
             answers_choices.append(_meta['answers_choice'])
