@@ -276,6 +276,17 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
                 eval_result_correctness = reward_sbert_cached(predicted_answer_norm, gold_answer_norm)
             eval_result_context     = reward_sbert_cached(context_ret_norm, ground_truth_context)  
 
+            import io
+            import json as _json
+            try:
+                _buf = io.BytesIO()
+                _json.dump(cr.meta_codebook, io.TextIOWrapper(_buf, encoding="utf-8"), ensure_ascii=False)
+                _buf.seek(0, 2)
+                meta_codebook_bytes = _buf.tell()
+            except Exception:
+                meta_codebook_bytes = 0
+            meta_codebook_mb = round(meta_codebook_bytes / (1024 * 1024), 3)
+
             row = row_lookup[q]
             rows.append({
                 "id":               row["id"],
@@ -291,6 +302,8 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
                 "facts_choice":     _meta['facts_choice'],
                 "correctness": eval_result_correctness,
                 "context_similarity": eval_result_context,
+                "meta_codebook_json_bytes": meta_codebook_bytes,
+                "meta_codebook_json_MB": meta_codebook_mb,
             })
 
             answers_choices.append(_meta['answers_choice'])
