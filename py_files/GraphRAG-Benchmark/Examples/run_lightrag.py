@@ -707,8 +707,8 @@ async def process_corpus(
 
             **gen_info,
 
-            "correctness_sbert": float(eval_result_correctness),
-            "context_similarity_sbert": float(eval_result_context),
+            "correctness": float(eval_result_correctness),
+            "context": float(eval_result_context),
         }
 
         results.append(record)
