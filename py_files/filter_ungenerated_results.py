@@ -1,6 +1,7 @@
 import json
 import re 
 import pandas as pd
+import numpy as np
 
 cr_reuslts_path = 'results/cr_results/compressrag_medical_data.json'
 
@@ -68,8 +69,9 @@ for i, d in enumerate(light_rag_results):
         gi = d.get("gen_info", {}) or {}
         ev = d.get("eval", {}) or {}
         rows.append({
-            "index": i,
-            "generated_answer": ans,
+            "med_id": i,
+            # "generated_answer": ans,
+            'id': d['id'],
 
             # ---- gen_info ----
             "input_tokens": gi.get("input_tokens"),
@@ -98,5 +100,46 @@ df_no_idk = pd.DataFrame(rows)
 print(f"Kept {len(df_no_idk)} / {len(light_rag_results)} rows without 'I don't know'.")
 # Optional: quick peek
 print(df_no_idk.head())
+
+print(df_no_idk.columns)
+
+
+
+cr_metrics_path = 'results/cr_results/compressrag_medical_metrics.json'
+
+# load the json file
+
+with open(cr_metrics_path, 'r', encoding='utf-8') as f:
+    cr_metrics = json.load(f)
+
+rows = []
+i = 0
+for entry in cr_metrics["run_meta"]:
+    if i not in start_with_context:
+        q = entry["question"]
+        metrics = entry[q]  
+        row = {"med_id": i, "question": q} 
+        row.update(metrics)
+        rows.append(row)
+
+    i+=1
+
+df_cr = pd.DataFrame(rows)
+
+print(df_cr.columns)
+
+print(f"Kept {len(df_cr)} / 980 rows without missing answers.")
+
+df_cr_eval = pd.read_csv('results/cr_results/result_sbertinclusive_new_embed_for_exactgraphrag.csv')
+
+df_cr_eval = df_cr_eval[~df_cr_eval.index.isin(start_with_context)]
+
+df_cr_all = pd.concat([df_cr.reset_index(drop=True), 
+                         df_cr_eval.reset_index(drop=True)], axis=1)
+print(f"Kept {len(df_cr_all)} / 980 rows without missing answers.")
+
+
+df_cr_all.to_csv('results/cr_results/cr_combined_results.csv')
+df_no_idk.to_csv('results/light_rag_results/lightrag_eval_results.csv')
 
 #  python filter_ungenerated_results.py
