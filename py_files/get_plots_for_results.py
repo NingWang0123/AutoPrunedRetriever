@@ -68,21 +68,26 @@ plt.tight_layout()
 plt.savefig(os.path.join(out_dir, "boxplots_comparison_qwen3b.pdf"), bbox_inches="tight")
 plt.show()
 
+
+metrics = ["total_tokens", "correctness_sbert", "context_similarity_sbert", " retrieval_latency_sec", "gen_latency_sec"]
+
 # --- 2) Separate Mean Bar Graphs ---
 for metric in metrics:
+    metric_clean = metric.strip()  # remove accidental spaces
+
     plt.figure(figsize=(7,6))
     mean_values = {
         "System": ["AutoPruned Retriever", "LightRAG"],
         "Mean": [
-            df_merged[f"{metric}_apr"].mean(),
-            df_merged[f"{metric}_light"].mean()
+            df_merged[f"{metric_clean}_apr"].mean(),
+            df_merged[f"{metric_clean}_light"].mean()
         ]
     }
     df_means = pd.DataFrame(mean_values)
     ax = sns.barplot(data=df_means, x="System", y="Mean", palette="Set2", width=0.5)
 
     # Titles and labels
-    plt.title(f"Mean {metric.replace('_',' ').title()}", fontsize=18, weight="bold")
+    plt.title(f"Mean {metric_clean.replace('_',' ').title()}", fontsize=18, weight="bold")
     plt.ylabel("Mean Value", fontsize=14)
     plt.xlabel("")
     plt.xticks(fontsize=13)
@@ -97,12 +102,10 @@ for metric in metrics:
 
     plt.tight_layout()
 
-    # Save with good name
-    fname = f"mean_{metric}_qwen3b.pdf"
+    # Save with clean name
+    fname = f"mean_{metric_clean}_qwen3b.pdf"
     plt.savefig(os.path.join(out_dir, fname), bbox_inches="tight")
     plt.show()
-
-
 
 
 
