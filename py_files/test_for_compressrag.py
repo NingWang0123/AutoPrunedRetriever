@@ -1,4 +1,4 @@
-from CompressRag_rl_v3 import CompressRag_rl,decode_questions, get_context
+from CompressRag_rl_v1 import CompressRag_rl,decode_questions, get_context
 from WordEmb import WordAvgEmbeddings, Word2VecEmbeddings
 from langchain.embeddings.base import Embeddings
 from langchain_community.embeddings import HuggingFaceEmbeddings
@@ -7,7 +7,6 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 import re, os
 from typing import List, Tuple
 import time
-from CompressRag_rl_v3 import Word2VecEmbeddings
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
@@ -228,8 +227,7 @@ class Phi4MiniReasoningLLM:
         latency_sec = t2 - t0
         # prompt chars
         prompt_chars = float(len(prompt))
-        # cuda peak
-        peak_vram = self._get_cuda_peak_mib_after()
+
         gen_info = {
             "input_tokens": float(input_tokens),
             "output_tokens": float(output_tokens),
@@ -238,7 +236,6 @@ class Phi4MiniReasoningLLM:
             "gen_latency_sec": float(gen_latency_sec),
             # retrieval_latency_sec / retrieved_count 由上层调用注入（见 take_questions）
             "retrieval_latency_sec": None,
-            "peak_vram_MiB": float(peak_vram),
             "prompt_chars": float(prompt_chars),
             # 衍生指标
             "throughput_tok_per_s": float((output_tokens / gen_latency_sec) if gen_latency_sec > 0 else 0.0),
@@ -385,7 +382,8 @@ class Phi4MiniReasoningLLM:
 #word_emb = WordAvgEmbeddings(model_path="gensim-data/glove-wiki-gigaword-100/glove-wiki-gigaword-100.model")
 
 word_emb = Word2VecEmbeddings(model_name="word2vec-google-news-300")
-sentence_emb = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+sentence_emb = HuggingFaceEmbeddings(model_name="BAAI/bge-base-en")
+
 
 include_thinking = True
 phi_llm = Phi4MiniReasoningLLM(
@@ -430,16 +428,16 @@ def to_serializable(obj):
     raise TypeError(f"Type {type(obj)} not serializable")
 
 
-def run_eval_case(question, reference_answer, facts_json_path, rag, work_mode="normal", llm_metrics=True, warm_start="coarse"):
+def run_eval_case(question, reference_answer, facts_json_path, rag, work_mode="normal", llm_metrics=True, warm_start="coarse", websearch=None):
     if work_mode == "dpo":
         result = rag.run_work_flow_for_dpo(question, facts_json_path=facts_json_path, warm_start=warm_start)
     else:
-        result = rag.run_work_flow(question, facts_json_path=facts_json_path, warm_start=warm_start)
+        result = rag.run_work_flow(question, facts_json_path=facts_json_path, warm_start=warm_start, websearch=websearch)
     if isinstance(result, tuple):
         gen_text = result[0]
     else:
         gen_text = str(result)
-    # 评测
+
     from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
     from rouge_score import rouge_scorer
     smooth = SmoothingFunction().method1
@@ -449,48 +447,7 @@ def run_eval_case(question, reference_answer, facts_json_path, rag, work_mode="n
     rouge1 = scores["rouge1"].fmeasure
     rouge2 = scores["rouge2"].fmeasure
     rougeL = scores["rougeL"].fmeasure
-    # metrics_runs
-    if rag.llm.metrics_runs and isinstance(rag.llm.metrics_runs[-1], dict):
-        last_metrics = list(rag.llm.metrics_runs[-1].values())[0]
-        last_metrics["BLEU"] = bleu
-        last_metrics["ROUGE-1"] = rouge1
-        last_metrics["ROUGE-2"] = rouge2
-        last_metrics["ROUGE-L"] = rougeL
-    if llm_metrics:
-        print(rag.llm.metrics_runs)
-    print(result)
-    print(f'BLEU: {bleu:.4f}, ROUGE-1: {rouge1:.4f}, ROUGE-2: {rouge2:.4f}, ROUGE-L: {rougeL:.4f}')
-    return gen_text, bleu, rouge1, rouge2, rougeL
 
-
-from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
-from rouge_score import rouge_scorer
-from dpo_compressrag_v2 import answer_with_auto_strategy
-
-
-def run_eval_case_regular_and_dpo(question, reference_answer, facts_json_path, rag, policy=None, work_mode="normal", llm_metrics=True, warm_start="coarse"):
-    if work_mode == "dpo":
-        result = answer_with_auto_strategy(cr =rag, 
-                                            policy =policy, 
-                                            q = question,
-                                            reward_fn       = None,
-                                            gold_answer     = None,
-                                            greedy          = True) # evaluation don't need groundtruth and reward_fn
-    else:
-        result = rag.run_work_flow(question, facts_json_path=facts_json_path, warm_start=warm_start)
-    if isinstance(result, tuple):
-        gen_text = result[0]
-    else:
-        gen_text = str(result)
-
-    smooth = SmoothingFunction().method1
-    scorer = rouge_scorer.RougeScorer(["rouge1", "rouge2", "rougeL"], use_stemmer=True)
-    bleu = sentence_bleu([reference_answer.split()], gen_text.split(), smoothing_function=smooth)
-    scores = scorer.score(reference_answer, gen_text)
-    rouge1 = scores["rouge1"].fmeasure
-    rouge2 = scores["rouge2"].fmeasure
-    rougeL = scores["rougeL"].fmeasure
-    # metrics_runs
     if rag.llm.metrics_runs and isinstance(rag.llm.metrics_runs[-1], dict):
         last_metrics = list(rag.llm.metrics_runs[-1].values())[0]
         last_metrics["BLEU"] = bleu
@@ -505,21 +462,20 @@ def run_eval_case_regular_and_dpo(question, reference_answer, facts_json_path, r
 
 
 
+DATA_PATH     = "context/medical_questions.json"
+DATA_SLICE    = 2
 
-# DATA_PATH     = "context/medical_questions.json"
-# DATA_SLICE    = 2
+with open(DATA_PATH, "r", encoding="utf-8") as f:
+    raw_data = json.load(f)
 
-# with open(DATA_PATH, "r", encoding="utf-8") as f:
-#     raw_data = json.load(f)
-
-# raw_data = raw_data[:DATA_SLICE]
-# print(f"[INFO] Loaded {len(raw_data)} samples for answering)")
-# questions = [item["question"] for item in raw_data if "question" in item]
-# answers = [item["answer"] if "answer" in item else "" for item in raw_data if "question" in item]
-# i = 0
-# for q, ref in zip(questions, answers):
-#     run_eval_case(q, ref, ["context/novel copy.json", "context/medical_sub.json"], rag, work_mode="normal")
-#     i += 1
+raw_data = raw_data[:DATA_SLICE]
+print(f"[INFO] Loaded {len(raw_data)} samples for answering)")
+questions = [item["question"] for item in raw_data if "question" in item]
+answers = [item["answer"] if "answer" in item else "" for item in raw_data if "question" in item]
+i = 0
+for q, ref in zip(questions, answers):
+    run_eval_case(q, ref, ["context/novel copy.json", "context/medical_sub.json"], rag, work_mode="normal", websearch= True)
+    i += 1
     #with open(f"meta_codebook_{i}.json", "w", encoding="utf-8") as f:
     #    json.dump(rag.meta_codebook, f, ensure_ascii=False, indent=2, default=to_serializable)
     
