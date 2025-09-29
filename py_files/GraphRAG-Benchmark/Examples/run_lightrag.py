@@ -35,13 +35,12 @@ from collections import Counter
 from time import perf_counter
 from lightrag.kg import nano_vector_db_impl as nvdb
 
-# ===== 更稳的 CSV 日志补丁：兼容 datas / ids+vectors 两种 upsert 形式 =====
 import os, csv, asyncio, inspect, logging
 from datetime import datetime
 from collections import defaultdict
 from lightrag.kg import nano_vector_db_impl as _nvdb
 
-_VDB_CUM_COUNTS = defaultdict(int)  # 累计向量条数（按 storage_file）
+_VDB_CUM_COUNTS = defaultdict(int) 
 
 def _get_dir_size_bytes(path: str) -> int:
     total = 0
@@ -61,7 +60,7 @@ def _ensure_csv_with_header(csv_path: str):
             w = csv.writer(f)
             w.writerow([
                 "timestamp_utc",
-                "store_kind",          # entities / relations / chunks / unknown
+                "store_kind",         
                 "storage_file",
                 "batch_size",
                 "cum_vectors",
@@ -79,34 +78,22 @@ def _infer_store_kind(storage_file: str) -> str:
     return "unknown"
 
 def _infer_batch_size(args, kwargs) -> int:
-    """
-    尝试从多种入参形态推断 batch 大小：
-    - upsert(datas=[{id:..., vector:[...]} , ...])
-    - upsert(ids=[...], vectors=[...])
-    - upsert(vectors=[...])
-    - 其他：回退为 1
-    """
-    # 优先 'datas'
     if "datas" in kwargs and isinstance(kwargs["datas"], (list, tuple)):
         return len(kwargs["datas"])
-    # 从位置参数里找 datas
     if args:
         a0 = args[0]
         if isinstance(a0, (list, tuple)) and a0 and isinstance(a0[0], dict) and "vector" in a0[0]:
             return len(a0)
-    # ids + vectors
     if "vectors" in kwargs and isinstance(kwargs["vectors"], (list, tuple)):
         return len(kwargs["vectors"])
     if len(args) >= 2 and isinstance(args[1], (list, tuple)):
         return len(args[1])
-    # 仅 vectors
     if args:
         a0 = args[0]
         if isinstance(a0, (list, tuple)):
             return len(a0)
     return 1
 
-# 保存原始方法
 __ORIG_UPSERT = _nvdb.NanoVectorDB.upsert
 _IS_ORIG_ASYNC = inspect.iscoroutinefunction(__ORIG_UPSERT)
 
@@ -118,14 +105,11 @@ async def __PATCHED_UPSERT(self, *args, **kwargs):
     """
     batch_size = _infer_batch_size(args, kwargs)
 
-    # 调原方法
     if _IS_ORIG_ASYNC:
         result = await __ORIG_UPSERT(self, *args, **kwargs)
     else:
-        # 保险：如果原方法是同步的，丢到线程里
         result = await asyncio.to_thread(lambda: __ORIG_UPSERT(self, *args, **kwargs))
 
-    # 统计并记 CSV（尽量不因异常影响主流程）
     try:
         storage_file = getattr(self, "storage_file", None)
         if storage_file:
@@ -167,7 +151,6 @@ async def __PATCHED_UPSERT(self, *args, **kwargs):
 
     return result
 
-# 安装补丁（只需执行一次；放在 LightRAG 初始化之前）
 _nvdb.NanoVectorDB.upsert = __PATCHED_UPSERT
 
 
@@ -703,11 +686,14 @@ async def process_corpus(
         context_ret_norm      = _normalize_space(context_ret)
         ground_truth_context  = _normalize_space(ground_truth_context)
 
-        if "i don't know" in predicted_answer_norm.lower():
+        if "i don't know" in predicted_answer_norm.lower() or "no-context" in predicted_answer_norm.lower():
             eval_result_correctness = 0.0
         else:
             eval_result_correctness = reward_sbert_cached(predicted_answer_norm, gold_answer_norm)
-        eval_result_context     = reward_sbert_cached(context_ret_norm, ground_truth_context)
+        if context_ret == "":
+            eval_result_context = 0.0
+        else:
+            eval_result_context = reward_sbert_cached(context_ret_norm, ground_truth_context)
 
         record = {
             "id": q["id"],
