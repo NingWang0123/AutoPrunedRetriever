@@ -243,9 +243,6 @@ class Phi4MiniReasoningLLM:
             "device": self._device_str(),
             "dtype": str(getattr(self.model, "dtype", "unknown")),
             "model_name": self.model_name,
-            "temperature": float(self.temperature),
-            "top_p": float(self.top_p),
-            "max_new_tokens": int(self.max_new_tokens),
             "timestamp_start": t0,
             "timestamp_end": t2,
         }
