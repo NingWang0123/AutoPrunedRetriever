@@ -1,0 +1,6 @@
+auto_gptq
+autogptq_cuda_256
+autogptq_cuda_64
+exllama_kernels
+exllamav2_kernels
+tests

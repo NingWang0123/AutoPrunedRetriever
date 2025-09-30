@@ -216,6 +216,7 @@ class Phi4MiniReasoningLLM:
             temperature=self.temperature,
             top_p=self.top_p,
             pad_token_id=self.tokenizer.eos_token_id,
+            use_cache=True
         )
         t2 = time.perf_counter()
         text = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
