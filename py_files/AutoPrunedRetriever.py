@@ -3735,6 +3735,29 @@ class ExactGraphRag_rl:
 
         return new_result,metrics_from_llm,ft_txt
     
+    def record_labeled_q_and_a(self, questions, answers):
+        """Record labeled questions and answers into the meta_codebook."""
+
+        if len(questions) != len(answers):
+            raise ValueError("Number of questions and answers must match.")
+
+        # Process answers
+        for answer in answers:
+            codebook_sub = get_code_book(answer, type="answers")
+            self.meta_codebook = merging_codebook(
+                self.meta_codebook, codebook_sub, "answers", self.word_emb, True
+            )
+
+        # Process questions
+        for question in questions:
+            codebook_sub = get_code_book(question, type="questions")
+            self.meta_codebook = merging_codebook(
+                self.meta_codebook, codebook_sub, "questions", self.word_emb, True
+            )
+
+
+
+    
 
 # from pathlib import Path
 # if __name__ == "__main__":
