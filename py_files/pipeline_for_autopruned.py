@@ -7,6 +7,7 @@ import pathlib
 import numpy   as np
 import torch
 import pandas as pd
+import tqdm
 from huggingface_hub import hf_hub_download
 from langchain_community.embeddings import HuggingFaceEmbeddings
 
