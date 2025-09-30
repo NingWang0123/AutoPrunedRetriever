@@ -3755,6 +3755,16 @@ class ExactGraphRag_rl:
                 self.meta_codebook, codebook_sub, "questions", self.word_emb, True
             )
 
+    def record_labeled_thinkings(self, thinkings):
+        """Record labeled thinkings into the meta_codebook."""
+        # Process thinkings
+        for t in thinkings:
+            codebook_sub_t = get_code_book(t, type='thinkings')
+            self.meta_codebook = merging_codebook(
+                self.meta_codebook, codebook_sub_t, "thinkings", self.word_emb, True
+            )
+
+
 
 
     
