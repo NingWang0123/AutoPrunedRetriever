@@ -106,7 +106,17 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
     gold_lookup = {q: r["answer"]        for q, r in row_lookup.items()}
 
     all_questions  = list(row_lookup.keys())
-    seed_questions = all_questions[:SEED_N]
+    all_seed_questions = all_questions[:SEED_N]
+    midpoint = len(all_seed_questions) // 2
+    # for labeling only
+    train_questions = all_seed_questions[:midpoint]
+    seed_questions   = all_seed_questions[midpoint:]
+
+    train_answers = []
+
+    for q in train_questions:
+        train_answers.append(gold_lookup.get(q))
+        
     test_questions = all_questions[SEED_N : SEED_N+TEST_N]
 
     # ---------------------------------------------------------------------
@@ -158,6 +168,9 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
         print(f"loaded {len(pref_ds)} cached preference examples")
 
     else:
+
+        cr.record_labeled_q_and_a(train_questions, train_answers)
+
         if reward_func_mode == 'llm':
             # check if it is saved or not, reuse the trained one
             async def build_or_load_pref_ds() -> list:

@@ -54,7 +54,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
     )
     phi_llm  = Phi4MiniReasoningLLM(
         include_thinkings=False,
-        model_name="Qwen/Qwen2.5-7B-Instruct-GPTQ-Int4",
+        model_name="Qwen/Qwen2.5-7B",
         max_new_tokens=256,
         temperature=0.2,
         top_p=0.9,
