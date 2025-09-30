@@ -392,7 +392,7 @@ api_llm = OpenAILLM(
     temperature=0.2,
     top_p=0.9,
     use_cache=True,
-    api_key="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", 
+    api_key="your-api-key", 
     # base_url="https://api.openai.com/v1",  
 )
 
