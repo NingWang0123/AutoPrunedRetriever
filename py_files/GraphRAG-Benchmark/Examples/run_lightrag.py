@@ -15,6 +15,8 @@ from transformers import (
     AutoModelForCausalLM,
 )
 
+from lightrag.kg.shared_storage import get_namespace_data, get_pipeline_status_lock
+
 from lightrag import LightRAG, QueryParam
 from lightrag.llm.openai import openai_complete_if_cache
 from lightrag.llm.hf import hf_embed
@@ -23,6 +25,7 @@ from lightrag.kg.shared_storage import initialize_pipeline_status
 from tqdm import tqdm
 from lightrag.llm.ollama import ollama_model_complete, ollama_embed
 from typing import List, Tuple
+from lightrag.base import DocStatus
 
 # Apply nest_asyncio for Jupyter environments
 nest_asyncio.apply()
@@ -34,125 +37,6 @@ import re
 from collections import Counter
 from time import perf_counter
 from lightrag.kg import nano_vector_db_impl as nvdb
-
-import os, csv, asyncio, inspect, logging
-from datetime import datetime
-from collections import defaultdict
-from lightrag.kg import nano_vector_db_impl as _nvdb
-
-_VDB_CUM_COUNTS = defaultdict(int) 
-
-def _get_dir_size_bytes(path: str) -> int:
-    total = 0
-    for dp, _, fns in os.walk(path):
-        for fn in fns:
-            fp = os.path.join(dp, fn)
-            try:
-                total += os.path.getsize(fp)
-            except OSError:
-                pass
-    return total
-
-def _ensure_csv_with_header(csv_path: str):
-    if not os.path.exists(csv_path):
-        os.makedirs(os.path.dirname(csv_path), exist_ok=True)
-        with open(csv_path, "w", newline="", encoding="utf-8") as f:
-            w = csv.writer(f)
-            w.writerow([
-                "timestamp_utc",
-                "store_kind",         
-                "storage_file",
-                "batch_size",
-                "cum_vectors",
-                "file_size_bytes",
-                "file_size_mib",
-                "dir_size_bytes",
-                "dir_size_mib",
-            ])
-
-def _infer_store_kind(storage_file: str) -> str:
-    fn = os.path.basename(storage_file).lower()
-    if "entities" in fn:   return "entities"
-    if "relations" in fn:  return "relations"
-    if "chunks"   in fn:   return "chunks"
-    return "unknown"
-
-def _infer_batch_size(args, kwargs) -> int:
-    if "datas" in kwargs and isinstance(kwargs["datas"], (list, tuple)):
-        return len(kwargs["datas"])
-    if args:
-        a0 = args[0]
-        if isinstance(a0, (list, tuple)) and a0 and isinstance(a0[0], dict) and "vector" in a0[0]:
-            return len(a0)
-    if "vectors" in kwargs and isinstance(kwargs["vectors"], (list, tuple)):
-        return len(kwargs["vectors"])
-    if len(args) >= 2 and isinstance(args[1], (list, tuple)):
-        return len(args[1])
-    if args:
-        a0 = args[0]
-        if isinstance(a0, (list, tuple)):
-            return len(a0)
-    return 1
-
-__ORIG_UPSERT = _nvdb.NanoVectorDB.upsert
-_IS_ORIG_ASYNC = inspect.iscoroutinefunction(__ORIG_UPSERT)
-
-async def __PATCHED_UPSERT(self, *args, **kwargs):
-    """
-    统一签名：*args, **kwargs
-    - 原样转发给原始 upsert（不改变行为）
-    - 写入成功后读取真实文件/目录大小，追加 CSV 一行
-    """
-    batch_size = _infer_batch_size(args, kwargs)
-
-    if _IS_ORIG_ASYNC:
-        result = await __ORIG_UPSERT(self, *args, **kwargs)
-    else:
-        result = await asyncio.to_thread(lambda: __ORIG_UPSERT(self, *args, **kwargs))
-
-    try:
-        storage_file = getattr(self, "storage_file", None)
-        if storage_file:
-            _VDB_CUM_COUNTS[storage_file] += batch_size
-            cum_cnt = _VDB_CUM_COUNTS[storage_file]
-
-            dir_path = os.path.dirname(storage_file)
-            csv_path = os.path.join(dir_path, "storage_growth_log.csv")
-            _ensure_csv_with_header(csv_path)
-
-            try:
-                file_bytes = os.path.getsize(storage_file)
-            except OSError:
-                file_bytes = 0
-            dir_bytes = _get_dir_size_bytes(dir_path)
-
-            row = [
-                datetime.utcnow().isoformat(timespec="seconds") + "Z",
-                _infer_store_kind(storage_file),
-                storage_file,
-                batch_size,
-                cum_cnt,
-                file_bytes,
-                round(file_bytes / (1024**2), 3),
-                dir_bytes,
-                round(dir_bytes / (1024**2), 3),
-            ]
-            with open(csv_path, "a", newline="", encoding="utf-8") as f:
-                csv.writer(f).writerow(row)
-
-            logging.info(
-                f"[VDB LOG] {os.path.basename(storage_file)} +{batch_size} "
-                f"-> cum={cum_cnt}, file={row[6]} MiB, dir={row[8]} MiB"
-            )
-        else:
-            logging.debug("[VDB LOG] self.storage_file not found; skip CSV logging.")
-    except Exception as e:
-        logging.warning(f"[CSV-LOG] failed to write log: {e}")
-
-    return result
-
-_nvdb.NanoVectorDB.upsert = __PATCHED_UPSERT
-
 
 def get_dir_size(path: str) -> int:
     total = 0
