@@ -10,7 +10,7 @@ import pandas as pd
 from huggingface_hub import hf_hub_download
 from langchain_community.embeddings import HuggingFaceEmbeddings
 
-from ExactGraphRag_rl import (
+from AutoPrunedRetriever import (
     ExactGraphRag_rl, merging_codebook
 )
 

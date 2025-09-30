@@ -11,7 +11,7 @@ import tqdm
 from huggingface_hub import hf_hub_download
 from langchain_community.embeddings import HuggingFaceEmbeddings
 
-from ExactGraphRag_rl import (
+from AutoPrunedRetriever import (
     ExactGraphRag_rl, merging_codebook
 )
 
@@ -378,4 +378,4 @@ if __name__ == "__main__":
 
     # df.to_csv('results/result_sbertinclusive_new_embed_for_exactgraphrag.csv')
 
-# python pipeline_for_autopruned.py
+# python pipeline_for_autopruned_web.py
