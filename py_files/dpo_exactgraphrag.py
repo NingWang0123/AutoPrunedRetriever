@@ -10,7 +10,7 @@ import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import re, os
 from test_for_compressrag import Phi4MiniReasoningLLM
-import json
+import sys, json, pickle
 import asyncio,inspect
 from sentence_transformers import SentenceTransformer
 
@@ -473,7 +473,88 @@ def train_dpo_2head(examples: List[PrefExample2], input_dim: int, cfg: TrainCfg 
 
 
 
+#### measuring metacodebook
 
+def _sizeof_deep(obj, _seen=None) -> int:
+    """Best-effort deep size in bytes; handles dict/list/tuple/set, numpy, torch."""
+    try:
+        import numpy as np
+    except Exception:
+        np = None
+    try:
+        import torch
+    except Exception:
+        torch = None
+
+    if _seen is None:
+        _seen = set()
+    oid = id(obj)
+    if oid in _seen:
+        return 0
+    _seen.add(oid)
+
+    # Fast paths for arrays/tensors (data payload dominates)
+    if np is not None and isinstance(obj, np.ndarray):
+        return int(obj.nbytes) + sys.getsizeof(obj)
+    if torch is not None and isinstance(obj, torch.Tensor):
+        try:
+            return int(obj.element_size() * obj.nelement()) + sys.getsizeof(obj)
+        except Exception:
+            return sys.getsizeof(obj)
+
+    size = sys.getsizeof(obj)
+    if isinstance(obj, dict):
+        for k, v in obj.items():
+            size += _sizeof_deep(k, _seen)
+            size += _sizeof_deep(v, _seen)
+    elif isinstance(obj, (list, tuple, set, frozenset)):
+        for it in obj:
+            size += _sizeof_deep(it, _seen)
+    # else: treat as atomic (str, int, float, custom objs, etc.)
+    return int(size)
+
+def _mb(n_bytes: int) -> float:
+    return round(n_bytes / (1024 * 1024), 6)
+
+def _json_len_safe(x):
+    """Return (byte_len, error_str_or_None). Converts common non-JSON types."""
+    def _default(o):
+        # Minimal converter so dumps won’t fail on common types
+        try:
+            import numpy as np
+            import torch
+        except Exception:
+            np = torch = None
+        # numpy
+        if 'numpy' in str(type(o)):
+            try:
+                return o.tolist()
+            except Exception:
+                return str(o)
+        # torch
+        if 'torch' in str(type(o)):
+            try:
+                return o.detach().cpu().tolist()
+            except Exception:
+                return str(o)
+        # sets, defaultdicts, etc.
+        try:
+            from collections import defaultdict
+        except Exception:
+            defaultdict = None
+        if isinstance(o, set):
+            return list(o)
+        if defaultdict is not None and isinstance(o, defaultdict):
+            return dict(o)
+        # generic fallback
+        return str(o)
+
+    try:
+        b = json.dumps(x, ensure_ascii=False, default=_default).encode("utf-8")
+        return len(b), None
+    except Exception as e:
+        return 0, f"{type(e).__name__}: {e}"
+    
 # ===============================
 # 6) INFERENCE PIPELINE
 # ===============================
@@ -523,12 +604,23 @@ def answer_with_auto_strategy(
         except Exception:
             pass
 
+    # === Robust memory measurements for meta_codebook ===
+    meta_cb = getattr(cr, "meta_codebook", None)
+
+    if meta_cb is None:
+        json_bytes, json_err = 0, "No meta_codebook on cr"
+    else:
+        # JSON size (only meaningful if serializable or convertible)
+        json_bytes, json_err = _json_len_safe(meta_cb)
+
     meta = {
         "answers_choice": ans_choice,
         "thinkings_choice": th_choice,
         "facts_choice": facts_choice,
         "reward": reward,
         "fact_context": fact_context,
+        "meta_codebook_json_bytes": int(json_bytes),
+        "meta_codebook_json_MB": _mb(int(json_bytes)),
     }
     return pred, meta
 

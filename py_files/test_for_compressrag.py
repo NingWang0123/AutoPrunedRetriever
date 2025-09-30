@@ -459,20 +459,20 @@ def run_eval_case(question, reference_answer, facts_json_path, rag, work_mode="n
 
 
 
-DATA_PATH     = "context/medical_questions.json"
-DATA_SLICE    = 2
+# DATA_PATH     = "context/medical_questions.json"
+# DATA_SLICE    = 2
 
-with open(DATA_PATH, "r", encoding="utf-8") as f:
-    raw_data = json.load(f)
+# with open(DATA_PATH, "r", encoding="utf-8") as f:
+#     raw_data = json.load(f)
 
-raw_data = raw_data[:DATA_SLICE]
-print(f"[INFO] Loaded {len(raw_data)} samples for answering)")
-questions = [item["question"] for item in raw_data if "question" in item]
-answers = [item["answer"] if "answer" in item else "" for item in raw_data if "question" in item]
-i = 0
-for q, ref in zip(questions, answers):
-    run_eval_case(q, ref, ["context/novel copy.json", "context/medical_sub.json"], rag, work_mode="normal", websearch= True)
-    i += 1
+# raw_data = raw_data[:DATA_SLICE]
+# print(f"[INFO] Loaded {len(raw_data)} samples for answering)")
+# questions = [item["question"] for item in raw_data if "question" in item]
+# answers = [item["answer"] if "answer" in item else "" for item in raw_data if "question" in item]
+# i = 0
+# # for q, ref in zip(questions, answers):
+#     run_eval_case(q, ref, ["context/novel copy.json", "context/medical_sub.json"], rag, work_mode="normal", websearch= True)
+#     i += 1
     #with open(f"meta_codebook_{i}.json", "w", encoding="utf-8") as f:
     #    json.dump(rag.meta_codebook, f, ensure_ascii=False, indent=2, default=to_serializable)
     

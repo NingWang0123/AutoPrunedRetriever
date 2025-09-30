@@ -45,7 +45,7 @@ TOPK_CTX     = 5
 def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
                           top_m,top_k,combine_ent_sim,q_combine_sim,aft_combine_sim,semantic_overlap_sim,  # all the params can be optimized
                           ini_meta_json = Path("meta_codebook.json") ,saved_examples_name = "sbert_pref_examples_medical.json",
-                          reward_func = None,reward_func_mode = 'non_llm',final_csv_path = "results/sbert_result"):
+                          reward_func = None,reward_func_mode = 'non_llm',final_json_path = "results/compressrag_medical_data_test.json"):
     print("» Initialising embeddings & LLM …")
     word_emb = Word2VecEmbeddings(model_name="word2vec-google-news-300")
     sent_emb = HuggingFaceEmbeddings(
@@ -189,7 +189,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
                     THINKINGS_CHOICES=THINKINGS_CHOICES,
                     FACTS_CHOICES = FACTS_CHOICES,
                     isolate_state = True,
-                    feature_dim = 384
+                    feature_dim = 768
                 )
                 print(f"   generated {len(pref_ds)} preference examples")
                 save_pref_examples(saved_examples_name, pref_ds)
@@ -204,7 +204,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
                     questions= seed_questions,
                     gold_answers=gold_lookup,
                     per_q_samples = 6,
-                    feature_dim = 384,
+                    feature_dim = 768,
                     reward_fn = reward_func,
                     seed = 0,
                     isolate_state = True,
@@ -216,7 +216,121 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
             
 
 
-    policy, _ = train_dpo_2head(pref_ds, input_dim=384)
+    policy, _ = train_dpo_2head(pref_ds, input_dim=768)
+
+    # def dump_results(
+    #     questions: List[str],
+    #     out_path: str,
+    # ):
+    #     rows = []
+    #     run_metrics = []
+    #     answers_choices = []
+    #     thinkings_choices = []
+    #     facts_choices = []
+
+    #     for q in questions:
+    #         start_idx = len(cr.llm.metrics_runs)
+    #         pred, _meta = answer_with_auto_strategy(
+    #             cr, policy, q,
+    #             reward_fn       = default_reward,
+    #             gold_answer     = gold_lookup[q],
+    #             greedy          = True
+    #         )
+
+    #         gen_metrics = (cr.llm.metrics_runs[start_idx:] or [{}])[-1]
+    #         run_metrics.append({"question": q, **gen_metrics})    
+
+    #         def _normalize_space(s: str) -> str:
+    #             if isinstance(s, list):
+    #                 s = " ".join(str(x) for x in s if x is not None)
+
+    #             return re.sub(r"\s+", " ", (s or "").strip())
+            
+    #         _SbertModel = None
+
+    #         def get_sbert_model():
+    #             nonlocal _SbertModel
+    #             if _SbertModel is None:
+    #                 _SbertModel = SentenceTransformer("BAAI/bge-base-en", device="cuda")
+    #             return _SbertModel
+
+    #         def reward_sbert_cached(pred: str, gold: str) -> float:
+    #             model = get_sbert_model()
+    #             emb_pred, emb_gold = model.encode([pred, gold])
+    #             emb_pred /= (np.linalg.norm(emb_pred) + 1e-9)
+    #             emb_gold /= (np.linalg.norm(emb_gold) + 1e-9)
+    #             return float((emb_pred * emb_gold).sum())
+
+    #         def group_questions_by_source(question_list):
+    #             grouped_questions = {}
+    #             for question in question_list:
+    #                 source = question.get("source")
+    #                 if source not in grouped_questions:
+    #                     grouped_questions[source] = []
+    #                 grouped_questions[source].append(question)
+    #             return grouped_questions
+            
+
+    #         import io
+    #         import json as _json
+    #         try:
+    #             _buf = io.BytesIO()
+    #             _json.dump(cr.meta_codebook, io.TextIOWrapper(_buf, encoding="utf-8"), ensure_ascii=False)
+    #             _buf.seek(0, 2)
+    #             meta_codebook_bytes = _buf.tell()
+    #         except Exception:
+    #             meta_codebook_bytes = 0
+    #         meta_codebook_mb = round(meta_codebook_bytes / (1024 * 1024), 3)
+
+    #         row = row_lookup[q]
+
+    #         predicted_answer_norm = _normalize_space(pred)
+    #         gold_answer_norm      = _normalize_space(row["answer"])
+    #         context_ret_norm      = _normalize_space(_meta['fact_context'])
+    #         ground_truth_context  = _normalize_space(row["evidence"])
+
+    #         if "no answer" in predicted_answer_norm.lower():
+    #             eval_result_correctness = 0.0
+    #         else:
+    #             eval_result_correctness = reward_sbert_cached(predicted_answer_norm, gold_answer_norm)
+    #         eval_result_context     = reward_sbert_cached(context_ret_norm, ground_truth_context)  
+
+    #         rows.append({
+    #             "id":               row["id"],
+    #             "question":         q,
+    #             "source":           row["source"],
+    #             "context":          _meta['fact_context'],
+    #             "evidence":         row["evidence"],
+    #             "question_type":    row["question_type"],
+    #             "generated_answer": pred,
+    #             "ground_truth":     row["answer"],
+    #             "answers_choice":   _meta['answers_choice'],
+    #             "thinkings_choice": _meta['thinkings_choice'],
+    #             "facts_choice":     _meta['facts_choice'],
+    #             "correctness": eval_result_correctness,
+    #             "context_similarity": eval_result_context,
+    #             "meta_codebook_json_bytes": meta_codebook_bytes,
+    #             "meta_codebook_json_MB": meta_codebook_mb,
+    #         })
+
+    #         answers_choices.append(_meta['answers_choice'])
+    #         thinkings_choices.append(_meta['thinkings_choice'])
+    #         facts_choices.append(_meta['facts_choice'])
+
+    #     Path(out_path).parent.mkdir(parents=True, exist_ok=True)
+    #     # 合并 rows 和 run_metrics
+    #     metrics_by_q = {m["question"]: m for m in run_metrics}
+    #     merged_results = []
+    #     for row in rows:
+    #         q = row["question"]
+    #         merged = dict(metrics_by_q.get(q, {}))
+    #         merged.update(row)  
+    #         merged_results.append(merged)
+    #     with open(out_path, "w") as f:
+    #         json.dump(merged_results, f, indent=2)
+    #         print(f"✓ wrote {len(merged_results)} merged rows → {out_path}")
+
+    #     return merged_results,answers_choices,thinkings_choices,facts_choices
 
     def dump_results(
         questions: List[str],
@@ -237,16 +351,35 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
                 greedy          = True
             )
 
-            gen_metrics = (cr.llm.metrics_runs[start_idx:] or [{}])[-1]
-            run_metrics.append({"question": q, **gen_metrics})    
+            # --- get and sanitize gen_metrics ---
+            gen_metrics = (cr.llm.metrics_runs[start_idx:] or [{}])[-1] or {}
+            if isinstance(gen_metrics, dict) and q in gen_metrics and isinstance(gen_metrics[q], dict):
+                gen_metrics = gen_metrics[q]
 
+            _ALLOWED_KEYS = {
+                "input_tokens", "output_tokens", "total_tokens",
+                "latency_sec", "gen_latency_sec", "retrieval_latency_sec",
+                "prompt_chars", "throughput_tok_per_s", "prompt_tok_per_s",
+                "device", "dtype", "model_name",
+                "timestamp_start", "timestamp_end",
+                "attempt", "question_chars", "answer_raw_chars", "answer_raw_tokens",
+                "prompt_to_output_char_ratio", "retrieved_count",
+                "peak_vram_MiB", "total_latency_sec",
+            }
+            gen_metrics = {k: v for k, v in gen_metrics.items() if k in _ALLOWED_KEYS}
+            run_metrics.append({"question": q, **gen_metrics})
+
+            # --- helpers ---
             def _normalize_space(s: str) -> str:
+                if isinstance(s, list):
+                    s = " ".join(str(x) for x in s if x is not None)
                 return re.sub(r"\s+", " ", (s or "").strip())
+
             _SbertModel = None
             def get_sbert_model():
-                global _SbertModel
+                nonlocal _SbertModel
                 if _SbertModel is None:
-                    _SbertModel = SentenceTransformer("BAAI/bge-base-en")
+                    _SbertModel = SentenceTransformer("BAAI/bge-base-en", device="cuda")
                 return _SbertModel
 
             def reward_sbert_cached(pred: str, gold: str) -> float:
@@ -256,15 +389,11 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
                 emb_gold /= (np.linalg.norm(emb_gold) + 1e-9)
                 return float((emb_pred * emb_gold).sum())
 
-            def group_questions_by_source(question_list):
-                grouped_questions = {}
-                for question in question_list:
-                    source = question.get("source")
-                    if source not in grouped_questions:
-                        grouped_questions[source] = []
-                    grouped_questions[source].append(question)
-                return grouped_questions
-            
+            # --- measure meta_codebook memory # mergee from meta
+            import json
+
+            # --- build row ---
+            row = row_lookup[q]
             predicted_answer_norm = _normalize_space(pred)
             gold_answer_norm      = _normalize_space(row["answer"])
             context_ret_norm      = _normalize_space(_meta['fact_context'])
@@ -274,20 +403,8 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
                 eval_result_correctness = 0.0
             else:
                 eval_result_correctness = reward_sbert_cached(predicted_answer_norm, gold_answer_norm)
-            eval_result_context     = reward_sbert_cached(context_ret_norm, ground_truth_context)  
+            eval_result_context = reward_sbert_cached(context_ret_norm, ground_truth_context)
 
-            import io
-            import json as _json
-            try:
-                _buf = io.BytesIO()
-                _json.dump(cr.meta_codebook, io.TextIOWrapper(_buf, encoding="utf-8"), ensure_ascii=False)
-                _buf.seek(0, 2)
-                meta_codebook_bytes = _buf.tell()
-            except Exception:
-                meta_codebook_bytes = 0
-            meta_codebook_mb = round(meta_codebook_bytes / (1024 * 1024), 3)
-
-            row = row_lookup[q]
             rows.append({
                 "id":               row["id"],
                 "question":         q,
@@ -302,32 +419,33 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
                 "facts_choice":     _meta['facts_choice'],
                 "correctness": eval_result_correctness,
                 "context_similarity": eval_result_context,
-                "meta_codebook_json_bytes": meta_codebook_bytes,
-                "meta_codebook_json_MB": meta_codebook_mb,
+                "meta_codebook_json_bytes": _meta['meta_codebook_json_bytes'],
+                "meta_codebook_json_MB": _meta['meta_codebook_json_MB'],
             })
 
             answers_choices.append(_meta['answers_choice'])
             thinkings_choices.append(_meta['thinkings_choice'])
             facts_choices.append(_meta['facts_choice'])
 
+        # --- merge metrics + rows ---
         Path(out_path).parent.mkdir(parents=True, exist_ok=True)
-        # 合并 rows 和 run_metrics
         metrics_by_q = {m["question"]: m for m in run_metrics}
         merged_results = []
         for row in rows:
             q = row["question"]
             merged = dict(metrics_by_q.get(q, {}))
-            merged.update(row)  
+            merged.update(row)
             merged_results.append(merged)
+
         with open(out_path, "w") as f:
             json.dump(merged_results, f, indent=2)
             print(f"✓ wrote {len(merged_results)} merged rows → {out_path}")
 
-        return merged_results,answers_choices,thinkings_choices,facts_choices
+        return merged_results, answers_choices, thinkings_choices, facts_choices
 
 
     print("» Answering evaluation questions …")
-    generated_rows,answers_choices,thinkings_choices,facts_choices = dump_results(test_questions, out_path= "results/compressrag_medical_data.json")
+    generated_rows,answers_choices,thinkings_choices,facts_choices = dump_results(test_questions, out_path= final_json_path)
 
 
 if __name__ == "__main__":
@@ -337,18 +455,18 @@ if __name__ == "__main__":
 
     reward_func = reward_func_dpo.reward_sbert_inclusive
 
-    SEED_N       = 20    # change to 20 for training
-    TEST_N       = 980     # change to 980 for rest
+    SEED_N       = 1    # change to 20 for training
+    TEST_N       = 3     # change to 980 for rest
 
     
 
     # change v number to v number +1 if want to recreate
 
-    df = compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N, 
+    compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N, 
                             top_m,top_m*10,aft_combine_sim,aft_combine_sim,aft_combine_sim,aft_combine_sim,
-                            Path("meta_codebook.json") ,f"pref_examples_medical_exact_graph_rag_v5.json",reward_func,
-                            reward_func_mode = 'non_llm',final_csv_path = f"results/{str(reward_func.__name__)}_result_for_exact_graph_rag_v5")
+                            Path("meta_codebook.json") ,f"pref_examples_medical_exact_graph_rag_v5_test.json",reward_func,
+                            reward_func_mode = 'non_llm',final_json_path = f"results/compressrag_medical_data_test.json")
 
-    df.to_csv('results/result_sbertinclusive_new_embed_for_exactgraphrag.csv')
+    # df.to_csv('results/result_sbertinclusive_new_embed_for_exactgraphrag.csv')
 
-# python pipeline_for_exactgraphrag.py
+# python pipeline_for_autopruned.py
