@@ -78,5 +78,11 @@ def triplet_parser(text: str, *, device: Optional[str|int] = None, max_new_token
         gen = rec.get("generated_text") or str(rec)
     return extract_triplets(gen)
 
-if __name__ == "__main__":
-   print(triplet_parser("Punta Cana is a resort town in the municipality of Higuey, in La Altagracia Province, the eastern most province of the Dominican Republic"))
+# if __name__ == "__main__":
+#     print(triplet_parser("Punta Cana is a resort town in the municipality of Higuey, in La Altagracia Province, the eastern most province of the Dominican Republic"))
+#     print(len(triplet_parser("Punta Cana is a resort town in the municipality of Higuey, in La Altagracia Province, the eastern most province of the Dominican Republic")))
+#     long_text ="Basal cell carcinoma (BCC) arises." * 2
+#     triples = triplet_parser(long_text, device=0)
+#     print(len(triples), "triples extracted")
+
+# python graph_generator/rebel.py

@@ -10,7 +10,7 @@ import pandas as pd
 from huggingface_hub import hf_hub_download
 from langchain_community.embeddings import HuggingFaceEmbeddings
 
-from ExactGraphRag_rl import (
+from AutoPrunedRetriever import (
     ExactGraphRag_rl, merging_codebook
 )
 
@@ -342,7 +342,7 @@ if __name__ == "__main__":
     reward_func = reward_func_dpo.reward_sbert_inclusive
 
     SEED_N       = 20    # change to 20 for training
-    TEST_N       = 980     # change to 980 for rest
+    TEST_N       = 2042     # change to 980 for rest
 
     
 
