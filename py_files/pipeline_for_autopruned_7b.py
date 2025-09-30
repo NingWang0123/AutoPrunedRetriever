@@ -7,6 +7,7 @@ import pathlib
 import numpy   as np
 import torch
 import pandas as pd
+from tqdm import tqdm
 from huggingface_hub import hf_hub_download
 from langchain_community.embeddings import HuggingFaceEmbeddings
 
@@ -218,6 +219,117 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
 
     policy, _ = train_dpo_2head(pref_ds, input_dim=768)
 
+    # def dump_results(
+    #     questions: List[str],
+    #     out_path: str,
+    # ):
+    #     rows = []
+    #     run_metrics = []
+    #     answers_choices = []
+    #     thinkings_choices = []
+    #     facts_choices = []
+
+    #     for q in questions:
+    #         start_idx = len(cr.llm.metrics_runs)
+    #         pred, _meta = answer_with_auto_strategy(
+    #             cr, policy, q,
+    #             reward_fn       = default_reward,
+    #             gold_answer     = gold_lookup[q],
+    #             greedy          = True
+    #         )
+
+    #         # --- get and sanitize gen_metrics ---
+    #         gen_metrics = (cr.llm.metrics_runs[start_idx:] or [{}])[-1] or {}
+    #         if isinstance(gen_metrics, dict) and q in gen_metrics and isinstance(gen_metrics[q], dict):
+    #             gen_metrics = gen_metrics[q]
+
+    #         _ALLOWED_KEYS = {
+    #             "input_tokens", "output_tokens", "total_tokens",
+    #             "latency_sec", "gen_latency_sec", "retrieval_latency_sec",
+    #             "prompt_chars", "throughput_tok_per_s", "prompt_tok_per_s",
+    #             "device", "dtype", "model_name",
+    #             "timestamp_start", "timestamp_end",
+    #             "attempt", "question_chars", "answer_raw_chars", "answer_raw_tokens",
+    #             "prompt_to_output_char_ratio", "retrieved_count",
+    #             "peak_vram_MiB", "total_latency_sec",
+    #         }
+    #         gen_metrics = {k: v for k, v in gen_metrics.items() if k in _ALLOWED_KEYS}
+    #         run_metrics.append({"question": q, **gen_metrics})
+
+    #         # --- helpers ---
+    #         def _normalize_space(s: str) -> str:
+    #             if isinstance(s, list):
+    #                 s = " ".join(str(x) for x in s if x is not None)
+    #             return re.sub(r"\s+", " ", (s or "").strip())
+
+    #         _SbertModel = None
+    #         def get_sbert_model():
+    #             nonlocal _SbertModel
+    #             if _SbertModel is None:
+    #                 _SbertModel = SentenceTransformer("BAAI/bge-base-en", device="cuda")
+    #             return _SbertModel
+
+    #         def reward_sbert_cached(pred: str, gold: str) -> float:
+    #             model = get_sbert_model()
+    #             emb_pred, emb_gold = model.encode([pred, gold])
+    #             emb_pred /= (np.linalg.norm(emb_pred) + 1e-9)
+    #             emb_gold /= (np.linalg.norm(emb_gold) + 1e-9)
+    #             return float((emb_pred * emb_gold).sum())
+
+    #         # --- measure meta_codebook memory # mergee from meta
+    #         import json
+
+    #         # --- build row ---
+    #         row = row_lookup[q]
+    #         predicted_answer_norm = _normalize_space(pred)
+    #         gold_answer_norm      = _normalize_space(row["answer"])
+    #         context_ret_norm      = _normalize_space(_meta['fact_context'])
+    #         ground_truth_context  = _normalize_space(row["evidence"])
+
+    #         if "no answer" in predicted_answer_norm.lower():
+    #             eval_result_correctness = 0.0
+    #         else:
+    #             eval_result_correctness = reward_sbert_cached(predicted_answer_norm, gold_answer_norm)
+    #         eval_result_context = reward_sbert_cached(context_ret_norm, ground_truth_context)
+
+    #         rows.append({
+    #             "id":               row["id"],
+    #             "question":         q,
+    #             "source":           row["source"],
+    #             "context":          _meta['fact_context'],
+    #             "evidence":         row["evidence"],
+    #             "question_type":    row["question_type"],
+    #             "generated_answer": pred,
+    #             "ground_truth":     row["answer"],
+    #             "answers_choice":   _meta['answers_choice'],
+    #             "thinkings_choice": _meta['thinkings_choice'],
+    #             "facts_choice":     _meta['facts_choice'],
+    #             "correctness": eval_result_correctness,
+    #             "context_similarity": eval_result_context,
+    #             "meta_codebook_json_bytes": _meta['meta_codebook_json_bytes'],
+    #             "meta_codebook_json_MB": _meta['meta_codebook_json_MB'],
+    #         })
+
+    #         answers_choices.append(_meta['answers_choice'])
+    #         thinkings_choices.append(_meta['thinkings_choice'])
+    #         facts_choices.append(_meta['facts_choice'])
+
+    #     # --- merge metrics + rows ---
+    #     Path(out_path).parent.mkdir(parents=True, exist_ok=True)
+    #     metrics_by_q = {m["question"]: m for m in run_metrics}
+    #     merged_results = []
+    #     for row in rows:
+    #         q = row["question"]
+    #         merged = dict(metrics_by_q.get(q, {}))
+    #         merged.update(row)
+    #         merged_results.append(merged)
+
+    #     with open(out_path, "w") as f:
+    #         json.dump(merged_results, f, indent=2)
+    #         print(f"✓ wrote {len(merged_results)} merged rows → {out_path}")
+
+    #     return merged_results, answers_choices, thinkings_choices, facts_choices
+
     def dump_results(
         questions: List[str],
         out_path: str,
@@ -228,90 +340,99 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
         thinkings_choices = []
         facts_choices = []
 
-        for q in questions:
-            start_idx = len(cr.llm.metrics_runs)
-            pred, _meta = answer_with_auto_strategy(
-                cr, policy, q,
-                reward_fn       = default_reward,
-                gold_answer     = gold_lookup[q],
-                greedy          = True
-            )
+        with tqdm(questions, desc="Processing questions") as pbar:
+            for q in pbar:
+                start_idx = len(cr.llm.metrics_runs)
+                pred, _meta = answer_with_auto_strategy(
+                    cr, policy, q,
+                    reward_fn       = default_reward,
+                    gold_answer     = gold_lookup[q],
+                    greedy          = True
+                )
 
-            # --- get and sanitize gen_metrics ---
-            gen_metrics = (cr.llm.metrics_runs[start_idx:] or [{}])[-1] or {}
-            if isinstance(gen_metrics, dict) and q in gen_metrics and isinstance(gen_metrics[q], dict):
-                gen_metrics = gen_metrics[q]
+                # --- get and sanitize gen_metrics ---
+                gen_metrics = (cr.llm.metrics_runs[start_idx:] or [{}])[-1] or {}
+                if isinstance(gen_metrics, dict) and q in gen_metrics and isinstance(gen_metrics[q], dict):
+                    gen_metrics = gen_metrics[q]
 
-            _ALLOWED_KEYS = {
-                "input_tokens", "output_tokens", "total_tokens",
-                "latency_sec", "gen_latency_sec", "retrieval_latency_sec",
-                "prompt_chars", "throughput_tok_per_s", "prompt_tok_per_s",
-                "device", "dtype", "model_name",
-                "timestamp_start", "timestamp_end",
-                "attempt", "question_chars", "answer_raw_chars", "answer_raw_tokens",
-                "prompt_to_output_char_ratio", "retrieved_count",
-                "peak_vram_MiB", "total_latency_sec",
-            }
-            gen_metrics = {k: v for k, v in gen_metrics.items() if k in _ALLOWED_KEYS}
-            run_metrics.append({"question": q, **gen_metrics})
+                _ALLOWED_KEYS = {
+                    "input_tokens", "output_tokens", "total_tokens",
+                    "latency_sec", "gen_latency_sec", "retrieval_latency_sec",
+                    "prompt_chars", "throughput_tok_per_s", "prompt_tok_per_s",
+                    "device", "dtype", "model_name",
+                    "timestamp_start", "timestamp_end",
+                    "attempt", "question_chars", "answer_raw_chars", "answer_raw_tokens",
+                    "prompt_to_output_char_ratio", "retrieved_count",
+                    "peak_vram_MiB", "total_latency_sec",
+                }
+                gen_metrics = {k: v for k, v in gen_metrics.items() if k in _ALLOWED_KEYS}
+                run_metrics.append({"question": q, **gen_metrics})
 
-            # --- helpers ---
-            def _normalize_space(s: str) -> str:
-                if isinstance(s, list):
-                    s = " ".join(str(x) for x in s if x is not None)
-                return re.sub(r"\s+", " ", (s or "").strip())
+                # --- update progress bar with latest latencies ---
+                if "latency_sec" in gen_metrics or "gen_latency_sec" in gen_metrics:
+                    pbar.set_postfix({
+                        "lat": f"{gen_metrics.get('latency_sec', 0):.2f}s",
+                        "gen": f"{gen_metrics.get('gen_latency_sec', 0):.2f}s",
+                        "ret": f"{gen_metrics.get('retrieval_latency_sec', 0):.2f}s"
+                    })
 
-            _SbertModel = None
-            def get_sbert_model():
-                nonlocal _SbertModel
-                if _SbertModel is None:
-                    _SbertModel = SentenceTransformer("BAAI/bge-base-en", device="cuda")
-                return _SbertModel
+                # --- helpers ---
+                def _normalize_space(s: str) -> str:
+                    if isinstance(s, list):
+                        s = " ".join(str(x) for x in s if x is not None)
+                    return re.sub(r"\s+", " ", (s or "").strip())
 
-            def reward_sbert_cached(pred: str, gold: str) -> float:
-                model = get_sbert_model()
-                emb_pred, emb_gold = model.encode([pred, gold])
-                emb_pred /= (np.linalg.norm(emb_pred) + 1e-9)
-                emb_gold /= (np.linalg.norm(emb_gold) + 1e-9)
-                return float((emb_pred * emb_gold).sum())
+                _SbertModel = None
+                def get_sbert_model():
+                    nonlocal _SbertModel
+                    if _SbertModel is None:
+                        _SbertModel = SentenceTransformer("BAAI/bge-base-en", device="cuda")
+                    return _SbertModel
 
-            # --- measure meta_codebook memory # mergee from meta
-            import json
+                def reward_sbert_cached(pred: str, gold: str) -> float:
+                    model = get_sbert_model()
+                    emb_pred, emb_gold = model.encode([pred, gold])
+                    emb_pred /= (np.linalg.norm(emb_pred) + 1e-9)
+                    emb_gold /= (np.linalg.norm(emb_gold) + 1e-9)
+                    return float((emb_pred * emb_gold).sum())
 
-            # --- build row ---
-            row = row_lookup[q]
-            predicted_answer_norm = _normalize_space(pred)
-            gold_answer_norm      = _normalize_space(row["answer"])
-            context_ret_norm      = _normalize_space(_meta['fact_context'])
-            ground_truth_context  = _normalize_space(row["evidence"])
+                # --- measure meta_codebook memory # mergee from meta
+                import json
 
-            if "no answer" in predicted_answer_norm.lower():
-                eval_result_correctness = 0.0
-            else:
-                eval_result_correctness = reward_sbert_cached(predicted_answer_norm, gold_answer_norm)
-            eval_result_context = reward_sbert_cached(context_ret_norm, ground_truth_context)
+                # --- build row ---
+                row = row_lookup[q]
+                predicted_answer_norm = _normalize_space(pred)
+                gold_answer_norm      = _normalize_space(row["answer"])
+                context_ret_norm      = _normalize_space(_meta['fact_context'])
+                ground_truth_context  = _normalize_space(row["evidence"])
 
-            rows.append({
-                "id":               row["id"],
-                "question":         q,
-                "source":           row["source"],
-                "context":          _meta['fact_context'],
-                "evidence":         row["evidence"],
-                "question_type":    row["question_type"],
-                "generated_answer": pred,
-                "ground_truth":     row["answer"],
-                "answers_choice":   _meta['answers_choice'],
-                "thinkings_choice": _meta['thinkings_choice'],
-                "facts_choice":     _meta['facts_choice'],
-                "correctness": eval_result_correctness,
-                "context_similarity": eval_result_context,
-                "meta_codebook_json_bytes": _meta['meta_codebook_json_bytes'],
-                "meta_codebook_json_MB": _meta['meta_codebook_json_MB'],
-            })
+                if "no answer" in predicted_answer_norm.lower():
+                    eval_result_correctness = 0.0
+                else:
+                    eval_result_correctness = reward_sbert_cached(predicted_answer_norm, gold_answer_norm)
+                eval_result_context = reward_sbert_cached(context_ret_norm, ground_truth_context)
 
-            answers_choices.append(_meta['answers_choice'])
-            thinkings_choices.append(_meta['thinkings_choice'])
-            facts_choices.append(_meta['facts_choice'])
+                rows.append({
+                    "id":               row["id"],
+                    "question":         q,
+                    "source":           row["source"],
+                    "context":          _meta['fact_context'],
+                    "evidence":         row["evidence"],
+                    "question_type":    row["question_type"],
+                    "generated_answer": pred,
+                    "ground_truth":     row["answer"],
+                    "answers_choice":   _meta['answers_choice'],
+                    "thinkings_choice": _meta['thinkings_choice'],
+                    "facts_choice":     _meta['facts_choice'],
+                    "correctness": eval_result_correctness,
+                    "context_similarity": eval_result_context,
+                    "meta_codebook_json_bytes": _meta['meta_codebook_json_bytes'],
+                    "meta_codebook_json_MB": _meta['meta_codebook_json_MB'],
+                })
+
+                answers_choices.append(_meta['answers_choice'])
+                thinkings_choices.append(_meta['thinkings_choice'])
+                facts_choices.append(_meta['facts_choice'])
 
         # --- merge metrics + rows ---
         Path(out_path).parent.mkdir(parents=True, exist_ok=True)
