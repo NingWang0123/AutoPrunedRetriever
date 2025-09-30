@@ -204,7 +204,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
                     questions= seed_questions,
                     gold_answers=gold_lookup,
                     per_q_samples = 6,
-                    feature_dim = 384,
+                    feature_dim = 768,
                     reward_fn = reward_func,
                     seed = 0,
                     isolate_state = True,
@@ -216,7 +216,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
             
 
 
-    policy, _ = train_dpo_2head(pref_ds, input_dim=384)
+    policy, _ = train_dpo_2head(pref_ds, input_dim=768)
 
     def dump_results(
         questions: List[str],
