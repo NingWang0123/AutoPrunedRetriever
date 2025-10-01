@@ -2707,14 +2707,16 @@ def _drop_keys(d: Dict[str, Any], matchers) -> Dict[str, Any]:
 # decode ere or edge into words
 def decode_into_words_for_ere_and_edge(final_merged_json: Dict[str, Any],format : str = 'edge',choices = []):
   final_merged_json_copy = deepcopy(final_merged_json)
+  all_transformed_feats = []
 
   if format == 'edge':
     for choice in choices:
       if choice in final_merged_json_copy:
         trans_formed_choice = decode_questions(final_merged_json_copy[choice], final_merged_json_copy, fmt='words')
         final_merged_json_copy[choice.split("(")[0]+'words'] = trans_formed_choice
+        all_transformed_feats.append(choice.split("(")[0]+'words')
         final_merged_json_copy.pop(choice)
-      
+
 
   elif format == 'ere':
     def _triples_to_words(triples, cb):
@@ -2727,9 +2729,11 @@ def decode_into_words_for_ere_and_edge(final_merged_json: Dict[str, Any],format 
         for triples in final_merged_json_copy[choice]:
           trans_formed_choice.append(_triples_to_words(triples, final_merged_json_copy))
         final_merged_json_copy[choice.split("(")[0]+'words'] = trans_formed_choice
+        all_transformed_feats.append(choice.split("(")[0]+'words')
         final_merged_json_copy.pop(choice)
 
-  return format, final_merged_json_copy
+  return final_merged_json_copy,all_transformed_feats
+
 
 def slice_for_final_merged_json(final_merged_json: Dict[str, Any],use_word_format : bool = True) -> Dict[str, Any]:
     """
