@@ -148,7 +148,7 @@ class Phi4MiniReasoningLLM:
         # Keep the system prompt bossy and unambiguous
         system_msg = (
             "You are a precise QA agent. "
-            "Return ONLY the final answer as 2-3 short phrases/sentences."
+            "Return ONLY the final answer in as 2-3 short sentences."
             "If yes or no question, still descirbe in 2-3 sentences."
             "No preamble, no labels, no emojis, no follow-up questions."
             "Read the information from the json below"
