@@ -20,7 +20,7 @@ from dpo_exactgraphrag import (
     default_reward, answer_with_auto_strategy,save_pref_examples,load_pref_examples,ANSWERS_CHOICES,THINKINGS_CHOICES,FACTS_CHOICES
 )
 
-from test_for_compressrag import Phi4MiniReasoningLLM,Word2VecEmbeddings
+from llm_local import Phi4MiniReasoningLLM,Word2VecEmbeddings
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings
 from langchain_openai import ChatOpenAI
 # from evaluation_func_graphrag import compute_answer_correctness
@@ -354,6 +354,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
 
     print("» Answering evaluation questions …")
     generated_rows,answers_choices,thinkings_choices,facts_choices = dump_results(test_questions, out_path= final_json_path)
+
 
 
 if __name__ == "__main__":
