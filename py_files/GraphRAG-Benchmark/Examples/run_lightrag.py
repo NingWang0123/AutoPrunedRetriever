@@ -370,8 +370,8 @@ async def initialize_rag(
 
         llm_kwargs = {
             "model_name": model_name,
-            "temperature": 0.0,
-            "top_p": 0.9,
+            "temperature": 0.3,
+            "top_p": 0.95,
             "max_new_tokens": 256,
         }
         llm_model_func_input = hf_model_complete

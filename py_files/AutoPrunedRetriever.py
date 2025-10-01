@@ -2729,7 +2729,7 @@ def decode_into_words_for_ere_and_edge(final_merged_json: Dict[str, Any],format 
         final_merged_json_copy[choice.split("(")[0]+'words'] = trans_formed_choice
         final_merged_json_copy.pop(choice)
 
-  return final_merged_json_copy
+  return format, final_merged_json_copy
 
 def slice_for_final_merged_json(final_merged_json: Dict[str, Any],use_word_format : bool = True) -> Dict[str, Any]:
     """
@@ -3578,6 +3578,8 @@ class ExactGraphRag_rl:
         q_txt, gk_txt, st_txt, ft_txt = select_best_context_by_keys(final_merged_json)
 
         final_merged_json = slice_for_final_merged_json(final_merged_json,self.use_word)
+
+        print(f'slice_for_final_merged_json {final_merged_json}')
 
         self.cur_fact_context = ft_txt
 
