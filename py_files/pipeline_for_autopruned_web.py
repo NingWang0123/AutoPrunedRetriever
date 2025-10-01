@@ -7,7 +7,7 @@ import pathlib
 import numpy   as np
 import torch
 import pandas as pd
-import tqdm
+from tqdm import tqdm
 from huggingface_hub import hf_hub_download
 from langchain_community.embeddings import HuggingFaceEmbeddings
 
@@ -20,7 +20,7 @@ from dpo_exactgraphrag import (
     default_reward, answer_with_auto_strategy,save_pref_examples,load_pref_examples,ANSWERS_CHOICES,THINKINGS_CHOICES,FACTS_CHOICES
 )
 
-from test_for_compressrag import Phi4MiniReasoningLLM,Word2VecEmbeddings
+from llm_local import Phi4MiniReasoningLLM,Word2VecEmbeddings
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings
 from langchain_openai import ChatOpenAI
 # from evaluation_func_graphrag import compute_answer_correctness
