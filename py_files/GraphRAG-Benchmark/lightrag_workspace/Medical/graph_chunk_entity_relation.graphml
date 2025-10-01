@@ -1,0 +1,625 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+  <key id="d11" for="edge" attr.name="created_at" attr.type="long" />
+  <key id="d10" for="edge" attr.name="file_path" attr.type="string" />
+  <key id="d9" for="edge" attr.name="source_id" attr.type="string" />
+  <key id="d8" for="edge" attr.name="keywords" attr.type="string" />
+  <key id="d7" for="edge" attr.name="description" attr.type="string" />
+  <key id="d6" for="edge" attr.name="weight" attr.type="double" />
+  <key id="d5" for="node" attr.name="created_at" attr.type="long" />
+  <key id="d4" for="node" attr.name="file_path" attr.type="string" />
+  <key id="d3" for="node" attr.name="source_id" attr.type="string" />
+  <key id="d2" for="node" attr.name="description" attr.type="string" />
+  <key id="d1" for="node" attr.name="entity_type" attr.type="string" />
+  <key id="d0" for="node" attr.name="entity_id" attr.type="string" />
+  <graph edgedefault="undirected">
+    <node id="Active Medicine">
+      <data key="d0">Active Medicine</data>
+      <data key="d1">Category</data>
+      <data key="d2">Active medicine refers to treatments that are active in the body, such as chemotherapy or immunotherapy.</data>
+      <data key="d3">chunk-bb68daec67dd8f436d82814b0e61ff21</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177686</data>
+    </node>
+    <node id="Dont Be Shy">
+      <data key="d0">Dont Be Shy</data>
+      <data key="d1">Category</data>
+      <data key="d2">This phrase encourages individuals to take an active role in their health and well-being.</data>
+      <data key="d3">chunk-bb68daec67dd8f436d82814b0e61ff21</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177686</data>
+    </node>
+    <node id="Be Your Own Advocate">
+      <data key="d0">Be Your Own Advocate</data>
+      <data key="d1">Category</data>
+      <data key="d2">This phrase suggests that individuals should advocate for themselves and seek help when needed.</data>
+      <data key="d3">chunk-bb68daec67dd8f436d82814b0e61ff21</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177686</data>
+    </node>
+    <node id="Ask Someone Close">
+      <data key="d0">Ask Someone Close</data>
+      <data key="d1">Category</data>
+      <data key="d2">This phrase advises individuals to seek support from someone they trust.</data>
+      <data key="d3">chunk-bb68daec67dd8f436d82814b0e61ff21</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177686</data>
+    </node>
+    <node id="Quality of Life">
+      <data key="d0">Quality of Life</data>
+      <data key="d1">Category</data>
+      <data key="d2">Quality of life refers to an individual's overall sense of well-being and ability to participate in their usual activities.</data>
+      <data key="d3">chunk-bb68daec67dd8f436d82814b0e61ff21</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177686</data>
+    </node>
+    <node id="Induction">
+      <data key="d0">Induction</data>
+      <data key="d1">Category</data>
+      <data key="d2">Induction is the first phase of treatment for primary CNS lymphoma, aimed at wiping out lymphoma cells.</data>
+      <data key="d3">chunk-bb68daec67dd8f436d82814b0e61ff21</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177686</data>
+    </node>
+    <node id="Consolidation">
+      <data key="d0">Consolidation</data>
+      <data key="d1">Category</data>
+      <data key="d2">Consolidation is the second phase of treatment for primary CNS lymphoma, aimed at destroying any remaining cancer cells.</data>
+      <data key="d3">chunk-bb68daec67dd8f436d82814b0e61ff21</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177686</data>
+    </node>
+    <node id="Treatment for the Spine">
+      <data key="d0">Treatment for the Spine</data>
+      <data key="d1">Category</data>
+      <data key="d2">Treatment for</data>
+      <data key="d3">chunk-bb68daec67dd8f436d82814b0e61ff21</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177686</data>
+    </node>
+    <node id="colonoscopy">
+      <data key="d0">colonoscopy</data>
+      <data key="d1">Procedure</data>
+      <data key="d2">A colonoscopy is a medical procedure used to examine the inside of the colon and rectum.</data>
+      <data key="d3">chunk-c1c1687a8a20b9c451956cf8bba241cc</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177686</data>
+    </node>
+    <node id="colon">
+      <data key="d0">colon</data>
+      <data key="d1">Body Part</data>
+      <data key="d2">The colon is a part of the digestive system responsible for absorbing water and nutrients from food.</data>
+      <data key="d3">chunk-c1c1687a8a20b9c451956cf8bba241cc</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177686</data>
+    </node>
+    <node id="rectum">
+      <data key="d0">rectum</data>
+      <data key="d1">Body Part</data>
+      <data key="d2">The rectum is the last part of the large intestine, where waste is stored before being eliminated from the body.</data>
+      <data key="d3">chunk-c1c1687a8a20b9c451956cf8bba241cc</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177686</data>
+    </node>
+    <node id="colon cancer">
+      <data key="d0">colon cancer</data>
+      <data key="d1">Disease</data>
+      <data key="d2">Colon cancer is a type of cancer that develops in the colon or rectum.</data>
+      <data key="d3">chunk-c1c1687a8a20b9c451956cf8bba241cc</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177686</data>
+    </node>
+    <node id="Cancer">
+      <data key="d0">Cancer</data>
+      <data key="d1">Category</data>
+      <data key="d2">Cancer is a broad term for diseases that involve abnormal cell growth.&lt;SEP&gt;Cancer is a disease characterized by the abnormal growth and spread of cells, often leading to tissue damage and potential life-threatening complications.</data>
+      <data key="d3">chunk-ef6586b896c47b361bf4f6aabb4c35d5&lt;SEP&gt;chunk-cb41559e96b71d2bb4ea207c806e8d5f</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177686</data>
+    </node>
+    <node id="Non-Small Cell Lung Cancer">
+      <data key="d0">Non-Small Cell Lung Cancer</data>
+      <data key="d1">Category</data>
+      <data key="d2">Non-small cell lung cancer (NSCLC) is a type of lung cancer that is the most common type of lung cancer.</data>
+      <data key="d3">chunk-ef6586b896c47b361bf4f6aabb4c35d5</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177686</data>
+    </node>
+    <node id="Small Cell Lung Cancer">
+      <data key="d0">Small Cell Lung Cancer</data>
+      <data key="d1">Category</data>
+      <data key="d2">Small cell lung cancer is a different type of lung cancer covered in another book.</data>
+      <data key="d3">chunk-ef6586b896c47b361bf4f6aabb4c35d5</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177686</data>
+    </node>
+    <node id="Lung Cancer">
+      <data key="d0">Lung Cancer</data>
+      <data key="d1">Category</data>
+      <data key="d2">Lung cancer is a type of cancer that forms in the lungs.</data>
+      <data key="d3">chunk-ef6586b896c47b361bf4f6aabb4c35d5</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177686</data>
+    </node>
+    <node id="Airways">
+      <data key="d0">Airways</data>
+      <data key="d1">Category</data>
+      <data key="d2">The airways of the lungs are the bronchi, bronchioli, and alveoli.</data>
+      <data key="d3">chunk-ef6586b896c47b361bf4f6aabb4c35d5</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177687</data>
+    </node>
+    <node id="Bronchi">
+      <data key="d0">Bronchi</data>
+      <data key="d1">Category</data>
+      <data key="d2">The bronchi are the airways inside the lungs that split from the windpipe.</data>
+      <data key="d3">chunk-ef6586b896c47b361bf4f6aabb4c35d5</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177687</data>
+    </node>
+    <node id="Bronchioli">
+      <data key="d0">Bronchioli</data>
+      <data key="d1">Category</data>
+      <data key="d2">The bronchioli are the smaller airways inside the lungs that branch off from the bronchi.</data>
+      <data key="d3">chunk-ef6586b896c47b361bf4f6aabb4c35d5</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177687</data>
+    </node>
+    <node id="Alveoli">
+      <data key="d0">Alveoli</data>
+      <data key="d1">Category</data>
+      <data key="d2">The alveoli are the</data>
+      <data key="d3">chunk-ef6586b896c47b361bf4f6aabb4c35d5</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177687</data>
+    </node>
+    <node id="CT or PET/MRI">
+      <data key="d0">CT or PET/MRI</data>
+      <data key="d1">Equipment</data>
+      <data key="d2">CT or PET/MRI is a type of medical imaging equipment used to diagnose and monitor various conditions, including cancer.</data>
+      <data key="d3">chunk-f1379433bc205cdec8af2edc77613acb</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177687</data>
+    </node>
+    <node id="natural language processing">
+      <data key="d0">natural language processing</data>
+      <data key="d1">Technology</data>
+      <data key="d2">Natural language processing is a field of artificial intelligence that focuses on enabling computers to understand, interpret, and generate human language.</data>
+      <data key="d3">chunk-f1379433bc205cdec8af2edc77613acb</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177687</data>
+    </node>
+    <node id="sugar">
+      <data key="d0">sugar</data>
+      <data key="d1">Product</data>
+      <data key="d2">Sugar is a type of carbohydrate that is commonly used as a sweetener in food and beverages.</data>
+      <data key="d3">chunk-f1379433bc205cdec8af2edc77613acb</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177687</data>
+    </node>
+    <node id="radioactive type of sugar">
+      <data key="d0">radioactive type of sugar</data>
+      <data key="d1">Product</data>
+      <data key="d2">A radioactive type of sugar is a substance that emits radiation, often used in medical imaging and treatment.</data>
+      <data key="d3">chunk-f1379433bc205cdec8af2edc77613acb</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177687</data>
+    </node>
+    <node id="FDG-PET scan">
+      <data key="d0">FDG-PET scan</data>
+      <data key="d1">Procedure</data>
+      <data key="d2">FDG-PET scan is a type of medical imaging procedure that uses a radioactive type of sugar to detect cancer cells.</data>
+      <data key="d3">chunk-f1379433bc205cdec8af2edc77613acb</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177687</data>
+    </node>
+    <node id="SSTR antagonist">
+      <data key="d0">SSTR antagonist</data>
+      <data key="d1">Product</data>
+      <data key="d2">A SSTR antagonist is a protein that binds to a hormone called somatostatin, which is found on the surface of cells.</data>
+      <data key="d3">chunk-f1379433bc205cdec8af2edc77613acb</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177687</data>
+    </node>
+    <node id="SSTR-PET/CT scan">
+      <data key="d0">SSTR-PET/CT scan</data>
+      <data key="d1">Procedure</data>
+      <data key="d2">SSTR-P</data>
+      <data key="d3">chunk-f1379433bc205cdec8af2edc77613acb</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177687</data>
+    </node>
+    <node id="National Comprehensive Cancer Network">
+      <data key="d0">National Comprehensive Cancer Network</data>
+      <data key="d1">Organization</data>
+      <data key="d2">The National Comprehensive Cancer Network is a non-profit organization that provides guidelines for cancer care.</data>
+      <data key="d3">chunk-bd7ea43a74059d6781866faec437f19a</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177687</data>
+    </node>
+    <node id="AML">
+      <data key="d0">AML</data>
+      <data key="d1">Category</data>
+      <data key="d2">AML stands for Acute Myeloid Leukemia, a type of blood cancer.</data>
+      <data key="d3">chunk-bd7ea43a74059d6781866faec437f19a</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177687</data>
+    </node>
+    <node id="bone marrow">
+      <data key="d0">bone marrow</data>
+      <data key="d1">Location</data>
+      <data key="d2">Bone marrow is the soft, spongy tissue found in the center of most bones.</data>
+      <data key="d3">chunk-bd7ea43a74059d6781866faec437f19a</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177687</data>
+    </node>
+    <node id="plasma">
+      <data key="d0">plasma</data>
+      <data key="d1">Product</data>
+      <data key="d2">Plasma is the liquid component of blood, made up of mostly water.</data>
+      <data key="d3">chunk-bd7ea43a74059d6781866faec437f19a</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177687</data>
+    </node>
+    <node id="red blood cells">
+      <data key="d0">red blood cells</data>
+      <data key="d1">Product</data>
+      <data key="d2">Red blood cells are the cells that carry oxygen throughout the body.</data>
+      <data key="d3">chunk-bd7ea43a74059d6781866faec437f19a</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177687</data>
+    </node>
+    <node id="white blood cells">
+      <data key="d0">white blood cells</data>
+      <data key="d1">Product</data>
+      <data key="d2">White blood cells are the cells that fight infections.</data>
+      <data key="d3">chunk-bd7ea43a74059d6781866faec437f19a</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177687</data>
+    </node>
+    <node id="platelets">
+      <data key="d0">platelets</data>
+      <data key="d1">Product</data>
+      <data key="d2">Platelets are the cells that help control bleeding.</data>
+      <data key="d3">chunk-bd7ea43a74059d6781866faec437f19a</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177687</data>
+    </node>
+    <node id="hematopoietic stem cells">
+      <data key="d0">hematopoietic stem cells</data>
+      <data key="d1">Product</data>
+      <data key="d2">Hematopoietic stem cells are the early blood-forming cells that develop into blood cells.</data>
+      <data key="d3">chunk-bd7ea43a74059d6781866faec437f19a</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177687</data>
+    </node>
+    <node id="digital rectal exam">
+      <data key="d0">digital rectal exam</data>
+      <data key="d1">Procedure</data>
+      <data key="d2">A digital rectal exam (DRE) is an important exam for diagnosis, staging, and follow-up. It involves inserting a gloved, lubricated finger into the anus and rectum to detect or assess growths or other abnormalities in the anal canal and nearby areas.</data>
+      <data key="d3">chunk-9530f389987c13273449ab22a85170ae</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177687</data>
+    </node>
+    <node id="high-resolution anoscopy">
+      <data key="d0">high-resolution anoscopy</data>
+      <data key="d1">Procedure</data>
+      <data key="d2">High-resolution anoscopy (HRA) is a procedure that allows a health care provider to view and examine the anal canal with magnification. After a numbing gel is applied to the anal area, a short, hollow tool (an anoscope) is inserted a few inches into the anus. Next, a liquid called acetic acid is applied to the anal canal tissue. A special magnifying glass called a colposcope is then used to closely examine the tissues of the anal canal.</data>
+      <data key="d3">chunk-9530f389987c13273449ab22a85170ae</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177687</data>
+    </node>
+    <node id="anal cancer">
+      <data key="d0">anal cancer</data>
+      <data key="d1">Category</data>
+      <data key="d2">Anal cancer is a type of cancer that starts in the anal canal, which is the last part of the large intestine. It can cause bleeding from the anus, anal itching, pain in the anal area, or the feeling of a lump or mass near the anus.</data>
+      <data key="d3">chunk-9530f389987c13273449ab22a85170ae</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177687</data>
+    </node>
+    <node id="Well differentiated">
+      <data key="d0">Well differentiated</data>
+      <data key="d1">Category</data>
+      <data key="d2">Well-differentiated cancer cells are those that have not yet spread beyond their original site.</data>
+      <data key="d3">chunk-29b3a349650a8bb55b318dcc6ecb0519</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177687</data>
+    </node>
+    <node id="Moderately differentiated">
+      <data key="d0">Moderately differentiated</data>
+      <data key="d1">Category</data>
+      <data key="d2">Moderately-differentiated cancer cells are those that have begun to spread but are still relatively contained.</data>
+      <data key="d3">chunk-29b3a349650a8bb55b318dcc6ecb0519</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177687</data>
+    </node>
+    <node id="Poorly differentiated">
+      <data key="d0">Poorly differentiated</data>
+      <data key="d1">Category</data>
+      <data key="d2">Poorly-differentiated cancer cells are those that have spread extensively and are highly invasive.</data>
+      <data key="d3">chunk-29b3a349650a8bb55b318dcc6ecb0519</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177687</data>
+    </node>
+    <node id="Undifferentiated">
+      <data key="d0">Undifferentiated</data>
+      <data key="d1">Category</data>
+      <data key="d2">Undifferentiated cancer cells are those that have lost their normal structure and function, often indicating a more aggressive form of cancer.</data>
+      <data key="d3">chunk-29b3a349650a8bb55b318dcc6ecb0519</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177687</data>
+    </node>
+    <node id="Local excision">
+      <data key="d0">Local excision</data>
+      <data key="d1">Procedure</data>
+      <data key="d2">Local excision is a surgical procedure that involves removing a small area of tissue, typically from the perianal region, to remove cancerous cells.</data>
+      <data key="d3">chunk-29b3a349650a8bb55b318dcc6ecb0519</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177687</data>
+    </node>
+    <node id="Surgical margin">
+      <data key="d0">Surgical margin</data>
+      <data key="d1">Procedure</data>
+      <data key="d2">The surgical margin is the area of tissue surrounding the cancerous lesion that is removed during surgery.</data>
+      <data key="d3">chunk-29b3a349650a8bb55b318dcc6ecb0519</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177687</data>
+    </node>
+    <node id="1 cm">
+      <data key="d0">1 cm</data>
+      <data key="d1">Measurement</data>
+      <data key="d2">1 cm is a common measurement used to determine the size of the surgical margin.</data>
+      <data key="d3">chunk-29b3a349650a8bb55b318dcc6ecb0519</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177687</data>
+    </node>
+    <node id="Mismatch Repair Deficiency">
+      <data key="d0">Mismatch Repair Deficiency</data>
+      <data key="d1">Category</data>
+      <data key="d2">Mismatch repair deficiency (dMMR) is a biomarker that indicates the presence of a specific type of cancer.</data>
+      <data key="d3">chunk-594536d6aaa61f8f1699ba50bf218a33</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177687</data>
+    </node>
+    <node id="Lynch Syndrome">
+      <data key="d0">Lynch Syndrome</data>
+      <data key="d1">Category</data>
+      <data key="d2">Lynch syndrome is an inherited cancer syndrome associated with mismatch repair deficiency (dMMR).</data>
+      <data key="d3">chunk-594536d6aaa61f8f1699ba50bf218a33</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177687</data>
+    </node>
+    <node id="Rectal Cancer">
+      <data key="d0">Rectal Cancer</data>
+      <data key="d1">Category</data>
+      <data key="d2">Rectal cancer is a type of cancer that affects the rectum, the lower part of the large intestine.</data>
+      <data key="d3">chunk-594536d6aaa61f8f1699ba50bf218a33</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177687</data>
+    </node>
+    <node id="Family Health History">
+      <data key="d0">Family Health History</data>
+      <data key="d1">Category</data>
+      <data key="d2">Family health history is a record of medical conditions and diseases in a person's family, which can provide insights into inherited cancer syndromes.</data>
+      <data key="d3">chunk-594536d6aaa61f8f1699ba50bf218a33</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177687</data>
+    </node>
+    <node id="MRI Pelvis">
+      <data key="d0">MRI Pelvis</data>
+      <data key="d1">Category</data>
+      <data key="d2">MRI of the pelvis is a diagnostic imaging technique used to examine the pelvic region, including the rectum and surrounding structures.</data>
+      <data key="d3">chunk-594536d6aaa61f8f1699ba50bf218a33</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177687</data>
+    </node>
+    <node id="CT Chest Abdomen">
+      <data key="d0">CT Chest Abdomen</data>
+      <data key="d1">Category</data>
+      <data key="d2">CT scan of the chest and abdomen is a diagnostic imaging technique used to examine the internal organs and structures in the chest and abdomen.</data>
+      <data key="d3">chunk-594536d6aaa61f8f1699ba50bf218a33</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177687</data>
+    </node>
+    <node id="Fertility Preservation">
+      <data key="d0">Fertility Preservation</data>
+      <data key="d1">Category</data>
+      <data key="d2">Fertility preservation</data>
+      <data key="d3">chunk-594536d6aaa61f8f1699ba50bf218a33</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177687</data>
+    </node>
+    <node id="Complete">
+      <data key="d0">Complete</data>
+      <data key="d1">Category</data>
+      <data key="d2">The extraction task is complete and all entities and relationships have been identified and extracted.</data>
+      <data key="d3">chunk-ae28e3852f4a9f229250fc19eb39036b</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177687</data>
+    </node>
+    <node id="RUNX1::RUNX1T">
+      <data key="d0">RUNX1::RUNX1T</data>
+      <data key="d1">Category</data>
+      <data key="d2">RUNX1::RUNX1T is a genetic mutation associated with leukemia predisposition syndromes.</data>
+      <data key="d3">chunk-db4e8318949a3fda5683c53985c6af05</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177687</data>
+    </node>
+    <node id="Leukemia Predisposition Syndromes">
+      <data key="d0">Leukemia Predisposition Syndromes</data>
+      <data key="d1">Category</data>
+      <data key="d2">Leukemia predisposition syndromes are hereditary conditions that increase the risk of developing leukemia.</data>
+      <data key="d3">chunk-db4e8318949a3fda5683c53985c6af05</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177687</data>
+    </node>
+    <node id="Hereditary Cancer Syndromes">
+      <data key="d0">Hereditary Cancer Syndromes</data>
+      <data key="d1">Category</data>
+      <data key="d2">Hereditary cancer syndromes are genetic conditions that increase the risk of developing certain types of cancer.</data>
+      <data key="d3">chunk-db4e8318949a3fda5683c53985c6af05</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177687</data>
+    </node>
+    <node id="Family History of Leukemia">
+      <data key="d0">Family History of Leukemia</data>
+      <data key="d1">Category</data>
+      <data key="d2">A family history of leukemia can affect treatment decisions and genetic testing.</data>
+      <data key="d3">chunk-db4e8318949a3fda5683c53985c6af05</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177688</data>
+    </node>
+    <node id="Skin Punch Biopsy">
+      <data key="d0">Skin Punch Biopsy</data>
+      <data key="d1">Procedure</data>
+      <data key="d2">A skin punch biopsy is a procedure used to obtain DNA from skin cells that haven't been affected by leukemia.</data>
+      <data key="d3">chunk-db4e8318949a3fda5683c53985c6af05</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177688</data>
+    </node>
+    <node id="Punch Biopsy">
+      <data key="d0">Punch Biopsy</data>
+      <data key="d1">Procedure</data>
+      <data key="d2">A punch biopsy is a procedure used to obtain tissue samples for genetic testing.</data>
+      <data key="d3">chunk-db4e8318949a3fda5683c53985c6af05</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177688</data>
+    </node>
+    <node id="Guidance">
+      <data key="d0">Guidance</data>
+      <data key="d1">Category</data>
+      <data key="d2">Guidance is a type of content that provides information, advice, or instruction on a specific topic.</data>
+      <data key="d3">chunk-1dc8d8e5ed4f165f3e56305a7644ba05</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177688</data>
+    </node>
+    <node id="Mammogram">
+      <data key="d0">Mammogram</data>
+      <data key="d1">Equipment</data>
+      <data key="d2">Mammogram is a medical imaging test used to detect breast cancer.</data>
+      <data key="d3">chunk-1dc8d8e5ed4f165f3e56305a7644ba05</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177688</data>
+    </node>
+    <node id="Breast Cancer">
+      <data key="d0">Breast Cancer</data>
+      <data key="d1">Category</data>
+      <data key="d2">Breast cancer is a type of cancer that starts in the cells of the breast.</data>
+      <data key="d3">chunk-1dc8d8e5ed4f165f3e56305a7644ba05</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177688</data>
+    </node>
+    <node id="Breast Specialist">
+      <data key="d0">Breast Specialist</data>
+      <data key="d1">Person</data>
+      <data key="d2">A breast specialist is a healthcare professional who specializes in breast health and disease.</data>
+      <data key="d3">chunk-1dc8d8e5ed4f165f3e56305a7644ba05</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177688</data>
+    </node>
+    <node id="Breast Diagnostic Radiologist">
+      <data key="d0">Breast Diagnostic Radiologist</data>
+      <data key="d1">Person</data>
+      <data key="d2">A breast diagnostic radiologist is a healthcare professional who interprets the results of mammograms, MRIs, and other imaging tests.</data>
+      <data key="d3">chunk-1dc8d8e5ed4f165f3e56305a7644ba05</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177688</data>
+    </node>
+    <node id="Gynecologist">
+      <data key="d0">Gynecologist</data>
+      <data key="d1">Person</data>
+      <data key="d2">A gynecologist is a healthcare professional who diagnoses and treats diseases of the female reproductive organs.</data>
+      <data key="d3">chunk-1dc8d8e5ed4f165f3e56305a7644ba05</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177688</data>
+    </node>
+    <node id="Lactation Consultant">
+      <data key="d0">Lactation Consultant</data>
+      <data key="d1">Person</data>
+      <data key="d2">A lactation consultant is a healthcare professional who specializes in breastfeeding.</data>
+      <data key="d3">chunk-1dc8d8e5ed4f165f3e56305a7644ba05</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177688</data>
+    </node>
+    <node id="Breast Pain">
+      <data key="d0">Breast Pain</data>
+      <data key="d1">Category</data>
+      <data key="d2">Breast pain is a symptom that can</data>
+      <data key="d3">chunk-1dc8d8e5ed4f165f3e56305a7644ba05</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177688</data>
+    </node>
+    <node id="Infraclavicular Nodes">
+      <data key="d0">Infraclavicular Nodes</data>
+      <data key="d1">Location</data>
+      <data key="d2">Infraclavicular nodes are lymph nodes located in the area below the collarbone, which can be affected by cancer.</data>
+      <data key="d3">chunk-cb41559e96b71d2bb4ea207c806e8d5f</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177688</data>
+    </node>
+    <node id="Supraclavicular Nodes">
+      <data key="d0">Supraclavicular Nodes</data>
+      <data key="d1">Location</data>
+      <data key="d2">Supraclavicular nodes are</data>
+      <data key="d3">chunk-cb41559e96b71d2bb4ea207c806e8d5f</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177688</data>
+    </node>
+    <node id="Grade">
+      <data key="d0">Grade</data>
+      <data key="d1">Category</data>
+      <data key="d2">Grade describes how abnormal the tumor cells look under a microscope (called histology). Higher-grade cancers tend to grow and spread faster than lower-grade cancers.</data>
+      <data key="d3">chunk-cb41559e96b71d2bb4ea207c806e8d5f</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177688</data>
+    </node>
+    <node id="Natural Language Processing">
+      <data key="d0">Natural Language Processing</data>
+      <data key="d1">Technology</data>
+      <data key="d2">Natural language processing is a field of artificial intelligence that focuses on enabling computers to understand, interpret, and generate human language.</data>
+      <data key="d3">chunk-cb41559e96b71d2bb4ea207c806e8d5f</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177688</data>
+    </node>
+    <node id="Carbon-Fiber Spikes">
+      <data key="d0">Carbon-Fiber Spikes</data>
+      <data key="d1">Equipment</data>
+      <data key="d2">Carbon-fiber spikes are advanced sprinting shoes that provide enhanced speed and traction.</data>
+      <data key="d3">chunk-cb41559e96b71d2bb4ea207c806e8d5f</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177688</data>
+    </node>
+    <node id="MRI">
+      <data key="d0">MRI</data>
+      <data key="d1">Technology</data>
+      <data key="d2">MRI is a medical imaging technique that uses radio waves and a strong magnetic field to create detailed images of the body's internal structures, including the brain and spinal cord.</data>
+      <data key="d3">chunk-a0d4d6b091e033fd01aa721422b68ef5</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177688</data>
+    </node>
+    <node id="CT">
+      <data key="d0">CT</data>
+      <data key="d1">Technology</data>
+      <data key="d2">CT (computed tomography) is a medical imaging technique that uses x-rays to create cross-sectional images of the body, including the brain and spinal cord.&lt;SEP&gt;CT (computed tomography) is a medical imaging technique that uses x-rays</data>
+      <data key="d3">chunk-a0d4d6b091e033fd01aa721422b68ef5</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177688</data>
+    </node>
+    <node id="entity">
+      <data key="d0">entity</data>
+      <data key="d3">chunk-ae28e3852f4a9f229250fc19eb39036b</data>
+      <data key="d2">The extraction task is complete, indicating that all entities and relationships have been successfully identified and extracted.</data>
+      <data key="d1">UNKNOWN</data>
+      <data key="d4">unknown_source</data>
+      <data key="d5">1759177688</data>
+    </node>
+    <edge source="Complete" target="entity">
+      <data key="d6">1.0</data>
+      <data key="d7">The extraction task is complete, indicating that all entities and relationships have been successfully identified and extracted.</data>
+      <data key="d8">entity completeness</data>
+      <data key="d9">chunk-ae28e3852f4a9f229250fc19eb39036b</data>
+      <data key="d10">unknown_source</data>
+      <data key="d11">1759177688</data>
+    </edge>
+  </graph>
+</graphml>
