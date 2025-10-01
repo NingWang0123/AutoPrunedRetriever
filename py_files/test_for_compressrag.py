@@ -1,4 +1,4 @@
-from CompressRag_rl_v1 import CompressRag_rl,decode_questions, get_context
+from AutoPrunedRetriever import  get_context
 from WordEmb import WordAvgEmbeddings, Word2VecEmbeddings
 from langchain.embeddings.base import Embeddings
 from langchain_community.embeddings import HuggingFaceEmbeddings
@@ -125,70 +125,48 @@ class Phi4MiniReasoningLLM:
             return "mps"
         return "cpu"
 
-    def _build_prompt(self, final_merged_json, question, decode = False):
-        if decode:
-            q_txt, gk_txt, st_txt, ft_txt = get_context(final_merged_json)
-            user_msg = ""
+    def _build_prompt(self, final_merged_json: str, question: str, decode: bool = False):
+        """
+        Build chat messages or (fallback) a single text prompt.
+        IMPORTANT: We keep final_merged_json unchanged, but we DO NOT show <<<...>>> markers.
+        """
+        # High-priority rule: don't quote or reproduce context verbatim
+        system_rule = (
+            "You are a precise QA assistant. Use the contextual notes only to inform your answer. "
+            "Do NOT quote or reproduce the notes verbatim. Do NOT output any markup like <<<...>>>. "
+            "Do NOT output JSON or code blocks. Answer in plain sentences, 2-3 sentences when possible."
+        )
 
-            system_msg = (
-                "You are a precise QA agent that answers by expressing facts as short, "
-                "plain English statements. Keep outputs concise and factual."
-            )
+        # We still pass your raw JSON, unchanged, but wrap it in neutral tags.
+        # This removes the strong copying prior from <<<RETRIEVED_CONTEXT_*>>>.
+        context_block = (
+            "Contextual notes (for reference only—do not quote or copy):\n"
+            "<context>\n" + final_merged_json + "\n</context>"
+        )
 
-            ctx_lines = [
-                "<<<RETRIEVED_CONTEXT_START>>>",
-                "The system searched for a related question in the database. Below are related question's graph triples and its prior answer as reference. You don't have to follow it completely, just use it as a reference.",
-                "[RELATED QUESTION'S GRAPH TRIPLES]:",
-                q_txt,
-                f"[RELATED QUESTION'S ANSWER TRIPLES]: {gk_txt}",
+        user_block = (
+            f"[CURRENT QUESTION]: {question}\n"
+            "[TASK]: Provide a short, direct answer. "
+            "If the question is yes/no-like, give the conclusion AND 1–2 brief reasons.\n"
+            "[ANSWER]:"
+        )
+
+        if getattr(self, "_use_chat_template", False):
+            # Return structured messages for apply_chat_template
+            messages = [
+                {"role": "system", "content": system_rule},
+                {"role": "system", "content": context_block},
+                {"role": "user",   "content": user_block},
             ]
-            
-            if st_txt.strip().lower() != "none.":
-                ctx_lines.append(f"[RELATED THINKING“S TRIPLES]: {st_txt}")
-
-            if ft_txt.strip().lower() != "none.":
-                ctx_lines.append(f"[RELATED FACTS'S TRIPLES]: {ft_txt}")
-
-            ctx_lines.append("<<<RETRIEVED_CONTEXT_END>>>")
-
-            user_msg += "\n".join(ctx_lines) + "\n"
-
-            user_msg += (
-                f"[CURRENT QUESTION]: {question} \n"
-                "[TASK]: You are a QA assistant for open-ended questions.\n"
-                f"- Give a short, direct answer in 2–3 sentences."
-                "- Do NOT restrict to yes/no.\n"
-                "[FORMAT]: Write complete sentences (not a single word)."
-                "Avoid starting with just 'Yes.' or 'No.'; if the question is yes/no-style, state the conclusion AND 1–2 short reasons.\n"
-                "[ANSWER]: "
-            )
+            return messages, None
         else:
-            user_msg = ""
-            system_msg = (
-                "You are a precise QA agent that answers by expressing facts as short, "
-                "plain English statements. Keep outputs concise and factual."
+            # Fallback: single concatenated text prompt
+            prompt = (
+                f"[System]\n{system_rule}\n\n"
+                f"[Notes]\n{context_block}\n\n"
+                f"[User]\n{user_block}\n"
             )
-
-            ctx_lines = [
-                "<<<RETRIEVED_CONTEXT_START>>>",
-                "The system searched for a related question in the database. Below are related question's graph triples and its prior answer as reference. You don't have to follow it completely, just use it as a reference.",
-                f"{final_merged_json}",
-            ]
-            ctx_lines.append("<<<RETRIEVED_CONTEXT_END>>>")
-            user_msg += "\n".join(ctx_lines) + "\n"
-
-            user_msg += (
-                f"[CURRENT QUESTION]: {question} \n"
-                "[TASK]: You are a QA assistant for open-ended questions.\n"
-                f"- Give a short, direct answer in 2–3 sentences."
-                "- Do NOT restrict to yes/no.\n"
-                "[FORMAT]: Write complete sentences (not a single word)."
-                "Avoid starting with just 'Yes.' or 'No.'; if the question is yes/no-style, state the conclusion AND 1–2 short reasons.\n"
-                "[ANSWER]: "
-            )
-        #print(system_msg)
-        print(user_msg)
-        return system_msg, user_msg
+            return None, prompt
 
 
     @torch.no_grad()

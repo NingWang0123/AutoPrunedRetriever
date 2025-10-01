@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import List, Dict, Tuple, Optional
 import json
 import pathlib
-import numpy   as np
+import numpy as np
 import torch
 import pandas as pd
 import tqdm
@@ -20,7 +20,8 @@ from dpo_exactgraphrag import (
     default_reward, answer_with_auto_strategy,save_pref_examples,load_pref_examples,ANSWERS_CHOICES,THINKINGS_CHOICES,FACTS_CHOICES
 )
 
-from test_for_compressrag import Phi4MiniReasoningLLM,Word2VecEmbeddings
+from test_for_compressrag import Word2VecEmbeddings
+from llm_local import Phi4MiniReasoningLLM
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings
 from langchain_openai import ChatOpenAI
 # from evaluation_func_graphrag import compute_answer_correctness
@@ -364,8 +365,8 @@ if __name__ == "__main__":
 
     reward_func = reward_func_dpo.reward_sbert_inclusive
 
-    SEED_N       = 20    # change to 20 for training
-    TEST_N       = 2042     # change to 980 for rest
+    SEED_N       = 2    # change to 20 for training
+    TEST_N       = 3     # change to 980 for rest
 
     
 
