@@ -149,7 +149,7 @@ class Phi4MiniReasoningLLM:
         system_msg = (
             "You are a precise QA agent. "
             "Return ONLY the final answer in as 2-3 short sentences."
-            "If yes or no question, still descirbe in 2-3 sentences."
+            "Do not give yes no, you have to conlude at least in one sentence."
             "No preamble, no labels, no emojis, no follow-up questions."
             "Read the information from the json below"
         )
