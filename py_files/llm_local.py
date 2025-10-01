@@ -4,8 +4,11 @@ from transformers import AutoTokenizer, AutoModelForCausalLM,StoppingCriteria, S
 import re, os
 from typing import List, Tuple
 import time
+from WordEmb import Word2VecEmbeddings
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
+
+# word_emb = Word2VecEmbeddings(model_name="word2vec-google-news-300")
 
 def self_decode_question(question, codebook_main, fmt='words'):
     """
@@ -141,63 +144,59 @@ class Phi4MiniReasoningLLM:
         return "cpu"
 
     # CHANGED: hide <<<...>>> markers; keep your JSON EXACTLY as-is, wrapped in neutral <context> tags
-    def _build_prompt(self, final_merged_json, question, decode = False):
-        # Common high-priority rule in system
+    def _build_prompt(self, final_merged_json, question, decode=False):
+        # Keep the system prompt bossy and unambiguous
         system_msg = (
-            "You are a precise QA agent that answers in short, plain English sentences. "
-            "Use the contextual notes only to inform your answer. "
-            "Do NOT quote or reproduce the notes verbatim. "
-            "Do NOT output any markup like <<<...>>>. "
-            "Do NOT output JSON or code blocks. Provide 2–3 sentences when possible."
+            "You are a precise QA agent. "
+            "Return ONLY the final answer as a short phrase/sentence. "
+            "No preamble, no labels, no emojis, no follow-up questions."
         )
 
+        # Give the model context but forbid quoting it
         if decode:
-            # If you still need the decoded variant, we keep the spirit: no <<<...>>>, keep content.
             q_txt, gk_txt, st_txt, ft_txt = get_context(final_merged_json)
             ctx_lines = [
-                "Contextual notes (for reference only—do not quote or copy):",
+                "Context (do NOT quote or copy):",
                 "<context>",
-                "[RELATED QUESTION'S GRAPH TRIPLES]:",
                 q_txt,
-                f"[RELATED QUESTION'S ANSWER TRIPLES]: {gk_txt}",
+                f"ANSWER_TRIPLES: {gk_txt}",
             ]
             if st_txt.strip().lower() != "none.":
-                ctx_lines.append(f"[RELATED THINKING'S TRIPLES]: {st_txt}")
+                ctx_lines.append(f"THINK_TRIPLES: {st_txt}")
             if ft_txt.strip().lower() != "none.":
-                ctx_lines.append(f"[RELATED FACTS'S TRIPLES]: {ft_txt}")
+                ctx_lines.append(f"FACT_TRIPLES: {ft_txt}")
             ctx_lines.append("</context>")
             user_msg = "\n".join(ctx_lines) + "\n"
         else:
-            # Pass your raw JSON unchanged, just wrapped; no retrieved markers shown to the model
-            ctx_lines = [
-                "Contextual notes (for reference only—do not quote or copy):",
-                "<context>",
-                f"{final_merged_json}",
-                "</context>",
-            ]
-            user_msg = "\n".join(ctx_lines) + "\n"
+            user_msg = (
+                "Context (do NOT quote or copy):\n<context>\n"
+                f"{final_merged_json}\n</context>\n"
+            )
 
+        # IMPORTANT: ask for answer only; remove the literal "[ANSWER]:" label
         user_msg += (
-            f"[CURRENT QUESTION]: {question} \n"
-            "[TASK]: Provide a short, direct answer. "
-            "If the question is yes/no-like, state the conclusion AND 1–2 brief reasons.\n"
-            "[ANSWER]: "
+            f"Question: {question}\n"
+            "Instruction: Reply with ONLY the answer text. No extra words.\n"
         )
-
-        # (optional) keep your debug print
-        print(user_msg)
         return system_msg, user_msg
 
     # CHANGED: add sanitizer to strip any leakage if it happens
     def _sanitize_answer(self, text: str) -> str:
-        # Remove accidental leakage of markers / context
-        text = re.sub(r"<<<?RETRIEVED_CONTEXT_START>>>?", "", text, flags=re.I)
-        text = re.sub(r"<<<?RETRIEVED_CONTEXT_END>>>?", "", text, flags=re.I)
-        text = re.sub(r"(?is)<context>.*?</context>", "", text).strip()
+        import re
+        # Nuke leaked blocks/labels/emoji/debug
+        text = re.sub(r"(?is)<context>.*?</context>", "", text)
+        text = re.sub(r"<<<RETRIEVED_CONTEXT_START>>>|<<<RETRIEVED_CONTEXT_END>>>", "", text)
+        text = re.sub(r"\[ANSWER\]\s*:?|^Answer\s*:?\s*", "", text, flags=re.I)
+        text = re.sub(r"^[-–—]+RAW.*?$", "", text, flags=re.I | re.M)
+        text = re.sub(r"^[-–—]+ANS.*?$", "", text, flags=re.I | re.M)
+        text = re.sub(r"INFO:.*?$", "", text, flags=re.M)
+        text = text.replace("Is this correct?", "").replace("🐉", "")
         # Collapse whitespace
-        text = re.sub(r"\n{3,}", "\n\n", text)
-        return text.strip()
-
+        text = re.sub(r"\s+", " ", text).strip()
+        # Keep only the first sentence/phrase
+        m = re.match(r"(.+?)(?:[.!?](?:\s|$)|$)", text)
+        return (m.group(1) if m else text).strip()
+    
     @torch.no_grad()
     def _generate(self, system_msg: str, user_msg: str) -> str:
         self._cuda_peak_mib()
@@ -208,19 +207,22 @@ class Phi4MiniReasoningLLM:
                 {"role": "system", "content": system_msg},
                 {"role": "user",   "content": user_msg},
             ]
-            prompt = self.tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+            prompt = self.tokenizer.apply_chat_template(
+                messages, tokenize=False, add_generation_prompt=True
+            )
         else:
             prompt = f"<|system|>\n{system_msg}\n<|user|>\n{user_msg}\n<|assistant|>\n"
 
         inputs = self.tokenizer(prompt, return_tensors="pt").to(self.model.device)
         input_tokens = int(inputs["input_ids"].shape[-1])
 
-        # CHANGED: add stop substrings + gentle repetition penalty to reduce copying
+        # Beefed-up stop list to catch your markers & accidental echoes
         stop_strings = [
-            "<<<RETRIEVED_CONTEXT_START>>>",
-            "<<<RETRIEVED_CONTEXT_END>>>",
-            "<context>",
-            "</context>",
+            "<context>", "</context>",
+            "Context (do NOT quote or copy):",
+            "Instruction:", "Question:",
+            "RAW", "ANS:", "INFO:", "ft_txt",
+            "Is this correct"
         ]
         stopping_criteria = StoppingCriteriaList([
             _StopOnSubstrings(self.tokenizer, stop_strings)
@@ -233,40 +235,33 @@ class Phi4MiniReasoningLLM:
             do_sample=(self.temperature > 0),
             temperature=self.temperature,
             top_p=self.top_p,
-            repetition_penalty=1.12,  # CHANGED: nudge away from verbatim copying
+            repetition_penalty=1.15,   # nudge away from copying context
             pad_token_id=self.tokenizer.eos_token_id,
             eos_token_id=self.tokenizer.eos_token_id,
             use_cache=True,
-            stopping_criteria=stopping_criteria,  # CHANGED
+            stopping_criteria=stopping_criteria,
         )
         t2 = time.perf_counter()
 
-        # Decode and slice completion (best-effort)
         text_full = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
         prompt_only = self.tokenizer.decode(inputs["input_ids"][0], skip_special_tokens=True)
         completion = text_full[len(prompt_only):].strip() if text_full.startswith(prompt_only) else text_full.strip()
 
-        # CHANGED: sanitize any leaked context/markers
         completion = self._sanitize_answer(completion)
 
-        total_tokens = int(outputs[0].shape[-1])  # input + generated (approx)
+        total_tokens = int(outputs[0].shape[-1])
         output_tokens = max(0, total_tokens - input_tokens)
-
-        gen_latency_sec = t2 - t1
-        latency_sec = t2 - t0
-        prompt_chars = float(len(prompt))
 
         gen_info = {
             "input_tokens": float(input_tokens),
             "output_tokens": float(output_tokens),
             "total_tokens": float(input_tokens + output_tokens),
-            "latency_sec": float(latency_sec),
-            "gen_latency_sec": float(gen_latency_sec),
-            # retrieval_latency_sec injected by caller
+            "latency_sec": float(t2 - t0),
+            "gen_latency_sec": float(t2 - t1),
             "retrieval_latency_sec": None,
-            "prompt_chars": float(prompt_chars),
-            "throughput_tok_per_s": float((output_tokens / gen_latency_sec) if gen_latency_sec > 0 else 0.0),
-            "prompt_tok_per_s": float((input_tokens / (latency_sec - gen_latency_sec)) if (latency_sec - gen_latency_sec) > 0 else 0.0),
+            "prompt_chars": float(len(prompt)),
+            "throughput_tok_per_s": float((output_tokens / (t2 - t1)) if (t2 - t1) > 0 else 0.0),
+            "prompt_tok_per_s": float((input_tokens / max(1e-6, (t2 - t0) - (t2 - t1)))),
             "device": self._device_str(),
             "dtype": str(getattr(self.model, "dtype", "unknown")),
             "model_name": self.model_name,
@@ -274,6 +269,41 @@ class Phi4MiniReasoningLLM:
             "timestamp_end": t2,
         }
         return completion, gen_info
+
+
+    # --- REPLACE take_questions (smaller & quieter) ---
+    def take_questions(self, final_merged_json, question, *, max_regen: int = 3, retrieval_time):
+        last_metrics = None
+        ans_clean = ""
+
+        for attempt in range(max_regen):
+            sys_msg, usr_msg = self._build_prompt(final_merged_json, question, decode=False)
+            out, gen_info = self._generate(sys_msg, usr_msg)
+            gen_info["retrieval_latency_sec"] = float(retrieval_time)
+            gen_info["attempt"] = int(attempt + 1)
+            gen_info["question_chars"] = float(len(str(question)))
+            gen_info["answer_raw_chars"] = float(len(out))
+            gen_info["answer_raw_tokens"] = float(self._count_tokens(out))
+            gen_info["prompt_to_output_char_ratio"] = float(
+                (gen_info["prompt_chars"] / max(1.0, gen_info["answer_raw_chars"]))
+            )
+
+            candidate = self._sanitize_answer(out)
+            if candidate:
+                ans_clean = candidate
+                last_metrics = gen_info
+                break
+
+        if not ans_clean:
+            ans_clean = "No answer."
+            last_metrics = last_metrics or {}
+
+        metrics_wrapped = {f"{question}": last_metrics}
+        self.last_metrics = metrics_wrapped
+        self.metrics_runs.append(metrics_wrapped)
+
+        # Always return JUST the clean answer; no thinks/debug
+        return ans_clean
 
     def strip_think(self, s: str) -> Tuple[str, List[str]]:
         """提取思考并返回干净答案；支持 <think>...</think> 与多段 <|assistant|>。"""
