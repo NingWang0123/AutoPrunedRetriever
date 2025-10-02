@@ -92,7 +92,8 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
         combine_ent_sim = combine_ent_sim,
         q_combine_sim = q_combine_sim,
         aft_combine_sim = aft_combine_sim,
-        semantic_overlap_sim = semantic_overlap_sim
+        semantic_overlap_sim = semantic_overlap_sim,
+        use_word = True
     )
 
     # ---------------------------------------------------------------------
