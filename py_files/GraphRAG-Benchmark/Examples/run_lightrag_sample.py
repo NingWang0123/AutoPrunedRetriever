@@ -5,33 +5,10 @@ os.environ["FUNC_TIMEOUT"] = "600"          # base LLM timeout
 os.environ["WORKER_TIMEOUT"] = "630"        # optional: only if your build reads this explicitly
 os.environ["HEALTHCHECK_TIMEOUT"] = "660"   # optional: only if your build reads this explicitly
 os.environ["EMBEDDING_TIMEOUT"] = "600"     # embedding workers base timeout
-
-os.environ["LIGHTRAG_FUNC_TIMEOUT"] = "600"
-os.environ["LIGHTRAG_WORKER_TIMEOUT"] = "630"     # optional; we’ll derive anyway
-os.environ["LIGHTRAG_HEALTHCHECK_TIMEOUT"] = "660"
-os.environ["EMBEDDING_TIMEOUT"] = "600"
+os.environ["LLM_TIMEOUT"] = "600"
 
 # Patch the decorator factory BEFORE importing any other lightrag submodules
 import lightrag.utils as _lr_utils
-
-_orig = _lr_utils.priority_limit_async_func_call
-def _patched(max_size, llm_timeout=None, max_execution_timeout=None, max_task_duration=None, **kw):
-    # inject from env if caller omitted; derive the rest
-    if llm_timeout is None:
-        llm_timeout = int(os.getenv("LIGHTRAG_FUNC_TIMEOUT", "600"))
-    if max_execution_timeout is None:
-        max_execution_timeout = int(os.getenv("LIGHTRAG_WORKER_TIMEOUT", str(llm_timeout + 30)))
-    if max_task_duration is None:
-        max_task_duration = int(os.getenv("LIGHTRAG_HEALTHCHECK_TIMEOUT", str(llm_timeout + 60)))
-    return _orig(max_size,
-                 llm_timeout=llm_timeout,
-                 max_execution_timeout=max_execution_timeout,
-                 max_task_duration=max_task_duration,
-                 **kw)
-
-_lr_utils.priority_limit_async_func_call = _patched
-
-
 import asyncio
 import logging
 import nest_asyncio
@@ -478,26 +455,6 @@ async def process_corpus(
         llm_api_key=llm_api_key
     )
 
-    # get the raw function (undecorated) if possible
-    base_llm = getattr(rag, "llm_model_func", None)
-    if base_llm is None:
-        raise RuntimeError("rag.llm_model_func not found")
-
-    # if it was already decorated, unwrap once
-    if hasattr(base_llm, "__wrapped__"):
-        base_llm = base_llm.__wrapped__
-
-    # rebuild with our patched decorator + timeouts from env
-    timeout = int(os.getenv("LIGHTRAG_FUNC_TIMEOUT", "600"))
-    patched_llm = _lr_utils.priority_limit_async_func_call(
-        max_size=getattr(rag, "llm_model_max_async", 2),
-        llm_timeout=timeout,
-        queue_name="LLM func",
-    )(base_llm)
-
-    # hot-swap the function kg_query calls
-    _op.use_model_func = patched_llm
-
     # Index corpus (await if coroutine)
     ins = rag.insert(context)
     if asyncio.iscoroutine(ins):
@@ -694,8 +651,6 @@ def main():
             "questions": "./Datasets/Questions/novel_questions.json"
         }
     }
-
-    os.environ["LIGHTRAG_WORKER_TIMEOUT"] = "600"
 
     parser = argparse.ArgumentParser(description="LightRAG: Process Corpora and Answer Questions")
     parser.add_argument("--subset", required=True, choices=["medical", "novel"], help="Subset to process (medical or novel)")

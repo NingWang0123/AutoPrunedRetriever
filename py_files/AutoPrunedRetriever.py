@@ -3237,6 +3237,9 @@ class ExactGraphRag_rl:
 
         questions_edges_index = self.meta_codebook['questions_lst'][-1]
 
+        # due to almost empty prev answer database, give adapted m
+        adapted_m = min(max(1,int(0.1*len(self.meta_codebook['answers_lst']))),self.top_m)
+
         top_m_results = coarse_filter(
                         questions_edges_index,
                         self.meta_codebook,
@@ -3244,7 +3247,7 @@ class ExactGraphRag_rl:
                         self.top_k,                             # word-embedding candidates
                         self.question_batch_size,               # query batch size
                         self.questions_db_batch_size,           # DB batch size
-                        self.top_m,                             # sentence-embedding rerank
+                        adapted_m,                             # sentence-embedding rerank
                         self.custom_linearizer)
         
         result = add_answers_to_filtered_lst(top_m_results,self.meta_codebook)
