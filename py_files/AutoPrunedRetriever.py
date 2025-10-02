@@ -34,7 +34,10 @@ Triplet = Tuple[str, str, str]
 nlp = spacy.load("en_core_web_sm")
 
 #word_emb = WordAvgEmbeddings(model_path="gensim-data/glove-wiki-gigaword-100/glove-wiki-gigaword-100.model")
-word_emb = Word2VecEmbeddings(model_name="word2vec-google-news-300")
+#word_emb = Word2VecEmbeddings(model_name="word2vec-google-news-300")
+word_emb = HuggingFaceEmbeddings(
+        model_name="BAAI/bge-base-en"
+    )
 
 SUBJ_DEPS = {"nsubj", "nsubjpass", "csubj", "csubjpass"}
 OBJ_DEPS  = {"dobj", "obj", "attr", "oprd", "dative"}
@@ -674,11 +677,55 @@ def get_word_embeddings(list_of_text,word_emb):
 
     list_of_text_embeddings:  [embedding_vals,...]
     """
+    # Check if it's HuggingFaceEmbeddings or Word2VecEmbeddings
+    if hasattr(word_emb, '_embed_text'):
+        # Word2VecEmbeddings or WordAvgEmbeddings
+        list_of_text_embeddings = [word_emb._embed_text(text) for text in list_of_text]
+    elif hasattr(word_emb, 'embed_documents'):
+        # HuggingFaceEmbeddings
+        list_of_text_embeddings = word_emb.embed_documents(list_of_text)
+    else:
+        raise AttributeError(f"Unsupported embedding model type: {type(word_emb)}")
 
-    list_of_text_embeddings = [word_emb._embed_text(text) for text in list_of_text]
-
-
+    # Ensure all embeddings are numpy arrays with consistent shape
+    list_of_text_embeddings = [np.asarray(emb, dtype=np.float32) for emb in list_of_text_embeddings]
+    
     return list_of_text_embeddings
+
+def _normalize_embeddings_shape(embeddings_list, target_dim=None):
+    """
+    Normalize embedding shapes to ensure consistency
+    """
+    if not embeddings_list:
+        return []
+    
+    # Convert to numpy arrays if not already
+    embeddings_list = [np.asarray(emb, dtype=np.float32) for emb in embeddings_list]
+    
+    # Determine target dimension
+    if target_dim is None:
+        target_dim = max(emb.shape[0] if emb.ndim > 0 else 1 for emb in embeddings_list)
+    
+    normalized_embeddings = []
+    for emb in embeddings_list:
+        if emb.ndim == 0:  # scalar
+            emb = np.array([float(emb)], dtype=np.float32)
+        elif emb.ndim > 1:  # flatten if multi-dimensional
+            emb = emb.flatten().astype(np.float32)
+        else:
+            emb = emb.astype(np.float32)
+            
+        # Resize to target dimension
+        if len(emb) > target_dim:
+            emb = emb[:target_dim]  # truncate
+        elif len(emb) < target_dim:
+            # pad with zeros
+            padding = np.zeros(target_dim - len(emb), dtype=np.float32)
+            emb = np.concatenate([emb, padding])
+            
+        normalized_embeddings.append(emb)
+    
+    return normalized_embeddings
 
 
 ### edit codebook to also take the answers
@@ -923,6 +970,24 @@ def merging_codebook(codebook_main, codebook_sub, type='questions', word_emb=wor
         new_ent_embeds = get_word_embeddings(new_added_ents, word_emb)
         new_r_embeds = get_word_embeddings(new_added_rs, word_emb)
 
+        # Normalize embedding dimensions to ensure consistency
+        existing_e_embeds = codebook_main.get('e_embeddings', [])
+        existing_r_embeds = codebook_main.get('r_embeddings', [])
+        
+        # Get target dimensions from existing embeddings
+        e_target_dim = None
+        r_target_dim = None
+        if existing_e_embeds:
+            e_target_dim = len(np.asarray(existing_e_embeds[0]).flatten())
+        if existing_r_embeds:
+            r_target_dim = len(np.asarray(existing_r_embeds[0]).flatten())
+            
+        # Normalize new embeddings to match existing dimensions
+        if new_ent_embeds:
+            new_ent_embeds = _normalize_embeddings_shape(new_ent_embeds, e_target_dim)
+        if new_r_embeds:
+            new_r_embeds = _normalize_embeddings_shape(new_r_embeds, r_target_dim)
+
         edge_mat_needs_merged_remapped = remap_edges_matrix(edge_mat_needs_merged, new_index_replacement_for_ent_sub, new_index_replacement_for_r_sub)
 
         new_index_replacement_for_edges_sub, index_edges_main = combine_updated_edges(edge_mat_main, edge_mat_needs_merged_remapped)
@@ -936,8 +1001,19 @@ def merging_codebook(codebook_main, codebook_sub, type='questions', word_emb=wor
         codebook_main["r"].extend(new_added_rs)
         codebook_main["edge_matrix"] = index_edges_main
         codebook_main[main_feat_name] = lst_questions_main
-        codebook_main["e_embeddings"] = codebook_main['e_embeddings'] + new_ent_embeds
-        codebook_main["r_embeddings"] = codebook_main['r_embeddings'] + new_r_embeds
+        
+        # Ensure all existing embeddings are normalized too
+        if existing_e_embeds and new_ent_embeds:
+            all_e_embeds = _normalize_embeddings_shape(existing_e_embeds + new_ent_embeds)
+            codebook_main["e_embeddings"] = all_e_embeds
+        elif new_ent_embeds:
+            codebook_main["e_embeddings"] = new_ent_embeds
+            
+        if existing_r_embeds and new_r_embeds:
+            all_r_embeds = _normalize_embeddings_shape(existing_r_embeds + new_r_embeds)
+            codebook_main["r_embeddings"] = all_r_embeds
+        elif new_r_embeds:
+            codebook_main["r_embeddings"] = new_r_embeds
 
         if type == 'thinkings':
             codebook_main['questions_to_thinkings'][len(codebook_main['questions_lst']) - 1] = len(codebook_main[main_feat_name]) - 1
@@ -1051,6 +1127,15 @@ def _avg_vec_from_decoded(decoded_q, dim: int) -> np.ndarray:
             if v is not None:
                 vv = _to_vec(v)
                 if vv.size:
+                    # Ensure all vectors have the same dimension
+                    if vv.shape[0] != dim:
+                        # Resize vector to match expected dimension
+                        if vv.shape[0] > dim:
+                            vv = vv[:dim]  # truncate
+                        else:
+                            # pad with zeros
+                            padding = np.zeros(dim - vv.shape[0], dtype=np.float32)
+                            vv = np.concatenate([vv.astype(np.float32), padding])
                     parts.append(vv.astype(np.float32, copy=False))
     if not parts:
         return np.zeros(dim, dtype=np.float32)
@@ -1122,25 +1207,45 @@ def _ensure_embeddings_in_codebook(codebook_main, dim_fallback: int = 64):
             out.append([rnd.uniform(-1, 1) for _ in range(dim)])
         return out
 
+    def _detect_embedding_dim(word_emb):
+        """Detect the embedding dimension from the word_emb model"""
+        try:
+            if hasattr(word_emb, '_embed_text'):
+                # Word2VecEmbeddings or WordAvgEmbeddings
+                test_embed = word_emb._embed_text("test")
+                return len(test_embed)
+            elif hasattr(word_emb, 'embed_documents'):
+                # HuggingFaceEmbeddings
+                test_embed = word_emb.embed_documents(["test"])[0]
+                return len(test_embed)
+        except Exception:
+            pass
+        return dim_fallback
+
+    # Detect actual embedding dimension
+    actual_dim = _detect_embedding_dim(word_emb) if 'word_emb' in globals() else dim_fallback
+
     # --- entities ---
     if "e_embeddings" not in codebook_main or not codebook_main["e_embeddings"]:
         if "e" not in codebook_main:
             raise ValueError("codebook_main missing key 'e' to compute e_embeddings.")
         try:
             # try your word_emb pipeline
-            codebook_main["e_embeddings"] = get_word_embeddings(codebook_main["e"], word_emb)
+            e_embeddings = get_word_embeddings(codebook_main["e"], word_emb)
+            codebook_main["e_embeddings"] = _normalize_embeddings_shape(e_embeddings, actual_dim)
         except Exception:
             # fallback stable random
-            codebook_main["e_embeddings"] = _hash_embed(codebook_main["e"], dim=dim_fallback)
+            codebook_main["e_embeddings"] = _hash_embed(codebook_main["e"], dim=actual_dim)
 
     # --- relations ---
     if "r_embeddings" not in codebook_main or not codebook_main["r_embeddings"]:
         if "r" not in codebook_main:
             raise ValueError("codebook_main missing key 'r' to compute r_embeddings.")
         try:
-            codebook_main["r_embeddings"] = get_word_embeddings(codebook_main["r"], word_emb)
+            r_embeddings = get_word_embeddings(codebook_main["r"], word_emb)
+            codebook_main["r_embeddings"] = _normalize_embeddings_shape(r_embeddings, actual_dim)
         except Exception:
-            codebook_main["r_embeddings"] = _hash_embed(codebook_main["r"], dim=dim_fallback)
+            codebook_main["r_embeddings"] = _hash_embed(codebook_main["r"], dim=actual_dim)
 
 def get_topk_word_embedding_batched(
     questions: List[List[int]],
@@ -1151,12 +1256,15 @@ def get_topk_word_embedding_batched(
 ) -> Dict[int, List[Dict[str, Any]]]:
 
     # 0) ensure embeddings...
+    _ensure_embeddings_in_codebook(codebook_main, dim_fallback=64)
+    
+    # Now we can safely get the dimension
     if "e_embeddings" in codebook_main and len(codebook_main["e_embeddings"]) > 0:
         dim = len(codebook_main["e_embeddings"][0])
     elif "r_embeddings" in codebook_main and len(codebook_main["r_embeddings"]) > 0:
         dim = len(codebook_main["r_embeddings"][0])
     else:
-        _ensure_embeddings_in_codebook(codebook_main, dim_fallback=64)
+        dim = 64  # fallback
 
     # === 1) 选择候选库：优先历史 questions；若没有，则回退到 answers ===
     results: Dict[int, List[Dict[str, Any]]] = {i: [] for i in range(len(questions))}
@@ -3518,9 +3626,9 @@ class ExactGraphRag_rl:
                     k_grid_size = self.k_grid_size
                     ) 
         elif mode == "knn":
-            self.meta_codebook = combine_ents_ann_knn(self.meta_codebook,sim_threshold = self.combine_ent_sim)
+            self.meta_codebook = combine_ents_ann_knn(self.meta_codebook)
         elif mode == "coarse":
-            self.meta_codebook = coarse_combine(self.meta_codebook,sim_threshold = self.combine_ent_sim)           
+            self.meta_codebook = coarse_combine(self.meta_codebook)           
 
     def load_and_merge_facts(self, facts_json_path, chunk_chars=800, overlap=120):
         if not facts_json_path:

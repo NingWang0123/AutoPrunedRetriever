@@ -48,7 +48,9 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
                           ini_meta_json = Path("meta_codebook.json") ,saved_examples_name = "sbert_pref_examples_medical.json",
                           reward_func = None,reward_func_mode = 'non_llm',final_json_path = "results/compressrag_medical_data_test.json"):
     print("» Initialising embeddings & LLM …")
-    word_emb = Word2VecEmbeddings(model_name="word2vec-google-news-300")
+    word_emb = HuggingFaceEmbeddings(
+        model_name="BAAI/bge-base-en"
+    )
     sent_emb = HuggingFaceEmbeddings(
         model_name="BAAI/bge-base-en"
     )
@@ -59,7 +61,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
         temperature=0.2,
         top_p=0.9,
         use_cache=True,
-        api_key="",  
+        api_key="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",  
         # base_url="https://api.openai.com/v1",  # 可选，使用其他兼容服务
     )
 
@@ -129,7 +131,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
     # only load if we do not have ini_meta 
     if not pre_loaded_meta:
         # corpus file is the facts
-        facts_cb = cr.load_and_merge_facts(CORPUS_FILE, chunk_chars=100, overlap=30)
+        facts_cb = cr.load_and_merge_facts(CORPUS_FILE, chunk_chars=1200, overlap=100)
         cr._facts_preloaded = True
         cr.top_m = 5          # sentence-embedding rerank top-m
 
