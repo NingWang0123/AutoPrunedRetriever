@@ -663,7 +663,7 @@ def main():
     parser.add_argument("--mode", required=True, choices=["API", "ollama", "hf"], help="Use API, ollama, or hf (local transformers)")
     parser.add_argument("--model_name", default="qwen2.5-14b-instruct", help="LLM model identifier (HF 模式下是 HF repo id)")
     parser.add_argument("--embed_model", default="bge-base-en", help="Embedding model name (HF/ollama 的名称)")
-    parser.add_argument("--retrieve_topk", type=int, default=10, help="Number of top documents to retrieve")
+    parser.add_argument("--retrieve_topk", type=int, default=5, help="Number of top documents to retrieve")
     parser.add_argument("--sample", type=int, default=None, help="Number of questions to sample per corpus")
 
     parser.add_argument("--llm_base_url", default="https://api.openai.com/v1", help="Base URL for LLM API / ollama host")
