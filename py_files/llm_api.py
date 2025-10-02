@@ -124,68 +124,42 @@ class DeepSeekLLM:
 
     def _device_str(self) -> str:
         return "deepseek-api"  
-    def _build_prompt(self, final_merged_json, question, decode = False):
+    def _build_prompt(self, final_merged_json, question, decode=False):
+        # Keep the system prompt bossy and unambiguous
+        system_msg = (
+            "You are a precise QA agent. "
+            "Return ONLY the final answer in as 2-3 short sentences."
+            "Do not give yes no, you have to conlude at least in one sentence."
+            "No preamble, no labels, no emojis, no follow-up questions."
+            "Read the information from the json below"
+        )
+
+        # Give the model context but forbid quoting it
         if decode:
             q_txt, gk_txt, st_txt, ft_txt = get_context(final_merged_json)
-            user_msg = ""
-
-            system_msg = (
-                "You are a precise QA agent that answers by expressing facts as short, "
-                "plain English statements. Keep outputs concise and factual."
-            )
-
             ctx_lines = [
-                "<<<RETRIEVED_CONTEXT_START>>>",
-                "The system searched for a related question in the database. Below are related question's graph triples and its prior answer as reference. You don't have to follow it completely, just use it as a reference.",
-                "[RELATED QUESTION'S GRAPH TRIPLES]:",
+                "Context (do NOT quote or copy):",
+                "<context>",
                 q_txt,
-                f"[RELATED QUESTION'S ANSWER TRIPLES]: {gk_txt}",
+                f"ANSWER_TRIPLES: {gk_txt}",
             ]
-            
             if st_txt.strip().lower() != "none.":
-                ctx_lines.append(f"[RELATED THINKING'S TRIPLES]: {st_txt}")
-
+                ctx_lines.append(f"THINK_TRIPLES: {st_txt}")
             if ft_txt.strip().lower() != "none.":
-                ctx_lines.append(f"[RELATED FACTS'S TRIPLES]: {ft_txt}")
-
-            ctx_lines.append("<<<RETRIEVED_CONTEXT_END>>>")
-
-            user_msg += "\n".join(ctx_lines) + "\n"
-
-            user_msg += (
-                f"[CURRENT QUESTION]: {question} \n"
-                "[TASK]: You are a QA assistant for open-ended questions.\n"
-                f"- Give a short, direct answer in 2–3 sentences."
-                "- Do NOT restrict to yes/no.\n"
-                "[FORMAT]: Write complete sentences (not a single word)."
-                "Avoid starting with just 'Yes.' or 'No.'; if the question is yes/no-style, state the conclusion AND 1–2 short reasons.\n"
-                "[ANSWER]: "
-            )
+                ctx_lines.append(f"FACT_TRIPLES: {ft_txt}")
+            ctx_lines.append("</context>")
+            user_msg = "\n".join(ctx_lines) + "\n"
         else:
-            user_msg = ""
-            system_msg = (
-                "You are a precise QA agent that answers by expressing facts as short, "
-                "plain English statements. Keep outputs concise and factual."
+            user_msg = (
+                "Context (do NOT quote or copy):\n<context>\n"
+                f"{final_merged_json}\n</context>\n"
             )
 
-            ctx_lines = [
-                "<<<RETRIEVED_CONTEXT_START>>>",
-                "The system searched for a related question in the database. Below are related question's graph triples and its prior answer as reference. You don't have to follow it completely, just use it as a reference.",
-                f"{final_merged_json}",
-            ]
-            ctx_lines.append("<<<RETRIEVED_CONTEXT_END>>>")
-            user_msg += "\n".join(ctx_lines) + "\n"
-
-            user_msg += (
-                f"[CURRENT QUESTION]: {question} \n"
-                "[TASK]: You are a QA assistant for open-ended questions.\n"
-                f"- Give a short, direct answer in 2–3 sentences."
-                "- Do NOT restrict to yes/no.\n"
-                "[FORMAT]: Write complete sentences (not a single word)."
-                "Avoid starting with just 'Yes.' or 'No.'; if the question is yes/no-style, state the conclusion AND 1–2 short reasons.\n"
-                "[ANSWER]: "
-            )
-        print(user_msg)
+        # IMPORTANT: ask for answer only; remove the literal "[ANSWER]:" label
+        user_msg += (
+            f"Question: {question}\n"
+            "Instruction: Reply with ONLY the answer text. No extra words.\n"
+        )
         return system_msg, user_msg
 
     def _generate(self, system_msg: str, user_msg: str) -> str:
