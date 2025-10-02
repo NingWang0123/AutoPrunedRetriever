@@ -1,6 +1,38 @@
 # lightrag_example.py
-import asyncio
 import os
+
+os.environ["FUNC_TIMEOUT"] = "600"          # base LLM timeout
+os.environ["WORKER_TIMEOUT"] = "630"        # optional: only if your build reads this explicitly
+os.environ["HEALTHCHECK_TIMEOUT"] = "660"   # optional: only if your build reads this explicitly
+os.environ["EMBEDDING_TIMEOUT"] = "600"     # embedding workers base timeout
+
+os.environ["LIGHTRAG_FUNC_TIMEOUT"] = "600"
+os.environ["LIGHTRAG_WORKER_TIMEOUT"] = "630"     # optional; we’ll derive anyway
+os.environ["LIGHTRAG_HEALTHCHECK_TIMEOUT"] = "660"
+os.environ["EMBEDDING_TIMEOUT"] = "600"
+
+# Patch the decorator factory BEFORE importing any other lightrag submodules
+import lightrag.utils as _lr_utils
+
+_orig = _lr_utils.priority_limit_async_func_call
+def _patched(max_size, llm_timeout=None, max_execution_timeout=None, max_task_duration=None, **kw):
+    # inject from env if caller omitted; derive the rest
+    if llm_timeout is None:
+        llm_timeout = int(os.getenv("LIGHTRAG_FUNC_TIMEOUT", "600"))
+    if max_execution_timeout is None:
+        max_execution_timeout = int(os.getenv("LIGHTRAG_WORKER_TIMEOUT", str(llm_timeout + 30)))
+    if max_task_duration is None:
+        max_task_duration = int(os.getenv("LIGHTRAG_HEALTHCHECK_TIMEOUT", str(llm_timeout + 60)))
+    return _orig(max_size,
+                 llm_timeout=llm_timeout,
+                 max_execution_timeout=max_execution_timeout,
+                 max_task_duration=max_task_duration,
+                 **kw)
+
+_lr_utils.priority_limit_async_func_call = _patched
+
+
+import asyncio
 import logging
 import nest_asyncio
 import argparse
@@ -21,7 +53,7 @@ from lightrag.kg.shared_storage import get_namespace_data, get_pipeline_status_l
 from lightrag import LightRAG, QueryParam
 from lightrag.llm.openai import openai_complete_if_cache
 from lightrag.llm.hf import hf_embed
-from lightrag.utils import EmbeddingFunc
+# from lightrag.utils import EmbeddingFunc
 from lightrag.kg.shared_storage import initialize_pipeline_status
 from tqdm import tqdm
 from lightrag.llm.ollama import ollama_model_complete, ollama_embed
@@ -38,6 +70,10 @@ import re
 from collections import Counter
 from time import perf_counter
 from lightrag.kg import nano_vector_db_impl as nvdb
+
+
+from functools import wraps
+import lightrag.operate as _op
 
 def get_dir_size(path: str) -> int:
     total = 0
@@ -301,7 +337,7 @@ async def initialize_rag(
         tokenizer = AutoTokenizer.from_pretrained(embed_model_name)
         embed_model = AutoModel.from_pretrained(embed_model_name)
         embedding_dim = 1024 if "large" in embed_model_name.lower() else 768
-        embedding_func = EmbeddingFunc(
+        embedding_func = _lr_utils.EmbeddingFunc(
             embedding_dim=embedding_dim,
             max_token_size=8192,
             func=lambda texts: hf_embed(texts, tokenizer, embed_model),
@@ -327,7 +363,7 @@ async def initialize_rag(
         else:
             embedding_dim = 768
 
-        embedding_func = EmbeddingFunc(
+        embedding_func = _lr_utils.EmbeddingFunc(
             embedding_dim=embedding_dim,
             max_token_size=8192,
             func=lambda texts: ollama_embed(
@@ -363,7 +399,7 @@ async def initialize_rag(
         else:
             embedding_dim = 768
 
-        embedding_func = EmbeddingFunc(
+        embedding_func = _lr_utils.EmbeddingFunc(
             embedding_dim=embedding_dim,
             max_token_size=8192,
             func=lambda texts: hf_embed(texts, tok_embed, mdl_embed),
@@ -441,6 +477,26 @@ async def process_corpus(
         llm_base_url=llm_base_url,
         llm_api_key=llm_api_key
     )
+
+    # get the raw function (undecorated) if possible
+    base_llm = getattr(rag, "llm_model_func", None)
+    if base_llm is None:
+        raise RuntimeError("rag.llm_model_func not found")
+
+    # if it was already decorated, unwrap once
+    if hasattr(base_llm, "__wrapped__"):
+        base_llm = base_llm.__wrapped__
+
+    # rebuild with our patched decorator + timeouts from env
+    timeout = int(os.getenv("LIGHTRAG_FUNC_TIMEOUT", "600"))
+    patched_llm = _lr_utils.priority_limit_async_func_call(
+        max_size=getattr(rag, "llm_model_max_async", 2),
+        llm_timeout=timeout,
+        queue_name="LLM func",
+    )(base_llm)
+
+    # hot-swap the function kg_query calls
+    _op.use_model_func = patched_llm
 
     # Index corpus (await if coroutine)
     ins = rag.insert(context)
@@ -639,6 +695,8 @@ def main():
         }
     }
 
+    os.environ["LIGHTRAG_WORKER_TIMEOUT"] = "600"
+
     parser = argparse.ArgumentParser(description="LightRAG: Process Corpora and Answer Questions")
     parser.add_argument("--subset", required=True, choices=["medical", "novel"], help="Subset to process (medical or novel)")
     parser.add_argument("--q_start", type=int, default=None, help="Start index of questions (1-based, inclusive)")
@@ -725,7 +783,8 @@ def main():
         )
 
 if __name__ == "__main__":
+    # os.environ["LIGHTRAG_WORKER_TIMEOUT"] = "600"
     main()
 
 
-# python .\Examples\run_lightrag.py --subset medical --mode hf --model_name "Qwen/Qwen2.5-3B" --embed_model "BAAI/bge-base-en" --q_start 21 --rand_n 50 --base_dir ./lightrag_workspace_qwen3b
+# python .\Examples\run_lightrag_sample.py --subset medical --mode hf --model_name "Qwen/Qwen2.5-3B" --embed_model "BAAI/bge-base-en" --q_start 21 --base_dir ./lightrag_workspace_gpt4omini --rand_n 100
