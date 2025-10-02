@@ -89,8 +89,8 @@ class Phi4MiniReasoningLLM:
     def __init__(self, include_thinkings: bool = True,
                 model_name: str = "microsoft/Phi-4-mini-reasoning",
                 max_new_tokens: int = 256,
-                temperature: float = 0.3,
-                top_p: float = 0.95):
+                temperature: float = 0.2,
+                top_p: float = 0.9):
         self.include_thinkings = include_thinkings
         self.max_new_tokens = max_new_tokens
         self.temperature = temperature

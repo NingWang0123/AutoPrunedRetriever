@@ -128,7 +128,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
         # corpus file is the facts
         facts_cb = cr.load_and_merge_facts(CORPUS_FILE, chunk_chars=100, overlap=30)
         cr._facts_preloaded = True
-        cr.top_m = 10          # sentence-embedding rerank top-m
+        cr.top_m = 5          # sentence-embedding rerank top-m
 
         cr.meta_codebook = merging_codebook(
             cr.meta_codebook, facts_cb,
@@ -361,7 +361,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
 if __name__ == "__main__":
 
     aft_combine_sim = 0.9
-    top_m = 10
+    top_m = 5
 
     reward_func = reward_func_dpo.reward_sbert_inclusive
 
