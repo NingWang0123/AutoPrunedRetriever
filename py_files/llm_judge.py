@@ -3,7 +3,7 @@ from pathlib import Path
 
 
 REPO_ROOT = Path("GraphRAG-Benchmark")
-DATA      = Path("results/compressrag_medical_data.json")
+DATA      = Path("results/compressrag_medical_data_openai.json")
 OUT_DIR   = Path("results")
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -29,7 +29,7 @@ base_cmd = [
     "--mode", "API",
     "--model", "gpt-4o-mini",    
     "--data_file", str(DATA),
-    "--output_file", str(OUT_DIR / "retrieval_scores.json"),
+    "--output_file", str(OUT_DIR / "retrieval_scores_apr.json"),
     "--detailed_output",
 ]
 
@@ -40,7 +40,7 @@ gen_cmd = [
     "--mode", "API",
     "--model", "gpt-4o-mini",
     "--data_file", str(DATA),
-    "--output_file", str(OUT_DIR / "generation_scores.json"),
+    "--output_file", str(OUT_DIR / "generation_scores_apr.json"),
     "--detailed_output",
     "--embedding_model", "BAAI/bge-large-en",         
 ]
