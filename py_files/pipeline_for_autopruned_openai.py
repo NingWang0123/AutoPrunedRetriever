@@ -364,7 +364,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
 if __name__ == "__main__":
 
     aft_combine_sim = 0.9
-    top_m = 10
+    top_m = 5
 
     reward_func = reward_func_dpo.reward_sbert_inclusive
 
