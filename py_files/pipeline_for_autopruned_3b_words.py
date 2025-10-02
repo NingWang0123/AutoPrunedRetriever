@@ -374,8 +374,8 @@ if __name__ == "__main__":
 
     compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N, 
                             top_m,top_m*10,aft_combine_sim,aft_combine_sim,aft_combine_sim,aft_combine_sim,
-                            Path("meta_codebook.json") ,f"pref_examples_medical_exact_graph_rag_v6_3b_words.json",reward_func,
-                            reward_func_mode = 'non_llm',final_json_path = f"results/compressrag_medical_data_3b_words.json")
+                            Path("meta_codebook.json") ,f"pref_examples_medical_exact_graph_rag_v6_3b_words_top5.json",reward_func,
+                            reward_func_mode = 'non_llm',final_json_path = f"results/compressrag_medical_data_3b_words_top5.json")
 
     # df.to_csv('results/result_sbertinclusive_new_embed_for_exactgraphrag.csv')
 
