@@ -742,7 +742,7 @@ def get_code_book(
     rule: str = "Answer questions.",
     factparser: bool = False,   
     *,
-    batch_size: int = 64       
+    batch_size: int = 1      
 ):
     valid_types = {'questions', 'answers', 'thinkings', 'facts'}
     if type not in valid_types:
@@ -2997,55 +2997,6 @@ combine_ents_choice = [0,1,2]
 def skip_func(a,b):
     return None
 
-
-def _l2norm_rows(X: np.ndarray, eps: float = 1e-12) -> np.ndarray:
-    return X / (np.linalg.norm(X, axis=1, keepdims=True) + eps)
-
-def _extract_entities_relations_from_run(edge_run: List[int],
-                                         codebook_main: Dict[str, Any]
-                                         ) -> Tuple[Optional[np.ndarray], Optional[np.ndarray]]:
-    """
-    Returns:
-      E: (n_e, de) or None    # heads+tails
-      R: (n_r, dr) or None    # relations
-    """
-    decoded = decode_question(edge_run, codebook_main, fmt='embeddings')
-
-    Es, Rs = [], []
-    for h_vec, r_vec, t_vec in decoded:
-        if h_vec is not None:
-            Es.append(np.asarray(h_vec, dtype=np.float32))
-        if t_vec is not None:
-            Es.append(np.asarray(t_vec, dtype=np.float32))
-        if r_vec is not None:
-            Rs.append(np.asarray(r_vec, dtype=np.float32))
-
-    E = np.vstack(Es).astype(np.float32) if Es else None
-    R = np.vstack(Rs).astype(np.float32) if Rs else None
-    return E, R
-
-def _pairwise_max_cos(A: Optional[np.ndarray], B: Optional[np.ndarray]) -> float:
-    """
-    Max cosine similarity over all pairs between rows of A and B.
-    Returns 0.0 if A or B is None/empty.
-    """
-    if A is None or B is None or A.size == 0 or B.size == 0:
-        return 0.0
-    An = _l2norm_rows(A)
-    Bn = _l2norm_rows(B)
-    # (na, nb) cosine matrix
-    S = An @ Bn.T
-    return float(S.max())
-
-def entrel_maxpair_similarity(Eq, Rq,Ef, Rf,codebook_main: Dict[str, Any],
-                              w_ent: float = 1.0, w_rel: float = 0.5) -> float:
-    """
-      score = w_ent * max_{ent pair} cos + w_rel * max_{rel pair} cos
-    """
-    ent_score = _pairwise_max_cos(Eq, Ef)
-    rel_score = _pairwise_max_cos(Rq, Rf)
-    return w_ent * ent_score + w_rel * rel_score
-
 class ExactGraphRag_rl:
     def __init__(
         self,
@@ -3192,7 +3143,7 @@ class ExactGraphRag_rl:
         self.set_include_answers()
         self.set_include_facts()
 
-    def preload_context_json(self, json_path: str, chunk_chars: int = 800, overlap: int = 120):
+    def preload_context_json(self, json_path: str, chunk_chars: int = 1200, overlap: int = 100):
         import json
 
         with open(json_path, "r", encoding="utf-8") as f:
@@ -3218,12 +3169,19 @@ class ExactGraphRag_rl:
         items = data if isinstance(data, list) else [data]
 
         all_chunks = []
-        for item in items:
+        for item_idx, item in enumerate(items):
             ctx = (item.get("context") or "").strip()
             if ctx:
-                all_chunks.extend(_chunk_text(ctx, chunk_chars=chunk_chars, overlap=overlap))
+                item_chunks = _chunk_text(ctx, chunk_chars=chunk_chars, overlap=overlap)
+                print(f"Item {item_idx}: original text length = {len(ctx)} chars, split into {len(item_chunks)} chunks")
+                for chunk_idx, chunk in enumerate(item_chunks):
+                    print(f"  Chunk {chunk_idx}: {len(chunk)} chars")
+                all_chunks.extend(item_chunks)
 
         total_chunks = len(all_chunks)
+        print(f"Total chunks created: {total_chunks}")
+        print(f"Average chunk size: {sum(len(chunk) for chunk in all_chunks) / total_chunks:.1f} chars" if total_chunks > 0 else "No chunks created")
+        
         if total_chunks == 0:
             return None
         
@@ -3232,7 +3190,7 @@ class ExactGraphRag_rl:
             all_chunks,
             type='facts',
             rule="Store factual statements.",
-            # batch_size=64, 
+            batch_size=1, 
         )
         if combined is None:
             combined = {
@@ -3266,8 +3224,6 @@ class ExactGraphRag_rl:
             combined["e"].extend(new_ents)
             combined["r"].extend(new_rels)
             combined["edge_matrix"] = new_edge_matrix
-        print(f"{json_path} chunk num:", total_chunks)
-        print(f"{json_path} chunk num:", total_chunks)
         print(f"{json_path} chunk num:", total_chunks)
         return combined
 
@@ -3304,41 +3260,6 @@ class ExactGraphRag_rl:
             except Exception:
                 continue
         return sep.join(out) if out else "[EMPTY]"
-    
-
-    def _default_linearizer_new(self, edges_run, codebook_main, sep="; ", max_len=128):
-        """
-        把一条边序列转成可读字符串：'A --r1--> B; B --r2--> C'
-        在索引越界/脏数据时自动跳过，保证不抛异常。
-        """
-        if not edges_run:
-            return "[EMPTY]"
-        e = codebook_main.get("e", [])
-        r = codebook_main.get("r", [])
-        edges = codebook_main.get("edge_matrix", [])
-        out = []
-        for idx in edges_run[:max_len]:
-            try:
-                h, rel, t = edges[int(idx)]
-                # 保护性取值
-                sh = str(e[h]) if 0 <= h < len(e) else f"e[{h}]"
-                sr = str(r[rel]) if 0 <= rel < len(r) else f"r[{rel}]"
-                st = str(e[t]) if 0 <= t < len(e) else f"e[{t}]"
-                out.append(f"{sh} {sr} {st}")
-            except Exception:
-                continue
-        return sep.join(out) if out else "[EMPTY]"
-    
-
-    def _get_linearizer_new(self):
-        """
-        返回一个可调用的 linearizer：
-        - 若 self.custom_linearizer 可调用则用它
-        - 否则回退到 _default_linearizer
-        """
-        if callable(getattr(self, "custom_linearizer", None)):
-            return self.custom_linearizer
-        return lambda run, cb: self._default_linearizer_new(run, cb)
 
     def _get_linearizer(self):
         """
@@ -3407,63 +3328,6 @@ class ExactGraphRag_rl:
         chosen_global = [int(idx1_sorted[i]) for i in chosen_local]
 
         return [(i, float(sims_s[j])) for j, i in zip(chosen_local, chosen_global)]
-    
-
-    def _embed_edge_run(self, edge_run, codebook_main):
-        decoded = decode_question(edge_run, codebook_main, fmt='embeddings')
-        # 利用你已有的 _avg_vec_from_decoded
-        dim = len(codebook_main["e_embeddings"][0]) if codebook_main.get("e_embeddings") else 64
-        return _avg_vec_from_decoded(decoded, dim)
-    
-
-
-    def _rank_facts_for_query_new(self, query_edges, facts_runs, codebook_main,
-                            pre_topk=50, final_topm=5):
-        if not facts_runs:
-            return []
-        
-        # ent to ent, relation to relation
-        Eq,Rq = _extract_entities_relations_from_run(query_edges,codebook_main)
-        f_fict = {}
-        f_index = 0
-
-        print(f'{len(facts_runs)} facts_runs detected')
-        for f_run in facts_runs:
-            Ef, Rf = _extract_entities_relations_from_run(f_run, codebook_main)
-
-            score = entrel_maxpair_similarity(Eq, Rq,Ef, Rf,codebook_main,
-                                                w_ent = 1.0, w_rel = 0.5)
-            
-            f_fict[f_index] = score
-            f_index+=1
-
-        sorted_f_indexes = sorted(f_fict, key=f_fict.get, reverse=True)
-        k = min(pre_topk, len(sorted_f_indexes))
-        idx1_sorted = sorted_f_indexes[:k]
-
-        lin = self._get_linearizer_new()
-
-        q_text = lin(query_edges, codebook_main)
-        cand_texts = [lin(facts_runs[i], codebook_main) for i in idx1_sorted]
-
-        if hasattr(self.sentence_emb, "embed_query"):
-            import numpy as np
-            qv_s = np.asarray(self.sentence_emb.embed_query(q_text), dtype=np.float32)
-            F_s  = np.asarray(self.sentence_emb.embed_documents(cand_texts), dtype=np.float32)
-        else:
-            import numpy as np
-            qv_s = np.asarray(self.sentence_emb.encode([q_text])[0], dtype=np.float32)
-            F_s  = np.asarray(self.sentence_emb.encode(cand_texts), dtype=np.float32)
-
-        qv_s = qv_s / (np.linalg.norm(qv_s) + 1e-12)
-        F_s  = F_s / (np.linalg.norm(F_s, axis=1, keepdims=True) + 1e-12)
-        sims_s = F_s @ qv_s  
-
-        order_local = np.argsort(-sims_s)
-        chosen_local = order_local[:min(final_topm, order_local.size)]
-        chosen_global = [int(idx1_sorted[i]) for i in chosen_local]
-
-        return [(i, float(sims_s[j])) for j, i in zip(chosen_local, chosen_global)]
 
 
 
@@ -3480,45 +3344,6 @@ class ExactGraphRag_rl:
                             flat.append(r2)
                             map_idx.append([gi, fj])  # ← 用列表
         return flat, map_idx
-    
-
-    def retrieve_new(self,q_json):
-
-        self.meta_codebook = merging_codebook(self.meta_codebook,q_json,'questions',self.word_emb,True)
-        # take the last one 
-
-        questions_edges_index = self.meta_codebook['questions_lst'][-1]
-
-        # due to almost empty prev answer database, give adapted m
-        adapted_m = min(max(1,int(0.1*len(self.meta_codebook['answers_lst']))),self.top_m)
-
-        top_m_results = coarse_filter(
-                        questions_edges_index,
-                        self.meta_codebook,
-                        self.sentence_emb,                 # ← move before defaults
-                        self.top_k,                             # word-embedding candidates
-                        self.question_batch_size,               # query batch size
-                        self.questions_db_batch_size,           # DB batch size
-                        adapted_m,                             # sentence-embedding rerank
-                        self.custom_linearizer)
-        
-        result = add_answers_to_filtered_lst(top_m_results,self.meta_codebook)
-
-        all_answers,all_q_indices = get_answers_lst_from_results(result)
-        
-
-        flat_facts, facts_map = self._flatten_facts(self.meta_codebook)  
-
-        all_facts = []
-        all_f_indices = []   
-
-        for q_edges in questions_edges_index:
-            ranked = self._rank_facts_for_query_new(q_edges, flat_facts, self.meta_codebook, final_topm=self.top_m)
-            for fact_idx, _score in ranked:
-                all_facts.append(flat_facts[fact_idx])
-                all_f_indices.append(facts_map[fact_idx])
-
-        return all_answers, all_q_indices, all_f_indices
 
     def retrieve(self,q_json):
 
@@ -3783,24 +3608,14 @@ class ExactGraphRag_rl:
 
         return new_result,new_json_lst,metrics_from_llm
     
-
-    # only update when we get the valid triples answers
     def update_meta(self, new_json_lst, facts_cb=None):
         if self.include_thinkings:
             codebook_sub_a, codebook_sub_t = new_json_lst
-            if len(codebook_sub_a["edges([e,r,e])"])>0:
-                self.meta_codebook = merging_codebook(self.meta_codebook, codebook_sub_a, 'answers',   self.word_emb, True)
-                self.meta_codebook = merging_codebook(self.meta_codebook, codebook_sub_t, 'thinkings', self.word_emb, True)
-            else:
-                self.meta_codebook['questions_lst'].pop()
-
+            self.meta_codebook = merging_codebook(self.meta_codebook, codebook_sub_a, 'answers',   self.word_emb, True)
+            self.meta_codebook = merging_codebook(self.meta_codebook, codebook_sub_t, 'thinkings', self.word_emb, True)
         else:
             codebook_sub_a = new_json_lst[0]
-
-            if len(codebook_sub_a["edges([e,r,e])"])>0:
-                self.meta_codebook = merging_codebook(self.meta_codebook, codebook_sub_a, 'answers',   self.word_emb, True)
-            else:
-                self.meta_codebook['questions_lst'].pop()
+            self.meta_codebook = merging_codebook(self.meta_codebook, codebook_sub_a, 'answers',   self.word_emb, True)
 
         if facts_cb is not None:
             print("----------fact is loaded------")
@@ -3818,11 +3633,11 @@ class ExactGraphRag_rl:
                     k_grid_size = self.k_grid_size
                     ) 
         elif mode == "knn":
-            self.meta_codebook = combine_ents_ann_knn(self.meta_codebook,sim_threshold = self.combine_ent_sim)
+            self.meta_codebook = combine_ents_ann_knn(self.meta_codebook)
         elif mode == "coarse":
-            self.meta_codebook = coarse_combine(self.meta_codebook,sim_threshold = self.combine_ent_sim)           
+            self.meta_codebook = coarse_combine(self.meta_codebook)           
 
-    def load_and_merge_facts(self, facts_json_path, chunk_chars=1200, overlap=100):
+    def load_and_merge_facts(self, facts_json_path, chunk_chars=800, overlap=120):
         if not facts_json_path:
             return None
         if isinstance(facts_json_path, (list, tuple)):
@@ -3854,6 +3669,7 @@ class ExactGraphRag_rl:
         combined_facts_cb = None
         if not getattr(self, "_facts_preloaded", False) and facts_json_path:
             combined_facts_cb = self.load_and_merge_facts(facts_json_path, chunk_chars, overlap)
+            print("combined_facts_cb:", combined_facts_cb)
             if combined_facts_cb:
                 self.meta_codebook = merging_codebook(
                     self.meta_codebook, combined_facts_cb, 'facts', self.word_emb, False
@@ -3862,7 +3678,7 @@ class ExactGraphRag_rl:
 
         if self.meta_codebook:
             t0 = time.perf_counter()
-            all_answers, all_q_indices, all_f_indices = self.retrieve_new(q_json)
+            all_answers, all_q_indices, all_f_indices = self.retrieve(q_json)
             retrieval_time = time.perf_counter() - t0
             print("all_answers", all_answers)
             print("all_q_indices", all_q_indices)
@@ -3886,7 +3702,7 @@ class ExactGraphRag_rl:
 
         final_merged_json = slice_for_final_merged_json(final_merged_json,self.use_word)
 
-        print(f'slice_for_final_merged_json {final_merged_json}')
+        print(f'final_merged_json sliced{final_merged_json}')
 
         self.cur_fact_context = ft_txt
 
@@ -3931,33 +3747,33 @@ class ExactGraphRag_rl:
 
         # after combine ents combine others
         # combine qas if avaliable
-        # if 'questions_lst' in self.meta_codebook and 'answers_lst' in self.meta_codebook:
-        #     if len(self.meta_codebook['questions_lst'])>=2:
-        #         new_q, new_a, q_old_to_new, q_clusters, kept = ann_merge_questions_answer_gated(self.meta_codebook,
-        #                                                                                         self.meta_codebook['questions_lst'],
-        #                                                                                         self.meta_codebook['answers_lst'],
-        #                                                                                         q_sim_threshold = self.q_combine_sim,
-        #                                                                                         a_sim_threshold = self.aft_combine_sim)
+        if 'questions_lst' in self.meta_codebook and 'answers_lst' in self.meta_codebook:
+            if len(self.meta_codebook['questions_lst'])>=2:
+                new_q, new_a, q_old_to_new, q_clusters, kept = ann_merge_questions_answer_gated(self.meta_codebook,
+                                                                                                self.meta_codebook['questions_lst'],
+                                                                                                self.meta_codebook['answers_lst'],
+                                                                                                q_sim_threshold = self.q_combine_sim,
+                                                                                                a_sim_threshold = self.aft_combine_sim)
                 
-        #         self.meta_codebook['questions_lst'] = new_q
-        #         self.meta_codebook['answers_lst'] = new_a
+                self.meta_codebook['questions_lst'] = new_q
+                self.meta_codebook['answers_lst'] = new_a
 
-        # if 'facts_lst' in self.meta_codebook:
-        #     if len(self.meta_codebook['facts_lst'])>=2:
-        #         new_facts, f_old2new, f_clusters, kept = ann_feat_combine(self.meta_codebook,
-        #                                                                                         self.meta_codebook['facts_lst'],
-        #                                                                                         sim_threshold = self.aft_combine_sim)
+        if 'facts_lst' in self.meta_codebook:
+            if len(self.meta_codebook['facts_lst'])>=2:
+                new_facts, f_old2new, f_clusters, kept = ann_feat_combine(self.meta_codebook,
+                                                                                                self.meta_codebook['facts_lst'],
+                                                                                                sim_threshold = self.aft_combine_sim)
                 
-        #         self.meta_codebook['facts_lst'] = new_facts
+                self.meta_codebook['facts_lst'] = new_facts
 
 
-        # if 'thinkings_lst' in self.meta_codebook:
-        #     if len(self.meta_codebook['thinkings_lst'])>=2:
-        #         new_thinkings, f_old2new, f_clusters, kept = ann_feat_combine(self.meta_codebook,
-        #                                                                                         self.meta_codebook['thinkings_lst'],
-        #                                                                                         sim_threshold = self.aft_combine_sim)
+        if 'thinkings_lst' in self.meta_codebook:
+            if len(self.meta_codebook['thinkings_lst'])>=2:
+                new_thinkings, f_old2new, f_clusters, kept = ann_feat_combine(self.meta_codebook,
+                                                                                                self.meta_codebook['thinkings_lst'],
+                                                                                                sim_threshold = self.aft_combine_sim)
                 
-        #         self.meta_codebook['thinkings_lst'] = new_thinkings
+                self.meta_codebook['thinkings_lst'] = new_thinkings
 
         return (new_result, metrics_map, self.cur_fact_context) if return_metrics else new_result
     
@@ -3971,6 +3787,7 @@ class ExactGraphRag_rl:
         combined_facts_cb = None
         if not getattr(self, "_facts_preloaded", False) and facts_json_path:
             combined_facts_cb = self.load_and_merge_facts(facts_json_path, chunk_chars, overlap)
+            print(f'combined_facts_cb: {combined_facts_cb}')
             if combined_facts_cb:
                 self.meta_codebook = merging_codebook(
                     self.meta_codebook, combined_facts_cb, 'facts', self.word_emb, False
@@ -3979,7 +3796,7 @@ class ExactGraphRag_rl:
 
         if self.meta_codebook:
             t0 = time.perf_counter()
-            all_answers, all_q_indices, all_f_indices = self.retrieve_new(q_json)
+            all_answers, all_q_indices, all_f_indices = self.retrieve(q_json)
             retrieval_time = time.perf_counter() - t0
             print("all_answers", all_answers)
             print("all_q_indices", all_q_indices)
@@ -3995,13 +3812,14 @@ class ExactGraphRag_rl:
         print(f'final_merged_json unsliced{final_merged_json}')
 
         q_txt, gk_txt, st_txt, ft_txt = select_best_context_by_keys(final_merged_json)
-
+        
         final_merged_json = slice_for_final_merged_json(final_merged_json,self.use_word)
 
         self.cur_fact_context = ft_txt
 
         print(f'{ft_txt} ft_txt')
 
+        print(f'final_merged_json sliced{final_merged_json}')
         new_result, new_json_lst,metrics_from_llm = self.collect_results_dpo(final_merged_json, questions=q_prompt, retrieval_time=retrieval_time)
 
         self.update_meta(new_json_lst, facts_cb=combined_facts_cb)
@@ -4013,33 +3831,33 @@ class ExactGraphRag_rl:
         # after combine ents combine others
         # after combine ents combine others
         # combine qas if avaliable
-        # if 'questions_lst' in self.meta_codebook and 'answers_lst' in self.meta_codebook:
-        #     if len(self.meta_codebook['questions_lst'])>=2:
-        #         new_q, new_a, q_old_to_new, q_clusters, kept = ann_merge_questions_answer_gated(self.meta_codebook,
-        #                                                                                         self.meta_codebook['questions_lst'],
-        #                                                                                         self.meta_codebook['answers_lst'],
-        #                                                                                         q_sim_threshold = self.q_combine_sim,
-        #                                                                                         a_sim_threshold = self.aft_combine_sim)
+        if 'questions_lst' in self.meta_codebook and 'answers_lst' in self.meta_codebook:
+            if len(self.meta_codebook['questions_lst'])>=2:
+                new_q, new_a, q_old_to_new, q_clusters, kept = ann_merge_questions_answer_gated(self.meta_codebook,
+                                                                                                self.meta_codebook['questions_lst'],
+                                                                                                self.meta_codebook['answers_lst'],
+                                                                                                q_sim_threshold = self.q_combine_sim,
+                                                                                                a_sim_threshold = self.aft_combine_sim)
                 
-        #         self.meta_codebook['questions_lst'] = new_q
-        #         self.meta_codebook['answers_lst'] = new_a
+                self.meta_codebook['questions_lst'] = new_q
+                self.meta_codebook['answers_lst'] = new_a
 
-        # if 'facts_lst' in self.meta_codebook:
-        #     if len(self.meta_codebook['facts_lst'])>=2:
-        #         new_facts, f_old2new, f_clusters, kept = ann_feat_combine(self.meta_codebook,
-        #                                                                                         self.meta_codebook['facts_lst'],
-        #                                                                                         sim_threshold = self.aft_combine_sim)
+        if 'facts_lst' in self.meta_codebook:
+            if len(self.meta_codebook['facts_lst'])>=2:
+                new_facts, f_old2new, f_clusters, kept = ann_feat_combine(self.meta_codebook,
+                                                                                                self.meta_codebook['facts_lst'],
+                                                                                                sim_threshold = self.aft_combine_sim)
                 
-        #         self.meta_codebook['facts_lst'] = new_facts
+                self.meta_codebook['facts_lst'] = new_facts
 
 
-        # if 'thinkings_lst' in self.meta_codebook:
-        #     if len(self.meta_codebook['thinkings_lst'])>=2:
-        #         new_thinkings, f_old2new, f_clusters, kept = ann_feat_combine(self.meta_codebook,
-        #                                                                                         self.meta_codebook['thinkings_lst'],
-        #                                                                                         sim_threshold = self.aft_combine_sim)
+        if 'thinkings_lst' in self.meta_codebook:
+            if len(self.meta_codebook['thinkings_lst'])>=2:
+                new_thinkings, f_old2new, f_clusters, kept = ann_feat_combine(self.meta_codebook,
+                                                                                                self.meta_codebook['thinkings_lst'],
+                                                                                                sim_threshold = self.aft_combine_sim)
                 
-        #         self.meta_codebook['thinkings_lst'] = new_thinkings
+                self.meta_codebook['thinkings_lst'] = new_thinkings
 
 
         return new_result,metrics_from_llm,ft_txt
