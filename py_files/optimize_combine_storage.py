@@ -294,8 +294,6 @@ def ann_merge_questions_answer_gated(
 
     # 1) Build question & answer vectors from decoded embeddings
     Q_vecs, A_vecs = [], []
-    # choose a conservative default embedding dim in case we can't infer it yet
-    DEFAULT_DIM = 768  # 768 for the sentence embed
 
     for i in range(n):
         qv = _embed_nested(questions_lst[i], codebook_main)
@@ -303,24 +301,18 @@ def ann_merge_questions_answer_gated(
 
         # If decoding failed (e.g., 1-word answer => no triple), fall back to zeros.
         # Prefer reusing a known shape if we've already appended the other side.
-        if qv is None:
-            if A_vecs:
-                qv = np.zeros_like(A_vecs[0], dtype=np.float32)
-            elif Q_vecs:
-                qv = np.zeros_like(Q_vecs[0], dtype=np.float32)
-            else:
-                qv = np.zeros((DEFAULT_DIM,), dtype=np.float32)
+        if qv is None or av is None:
+            # robust fallback (keeps them from merging due to low sims)
+            if qv is None and A_vecs:  # reuse known dimension
+                qv = np.zeros_like(A_vecs[0])
+            if av is None and Q_vecs:
+                av = np.zeros_like(Q_vecs[0])
 
-        if av is None:
-            if Q_vecs:
-                av = np.zeros_like(Q_vecs[0], dtype=np.float32)
-            elif A_vecs:
-                av = np.zeros_like(A_vecs[0], dtype=np.float32)
-            else:
-                av = np.zeros((DEFAULT_DIM,), dtype=np.float32)
+        # only append when same embedding shape
+        if qv is not None and av is not None:
+            Q_vecs.append(qv.astype(np.float32))
+            A_vecs.append(av.astype(np.float32))
 
-        Q_vecs.append(qv.astype(np.float32))
-        A_vecs.append(av.astype(np.float32))
     Q = np.stack(Q_vecs, axis=0)  # (n, d)
     A = np.stack(A_vecs, axis=0)
 
