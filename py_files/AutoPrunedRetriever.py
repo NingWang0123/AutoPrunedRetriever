@@ -3778,14 +3778,24 @@ class ExactGraphRag_rl:
 
         return new_result,new_json_lst,metrics_from_llm
     
+
+    # only update when we get the valid triples answers
     def update_meta(self, new_json_lst, facts_cb=None):
         if self.include_thinkings:
             codebook_sub_a, codebook_sub_t = new_json_lst
-            self.meta_codebook = merging_codebook(self.meta_codebook, codebook_sub_a, 'answers',   self.word_emb, True)
-            self.meta_codebook = merging_codebook(self.meta_codebook, codebook_sub_t, 'thinkings', self.word_emb, True)
+            if len(codebook_sub_a["edges([e,r,e])"])>0:
+                self.meta_codebook = merging_codebook(self.meta_codebook, codebook_sub_a, 'answers',   self.word_emb, True)
+                self.meta_codebook = merging_codebook(self.meta_codebook, codebook_sub_t, 'thinkings', self.word_emb, True)
+            else:
+                self.meta_codebook['questions_lst'].pop()
+
         else:
             codebook_sub_a = new_json_lst[0]
-            self.meta_codebook = merging_codebook(self.meta_codebook, codebook_sub_a, 'answers',   self.word_emb, True)
+
+            if len(codebook_sub_a["edges([e,r,e])"])>0:
+                self.meta_codebook = merging_codebook(self.meta_codebook, codebook_sub_a, 'answers',   self.word_emb, True)
+            else:
+                self.meta_codebook['questions_lst'].pop()
 
         if facts_cb is not None:
             print("----------fact is loaded------")
@@ -3847,7 +3857,7 @@ class ExactGraphRag_rl:
 
         if self.meta_codebook:
             t0 = time.perf_counter()
-            all_answers, all_q_indices, all_f_indices = self.retrieve(q_json)
+            all_answers, all_q_indices, all_f_indices = self.retrieve_new(q_json)
             retrieval_time = time.perf_counter() - t0
             print("all_answers", all_answers)
             print("all_q_indices", all_q_indices)
@@ -3964,7 +3974,7 @@ class ExactGraphRag_rl:
 
         if self.meta_codebook:
             t0 = time.perf_counter()
-            all_answers, all_q_indices, all_f_indices = self.retrieve(q_json)
+            all_answers, all_q_indices, all_f_indices = self.retrieve_new(q_json)
             retrieval_time = time.perf_counter() - t0
             print("all_answers", all_answers)
             print("all_q_indices", all_q_indices)
