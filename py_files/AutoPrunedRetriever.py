@@ -3926,33 +3926,33 @@ class ExactGraphRag_rl:
 
         # after combine ents combine others
         # combine qas if avaliable
-        if 'questions_lst' in self.meta_codebook and 'answers_lst' in self.meta_codebook:
-            if len(self.meta_codebook['questions_lst'])>=2:
-                new_q, new_a, q_old_to_new, q_clusters, kept = ann_merge_questions_answer_gated(self.meta_codebook,
-                                                                                                self.meta_codebook['questions_lst'],
-                                                                                                self.meta_codebook['answers_lst'],
-                                                                                                q_sim_threshold = self.q_combine_sim,
-                                                                                                a_sim_threshold = self.aft_combine_sim)
+        # if 'questions_lst' in self.meta_codebook and 'answers_lst' in self.meta_codebook:
+        #     if len(self.meta_codebook['questions_lst'])>=2:
+        #         new_q, new_a, q_old_to_new, q_clusters, kept = ann_merge_questions_answer_gated(self.meta_codebook,
+        #                                                                                         self.meta_codebook['questions_lst'],
+        #                                                                                         self.meta_codebook['answers_lst'],
+        #                                                                                         q_sim_threshold = self.q_combine_sim,
+        #                                                                                         a_sim_threshold = self.aft_combine_sim)
                 
-                self.meta_codebook['questions_lst'] = new_q
-                self.meta_codebook['answers_lst'] = new_a
+        #         self.meta_codebook['questions_lst'] = new_q
+        #         self.meta_codebook['answers_lst'] = new_a
 
-        if 'facts_lst' in self.meta_codebook:
-            if len(self.meta_codebook['facts_lst'])>=2:
-                new_facts, f_old2new, f_clusters, kept = ann_feat_combine(self.meta_codebook,
-                                                                                                self.meta_codebook['facts_lst'],
-                                                                                                sim_threshold = self.aft_combine_sim)
+        # if 'facts_lst' in self.meta_codebook:
+        #     if len(self.meta_codebook['facts_lst'])>=2:
+        #         new_facts, f_old2new, f_clusters, kept = ann_feat_combine(self.meta_codebook,
+        #                                                                                         self.meta_codebook['facts_lst'],
+        #                                                                                         sim_threshold = self.aft_combine_sim)
                 
-                self.meta_codebook['facts_lst'] = new_facts
+        #         self.meta_codebook['facts_lst'] = new_facts
 
 
-        if 'thinkings_lst' in self.meta_codebook:
-            if len(self.meta_codebook['thinkings_lst'])>=2:
-                new_thinkings, f_old2new, f_clusters, kept = ann_feat_combine(self.meta_codebook,
-                                                                                                self.meta_codebook['thinkings_lst'],
-                                                                                                sim_threshold = self.aft_combine_sim)
+        # if 'thinkings_lst' in self.meta_codebook:
+        #     if len(self.meta_codebook['thinkings_lst'])>=2:
+        #         new_thinkings, f_old2new, f_clusters, kept = ann_feat_combine(self.meta_codebook,
+        #                                                                                         self.meta_codebook['thinkings_lst'],
+        #                                                                                         sim_threshold = self.aft_combine_sim)
                 
-                self.meta_codebook['thinkings_lst'] = new_thinkings
+        #         self.meta_codebook['thinkings_lst'] = new_thinkings
 
         return (new_result, metrics_map, self.cur_fact_context) if return_metrics else new_result
     
@@ -4008,33 +4008,33 @@ class ExactGraphRag_rl:
         # after combine ents combine others
         # after combine ents combine others
         # combine qas if avaliable
-        if 'questions_lst' in self.meta_codebook and 'answers_lst' in self.meta_codebook:
-            if len(self.meta_codebook['questions_lst'])>=2:
-                new_q, new_a, q_old_to_new, q_clusters, kept = ann_merge_questions_answer_gated(self.meta_codebook,
-                                                                                                self.meta_codebook['questions_lst'],
-                                                                                                self.meta_codebook['answers_lst'],
-                                                                                                q_sim_threshold = self.q_combine_sim,
-                                                                                                a_sim_threshold = self.aft_combine_sim)
+        # if 'questions_lst' in self.meta_codebook and 'answers_lst' in self.meta_codebook:
+        #     if len(self.meta_codebook['questions_lst'])>=2:
+        #         new_q, new_a, q_old_to_new, q_clusters, kept = ann_merge_questions_answer_gated(self.meta_codebook,
+        #                                                                                         self.meta_codebook['questions_lst'],
+        #                                                                                         self.meta_codebook['answers_lst'],
+        #                                                                                         q_sim_threshold = self.q_combine_sim,
+        #                                                                                         a_sim_threshold = self.aft_combine_sim)
                 
-                self.meta_codebook['questions_lst'] = new_q
-                self.meta_codebook['answers_lst'] = new_a
+        #         self.meta_codebook['questions_lst'] = new_q
+        #         self.meta_codebook['answers_lst'] = new_a
 
-        if 'facts_lst' in self.meta_codebook:
-            if len(self.meta_codebook['facts_lst'])>=2:
-                new_facts, f_old2new, f_clusters, kept = ann_feat_combine(self.meta_codebook,
-                                                                                                self.meta_codebook['facts_lst'],
-                                                                                                sim_threshold = self.aft_combine_sim)
+        # if 'facts_lst' in self.meta_codebook:
+        #     if len(self.meta_codebook['facts_lst'])>=2:
+        #         new_facts, f_old2new, f_clusters, kept = ann_feat_combine(self.meta_codebook,
+        #                                                                                         self.meta_codebook['facts_lst'],
+        #                                                                                         sim_threshold = self.aft_combine_sim)
                 
-                self.meta_codebook['facts_lst'] = new_facts
+        #         self.meta_codebook['facts_lst'] = new_facts
 
 
-        if 'thinkings_lst' in self.meta_codebook:
-            if len(self.meta_codebook['thinkings_lst'])>=2:
-                new_thinkings, f_old2new, f_clusters, kept = ann_feat_combine(self.meta_codebook,
-                                                                                                self.meta_codebook['thinkings_lst'],
-                                                                                                sim_threshold = self.aft_combine_sim)
+        # if 'thinkings_lst' in self.meta_codebook:
+        #     if len(self.meta_codebook['thinkings_lst'])>=2:
+        #         new_thinkings, f_old2new, f_clusters, kept = ann_feat_combine(self.meta_codebook,
+        #                                                                                         self.meta_codebook['thinkings_lst'],
+        #                                                                                         sim_threshold = self.aft_combine_sim)
                 
-                self.meta_codebook['thinkings_lst'] = new_thinkings
+        #         self.meta_codebook['thinkings_lst'] = new_thinkings
 
 
         return new_result,metrics_from_llm,ft_txt
