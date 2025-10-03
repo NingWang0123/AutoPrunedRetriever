@@ -3513,6 +3513,44 @@ class ExactGraphRag_rl:
 
         return all_answers, all_q_indices, all_f_indices
     
+    def retrieve_new(self,q_json):
+
+        self.meta_codebook = merging_codebook(self.meta_codebook,q_json,'questions',self.word_emb,True)
+        # take the last one 
+
+        questions_edges_index = self.meta_codebook['questions_lst'][-1]
+
+        # due to almost empty prev answer database, give adapted m
+        adapted_m = min(max(1,int(0.1*len(self.meta_codebook['answers_lst']))),self.top_m)
+
+        top_m_results = coarse_filter(
+                        questions_edges_index,
+                        self.meta_codebook,
+                        self.sentence_emb,                 # ← move before defaults
+                        self.top_k,                             # word-embedding candidates
+                        self.question_batch_size,               # query batch size
+                        self.questions_db_batch_size,           # DB batch size
+                        adapted_m,                             # sentence-embedding rerank
+                        self.custom_linearizer)
+        
+        result = add_answers_to_filtered_lst(top_m_results,self.meta_codebook)
+
+        all_answers,all_q_indices = get_answers_lst_from_results(result)
+        
+
+        flat_facts, facts_map = self._flatten_facts(self.meta_codebook)  
+
+        all_facts = []
+        all_f_indices = []   
+
+        for q_edges in questions_edges_index:
+            ranked = self._rank_facts_for_query_new(q_edges, flat_facts, self.meta_codebook, final_topm=self.top_m)
+            for fact_idx, _score in ranked:
+                all_facts.append(flat_facts[fact_idx])
+                all_f_indices.append(facts_map[fact_idx])
+
+        return all_answers, all_q_indices, all_f_indices
+    
     def _gather_facts_by_indices(self, all_f_indices, codebook_main):
         facts_lsts = []
         facts_store = codebook_main.get('facts_lst', [])
@@ -3741,11 +3779,19 @@ class ExactGraphRag_rl:
     def update_meta(self, new_json_lst, facts_cb=None):
         if self.include_thinkings:
             codebook_sub_a, codebook_sub_t = new_json_lst
-            self.meta_codebook = merging_codebook(self.meta_codebook, codebook_sub_a, 'answers',   self.word_emb, True)
-            self.meta_codebook = merging_codebook(self.meta_codebook, codebook_sub_t, 'thinkings', self.word_emb, True)
+            if len(codebook_sub_a["edges([e,r,e])"])>0:
+                self.meta_codebook = merging_codebook(self.meta_codebook, codebook_sub_a, 'answers',   self.word_emb, True)
+                self.meta_codebook = merging_codebook(self.meta_codebook, codebook_sub_t, 'thinkings', self.word_emb, True)
+            else:
+                self.meta_codebook['questions_lst'].pop()
+
         else:
             codebook_sub_a = new_json_lst[0]
-            self.meta_codebook = merging_codebook(self.meta_codebook, codebook_sub_a, 'answers',   self.word_emb, True)
+
+            if len(codebook_sub_a["edges([e,r,e])"])>0:
+                self.meta_codebook = merging_codebook(self.meta_codebook, codebook_sub_a, 'answers',   self.word_emb, True)
+            else:
+                self.meta_codebook['questions_lst'].pop()
 
         if facts_cb is not None:
             print("----------fact is loaded------")
@@ -3763,9 +3809,9 @@ class ExactGraphRag_rl:
                     k_grid_size = self.k_grid_size
                     ) 
         elif mode == "knn":
-            self.meta_codebook = combine_ents_ann_knn(self.meta_codebook)
+            self.meta_codebook = combine_ents_ann_knn(self.meta_codebook,sim_threshold = self.combine_ent_sim)
         elif mode == "coarse":
-            self.meta_codebook = coarse_combine(self.meta_codebook)           
+            self.meta_codebook = coarse_combine(self.meta_codebook,sim_threshold = self.combine_ent_sim)           
 
     def load_and_merge_facts(self, facts_json_path, chunk_chars=800, overlap=120):
         if not facts_json_path:
