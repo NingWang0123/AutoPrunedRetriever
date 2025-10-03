@@ -3573,54 +3573,78 @@ class ExactGraphRag_rl:
         self.set_include_answers()
         self.set_include_facts()
 
-    def preload_context_json(self, json_path: str, chunk_chars: int = 1200, overlap: int = 100):
+    def preload_context_json(self, json_path: str, chunk_tokens: int = 1200, overlap_tokens: int = 100, sub_chunk_chars: int = 300, sub_chunk_overlap: int = 50, tokenizer_name: str = "gpt-4o-mini"):
         import json
+        import tiktoken
 
         with open(json_path, "r", encoding="utf-8") as f:
             data = json.load(f)
 
-        def _chunk_text(text: str, *, chunk_chars: int = 800, overlap: int = 120):
+        try:
+            tokenizer = tiktoken.encoding_for_model(tokenizer_name)
+        except KeyError:
+            tokenizer = tiktoken.get_encoding("cl100k_base")
+
+        def _chunk_text(text: str, *, chunk_tokens: int = 1200, overlap_tokens: int = 100, sub_chunk_chars: int = 300, sub_chunk_overlap: int = 50, tokenizer=tokenizer):
             text = (text or "").strip()
             if not text:
                 return []
-            chunks, n = [], len(text)
-            step = max(1, chunk_chars - overlap)
+            tokens = tokenizer.encode(text)
+            token_chunks = []
+            step = max(1, chunk_tokens - overlap_tokens)
             i = 0
-            while i < n:
-                j = min(n, i + chunk_chars)
-                chunk = text[i:j].strip()
-                if chunk:
-                    chunks.append(chunk)
-                if j == n:
+            while i < len(tokens):
+                j = min(len(tokens), i + chunk_tokens)
+                chunk_text = tokenizer.decode(tokens[i:j]).strip()
+                if chunk_text:
+                    token_chunks.append(chunk_text)
+                if j == len(tokens):
                     break
                 i += step
-            return chunks
+
+            def _sub_chunk_by_chars(text, chunk_size, overlap):
+                if not text or len(text) <= chunk_size:
+                    return [text] if text else []
+                sub_chunks = []
+                step = max(1, chunk_size - overlap)
+                i = 0
+                while i < len(text):
+                    j = min(len(text), i + chunk_size)
+                    sub_chunk = text[i:j].strip()
+                    if sub_chunk:
+                        sub_chunks.append(sub_chunk)
+                    if j == len(text):
+                        break
+                    i += step
+                return sub_chunks
+            all_sub_chunks = []
+            for token_chunk in token_chunks:
+                all_sub_chunks.extend(_sub_chunk_by_chars(token_chunk, sub_chunk_chars, sub_chunk_overlap))
+            return all_sub_chunks
 
         items = data if isinstance(data, list) else [data]
-
         all_chunks = []
-        for item_idx, item in enumerate(items):
+        for item in items:
             ctx = (item.get("context") or "").strip()
             if ctx:
-                item_chunks = _chunk_text(ctx, chunk_chars=chunk_chars, overlap=overlap)
-                print(f"Item {item_idx}: original text length = {len(ctx)} chars, split into {len(item_chunks)} chunks")
-                for chunk_idx, chunk in enumerate(item_chunks):
-                    print(f"  Chunk {chunk_idx}: {len(chunk)} chars")
+                item_chunks = _chunk_text(ctx, chunk_tokens=chunk_tokens, overlap_tokens=overlap_tokens, sub_chunk_chars=sub_chunk_chars, sub_chunk_overlap=sub_chunk_overlap)
                 all_chunks.extend(item_chunks)
 
-        total_chunks = len(all_chunks)
-        print(f"Total chunks created: {total_chunks}")
-        print(f"Average chunk size: {sum(len(chunk) for chunk in all_chunks) / total_chunks:.1f} chars" if total_chunks > 0 else "No chunks created")
-        
-        if total_chunks == 0:
+        if not all_chunks:
             return None
-        
-        combined = None  
+
+        # Print the number of chunk batches sent to the triple parser
+        total_chunks = len(all_chunks)
+        batch_size = 1
+        num_batches = (total_chunks + batch_size - 1) // batch_size
+        print(f"[preload_context_json] Total chunks sent to get_code_book: {total_chunks}, batch_size={batch_size}, num_batches: {num_batches}")
+
+        combined = None
         fact_cb = get_code_book(
             all_chunks,
             type='facts',
             rule="Store factual statements.",
-            batch_size=1, 
+            batch_size=batch_size,
         )
         if combined is None:
             combined = {
@@ -3654,7 +3678,6 @@ class ExactGraphRag_rl:
             combined["e"].extend(new_ents)
             combined["r"].extend(new_rels)
             combined["edge_matrix"] = new_edge_matrix
-        print(f"{json_path} chunk num:", total_chunks)
         return combined
 
 
@@ -4196,7 +4219,12 @@ class ExactGraphRag_rl:
         elif mode == "coarse":
             self.meta_codebook = coarse_combine(self.meta_codebook,sim_threshold = self.combine_ent_sim)           
 
-    def load_and_merge_facts(self, facts_json_path, chunk_chars=800, overlap=120):
+    def load_and_merge_facts(
+        self, facts_json_path,
+        chunk_tokens=1200, overlap_tokens=100,
+        sub_chunk_chars=300, sub_chunk_overlap=50,
+        tokenizer_name="gpt-4o-mini"
+    ):
         if not facts_json_path:
             return None
         if isinstance(facts_json_path, (list, tuple)):
@@ -4206,7 +4234,14 @@ class ExactGraphRag_rl:
 
         combined_facts_cb = None
         for p in paths:
-            cb = self.preload_context_json(p, chunk_chars, overlap)
+            cb = self.preload_context_json(
+                p,
+                chunk_tokens=chunk_tokens,
+                overlap_tokens=overlap_tokens,
+                sub_chunk_chars=sub_chunk_chars,
+                sub_chunk_overlap=sub_chunk_overlap,
+                tokenizer_name=tokenizer_name
+            )
             if not cb:
                 continue
             if combined_facts_cb is None:
