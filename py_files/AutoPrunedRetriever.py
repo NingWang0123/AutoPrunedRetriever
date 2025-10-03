@@ -1569,7 +1569,6 @@ def rerank_with_sentence_embeddings(
         query_text = make_question_text(q_edges, codebook_main, custom_linearizer)
         m = min(top_m, len(kept_texts))
         docs_scores = vs.similarity_search_with_score(query_text, k=m)
-
         ranked = []
         for doc, score in docs_scores:
             md = doc.metadata
@@ -1584,6 +1583,156 @@ def rerank_with_sentence_embeddings(
 
     return results
 
+
+######### new reranker
+
+# --- tiny utilities for rerank ---
+def _l2norm_rows(X: np.ndarray, eps: float = 1e-12) -> np.ndarray:
+    X = np.asarray(X, dtype=np.float32)
+    return X / (np.linalg.norm(X, axis=1, keepdims=True) + eps)
+
+def _cosine_sim_matrix(A: np.ndarray, B: np.ndarray) -> np.ndarray:
+    return _l2norm_rows(A) @ _l2norm_rows(B).T
+
+def _triples_words(edge_run: List[int], codebook_main: Dict[str, Any]) -> List[List[str]]:
+    """Returns [[h, r, t], ...] using your decoder in 'words' mode."""
+    return decode_question(edge_run, codebook_main, fmt='words')
+
+def _embed_lines(lines: List[str], emb) -> np.ndarray:
+    vecs = emb.embed_documents(lines)  # HuggingFaceEmbeddings-compatible
+    return np.asarray(vecs, dtype=np.float32)
+
+# --- scoring: top-t mean + coverage + multi-pair bonuses (uses words) ---
+def _score_query_vs_chunk_with_bonus(
+    q_edges: List[int],
+    chunk_edges: List[int],
+    codebook_main: Dict[str, Any],
+    emb,
+    top_t: int = 3,
+    cov_tau: float = 0.45, cov_weight: float = 0.10,
+    pair_tau: float = 0.55, pair_temp: float = 0.10, pair_weight: float = 0.20, pair_norm: str = "sqrt",
+    distinct_weight: float = 0.10, distinct_tau: float = 0.50,
+) -> float:
+    q_triples = _triples_words(q_edges, codebook_main)    # [[h,r,t], ...]
+    c_triples = _triples_words(chunk_edges, codebook_main)
+    if not q_triples or not c_triples:
+        return 0.0
+
+    # per-triple lines for embeddings
+    q_lines = [f"{h} {r} {t}" for h, r, t in q_triples]
+    c_lines = [f"{h} {r} {t}" for h, r, t in c_triples]
+
+    Q = _embed_lines(q_lines, emb)   # (nq,d)
+    C = _embed_lines(c_lines, emb)   # (nc,d)
+    S = _cosine_sim_matrix(Q, C)     # (nq,nc)
+    nq, nc = S.shape
+
+    # base: adaptive top-t mean over ALL pairs
+    t_pairs = max(1, min(top_t, nq * nc))
+    flat = S.ravel()
+    idx = np.argpartition(flat, -t_pairs)[-t_pairs:]
+    rel = float(flat[idx].mean())
+
+    # coverage: fraction of query triples with a good match
+    best_per_q = S.max(axis=1)
+    coverage = float((best_per_q >= cov_tau).mean())
+
+    # many-to-many good-pairs bonus (soft count + diminishing returns)
+    soft_hits = 1.0 / (1.0 + np.exp(-(S - pair_tau) / max(1e-6, pair_temp)))
+    good_pairs_soft = float(soft_hits.sum())
+    if pair_norm == "sqrt":
+        norm = np.sqrt(nq * nc) + 1e-12
+    elif pair_norm == "log":
+        norm = np.log1p(nq * nc) + 1e-12
+    else:
+        norm = 1.0
+    good_pairs_bonus = np.log1p(good_pairs_soft / norm)
+
+    # distinct (one-to-one) greedy bonus
+    distinct_bonus = 0.0
+    if distinct_weight > 0.0:
+        S_work = S.copy()
+        taken = 0
+        for _ in range(min(nq, nc)):
+            r, c = divmod(int(S_work.argmax()), S_work.shape[1])
+            val = S_work[r, c]
+            if val < distinct_tau:
+                break
+            distinct_bonus += float(val)
+            S_work[r, :] = -np.inf
+            S_work[:, c] = -np.inf
+            taken += 1
+        if taken > 0:
+            distinct_bonus /= np.sqrt(taken)
+
+    score = (
+        rel
+        + cov_weight * coverage
+        + pair_weight * good_pairs_bonus
+        + distinct_weight * distinct_bonus
+    )
+    # optional: damp very long chunks
+    # score /= (np.sqrt(nc) + 1e-12)
+    return float(score)
+
+# -----------------------------------------------------------
+def rerank_with_sentence_embeddings_score_with_coverage(
+    questions: List[List[int]],
+    codebook_main: Dict[str, Any],
+    coarse_topk: Dict[int, List[Dict[str, Any]]],
+    emb,                             # HuggingFaceEmbeddings (or compatible)
+    top_m: int = 1,
+    custom_linearizer: Optional[Callable[[List[List[str]]], str]] = None) -> Dict[int, List[Dict[str, Any]]]:
+
+    results: Dict[int, List[Dict[str, Any]]] = {}
+
+    for i, q_edges in enumerate(questions):
+        cand = coarse_topk.get(i, [])
+        if not cand:
+            results[i] = []
+            continue
+
+        seen = set()
+        scored = []
+
+        for item in cand:
+            qi = int(item["questions_index"])
+            qj = int(item["question_index"])
+            src = item.get("db_source", "questions")
+            key = (qi, qj, src)
+            if key in seen:
+                continue
+            seen.add(key)
+
+            groups = codebook_main["questions_lst"] if src == "questions" else codebook_main["answers_lst"]
+            chunk_edges = groups[qi][qj]
+
+            s = _score_query_vs_chunk_with_bonus(
+                q_edges, chunk_edges, codebook_main, emb,
+                top_t=3,
+                cov_tau=0.45, cov_weight=0.10,
+                pair_tau=0.55, pair_temp=0.10, pair_weight=0.20, pair_norm="sqrt",
+                distinct_weight=0.10, distinct_tau=0.50,
+            )
+
+            # Use YOUR linearizer for the display text
+            text = make_question_text(chunk_edges, codebook_main, custom_linearizer)
+            scored.append({
+                "score": float(s),                 # higher = better
+                "questions_index": qi,
+                "question_index": qj,
+                "text": text,                      # from your linearizer
+                "db_source": src,
+            })
+
+        m = min(top_m, len(scored))
+        results[i] = sorted(scored, key=lambda x: x["score"], reverse=True)[:m]
+
+    return results
+
+
+
+#### old coarse filter using one shot 
 
 def coarse_filter(
     questions: List[List[int]],
@@ -1608,6 +1757,42 @@ def coarse_filter(
     # doing the sentence embedding filter 
 
     top_m_results = rerank_with_sentence_embeddings(
+    questions,
+    codebook_main,
+    coarse_top_k,
+    sentence_emb,
+    top_m,
+    custom_linearizer)
+
+
+    return top_m_results
+
+
+#### new coarse filter using cross sim for first layer and overall score for the coverage
+
+def coarse_filter_advanced(
+    questions: List[List[int]],
+    codebook_main: Dict[str, Any],
+    sentence_emb: HuggingFaceEmbeddings,        # ← move before defaults
+    top_k: int = 3,                             # word-embedding candidates
+    question_batch_size: int = 1,               # query batch size
+    questions_db_batch_size: int = 1,           # DB batch size
+    top_m: int = 1,                             # sentence-embedding rerank
+    custom_linearizer: Optional[Callable[[List[List[str]]], str]] = None):
+
+    # doing the word embedding pre-filter 
+
+    coarse_top_k = get_topk_word_embedding_batched_cross_sim(
+    questions,
+    codebook_main,
+    top_k,
+    question_batch_size,         # number of query questions processed per time
+    questions_db_batch_size,     # number of db questions processed per time
+    )
+
+    # doing the sentence embedding filter 
+
+    top_m_results = rerank_with_sentence_embeddings_score_with_coverage(
     questions,
     codebook_main,
     coarse_top_k,
@@ -3582,8 +3767,8 @@ class ExactGraphRag_rl:
         for f_run in facts_runs:
             Ef, Rf = _extract_entities_relations_from_run(f_run, codebook_main)
 
-            score = entrel_maxpair_similarity(Eq, Rq,Ef, Rf,codebook_main,
-                                                w_ent = 1.0, w_rel = 0.5)
+            score = entrel_maxpair_similarity(Eq, Rq,Ef, Rf,
+                                                w_ent = 1.0, w_rel = 0.3)
             
             f_fict[f_index] = score
             f_index+=1
@@ -3598,11 +3783,9 @@ class ExactGraphRag_rl:
         cand_texts = [lin(facts_runs[i], codebook_main) for i in idx1_sorted]
 
         if hasattr(self.sentence_emb, "embed_query"):
-            import numpy as np
             qv_s = np.asarray(self.sentence_emb.embed_query(q_text), dtype=np.float32)
             F_s  = np.asarray(self.sentence_emb.embed_documents(cand_texts), dtype=np.float32)
         else:
-            import numpy as np
             qv_s = np.asarray(self.sentence_emb.encode([q_text])[0], dtype=np.float32)
             F_s  = np.asarray(self.sentence_emb.encode(cand_texts), dtype=np.float32)
 
