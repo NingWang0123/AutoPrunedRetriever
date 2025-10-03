@@ -4237,7 +4237,7 @@ class ExactGraphRag_rl:
 
         if self.meta_codebook:
             t0 = time.perf_counter()
-            all_answers, all_q_indices, all_f_indices = self.retrieve(q_json)
+            all_answers, all_q_indices, all_f_indices = self.retrieve_new(q_json)
             retrieval_time = time.perf_counter() - t0
             print("all_answers", all_answers)
             print("all_q_indices", all_q_indices)
@@ -4355,7 +4355,7 @@ class ExactGraphRag_rl:
 
         if self.meta_codebook:
             t0 = time.perf_counter()
-            all_answers, all_q_indices, all_f_indices = self.retrieve(q_json)
+            all_answers, all_q_indices, all_f_indices = self.retrieve_new(q_json)
             retrieval_time = time.perf_counter() - t0
             print("all_answers", all_answers)
             print("all_q_indices", all_q_indices)
