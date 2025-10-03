@@ -1423,6 +1423,39 @@ def rerank_with_sentence_embeddings(
 
     return results
 
+def coarse_filter(
+    questions: List[List[int]],
+    codebook_main: Dict[str, Any],
+    sentence_emb: HuggingFaceEmbeddings,        # ← move before defaults
+    top_k: int = 3,                             # word-embedding candidates
+    question_batch_size: int = 1,               # query batch size
+    questions_db_batch_size: int = 1,           # DB batch size
+    top_m: int = 1,                             # sentence-embedding rerank
+    custom_linearizer: Optional[Callable[[List[List[str]]], str]] = None):
+
+    # doing the word embedding pre-filter 
+
+    coarse_top_k = get_topk_word_embedding_batched(
+    questions,
+    codebook_main,
+    top_k,
+    question_batch_size,         # number of query questions processed per time
+    questions_db_batch_size,     # number of db questions processed per time
+    )
+
+    # doing the sentence embedding filter 
+
+    top_m_results = rerank_with_sentence_embeddings(
+    questions,
+    codebook_main,
+    coarse_top_k,
+    sentence_emb,
+    top_m,
+    custom_linearizer)
+
+
+    return top_m_results
+
 
 ######### new reranker
 def _l2norm_rows(X: np.ndarray, eps: float = 1e-12) -> np.ndarray:
@@ -1745,44 +1778,7 @@ def rerank_with_sentence_embeddings_score_with_coverage(
     return results
 
 
-
-#### old coarse filter using one shot 
-
-def coarse_filter(
-    questions: List[List[int]],
-    codebook_main: Dict[str, Any],
-    sentence_emb: HuggingFaceEmbeddings,        # ← move before defaults
-    top_k: int = 3,                             # word-embedding candidates
-    question_batch_size: int = 1,               # query batch size
-    questions_db_batch_size: int = 1,           # DB batch size
-    top_m: int = 1,                             # sentence-embedding rerank
-    custom_linearizer: Optional[Callable[[List[List[str]]], str]] = None):
-
-    # doing the word embedding pre-filter 
-
-    coarse_top_k = get_topk_word_embedding_batched(
-    questions,
-    codebook_main,
-    top_k,
-    question_batch_size,         # number of query questions processed per time
-    questions_db_batch_size,     # number of db questions processed per time
-    )
-
-    # doing the sentence embedding filter 
-
-    top_m_results = rerank_with_sentence_embeddings(
-    questions,
-    codebook_main,
-    coarse_top_k,
-    sentence_emb,
-    top_m,
-    custom_linearizer)
-
-
-    return top_m_results
-
-
-#### new coarse filter using cross sim for first layer and overall score for the coverage
+#### new coarse filter using cross sim for first layer and overall score for the coverage, this one can also used for the facts retrival
 
 def coarse_filter_advanced(
     questions: List[List[int]],
@@ -1792,7 +1788,10 @@ def coarse_filter_advanced(
     question_batch_size: int = 1,               # query batch size
     questions_db_batch_size: int = 1,           # DB batch size
     top_m: int = 1,                             # sentence-embedding rerank
-    custom_linearizer: Optional[Callable[[List[List[str]]], str]] = None):
+    custom_linearizer: Optional[Callable[[List[List[str]]], str]] = None,
+    target = 'questions',
+    w_ent: float = 1.0,
+    w_rel: float = 0.3,):
 
     # doing the word embedding pre-filter 
 
@@ -1802,6 +1801,9 @@ def coarse_filter_advanced(
     top_k,
     question_batch_size,         # number of query questions processed per time
     questions_db_batch_size,     # number of db questions processed per time
+    w_ent,
+    w_rel,
+    target
     )
 
     # doing the sentence embedding filter 
@@ -1841,6 +1843,31 @@ def get_answers_lst_from_results(result):
     all_answers = [d['answers(edges[i])'] for v in result.values() for d in v]
 
     return all_answers,all_q_indices
+
+
+#### return the facts
+def add_facts_to_filtered_lst(top_m_results,codebook_main):
+
+    result = {}
+                                 
+    for qid, matches in top_m_results.items():
+        
+        result[qid] = []
+    
+        for m in matches:
+            q_idx = m["questions_index"]
+            m_with_feat = m.copy()
+            m_with_feat['facts(edges[i])'] = codebook_main['facts_lst'][q_idx]
+            result[qid].append(m_with_feat)
+
+    return result
+
+def get_facts_lst_from_results(result):
+    # this will return the facts list and it's relative indicies
+    all_f_indices = [d['questions_index'] for v in result.values() for d in v]
+    all_facts = [d['facts(edges[i])'] for v in result.values() for d in v]
+
+    return all_facts,all_f_indices
 
 
 
@@ -3875,7 +3902,7 @@ class ExactGraphRag_rl:
         # due to almost empty prev answer database, give adapted m
         adapted_m = min(max(1,int(0.1*len(self.meta_codebook['answers_lst']))),self.top_m)
 
-        top_m_results = coarse_filter(
+        top_m_results = coarse_filter_advanced(
                         questions_edges_index,
                         self.meta_codebook,
                         self.sentence_emb,                 # ← move before defaults
@@ -3883,23 +3910,27 @@ class ExactGraphRag_rl:
                         self.question_batch_size,               # query batch size
                         self.questions_db_batch_size,           # DB batch size
                         adapted_m,                             # sentence-embedding rerank
-                        self.custom_linearizer)
+                        self.custom_linearizer,
+                        'questions')
         
         result = add_answers_to_filtered_lst(top_m_results,self.meta_codebook)
 
         all_answers,all_q_indices = get_answers_lst_from_results(result)
         
 
-        flat_facts, facts_map = self._flatten_facts(self.meta_codebook)  
-
-        all_facts = []
-        all_f_indices = []   
-
-        for q_edges in questions_edges_index:
-            ranked = self._rank_facts_for_query_new(q_edges, flat_facts, self.meta_codebook, final_topm=self.top_m)
-            for fact_idx, _score in ranked:
-                all_facts.append(flat_facts[fact_idx])
-                all_f_indices.append(facts_map[fact_idx])
+        top_m_results_for_facts = coarse_filter_advanced(
+                                    questions_edges_index,
+                                    self.meta_codebook,
+                                    self.sentence_emb,                 # ← move before defaults
+                                    self.top_k,                             # word-embedding candidates
+                                    self.question_batch_size,               # query batch size
+                                    self.questions_db_batch_size,           # DB batch size
+                                    self.top_m,                             # sentence-embedding rerank
+                                    self.custom_linearizer,
+                                    'facts')
+        
+        result_facts = add_facts_to_filtered_lst(top_m_results_for_facts,self.meta_codebook) 
+        all_facts,all_f_indices = get_facts_lst_from_results(result_facts)
 
         return all_answers, all_q_indices, all_f_indices
     
