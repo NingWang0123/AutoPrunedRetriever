@@ -3626,9 +3626,9 @@ class ExactGraphRag_rl:
                     k_grid_size = self.k_grid_size
                     ) 
         elif mode == "knn":
-            self.meta_codebook = combine_ents_ann_knn(self.meta_codebook)
+            self.meta_codebook = combine_ents_ann_knn(self.meta_codebook,sim_threshold = self.combine_ent_sim)
         elif mode == "coarse":
-            self.meta_codebook = coarse_combine(self.meta_codebook)           
+            self.meta_codebook = coarse_combine(self.meta_codebook,sim_threshold = self.combine_ent_sim)           
 
     def load_and_merge_facts(self, facts_json_path, chunk_chars=800, overlap=120):
         if not facts_json_path:
