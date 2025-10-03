@@ -32,7 +32,7 @@ from sentence_transformers import SentenceTransformer
 # 0) Paths / constants
 # ---------------------------------------------------------------------
 REPO_ID      = "GraphRAG-Bench/GraphRAG-Bench"
-CORPUS_FILE  = "Datasets/Corpus/medical.json"
+CORPUS_FILE  = "GraphRAG-Benchmark/Datasets/Corpus/medical.json"
 QUEST_FILE   = "Datasets/Questions/medical_questions.json"
 
 SEED_N       = 1    # first 30 rows → bootstrap + DPO train, numbers must be divided by 2. (n%2=0)
@@ -61,7 +61,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
         temperature=0.2,
         top_p=0.9,
         use_cache=True,
-        api_key="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",  
+        api_key="",  
         # base_url="https://api.openai.com/v1",  # 可选，使用其他兼容服务
     )
 
@@ -379,8 +379,8 @@ if __name__ == "__main__":
 
     compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N, 
                             top_m,top_m*10,aft_combine_sim,aft_combine_sim,aft_combine_sim,aft_combine_sim,
-                            Path("meta_codebook.json") ,f"pref_examples_medical_exact_graph_rag_v6_7b.json",reward_func,
-                            reward_func_mode = 'non_llm',final_json_path = f"results/compressrag_medical_data_openai.json")
+                            Path("meta_codebook_1200.json") ,f"pref_examples_medical_exact_openai_v1.json",reward_func,
+                            reward_func_mode = 'non_llm',final_json_path = f"results/compressrag_medical_data_openai_v1.json")
 
     # df.to_csv('results/result_sbertinclusive_new_embed_for_exactgraphrag.csv')
 # python pipeline_for_autopruned_openai.py

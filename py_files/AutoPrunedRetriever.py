@@ -3630,7 +3630,7 @@ class ExactGraphRag_rl:
         elif mode == "coarse":
             self.meta_codebook = coarse_combine(self.meta_codebook,sim_threshold = self.combine_ent_sim)           
 
-    def load_and_merge_facts(self, facts_json_path, chunk_chars=800, overlap=120):
+    def load_and_merge_facts(self, facts_json_path, chunk_chars=1200, overlap=100):
         if not facts_json_path:
             return None
         if isinstance(facts_json_path, (list, tuple)):
