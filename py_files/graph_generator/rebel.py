@@ -5,13 +5,6 @@ import torch
 
 @lru_cache(maxsize=3)
 def get_triplet_extractor(device: Optional[Union[str, int]] = None):
-    """
-    device:
-      - 'mps'  -> Apple MPS
-      - -1     -> CPU
-      - 0/1... -> CUDA GPU
-      - None   -> 自动检测（优先 mps，否则 CPU）
-    """
     if device is None:
         if hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
             device = torch.device("mps")
@@ -22,13 +15,12 @@ def get_triplet_extractor(device: Optional[Union[str, int]] = None):
     elif isinstance(device, str) and device.lower() == "mps":
         device = torch.device("mps")
 
-    # 关键点：用 device=...，不要用 torch_device=...
     return pipeline(
         task="text2text-generation",
         model="Babelscape/rebel-large",
         tokenizer="Babelscape/rebel-large",
-        device=device,                 # ✅ 正确姿势
-        # torch_dtype=torch.float32,   # 可选：MPS 上通常用 fp32 更稳
+        device=device,            
+        # torch_dtype=torch.float32,  
     )
 
 def extract_triplets(text):
