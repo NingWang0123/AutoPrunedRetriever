@@ -17,11 +17,22 @@ def _disable_sdpa_on_cuda():
             pass
 
 @lru_cache(maxsize=2)
-def get_triplet_extractor(device: Optional[Union[str, int]] = None):
-    if device is None:
-        device = 0 if torch.cuda.is_available() else -1
+def get_triplet_extractor(device: Optional[Union[str, int]] = "auto"):
+    # device: "auto" | None | "cuda" | "mps" | "cpu" | int
+    if device is None or device == "auto":
+        if torch.cuda.is_available():
+            device = 0  # CUDA
+        elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+            device = torch.device("mps")
+        else:
+            device = -1  # CPU
     elif isinstance(device, str):
-        device = 0 if device.startswith("cuda") else -1
+        if device.lower().startswith("cuda"):
+            device = 0
+        elif device.lower() == "mps":
+            device = torch.device("mps")
+        elif device.lower() == "cpu":
+            device = -1
 
     _disable_sdpa_on_cuda()
 
@@ -101,7 +112,7 @@ def _coerce_to_text(x: Any) -> str:
     return str(x)
 
 
-def triplet_parser(text: str, *, device: Optional[Union[str,int]] = None, max_new_tokens: int = 256):
+def triplet_parser(text: str, *, device: Optional[Union[str,int]] = "auto", max_new_tokens: int = 256):
     pipe = get_triplet_extractor(device)
     text = _coerce_to_text(text)                         # ensure string
     truncated = _truncate_to_max_tokens(text, pipe.tokenizer)
