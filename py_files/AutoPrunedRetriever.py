@@ -2997,6 +2997,55 @@ combine_ents_choice = [0,1,2]
 def skip_func(a,b):
     return None
 
+def _l2norm_rows(X: np.ndarray, eps: float = 1e-12) -> np.ndarray:
+    return X / (np.linalg.norm(X, axis=1, keepdims=True) + eps)
+
+def _extract_entities_relations_from_run(edge_run: List[int],
+                                         codebook_main: Dict[str, Any]
+                                         ) -> Tuple[Optional[np.ndarray], Optional[np.ndarray]]:
+    """
+    Returns:
+      E: (n_e, de) or None    # heads+tails
+      R: (n_r, dr) or None    # relations
+    """
+    decoded = decode_question(edge_run, codebook_main, fmt='embeddings')
+
+    Es, Rs = [], []
+    for h_vec, r_vec, t_vec in decoded:
+        if h_vec is not None:
+            Es.append(np.asarray(h_vec, dtype=np.float32))
+        if t_vec is not None:
+            Es.append(np.asarray(t_vec, dtype=np.float32))
+        if r_vec is not None:
+            Rs.append(np.asarray(r_vec, dtype=np.float32))
+
+    E = np.vstack(Es).astype(np.float32) if Es else None
+    R = np.vstack(Rs).astype(np.float32) if Rs else None
+    return E, R
+
+def _pairwise_max_cos(A: Optional[np.ndarray], B: Optional[np.ndarray]) -> float:
+    """
+    Max cosine similarity over all pairs between rows of A and B.
+    Returns 0.0 if A or B is None/empty.
+    """
+    if A is None or B is None or A.size == 0 or B.size == 0:
+        return 0.0
+    An = _l2norm_rows(A)
+    Bn = _l2norm_rows(B)
+    # (na, nb) cosine matrix
+    S = An @ Bn.T
+    return float(S.max())
+
+def entrel_maxpair_similarity(Eq, Rq,Ef, Rf,codebook_main: Dict[str, Any],
+                              w_ent: float = 1.0, w_rel: float = 0.5) -> float:
+    """
+      score = w_ent * max_{ent pair} cos + w_rel * max_{rel pair} cos
+    """
+    ent_score = _pairwise_max_cos(Eq, Ef)
+    rel_score = _pairwise_max_cos(Rq, Rf)
+    return w_ent * ent_score + w_rel * rel_score
+
+
 class ExactGraphRag_rl:
     def __init__(
         self,
@@ -3260,6 +3309,40 @@ class ExactGraphRag_rl:
             except Exception:
                 continue
         return sep.join(out) if out else "[EMPTY]"
+    
+    def _default_linearizer_new(self, edges_run, codebook_main, sep="; ", max_len=128):
+        """
+        把一条边序列转成可读字符串：'A --r1--> B; B --r2--> C'
+        在索引越界/脏数据时自动跳过，保证不抛异常。
+        """
+        if not edges_run:
+            return "[EMPTY]"
+        e = codebook_main.get("e", [])
+        r = codebook_main.get("r", [])
+        edges = codebook_main.get("edge_matrix", [])
+        out = []
+        for idx in edges_run[:max_len]:
+            try:
+                h, rel, t = edges[int(idx)]
+                # 保护性取值
+                sh = str(e[h]) if 0 <= h < len(e) else f"e[{h}]"
+                sr = str(r[rel]) if 0 <= rel < len(r) else f"r[{rel}]"
+                st = str(e[t]) if 0 <= t < len(e) else f"e[{t}]"
+                out.append(f"{sh} {sr} {st}")
+            except Exception:
+                continue
+        return sep.join(out) if out else "[EMPTY]"
+    
+
+    def _get_linearizer_new(self):
+        """
+        返回一个可调用的 linearizer：
+        - 若 self.custom_linearizer 可调用则用它
+        - 否则回退到 _default_linearizer
+        """
+        if callable(getattr(self, "custom_linearizer", None)):
+            return self.custom_linearizer
+        return lambda run, cb: self._default_linearizer_new(run, cb)
 
     def _get_linearizer(self):
         """
@@ -3330,6 +3413,53 @@ class ExactGraphRag_rl:
         return [(i, float(sims_s[j])) for j, i in zip(chosen_local, chosen_global)]
 
 
+    def _rank_facts_for_query_new(self, query_edges, facts_runs, codebook_main,
+                            pre_topk=50, final_topm=5):
+        if not facts_runs:
+            return []
+        
+        # ent to ent, relation to relation
+        Eq,Rq = _extract_entities_relations_from_run(query_edges,codebook_main)
+        f_fict = {}
+        f_index = 0
+
+        print(f'{len(facts_runs)} facts_runs detected')
+        for f_run in facts_runs:
+            Ef, Rf = _extract_entities_relations_from_run(f_run, codebook_main)
+
+            score = entrel_maxpair_similarity(Eq, Rq,Ef, Rf,codebook_main,
+                                                w_ent = 1.0, w_rel = 0.5)
+            
+            f_fict[f_index] = score
+            f_index+=1
+
+        sorted_f_indexes = sorted(f_fict, key=f_fict.get, reverse=True)
+        k = min(pre_topk, len(sorted_f_indexes))
+        idx1_sorted = sorted_f_indexes[:k]
+
+        lin = self._get_linearizer_new()
+
+        q_text = lin(query_edges, codebook_main)
+        cand_texts = [lin(facts_runs[i], codebook_main) for i in idx1_sorted]
+
+        if hasattr(self.sentence_emb, "embed_query"):
+            import numpy as np
+            qv_s = np.asarray(self.sentence_emb.embed_query(q_text), dtype=np.float32)
+            F_s  = np.asarray(self.sentence_emb.embed_documents(cand_texts), dtype=np.float32)
+        else:
+            import numpy as np
+            qv_s = np.asarray(self.sentence_emb.encode([q_text])[0], dtype=np.float32)
+            F_s  = np.asarray(self.sentence_emb.encode(cand_texts), dtype=np.float32)
+
+        qv_s = qv_s / (np.linalg.norm(qv_s) + 1e-12)
+        F_s  = F_s / (np.linalg.norm(F_s, axis=1, keepdims=True) + 1e-12)
+        sims_s = F_s @ qv_s  
+
+        order_local = np.argsort(-sims_s)
+        chosen_local = order_local[:min(final_topm, order_local.size)]
+        chosen_global = [int(idx1_sorted[i]) for i in chosen_local]
+
+        return [(i, float(sims_s[j])) for j, i in zip(chosen_local, chosen_global)]
 
     def _flatten_facts(self, meta):
         flat, map_idx = [], []
