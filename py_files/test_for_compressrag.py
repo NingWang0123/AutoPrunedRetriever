@@ -354,87 +354,87 @@ class Phi4MiniReasoningLLM:
             print("----------ANS:",ans_clean)
             return ans_clean
 
-if __name__ == "__main__":
-    #word_emb = WordAvgEmbeddings(model_path="gensim-data/glove-wiki-gigaword-100/glove-wiki-gigaword-100.model")
+# if __name__ == "__main__":
+#     #word_emb = WordAvgEmbeddings(model_path="gensim-data/glove-wiki-gigaword-100/glove-wiki-gigaword-100.model")
 
-    word_emb = Word2VecEmbeddings(model_name="word2vec-google-news-300")
-    sentence_emb = HuggingFaceEmbeddings(model_name="BAAI/bge-base-en")
-
-
-    include_thinking = True
-    phi_llm = Phi4MiniReasoningLLM(
-        include_thinkings=include_thinking,                 
-        model_name="microsoft/Phi-4-mini-reasoning",
-        max_new_tokens=256,
-        temperature=0.2,
-        top_p=0.9
-    )
-
-    import json
-    with open("meta_codebook.json", "r") as f:
-        ini = json.load(f)
-
-    rag = CompressRag_rl(
-        ini_meta_codebook = ini,
-        sentence_emb=sentence_emb,
-        word_emb=word_emb,
-        llm=phi_llm,    
-        thinkings_choice='overlap',  
-        answers_choice='unique'       
-    )
-
-    rag.top_k = 5
-    rag.top_m = 2
-    rag.question_batch_size = 2
-    rag.questions_db_batch_size = 16
+#     word_emb = Word2VecEmbeddings(model_name="word2vec-google-news-300")
+#     sentence_emb = HuggingFaceEmbeddings(model_name="BAAI/bge-base-en")
 
 
-    import json
-    import numpy as np
-    from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
-    from rouge_score import rouge_scorer
+#     include_thinking = True
+#     phi_llm = Phi4MiniReasoningLLM(
+#         include_thinkings=include_thinking,                 
+#         model_name="microsoft/Phi-4-mini-reasoning",
+#         max_new_tokens=256,
+#         temperature=0.2,
+#         top_p=0.9
+#     )
 
-    def to_serializable(obj):
-        if isinstance(obj, np.ndarray):
-            return obj.tolist()   # ndarray -> list
-        if isinstance(obj, (np.int32, np.int64)):
-            return int(obj)       # numpy int -> int
-        if isinstance(obj, (np.float32, np.float64)):
-            return float(obj)     # numpy float -> float
-        raise TypeError(f"Type {type(obj)} not serializable")
+#     import json
+#     with open("meta_codebook.json", "r") as f:
+#         ini = json.load(f)
+
+#     rag = CompressRag_rl(
+#         ini_meta_codebook = ini,
+#         sentence_emb=sentence_emb,
+#         word_emb=word_emb,
+#         llm=phi_llm,    
+#         thinkings_choice='overlap',  
+#         answers_choice='unique'       
+#     )
+
+#     rag.top_k = 5
+#     rag.top_m = 2
+#     rag.question_batch_size = 2
+#     rag.questions_db_batch_size = 16
 
 
-    def run_eval_case(question, reference_answer, facts_json_path, rag, work_mode="normal", llm_metrics=True, warm_start="coarse", websearch=None):
-        if work_mode == "dpo":
-            result = rag.run_work_flow_for_dpo(question, facts_json_path=facts_json_path, warm_start=warm_start)
-        else:
-            result = rag.run_work_flow(question, facts_json_path=facts_json_path, warm_start=warm_start, websearch=websearch)
-        if isinstance(result, tuple):
-            gen_text = result[0]
-        else:
-            gen_text = str(result)
+#     import json
+#     import numpy as np
+#     from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
+#     from rouge_score import rouge_scorer
 
-        from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
-        from rouge_score import rouge_scorer
-        smooth = SmoothingFunction().method1
-        scorer = rouge_scorer.RougeScorer(["rouge1", "rouge2", "rougeL"], use_stemmer=True)
-        bleu = sentence_bleu([reference_answer.split()], gen_text.split(), smoothing_function=smooth)
-        scores = scorer.score(reference_answer, gen_text)
-        rouge1 = scores["rouge1"].fmeasure
-        rouge2 = scores["rouge2"].fmeasure
-        rougeL = scores["rougeL"].fmeasure
+#     def to_serializable(obj):
+#         if isinstance(obj, np.ndarray):
+#             return obj.tolist()   # ndarray -> list
+#         if isinstance(obj, (np.int32, np.int64)):
+#             return int(obj)       # numpy int -> int
+#         if isinstance(obj, (np.float32, np.float64)):
+#             return float(obj)     # numpy float -> float
+#         raise TypeError(f"Type {type(obj)} not serializable")
 
-        if rag.llm.metrics_runs and isinstance(rag.llm.metrics_runs[-1], dict):
-            last_metrics = list(rag.llm.metrics_runs[-1].values())[0]
-            last_metrics["BLEU"] = bleu
-            last_metrics["ROUGE-1"] = rouge1
-            last_metrics["ROUGE-2"] = rouge2
-            last_metrics["ROUGE-L"] = rougeL
-        if llm_metrics:
-            print(rag.llm.metrics_runs)
-        print(result)
-        print(f'BLEU: {bleu:.4f}, ROUGE-1: {rouge1:.4f}, ROUGE-2: {rouge2:.4f}, ROUGE-L: {rougeL:.4f}')
-        return gen_text, bleu, rouge1, rouge2, rougeL
+
+#     def run_eval_case(question, reference_answer, facts_json_path, rag, work_mode="normal", llm_metrics=True, warm_start="coarse", websearch=None):
+#         if work_mode == "dpo":
+#             result = rag.run_work_flow_for_dpo(question, facts_json_path=facts_json_path, warm_start=warm_start)
+#         else:
+#             result = rag.run_work_flow(question, facts_json_path=facts_json_path, warm_start=warm_start, websearch=websearch)
+#         if isinstance(result, tuple):
+#             gen_text = result[0]
+#         else:
+#             gen_text = str(result)
+
+#         from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
+#         from rouge_score import rouge_scorer
+#         smooth = SmoothingFunction().method1
+#         scorer = rouge_scorer.RougeScorer(["rouge1", "rouge2", "rougeL"], use_stemmer=True)
+#         bleu = sentence_bleu([reference_answer.split()], gen_text.split(), smoothing_function=smooth)
+#         scores = scorer.score(reference_answer, gen_text)
+#         rouge1 = scores["rouge1"].fmeasure
+#         rouge2 = scores["rouge2"].fmeasure
+#         rougeL = scores["rougeL"].fmeasure
+
+#         if rag.llm.metrics_runs and isinstance(rag.llm.metrics_runs[-1], dict):
+#             last_metrics = list(rag.llm.metrics_runs[-1].values())[0]
+#             last_metrics["BLEU"] = bleu
+#             last_metrics["ROUGE-1"] = rouge1
+#             last_metrics["ROUGE-2"] = rouge2
+#             last_metrics["ROUGE-L"] = rougeL
+#         if llm_metrics:
+#             print(rag.llm.metrics_runs)
+#         print(result)
+#         print(f'BLEU: {bleu:.4f}, ROUGE-1: {rouge1:.4f}, ROUGE-2: {rouge2:.4f}, ROUGE-L: {rougeL:.4f}')
+#         return gen_text, bleu, rouge1, rouge2, rougeL
 
 
 

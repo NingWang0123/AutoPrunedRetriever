@@ -516,55 +516,63 @@ def json_dump_str(obj, indent=0):
 
 # ---------- ) Codebook ----------
 
-def all_chains_no_subchains(edges,use_full_edges = True):
-    """
-    Generate all simple chains where edges[i].tail == edges[j].head for consecutive edges,
-    then remove any chain that appears contiguously inside a longer chain (order matters).
-    Returns a list of chains (each chain is a list of edge triples).
-    """
-    n = len(edges)
-    # Build head->indices and adjacency i->list(j) if edges[i].t == edges[j].h
-    head_to_idxs = defaultdict(list)
-    for i, (h, _, _) in enumerate(edges):
-        head_to_idxs[h].append(i)
-    adj = [[] for _ in range(n)]
-    for i, (_, _, t) in enumerate(edges):
-        adj[i] = head_to_idxs.get(t, [])
+# def all_chains_no_subchains(edges,use_full_edges = True):
+#     """
+#     Generate all simple chains where edges[i].tail == edges[j].head for consecutive edges,
+#     then remove any chain that appears contiguously inside a longer chain (order matters).
+#     Returns a list of chains (each chain is a list of edge triples).
+#     """
+#     n = len(edges)
+#     # Build head->indices and adjacency i->list(j) if edges[i].t == edges[j].h
+#     head_to_idxs = defaultdict(list)
+#     for i, (h, _, _) in enumerate(edges):
+#         head_to_idxs[h].append(i)
+#     adj = [[] for _ in range(n)]
+#     for i, (_, _, t) in enumerate(edges):
+#         adj[i] = head_to_idxs.get(t, [])
 
-    # DFS from every edge to enumerate all simple paths (as tuples of indices)
-    all_paths = set()
-    for s in range(n):
-        stack = [(s, (s,))]
-        while stack:
-            cur, path = stack.pop()
-            all_paths.add(path)
-            for j in adj[cur]:
-                if j not in path:  # no edge reuse
-                    stack.append((j, path + (j,)))
+#     # DFS from every edge to enumerate all simple paths (as tuples of indices)
+#     all_paths = set()
+#     for s in range(n):
+#         stack = [(s, (s,))]
+#         while stack:
+#             cur, path = stack.pop()
+#             all_paths.add(path)
+#             for j in adj[cur]:
+#                 if j not in path:  # no edge reuse
+#                     stack.append((j, path + (j,)))
 
-    # prune paths that are contiguous subchains of longer ones
-    paths = list(all_paths)
-    def is_contig_subseq(a, b):
-        if len(a) >= len(b): return False
-        la = len(a)
-        for i in range(len(b)-la+1):
-            if b[i:i+la] == a:
-                return True
-        return False
+#     # prune paths that are contiguous subchains of longer ones
+#     paths = list(all_paths)
+#     def is_contig_subseq(a, b):
+#         if len(a) >= len(b): return False
+#         la = len(a)
+#         for i in range(len(b)-la+1):
+#             if b[i:i+la] == a:
+#                 return True
+#         return False
 
-    keep = []
-    for a in paths:
-        if not any(is_contig_subseq(a, b) for b in paths if b is not a):
-            keep.append(a)
+#     keep = []
+#     for a in paths:
+#         if not any(is_contig_subseq(a, b) for b in paths if b is not a):
+#             keep.append(a)
 
-    # map back to triples
+#     # map back to triples
+#     if use_full_edges:
+#       keep_chains = [[edges[i] for i in tup] for tup in keep]
+#     else:
+#       keep_chains = [[i for i in tup] for tup in keep]
+#     # (optional) sort by length desc then lexicographically by indices for stable output
+#     keep_chains.sort(key=lambda c: (-len(c), c))
+#     return keep_chains
+
+
+def all_chains_no_subchains(edges, use_full_edges=True):
+    chain = [edges]
     if use_full_edges:
-      keep_chains = [[edges[i] for i in tup] for tup in keep]
+        return chain
     else:
-      keep_chains = [[i for i in tup] for tup in keep]
-    # (optional) sort by length desc then lexicographically by indices for stable output
-    keep_chains.sort(key=lambda c: (-len(c), c))
-    return keep_chains
+        return [[i for i in range(len(edges))]]
 
 def build_codebook_from_triples(
     triples: List[Tuple[str, str, str]],
@@ -3573,7 +3581,7 @@ class ExactGraphRag_rl:
         self.set_include_answers()
         self.set_include_facts()
 
-    def preload_context_json(self, json_path: str, chunk_tokens: int = 1200, overlap_tokens: int = 100, sub_chunk_chars: int = 300, sub_chunk_overlap: int = 50, tokenizer_name: str = "gpt-4o-mini", subchunk_batch: int = 10):
+    def preload_context_json(self, json_path: str, chunk_tokens: int = 1200, overlap_tokens: int = 100, sub_chunk_chars: int = 300, sub_chunk_overlap: int = 50, tokenizer_name: str = "gpt-4o-mini", subchunk_batch: int = 500):
         import json
         import tiktoken
 
@@ -3639,14 +3647,19 @@ class ExactGraphRag_rl:
         print(f"[preload_context_json] Total chunks: {total_chunks}, batch_size={batch_size}, num_batches: {num_batches}")
 
         combined = None
+        batch_num = 0
         for i in range(0, total_chunks, batch_size):
             batch_chunks = all_chunks[i:i+batch_size]
+            print('batch ', batch_num)
             fact_cb = get_code_book(
                 batch_chunks,
                 type='facts',
                 rule="Store factual statements.",
                 batch_size=1,
             )
+
+            print(f'batch {batch_num} codebook is generated')
+            
             if combined is None:
                 combined = {
                     "e": list(fact_cb.get("e", [])),
@@ -3671,6 +3684,11 @@ class ExactGraphRag_rl:
                 combined["e"].extend(new_ents)
                 combined["r"].extend(new_rels)
                 combined["edge_matrix"] = new_edge_matrix
+
+            print(f'batch {batch_num} is finshed')
+
+            batch_num+=1
+
         return combined
 
 
@@ -4215,7 +4233,7 @@ class ExactGraphRag_rl:
     def load_and_merge_facts(
         self, facts_json_path,
         chunk_tokens=1200, overlap_tokens=100,
-        sub_chunk_chars=300, sub_chunk_overlap=50,
+        sub_chunk_chars=600, sub_chunk_overlap=50,
         tokenizer_name="gpt-4o-mini"
     ):
         if not facts_json_path:

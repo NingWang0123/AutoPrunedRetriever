@@ -135,7 +135,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
             CORPUS_FILE,
             chunk_tokens=1200,
             overlap_tokens=100,
-            sub_chunk_chars=300,
+            sub_chunk_chars=600,
             sub_chunk_overlap=50,
             tokenizer_name="gpt-4o-mini"
         )
@@ -377,8 +377,8 @@ if __name__ == "__main__":
 
     reward_func = reward_func_dpo.reward_sbert_inclusive
 
-    SEED_N       = 20    # change to 20 for training
-    TEST_N       = 2042     # change to 980 for rest
+    SEED_N       = 3    # change to 20 for training
+    TEST_N       = 6     # change to 980 for rest
 
     
 
@@ -386,8 +386,8 @@ if __name__ == "__main__":
 
     compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N, 
                             top_m,top_m*10,aft_combine_sim,aft_combine_sim,aft_combine_sim,aft_combine_sim,
-                            Path("meta_codebook_1200.json") ,f"pref_examples_medical_exact_openai_v1.json",reward_func,
-                            reward_func_mode = 'non_llm',final_json_path = f"results/compressrag_medical_data_openai_v1.json")
+                            Path("meta_codebook_new.json") ,f"pref_examples_medical_exact_openai_v1.json",reward_func,
+                            reward_func_mode = 'non_llm',final_json_path = f"results/compressrag_medical_data_openai_test.json")
 
     # df.to_csv('results/result_sbertinclusive_new_embed_for_exactgraphrag.csv')
 # python pipeline_for_autopruned_openai.py
