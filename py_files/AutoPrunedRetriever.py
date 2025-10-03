@@ -1247,166 +1247,6 @@ def _ensure_embeddings_in_codebook(codebook_main, dim_fallback: int = 64):
         except Exception:
             codebook_main["r_embeddings"] = _hash_embed(codebook_main["r"], dim=actual_dim)
 
-def _l2norm_rows(X: np.ndarray, eps: float = 1e-12) -> np.ndarray:
-    return X / (np.linalg.norm(X, axis=1, keepdims=True) + eps)
-
-def _extract_entities_relations_from_run(edge_run: List[int],
-                                         codebook_main: Dict[str, Any]
-                                         ) -> Tuple[Optional[np.ndarray], Optional[np.ndarray]]:
-    """
-    Returns:
-      E: (n_e, de) or None    # heads+tails
-      R: (n_r, dr) or None    # relations
-    """
-    decoded = decode_question(edge_run, codebook_main, fmt='embeddings')
-
-    Es, Rs = [], []
-    for h_vec, r_vec, t_vec in decoded:
-        if h_vec is not None:
-            Es.append(np.asarray(h_vec, dtype=np.float32))
-        if t_vec is not None:
-            Es.append(np.asarray(t_vec, dtype=np.float32))
-        if r_vec is not None:
-            Rs.append(np.asarray(r_vec, dtype=np.float32))
-
-    E = np.vstack(Es).astype(np.float32) if Es else None
-    R = np.vstack(Rs).astype(np.float32) if Rs else None
-    return E, R
-
-def _pairwise_max_cos(A: Optional[np.ndarray], B: Optional[np.ndarray]) -> float:
-    """
-    Max cosine similarity over all pairs between rows of A and B.
-    Returns 0.0 if A or B is None/empty.
-    """
-    if A is None or B is None or A.size == 0 or B.size == 0:
-        return 0.0
-    An = _l2norm_rows(A)
-    Bn = _l2norm_rows(B)
-    # (na, nb) cosine matrix
-    S = An @ Bn.T
-    return float(S.max())
-
-def entrel_maxpair_similarity(Eq, Rq,Ef, Rf,w_ent: float = 1.0, w_rel: float = 0.5) -> float:
-    """
-      score = w_ent * max_{ent pair} cos + w_rel * max_{rel pair} cos
-    """
-    ent_score = _pairwise_max_cos(Eq, Ef)
-    rel_score = _pairwise_max_cos(Rq, Rf)
-    return w_ent * ent_score + w_rel * rel_score
-
-
-def get_topk_word_embedding_batched_cross_sim(
-    questions: List[List[int]],
-    codebook_main: Dict[str, Any],
-    top_k: int = 3,
-    question_batch_size: int = 1,
-    questions_db_batch_size: int = 1,
-    w_ent: float = 1.0,
-    w_rel: float = 0.3,
-) -> Dict[int, List[Dict[str, Any]]]:
-    """
-    Uses (entities pooled: heads+tails) and relations from each edge_run, scored by:
-        score = w_ent * max_{entity pair} cos + w_rel * max_{relation pair} cos
-    Returns the same structure as before.
-    """
-
-    # 0) ensure embeddings exist in the codebook (same as old path)
-    _ensure_embeddings_in_codebook(codebook_main, dim_fallback=64)
-
-    results: Dict[int, List[Dict[str, Any]]] = {i: [] for i in range(len(questions))}
-
-    # Decide DB source (answers vs historical questions), same as before
-    q_groups_hist = codebook_main.get("questions_lst", [])[:-1]
-    use_answers_db = not any(len(g) > 0 for g in q_groups_hist)
-    if use_answers_db:
-        groups_for_db = codebook_main.get("answers_lst", [])
-        db_source = "answers"
-    else:
-        groups_for_db = q_groups_hist
-        db_source = "questions"
-
-    # Flatten DB runs
-    db_questions: List[List[int]] = []
-    db_qi: List[int] = []
-    db_qj: List[int] = []
-    for qi, group in enumerate(groups_for_db):
-        for qj, q_edges in enumerate(group):
-            db_questions.append(q_edges)
-            db_qi.append(qi)
-            db_qj.append(qj)
-
-    N_total = len(questions)
-    M_total = len(db_questions)
-    if N_total == 0 or M_total == 0:
-        return results
-
-    db_qi = np.asarray(db_qi, dtype=np.int32)
-    db_qj = np.asarray(db_qj, dtype=np.int32)
-
-    # Pre-extract (E,R) for DB once
-    db_ER: List[Tuple[Optional[np.ndarray], Optional[np.ndarray]]] = [
-        _extract_entities_relations_from_run(edge_run, codebook_main)
-        for edge_run in db_questions
-    ]
-
-    for q_start in range(0, N_total, question_batch_size):
-        q_end = min(q_start + question_batch_size, N_total)
-        q_batch_idx = list(range(q_start, q_end))
-
-        # Extract (E,R) for this query batch
-        q_ER: List[Tuple[Optional[np.ndarray], Optional[np.ndarray]]] = [
-            _extract_entities_relations_from_run(questions[i], codebook_main)
-            for i in q_batch_idx
-        ]
-
-        # Keep running top-k per query row as before
-        best_scores = [np.array([], dtype=np.float32) for _ in q_batch_idx]
-        best_cols   = [np.array([], dtype=np.int32)   for _ in q_batch_idx]
-
-        for db_start in range(0, M_total, questions_db_batch_size):
-            db_end = min(db_start + questions_db_batch_size, M_total)
-
-            # Compute a (len(q_batch) x (db_end-db_start)) similarity block
-            block_sims = np.empty((len(q_batch_idx), db_end - db_start), dtype=np.float32)
-
-            for i, (Eq, Rq) in enumerate(q_ER):
-                # Fill this row against current DB slice
-                for j, (Ef, Rf) in enumerate(db_ER[db_start:db_end]):
-                    block_sims[i, j] = entrel_maxpair_similarity(
-                        Eq, Rq, Ef, Rf, w_ent=w_ent, w_rel=w_rel
-                    )
-
-            # Merge into global top-k per row
-            k_local = min(top_k, db_end - db_start)
-            for i in range(len(q_batch_idx)):
-                row = block_sims[i]
-                # same selection logic as old
-                cand_idx = np.argpartition(-row, k_local - 1)[:k_local]
-                cand_idx = cand_idx[np.argsort(-row[cand_idx])]
-                batch_scores = row[cand_idx]
-                batch_cols   = cand_idx + db_start
-                merged_scores, merged_cols = _topk_merge(
-                    best_scores[i], best_cols[i], batch_scores, batch_cols, top_k
-                )
-                best_scores[i], best_cols[i] = merged_scores, merged_cols
-
-        # Write results for this batch (same schema)
-        for loc_i, gq_idx in enumerate(q_batch_idx):
-            cols = best_cols[loc_i]; scs = best_scores[loc_i]
-            keep = (cols >= 0)
-            cols, scs = cols[keep], scs[keep]
-            entries = []
-            for col, sc in zip(cols, scs):
-                entries.append({
-                    "score": float(sc),
-                    "questions_index": int(db_qi[col]),
-                    "question_index": int(db_qj[col]),
-                    "db_source": db_source,
-                })
-            results[gq_idx] = entries
-
-    return results
-
 
 def get_topk_word_embedding_batched(
     questions: List[List[int]],
@@ -1585,6 +1425,172 @@ def rerank_with_sentence_embeddings(
 
 
 ######### new reranker
+def _l2norm_rows(X: np.ndarray, eps: float = 1e-12) -> np.ndarray:
+    return X / (np.linalg.norm(X, axis=1, keepdims=True) + eps)
+
+def _extract_entities_relations_from_run(edge_run: List[int],
+                                         codebook_main: Dict[str, Any]
+                                         ) -> Tuple[Optional[np.ndarray], Optional[np.ndarray]]:
+    """
+    Returns:
+      E: (n_e, de) or None    # heads+tails
+      R: (n_r, dr) or None    # relations
+    """
+    decoded = decode_question(edge_run, codebook_main, fmt='embeddings')
+
+    Es, Rs = [], []
+    for h_vec, r_vec, t_vec in decoded:
+        if h_vec is not None:
+            Es.append(np.asarray(h_vec, dtype=np.float32))
+        if t_vec is not None:
+            Es.append(np.asarray(t_vec, dtype=np.float32))
+        if r_vec is not None:
+            Rs.append(np.asarray(r_vec, dtype=np.float32))
+
+    E = np.vstack(Es).astype(np.float32) if Es else None
+    R = np.vstack(Rs).astype(np.float32) if Rs else None
+    return E, R
+
+def _pairwise_max_cos(A: Optional[np.ndarray], B: Optional[np.ndarray]) -> float:
+    """
+    Max cosine similarity over all pairs between rows of A and B.
+    Returns 0.0 if A or B is None/empty.
+    """
+    if A is None or B is None or A.size == 0 or B.size == 0:
+        return 0.0
+    An = _l2norm_rows(A)
+    Bn = _l2norm_rows(B)
+    # (na, nb) cosine matrix
+    S = An @ Bn.T
+    return float(S.max())
+
+def entrel_maxpair_similarity(Eq, Rq,Ef, Rf,w_ent: float = 1.0, w_rel: float = 0.5) -> float:
+    """
+      score = w_ent * max_{ent pair} cos + w_rel * max_{rel pair} cos
+    """
+    ent_score = _pairwise_max_cos(Eq, Ef)
+    rel_score = _pairwise_max_cos(Rq, Rf)
+    return w_ent * ent_score + w_rel * rel_score
+
+
+def get_topk_word_embedding_batched_cross_sim(
+    questions: List[List[int]],
+    codebook_main: Dict[str, Any],
+    top_k: int = 3,
+    question_batch_size: int = 1,
+    questions_db_batch_size: int = 1,
+    w_ent: float = 1.0,
+    w_rel: float = 0.3,
+    target = 'questions'
+) -> Dict[int, List[Dict[str, Any]]]:
+    """
+    Uses (entities pooled: heads+tails) and relations from each edge_run, scored by:
+        score = w_ent * max_{entity pair} cos + w_rel * max_{relation pair} cos
+    Returns the same structure as before.
+    """
+
+    # 0) ensure embeddings exist in the codebook (same as old path)
+    _ensure_embeddings_in_codebook(codebook_main, dim_fallback=64)
+
+    results: Dict[int, List[Dict[str, Any]]] = {i: [] for i in range(len(questions))}
+
+    # Decide DB source (answers vs historical questions), same as before
+
+    if target == 'questions':
+        q_groups_hist = codebook_main.get("questions_lst", [])[:-1]
+        use_answers_db = not any(len(g) > 0 for g in q_groups_hist)
+        if use_answers_db:
+            groups_for_db = codebook_main.get("answers_lst", [])
+            db_source = "answers"
+        else:
+            groups_for_db = q_groups_hist
+            db_source = "questions"
+
+    elif target == 'facts':
+        groups_for_db = codebook_main.get("facts_lst", [])
+        db_source = "facts"
+
+    # Flatten DB runs
+    db_questions: List[List[int]] = []
+    db_qi: List[int] = []
+    db_qj: List[int] = []
+    for qi, group in enumerate(groups_for_db):
+        for qj, q_edges in enumerate(group):
+            db_questions.append(q_edges)
+            db_qi.append(qi)
+            db_qj.append(qj)
+
+    N_total = len(questions)
+    M_total = len(db_questions)
+    if N_total == 0 or M_total == 0:
+        return results
+
+    db_qi = np.asarray(db_qi, dtype=np.int32)
+    db_qj = np.asarray(db_qj, dtype=np.int32)
+
+    # Pre-extract (E,R) for DB once
+    db_ER: List[Tuple[Optional[np.ndarray], Optional[np.ndarray]]] = [
+        _extract_entities_relations_from_run(edge_run, codebook_main)
+        for edge_run in db_questions
+    ]
+
+    for q_start in range(0, N_total, question_batch_size):
+        q_end = min(q_start + question_batch_size, N_total)
+        q_batch_idx = list(range(q_start, q_end))
+
+        # Extract (E,R) for this query batch
+        q_ER: List[Tuple[Optional[np.ndarray], Optional[np.ndarray]]] = [
+            _extract_entities_relations_from_run(questions[i], codebook_main)
+            for i in q_batch_idx
+        ]
+
+        # Keep running top-k per query row as before
+        best_scores = [np.array([], dtype=np.float32) for _ in q_batch_idx]
+        best_cols   = [np.array([], dtype=np.int32)   for _ in q_batch_idx]
+
+        for db_start in range(0, M_total, questions_db_batch_size):
+            db_end = min(db_start + questions_db_batch_size, M_total)
+
+            # Compute a (len(q_batch) x (db_end-db_start)) similarity block
+            block_sims = np.empty((len(q_batch_idx), db_end - db_start), dtype=np.float32)
+
+            for i, (Eq, Rq) in enumerate(q_ER):
+                # Fill this row against current DB slice
+                for j, (Ef, Rf) in enumerate(db_ER[db_start:db_end]):
+                    block_sims[i, j] = entrel_maxpair_similarity(
+                        Eq, Rq, Ef, Rf, w_ent=w_ent, w_rel=w_rel
+                    )
+
+            # Merge into global top-k per row
+            k_local = min(top_k, db_end - db_start)
+            for i in range(len(q_batch_idx)):
+                row = block_sims[i]
+                # same selection logic as old
+                cand_idx = np.argpartition(-row, k_local - 1)[:k_local]
+                cand_idx = cand_idx[np.argsort(-row[cand_idx])]
+                batch_scores = row[cand_idx]
+                batch_cols   = cand_idx + db_start
+                merged_scores, merged_cols = _topk_merge(
+                    best_scores[i], best_cols[i], batch_scores, batch_cols, top_k
+                )
+                best_scores[i], best_cols[i] = merged_scores, merged_cols
+
+        # Write results for this batch (same schema)
+        for loc_i, gq_idx in enumerate(q_batch_idx):
+            cols = best_cols[loc_i]; scs = best_scores[loc_i]
+            keep = (cols >= 0)
+            cols, scs = cols[keep], scs[keep]
+            entries = []
+            for col, sc in zip(cols, scs):
+                entries.append({
+                    "score": float(sc),
+                    "questions_index": int(db_qi[col]),
+                    "question_index": int(db_qj[col]),
+                    "db_source": db_source,
+                })
+            results[gq_idx] = entries
+
+    return results
 
 # --- tiny utilities for rerank ---
 def _l2norm_rows(X: np.ndarray, eps: float = 1e-12) -> np.ndarray:
@@ -1704,7 +1710,15 @@ def rerank_with_sentence_embeddings_score_with_coverage(
                 continue
             seen.add(key)
 
-            groups = codebook_main["questions_lst"] if src == "questions" else codebook_main["answers_lst"]
+            if src == "questions":
+                groups = codebook_main["questions_lst"]
+
+            elif src == 'answers':
+                groups = codebook_main["answers_lst"]
+
+            else:
+                groups = codebook_main["facts_lst"]
+
             chunk_edges = groups[qi][qj]
 
             s = _score_query_vs_chunk_with_bonus(
