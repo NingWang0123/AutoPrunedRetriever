@@ -3267,6 +3267,8 @@ class ExactGraphRag_rl:
             combined["r"].extend(new_rels)
             combined["edge_matrix"] = new_edge_matrix
         print(f"{json_path} chunk num:", total_chunks)
+        print(f"{json_path} chunk num:", total_chunks)
+        print(f"{json_path} chunk num:", total_chunks)
         return combined
 
 
@@ -3424,6 +3426,8 @@ class ExactGraphRag_rl:
         Eq,Rq = _extract_entities_relations_from_run(query_edges,codebook_main)
         f_fict = {}
         f_index = 0
+
+        print(f'{len(facts_runs)} facts_runs detected')
         for f_run in facts_runs:
             Ef, Rf = _extract_entities_relations_from_run(f_run, codebook_main)
 
@@ -3433,8 +3437,9 @@ class ExactGraphRag_rl:
             f_fict[f_index] = score
             f_index+=1
 
-        sorted_f_indexes = sorted(f_index, key=f_index.get)
-        idx1_sorted = sorted_f_indexes[min(pre_topk, len(sorted_f_indexes))]
+        sorted_f_indexes = sorted(f_fict, key=f_fict.get, reverse=True)
+        k = min(pre_topk, len(sorted_f_indexes))
+        idx1_sorted = sorted_f_indexes[:k]
 
         lin = self._get_linearizer_new()
 
