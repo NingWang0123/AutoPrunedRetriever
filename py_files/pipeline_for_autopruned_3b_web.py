@@ -48,10 +48,10 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
                           reward_func = None,reward_func_mode = 'non_llm',final_json_path = "results/compressrag_medical_data_test.json"):
     print("» Initialising embeddings & LLM …")
     word_emb = HuggingFaceEmbeddings(
-        model_name="BAAI/bge-base-en-v1.5"
+        model_name="BAAI/bge-large-en-v1.5"
     )
     sent_emb = HuggingFaceEmbeddings(
-        model_name="BAAI/bge-base-en-v1.5"
+        model_name="BAAI/bge-large-en-v1.5"
     )
     phi_llm  = Phi4MiniReasoningLLM(
         include_thinkings=False,
@@ -171,7 +171,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
                     THINKINGS_CHOICES=THINKINGS_CHOICES,
                     FACTS_CHOICES = FACTS_CHOICES,
                     isolate_state = True,
-                    feature_dim = 768
+                    feature_dim = 1024
                 )
                 print(f"   generated {len(pref_ds)} preference examples")
                 save_pref_examples(saved_examples_name, pref_ds)
@@ -186,7 +186,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
                     questions= seed_questions,
                     gold_answers=gold_lookup,
                     per_q_samples = 6,
-                    feature_dim = 768,
+                    feature_dim = 1024,
                     reward_fn = reward_func,
                     seed = 0,
                     isolate_state = True,
@@ -198,7 +198,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
             
 
 
-    policy, _ = train_dpo_2head(pref_ds, input_dim=768)
+    policy, _ = train_dpo_2head(pref_ds, input_dim=1024)
 
     def dump_results(
         questions: List[str],
@@ -256,7 +256,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
                 def get_sbert_model():
                     nonlocal _SbertModel
                     if _SbertModel is None:
-                        _SbertModel = SentenceTransformer("BAAI/bge-base-en", device="cuda")
+                        _SbertModel = SentenceTransformer("BAAI/bge-large-en-v1.5", device="cuda")
                     return _SbertModel
 
                 def reward_sbert_cached(pred: str, gold: str) -> float:
