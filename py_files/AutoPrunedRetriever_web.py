@@ -37,7 +37,7 @@ nlp = spacy.load("en_core_web_sm")
 #word_emb = WordAvgEmbeddings(model_path="gensim-data/glove-wiki-gigaword-100/glove-wiki-gigaword-100.model")
 #word_emb = Word2VecEmbeddings(model_name="word2vec-google-news-300")
 word_emb = HuggingFaceEmbeddings(
-        model_name="BAAI/bge-base-en"
+        model_name="BAAI/bge-large-en-v1.5"
     )
 
 SUBJ_DEPS = {"nsubj", "nsubjpass", "csubj", "csubjpass"}
