@@ -3940,6 +3940,7 @@ class ExactGraphRag_rl:
                                     'facts')
         
         result_facts = add_facts_to_filtered_lst(top_m_results_for_facts,self.meta_codebook) 
+        print('result_facts',result_facts)
         all_facts,all_f_indices = get_facts_lst_from_results(result_facts)
 
         return all_answers, all_q_indices, all_facts
@@ -4269,6 +4270,20 @@ class ExactGraphRag_rl:
             retrieval_time = 0
 
         print(f'final_merged_json unsliced{final_merged_json}')
+
+        print('============================================================================')
+        print('============================================================================')
+        print('============================================================================')
+
+        
+        print(f"len(self.meta_codebook['answers_lst']) is {len(self.meta_codebook['answers_lst'])}")
+
+
+        print('============================================================================')
+        print('============================================================================')
+        print('============================================================================')
+
+        print(f"len(self.meta_codebook['questions_lst']) is {len(self.meta_codebook['questions_lst'])}")
 
         q_txt, gk_txt, st_txt, ft_txt = select_best_context_by_keys(final_merged_json)
 

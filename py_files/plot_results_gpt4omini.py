@@ -29,6 +29,9 @@ with open(cr_metrics_path, 'r', encoding='utf-8') as f:
 
 print(len(cr_metrics['e_embeddings'][0]))
 
+print(len(cr_metrics['facts_lst'][0]))
+print(len(cr_metrics['facts_lst']))
+
 
 
 
