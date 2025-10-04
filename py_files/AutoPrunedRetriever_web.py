@@ -18,7 +18,7 @@ from sklearn.metrics import silhouette_score
 from optimize_combine_ent import combine_ents_auto, combine_ents_ann_knn, coarse_combine
 from copy import deepcopy
 from textwrap import dedent
-from graph_generator.rebel import triplet_parser
+from graph_generator.rebel_large import triplet_parser
 import time
 from sentence_embed_overlap import get_unique_or_overlap_by_sentence_embedded
 import gensim.downloader as api
@@ -35,7 +35,10 @@ Triplet = Tuple[str, str, str]
 nlp = spacy.load("en_core_web_sm")
 
 #word_emb = WordAvgEmbeddings(model_path="gensim-data/glove-wiki-gigaword-100/glove-wiki-gigaword-100.model")
-word_emb = Word2VecEmbeddings(model_name="word2vec-google-news-300")
+#word_emb = Word2VecEmbeddings(model_name="word2vec-google-news-300")
+word_emb = HuggingFaceEmbeddings(
+        model_name="BAAI/bge-base-en"
+    )
 
 SUBJ_DEPS = {"nsubj", "nsubjpass", "csubj", "csubjpass"}
 OBJ_DEPS  = {"dobj", "obj", "attr", "oprd", "dative"}
@@ -514,55 +517,63 @@ def json_dump_str(obj, indent=0):
 
 # ---------- ) Codebook ----------
 
-def all_chains_no_subchains(edges,use_full_edges = True):
-    """
-    Generate all simple chains where edges[i].tail == edges[j].head for consecutive edges,
-    then remove any chain that appears contiguously inside a longer chain (order matters).
-    Returns a list of chains (each chain is a list of edge triples).
-    """
-    n = len(edges)
-    # Build head->indices and adjacency i->list(j) if edges[i].t == edges[j].h
-    head_to_idxs = defaultdict(list)
-    for i, (h, _, _) in enumerate(edges):
-        head_to_idxs[h].append(i)
-    adj = [[] for _ in range(n)]
-    for i, (_, _, t) in enumerate(edges):
-        adj[i] = head_to_idxs.get(t, [])
+# def all_chains_no_subchains(edges,use_full_edges = True):
+#     """
+#     Generate all simple chains where edges[i].tail == edges[j].head for consecutive edges,
+#     then remove any chain that appears contiguously inside a longer chain (order matters).
+#     Returns a list of chains (each chain is a list of edge triples).
+#     """
+#     n = len(edges)
+#     # Build head->indices and adjacency i->list(j) if edges[i].t == edges[j].h
+#     head_to_idxs = defaultdict(list)
+#     for i, (h, _, _) in enumerate(edges):
+#         head_to_idxs[h].append(i)
+#     adj = [[] for _ in range(n)]
+#     for i, (_, _, t) in enumerate(edges):
+#         adj[i] = head_to_idxs.get(t, [])
 
-    # DFS from every edge to enumerate all simple paths (as tuples of indices)
-    all_paths = set()
-    for s in range(n):
-        stack = [(s, (s,))]
-        while stack:
-            cur, path = stack.pop()
-            all_paths.add(path)
-            for j in adj[cur]:
-                if j not in path:  # no edge reuse
-                    stack.append((j, path + (j,)))
+#     # DFS from every edge to enumerate all simple paths (as tuples of indices)
+#     all_paths = set()
+#     for s in range(n):
+#         stack = [(s, (s,))]
+#         while stack:
+#             cur, path = stack.pop()
+#             all_paths.add(path)
+#             for j in adj[cur]:
+#                 if j not in path:  # no edge reuse
+#                     stack.append((j, path + (j,)))
 
-    # prune paths that are contiguous subchains of longer ones
-    paths = list(all_paths)
-    def is_contig_subseq(a, b):
-        if len(a) >= len(b): return False
-        la = len(a)
-        for i in range(len(b)-la+1):
-            if b[i:i+la] == a:
-                return True
-        return False
+#     # prune paths that are contiguous subchains of longer ones
+#     paths = list(all_paths)
+#     def is_contig_subseq(a, b):
+#         if len(a) >= len(b): return False
+#         la = len(a)
+#         for i in range(len(b)-la+1):
+#             if b[i:i+la] == a:
+#                 return True
+#         return False
 
-    keep = []
-    for a in paths:
-        if not any(is_contig_subseq(a, b) for b in paths if b is not a):
-            keep.append(a)
+#     keep = []
+#     for a in paths:
+#         if not any(is_contig_subseq(a, b) for b in paths if b is not a):
+#             keep.append(a)
 
-    # map back to triples
+#     # map back to triples
+#     if use_full_edges:
+#       keep_chains = [[edges[i] for i in tup] for tup in keep]
+#     else:
+#       keep_chains = [[i for i in tup] for tup in keep]
+#     # (optional) sort by length desc then lexicographically by indices for stable output
+#     keep_chains.sort(key=lambda c: (-len(c), c))
+#     return keep_chains
+
+
+def all_chains_no_subchains(edges, use_full_edges=True):
+    chain = [edges]
     if use_full_edges:
-      keep_chains = [[edges[i] for i in tup] for tup in keep]
+        return chain
     else:
-      keep_chains = [[i for i in tup] for tup in keep]
-    # (optional) sort by length desc then lexicographically by indices for stable output
-    keep_chains.sort(key=lambda c: (-len(c), c))
-    return keep_chains
+        return [[i for i in range(len(edges))]]
 
 def build_codebook_from_triples(
     triples: List[Tuple[str, str, str]],
@@ -675,11 +686,55 @@ def get_word_embeddings(list_of_text,word_emb):
 
     list_of_text_embeddings:  [embedding_vals,...]
     """
+    # Check if it's HuggingFaceEmbeddings or Word2VecEmbeddings
+    if hasattr(word_emb, '_embed_text'):
+        # Word2VecEmbeddings or WordAvgEmbeddings
+        list_of_text_embeddings = [word_emb._embed_text(text) for text in list_of_text]
+    elif hasattr(word_emb, 'embed_documents'):
+        # HuggingFaceEmbeddings
+        list_of_text_embeddings = word_emb.embed_documents(list_of_text)
+    else:
+        raise AttributeError(f"Unsupported embedding model type: {type(word_emb)}")
 
-    list_of_text_embeddings = [word_emb._embed_text(text) for text in list_of_text]
-
-
+    # Ensure all embeddings are numpy arrays with consistent shape
+    list_of_text_embeddings = [np.asarray(emb, dtype=np.float32) for emb in list_of_text_embeddings]
+    
     return list_of_text_embeddings
+
+def _normalize_embeddings_shape(embeddings_list, target_dim=None):
+    """
+    Normalize embedding shapes to ensure consistency
+    """
+    if not embeddings_list:
+        return []
+    
+    # Convert to numpy arrays if not already
+    embeddings_list = [np.asarray(emb, dtype=np.float32) for emb in embeddings_list]
+    
+    # Determine target dimension
+    if target_dim is None:
+        target_dim = max(emb.shape[0] if emb.ndim > 0 else 1 for emb in embeddings_list)
+    
+    normalized_embeddings = []
+    for emb in embeddings_list:
+        if emb.ndim == 0:  # scalar
+            emb = np.array([float(emb)], dtype=np.float32)
+        elif emb.ndim > 1:  # flatten if multi-dimensional
+            emb = emb.flatten().astype(np.float32)
+        else:
+            emb = emb.astype(np.float32)
+            
+        # Resize to target dimension
+        if len(emb) > target_dim:
+            emb = emb[:target_dim]  # truncate
+        elif len(emb) < target_dim:
+            # pad with zeros
+            padding = np.zeros(target_dim - len(emb), dtype=np.float32)
+            emb = np.concatenate([emb, padding])
+            
+        normalized_embeddings.append(emb)
+    
+    return normalized_embeddings
 
 
 ### edit codebook to also take the answers
@@ -696,7 +751,7 @@ def get_code_book(
     rule: str = "Answer questions.",
     factparser: bool = False,   
     *,
-    batch_size: int = 64       
+    batch_size: int = 1      
 ):
     valid_types = {'questions', 'answers', 'thinkings', 'facts'}
     if type not in valid_types:
@@ -924,6 +979,24 @@ def merging_codebook(codebook_main, codebook_sub, type='questions', word_emb=wor
         new_ent_embeds = get_word_embeddings(new_added_ents, word_emb)
         new_r_embeds = get_word_embeddings(new_added_rs, word_emb)
 
+        # Normalize embedding dimensions to ensure consistency
+        existing_e_embeds = codebook_main.get('e_embeddings', [])
+        existing_r_embeds = codebook_main.get('r_embeddings', [])
+        
+        # Get target dimensions from existing embeddings
+        e_target_dim = None
+        r_target_dim = None
+        if existing_e_embeds:
+            e_target_dim = len(np.asarray(existing_e_embeds[0]).flatten())
+        if existing_r_embeds:
+            r_target_dim = len(np.asarray(existing_r_embeds[0]).flatten())
+            
+        # Normalize new embeddings to match existing dimensions
+        if new_ent_embeds:
+            new_ent_embeds = _normalize_embeddings_shape(new_ent_embeds, e_target_dim)
+        if new_r_embeds:
+            new_r_embeds = _normalize_embeddings_shape(new_r_embeds, r_target_dim)
+
         edge_mat_needs_merged_remapped = remap_edges_matrix(edge_mat_needs_merged, new_index_replacement_for_ent_sub, new_index_replacement_for_r_sub)
 
         new_index_replacement_for_edges_sub, index_edges_main = combine_updated_edges(edge_mat_main, edge_mat_needs_merged_remapped)
@@ -937,8 +1010,19 @@ def merging_codebook(codebook_main, codebook_sub, type='questions', word_emb=wor
         codebook_main["r"].extend(new_added_rs)
         codebook_main["edge_matrix"] = index_edges_main
         codebook_main[main_feat_name] = lst_questions_main
-        codebook_main["e_embeddings"] = codebook_main['e_embeddings'] + new_ent_embeds
-        codebook_main["r_embeddings"] = codebook_main['r_embeddings'] + new_r_embeds
+        
+        # Ensure all existing embeddings are normalized too
+        if existing_e_embeds and new_ent_embeds:
+            all_e_embeds = _normalize_embeddings_shape(existing_e_embeds + new_ent_embeds)
+            codebook_main["e_embeddings"] = all_e_embeds
+        elif new_ent_embeds:
+            codebook_main["e_embeddings"] = new_ent_embeds
+            
+        if existing_r_embeds and new_r_embeds:
+            all_r_embeds = _normalize_embeddings_shape(existing_r_embeds + new_r_embeds)
+            codebook_main["r_embeddings"] = all_r_embeds
+        elif new_r_embeds:
+            codebook_main["r_embeddings"] = new_r_embeds
 
         if type == 'thinkings':
             codebook_main['questions_to_thinkings'][len(codebook_main['questions_lst']) - 1] = len(codebook_main[main_feat_name]) - 1
@@ -1052,6 +1136,15 @@ def _avg_vec_from_decoded(decoded_q, dim: int) -> np.ndarray:
             if v is not None:
                 vv = _to_vec(v)
                 if vv.size:
+                    # Ensure all vectors have the same dimension
+                    if vv.shape[0] != dim:
+                        # Resize vector to match expected dimension
+                        if vv.shape[0] > dim:
+                            vv = vv[:dim]  # truncate
+                        else:
+                            # pad with zeros
+                            padding = np.zeros(dim - vv.shape[0], dtype=np.float32)
+                            vv = np.concatenate([vv.astype(np.float32), padding])
                     parts.append(vv.astype(np.float32, copy=False))
     if not parts:
         return np.zeros(dim, dtype=np.float32)
@@ -1123,25 +1216,46 @@ def _ensure_embeddings_in_codebook(codebook_main, dim_fallback: int = 64):
             out.append([rnd.uniform(-1, 1) for _ in range(dim)])
         return out
 
+    def _detect_embedding_dim(word_emb):
+        """Detect the embedding dimension from the word_emb model"""
+        try:
+            if hasattr(word_emb, '_embed_text'):
+                # Word2VecEmbeddings or WordAvgEmbeddings
+                test_embed = word_emb._embed_text("test")
+                return len(test_embed)
+            elif hasattr(word_emb, 'embed_documents'):
+                # HuggingFaceEmbeddings
+                test_embed = word_emb.embed_documents(["test"])[0]
+                return len(test_embed)
+        except Exception:
+            pass
+        return dim_fallback
+
+    # Detect actual embedding dimension
+    actual_dim = _detect_embedding_dim(word_emb) if 'word_emb' in globals() else dim_fallback
+
     # --- entities ---
     if "e_embeddings" not in codebook_main or not codebook_main["e_embeddings"]:
         if "e" not in codebook_main:
             raise ValueError("codebook_main missing key 'e' to compute e_embeddings.")
         try:
             # try your word_emb pipeline
-            codebook_main["e_embeddings"] = get_word_embeddings(codebook_main["e"], word_emb)
+            e_embeddings = get_word_embeddings(codebook_main["e"], word_emb)
+            codebook_main["e_embeddings"] = _normalize_embeddings_shape(e_embeddings, actual_dim)
         except Exception:
             # fallback stable random
-            codebook_main["e_embeddings"] = _hash_embed(codebook_main["e"], dim=dim_fallback)
+            codebook_main["e_embeddings"] = _hash_embed(codebook_main["e"], dim=actual_dim)
 
     # --- relations ---
     if "r_embeddings" not in codebook_main or not codebook_main["r_embeddings"]:
         if "r" not in codebook_main:
             raise ValueError("codebook_main missing key 'r' to compute r_embeddings.")
         try:
-            codebook_main["r_embeddings"] = get_word_embeddings(codebook_main["r"], word_emb)
+            r_embeddings = get_word_embeddings(codebook_main["r"], word_emb)
+            codebook_main["r_embeddings"] = _normalize_embeddings_shape(r_embeddings, actual_dim)
         except Exception:
-            codebook_main["r_embeddings"] = _hash_embed(codebook_main["r"], dim=dim_fallback)
+            codebook_main["r_embeddings"] = _hash_embed(codebook_main["r"], dim=actual_dim)
+
 
 def get_topk_word_embedding_batched(
     questions: List[List[int]],
@@ -1152,14 +1266,14 @@ def get_topk_word_embedding_batched(
 ) -> Dict[int, List[Dict[str, Any]]]:
 
     # 0) ensure embeddings...
+    _ensure_embeddings_in_codebook(codebook_main, dim_fallback=64)
+    
+    # Now we can safely get the dimension
     if "e_embeddings" in codebook_main and len(codebook_main["e_embeddings"]) > 0:
         dim = len(codebook_main["e_embeddings"][0])
     elif "r_embeddings" in codebook_main and len(codebook_main["r_embeddings"]) > 0:
         dim = len(codebook_main["r_embeddings"][0])
-    else:
-        _ensure_embeddings_in_codebook(codebook_main, dim_fallback=64)
 
-    # === 1) 选择候选库：优先历史 questions；若没有，则回退到 answers ===
     results: Dict[int, List[Dict[str, Any]]] = {i: [] for i in range(len(questions))}
 
     q_groups_hist = codebook_main.get("questions_lst", [])[:-1]  # 历史 questions
@@ -1172,7 +1286,6 @@ def get_topk_word_embedding_batched(
         groups_for_db = q_groups_hist
         db_source = "questions"
 
-    # 把候选库拍平成若干 “问题/答案链”
     db_questions: List[List[int]] = []
     db_qi: List[int] = []
     db_qj: List[int] = []
@@ -1190,7 +1303,6 @@ def get_topk_word_embedding_batched(
     db_qi = np.asarray(db_qi, dtype=np.int32)
     db_qj = np.asarray(db_qj, dtype=np.int32)
 
-    # === 2) 下面逻辑不变；唯一变化：把 db_source 放进候选里，方便下一步重排使用 ===
     for q_start in range(0, N_total, question_batch_size):
         q_end = min(q_start + question_batch_size, N_total)
         q_batch_idx = list(range(q_start, q_end))
@@ -1226,7 +1338,7 @@ def get_topk_word_embedding_batched(
                     "score": float(sc),
                     "questions_index": int(db_qi[col]),
                     "question_index": int(db_qj[col]),
-                    "db_source": db_source,                 # ← 关键：标注候选来自 questions 还是 answers
+                    "db_source": db_source,                 
                 })
             results[gq_idx] = entries
 
@@ -1283,7 +1395,7 @@ def rerank_with_sentence_embeddings(
         for item in cand:
             qi = int(item["questions_index"])
             qj = int(item["question_index"])
-            src = item.get("db_source", "questions")   # ← 看候选来自哪里
+            src = item.get("db_source", "questions")   
 
             key = (qi, qj, src)
             if key in seen:
@@ -1291,7 +1403,7 @@ def rerank_with_sentence_embeddings(
             seen.add(key)
 
             groups = codebook_main["questions_lst"] if src == "questions" else codebook_main["answers_lst"]
-            db_edges = groups[qi][qj]  # 统一都是“边索引链”
+            db_edges = groups[qi][qj] 
             text = make_question_text(db_edges, codebook_main, custom_linearizer)
 
             md = {"questions_index": qi, "question_index": qj, "text": text, "db_source": src}
@@ -1306,7 +1418,6 @@ def rerank_with_sentence_embeddings(
         query_text = make_question_text(q_edges, codebook_main, custom_linearizer)
         m = min(top_m, len(kept_texts))
         docs_scores = vs.similarity_search_with_score(query_text, k=m)
-
         ranked = []
         for doc, score in docs_scores:
             md = doc.metadata
@@ -1320,7 +1431,6 @@ def rerank_with_sentence_embeddings(
         results[i] = ranked
 
     return results
-
 
 def coarse_filter(
     questions: List[List[int]],
@@ -1356,6 +1466,369 @@ def coarse_filter(
     return top_m_results
 
 
+######### new reranker
+def _l2norm_rows(X: np.ndarray, eps: float = 1e-12) -> np.ndarray:
+    return X / (np.linalg.norm(X, axis=1, keepdims=True) + eps)
+
+def _extract_entities_relations_from_run(edge_run: List[int],
+                                         codebook_main: Dict[str, Any]
+                                         ) -> Tuple[Optional[np.ndarray], Optional[np.ndarray]]:
+    """
+    Returns:
+      E: (n_e, de) or None    # heads+tails
+      R: (n_r, dr) or None    # relations
+    """
+    decoded = decode_question(edge_run, codebook_main, fmt='embeddings')
+
+    Es, Rs = [], []
+    for h_vec, r_vec, t_vec in decoded:
+        if h_vec is not None:
+            Es.append(np.asarray(h_vec, dtype=np.float32))
+        if t_vec is not None:
+            Es.append(np.asarray(t_vec, dtype=np.float32))
+        if r_vec is not None:
+            Rs.append(np.asarray(r_vec, dtype=np.float32))
+
+    E = np.vstack(Es).astype(np.float32) if Es else None
+    R = np.vstack(Rs).astype(np.float32) if Rs else None
+    return E, R
+
+def _pairwise_max_cos(A: Optional[np.ndarray], B: Optional[np.ndarray]) -> float:
+    """
+    Max cosine similarity over all pairs between rows of A and B.
+    Returns 0.0 if A or B is None/empty.
+    """
+    if A is None or B is None or A.size == 0 or B.size == 0:
+        return 0.0
+    An = _l2norm_rows(A)
+    Bn = _l2norm_rows(B)
+    # (na, nb) cosine matrix
+    S = An @ Bn.T
+    return float(S.max())
+
+def entrel_maxpair_similarity(Eq, Rq,Ef, Rf,w_ent: float = 1.0, w_rel: float = 0.5) -> float:
+    """
+      score = w_ent * max_{ent pair} cos + w_rel * max_{rel pair} cos
+    """
+    ent_score = _pairwise_max_cos(Eq, Ef)
+    rel_score = _pairwise_max_cos(Rq, Rf)
+    return w_ent * ent_score + w_rel * rel_score
+
+
+def get_topk_word_embedding_batched_cross_sim(
+    questions: List[List[int]],
+    codebook_main: Dict[str, Any],
+    top_k: int = 3,
+    question_batch_size: int = 1,
+    questions_db_batch_size: int = 1,
+    w_ent: float = 1.0,
+    w_rel: float = 0.3,
+    target = 'questions'
+) -> Dict[int, List[Dict[str, Any]]]:
+    """
+    Uses (entities pooled: heads+tails) and relations from each edge_run, scored by:
+        score = w_ent * max_{entity pair} cos + w_rel * max_{relation pair} cos
+    Returns the same structure as before.
+    """
+
+    # 0) ensure embeddings exist in the codebook (same as old path)
+    _ensure_embeddings_in_codebook(codebook_main, dim_fallback=64)
+
+    results: Dict[int, List[Dict[str, Any]]] = {i: [] for i in range(len(questions))}
+
+    # Decide DB source (answers vs historical questions), same as before
+
+    if target == 'questions':
+        q_groups_hist = codebook_main.get("questions_lst", [])[:-1]
+        use_answers_db = not any(len(g) > 0 for g in q_groups_hist)
+        if use_answers_db:
+            groups_for_db = codebook_main.get("answers_lst", [])
+            db_source = "answers"
+        else:
+            groups_for_db = q_groups_hist
+            db_source = "questions"
+
+    elif target == 'facts':
+        groups_for_db = codebook_main.get("facts_lst", [])
+        db_source = "facts"
+
+    # Flatten DB runs
+    db_questions: List[List[int]] = []
+    db_qi: List[int] = []
+    db_qj: List[int] = []
+    for qi, group in enumerate(groups_for_db):
+        for qj, q_edges in enumerate(group):
+            db_questions.append(q_edges)
+            db_qi.append(qi)
+            db_qj.append(qj)
+
+    N_total = len(questions)
+    M_total = len(db_questions)
+    if N_total == 0 or M_total == 0:
+        return results
+
+    db_qi = np.asarray(db_qi, dtype=np.int32)
+    db_qj = np.asarray(db_qj, dtype=np.int32)
+
+    # Pre-extract (E,R) for DB once
+    db_ER: List[Tuple[Optional[np.ndarray], Optional[np.ndarray]]] = [
+        _extract_entities_relations_from_run(edge_run, codebook_main)
+        for edge_run in db_questions
+    ]
+
+    for q_start in range(0, N_total, question_batch_size):
+        q_end = min(q_start + question_batch_size, N_total)
+        q_batch_idx = list(range(q_start, q_end))
+
+        # Extract (E,R) for this query batch
+        q_ER: List[Tuple[Optional[np.ndarray], Optional[np.ndarray]]] = [
+            _extract_entities_relations_from_run(questions[i], codebook_main)
+            for i in q_batch_idx
+        ]
+
+        # Keep running top-k per query row as before
+        best_scores = [np.array([], dtype=np.float32) for _ in q_batch_idx]
+        best_cols   = [np.array([], dtype=np.int32)   for _ in q_batch_idx]
+
+        for db_start in range(0, M_total, questions_db_batch_size):
+            db_end = min(db_start + questions_db_batch_size, M_total)
+
+            # Compute a (len(q_batch) x (db_end-db_start)) similarity block
+            block_sims = np.empty((len(q_batch_idx), db_end - db_start), dtype=np.float32)
+
+            for i, (Eq, Rq) in enumerate(q_ER):
+                # Fill this row against current DB slice
+                for j, (Ef, Rf) in enumerate(db_ER[db_start:db_end]):
+                    block_sims[i, j] = entrel_maxpair_similarity(
+                        Eq, Rq, Ef, Rf, w_ent=w_ent, w_rel=w_rel
+                    )
+
+            # Merge into global top-k per row
+            k_local = min(top_k, db_end - db_start)
+            for i in range(len(q_batch_idx)):
+                row = block_sims[i]
+                # same selection logic as old
+                cand_idx = np.argpartition(-row, k_local - 1)[:k_local]
+                cand_idx = cand_idx[np.argsort(-row[cand_idx])]
+                batch_scores = row[cand_idx]
+                batch_cols   = cand_idx + db_start
+                merged_scores, merged_cols = _topk_merge(
+                    best_scores[i], best_cols[i], batch_scores, batch_cols, top_k
+                )
+                best_scores[i], best_cols[i] = merged_scores, merged_cols
+
+        # Write results for this batch (same schema)
+        for loc_i, gq_idx in enumerate(q_batch_idx):
+            cols = best_cols[loc_i]; scs = best_scores[loc_i]
+            keep = (cols >= 0)
+            cols, scs = cols[keep], scs[keep]
+            entries = []
+            for col, sc in zip(cols, scs):
+                entries.append({
+                    "score": float(sc),
+                    "questions_index": int(db_qi[col]),
+                    "question_index": int(db_qj[col]),
+                    "db_source": db_source,
+                })
+            results[gq_idx] = entries
+
+    return results
+
+# --- tiny utilities for rerank ---
+def _l2norm_rows(X: np.ndarray, eps: float = 1e-12) -> np.ndarray:
+    X = np.asarray(X, dtype=np.float32)
+    return X / (np.linalg.norm(X, axis=1, keepdims=True) + eps)
+
+def _cosine_sim_matrix(A: np.ndarray, B: np.ndarray) -> np.ndarray:
+    return _l2norm_rows(A) @ _l2norm_rows(B).T
+
+def _triples_words(edge_run: List[int], codebook_main: Dict[str, Any]) -> List[List[str]]:
+    """Returns [[h, r, t], ...] using your decoder in 'words' mode."""
+    return decode_question(edge_run, codebook_main, fmt='words')
+
+def _embed_lines(lines: List[str], emb) -> np.ndarray:
+    vecs = emb.embed_documents(lines)  # HuggingFaceEmbeddings-compatible
+    return np.asarray(vecs, dtype=np.float32)
+
+# --- scoring: top-t mean + coverage + multi-pair bonuses (uses words) ---
+def _score_query_vs_chunk_with_bonus(
+    q_edges: List[int],
+    chunk_edges: List[int],
+    codebook_main: Dict[str, Any],
+    emb,
+    top_t: int = 3,
+    cov_tau: float = 0.45, cov_weight: float = 0.10,
+    pair_tau: float = 0.55, pair_temp: float = 0.10, pair_weight: float = 0.20, pair_norm: str = "sqrt",
+    distinct_weight: float = 0.10, distinct_tau: float = 0.50,
+) -> float:
+    q_triples = _triples_words(q_edges, codebook_main)    # [[h,r,t], ...]
+    c_triples = _triples_words(chunk_edges, codebook_main)
+    if not q_triples or not c_triples:
+        return 0.0
+
+    # per-triple lines for embeddings
+    q_lines = [f"{h} {r} {t}" for h, r, t in q_triples]
+    c_lines = [f"{h} {r} {t}" for h, r, t in c_triples]
+
+    Q = _embed_lines(q_lines, emb)   # (nq,d)
+    C = _embed_lines(c_lines, emb)   # (nc,d)
+    S = _cosine_sim_matrix(Q, C)     # (nq,nc)
+    nq, nc = S.shape
+
+    # base: adaptive top-t mean over ALL pairs
+    t_pairs = max(1, min(top_t, nq * nc))
+    flat = S.ravel()
+    idx = np.argpartition(flat, -t_pairs)[-t_pairs:]
+    rel = float(flat[idx].mean())
+
+    # coverage: fraction of query triples with a good match
+    best_per_q = S.max(axis=1)
+    coverage = float((best_per_q >= cov_tau).mean())
+
+    # many-to-many good-pairs bonus (soft count + diminishing returns)
+    soft_hits = 1.0 / (1.0 + np.exp(-(S - pair_tau) / max(1e-6, pair_temp)))
+    good_pairs_soft = float(soft_hits.sum())
+    if pair_norm == "sqrt":
+        norm = np.sqrt(nq * nc) + 1e-12
+    elif pair_norm == "log":
+        norm = np.log1p(nq * nc) + 1e-12
+    else:
+        norm = 1.0
+    good_pairs_bonus = np.log1p(good_pairs_soft / norm)
+
+    # distinct (one-to-one) greedy bonus
+    distinct_bonus = 0.0
+    if distinct_weight > 0.0:
+        S_work = S.copy()
+        taken = 0
+        for _ in range(min(nq, nc)):
+            r, c = divmod(int(S_work.argmax()), S_work.shape[1])
+            val = S_work[r, c]
+            if val < distinct_tau:
+                break
+            distinct_bonus += float(val)
+            S_work[r, :] = -np.inf
+            S_work[:, c] = -np.inf
+            taken += 1
+        if taken > 0:
+            distinct_bonus /= np.sqrt(taken)
+
+    score = (
+        rel
+        + cov_weight * coverage
+        + pair_weight * good_pairs_bonus
+        + distinct_weight * distinct_bonus
+    )
+    # optional: damp very long chunks
+    # score /= (np.sqrt(nc) + 1e-12)
+    return float(score)
+
+# -----------------------------------------------------------
+def rerank_with_sentence_embeddings_score_with_coverage(
+    questions: List[List[int]],
+    codebook_main: Dict[str, Any],
+    coarse_topk: Dict[int, List[Dict[str, Any]]],
+    emb,                             # HuggingFaceEmbeddings (or compatible)
+    top_m: int = 1,
+    custom_linearizer: Optional[Callable[[List[List[str]]], str]] = None) -> Dict[int, List[Dict[str, Any]]]:
+
+    results: Dict[int, List[Dict[str, Any]]] = {}
+
+    for i, q_edges in enumerate(questions):
+        cand = coarse_topk.get(i, [])
+        if not cand:
+            results[i] = []
+            continue
+
+        seen = set()
+        scored = []
+
+        for item in cand:
+            qi = int(item["questions_index"])
+            qj = int(item["question_index"])
+            src = item.get("db_source", "questions")
+            key = (qi, qj, src)
+            if key in seen:
+                continue
+            seen.add(key)
+
+            if src == "questions":
+                groups = codebook_main["questions_lst"]
+
+            elif src == 'answers':
+                groups = codebook_main["answers_lst"]
+
+            else:
+                groups = codebook_main["facts_lst"]
+
+            chunk_edges = groups[qi][qj]
+
+            s = _score_query_vs_chunk_with_bonus(
+                q_edges, chunk_edges, codebook_main, emb,
+                top_t=3,
+                cov_tau=0.45, cov_weight=0.10,
+                pair_tau=0.55, pair_temp=0.10, pair_weight=0.20, pair_norm="sqrt",
+                distinct_weight=0.10, distinct_tau=0.50,
+            )
+
+            # Use YOUR linearizer for the display text
+            text = make_question_text(chunk_edges, codebook_main, custom_linearizer)
+            scored.append({
+                "score": float(s),                 # higher = better
+                "questions_index": qi,
+                "question_index": qj,
+                "text": text,                      # from your linearizer
+                "db_source": src,
+            })
+
+        m = min(top_m, len(scored))
+        results[i] = sorted(scored, key=lambda x: x["score"], reverse=True)[:m]
+
+    return results
+
+
+#### new coarse filter using cross sim for first layer and overall score for the coverage, this one can also used for the facts retrival
+
+def coarse_filter_advanced(
+    questions: List[List[int]],
+    codebook_main: Dict[str, Any],
+    sentence_emb: HuggingFaceEmbeddings,        # ← move before defaults
+    top_k: int = 3,                             # word-embedding candidates
+    question_batch_size: int = 1,               # query batch size
+    questions_db_batch_size: int = 1,           # DB batch size
+    top_m: int = 1,                             # sentence-embedding rerank
+    custom_linearizer: Optional[Callable[[List[List[str]]], str]] = None,
+    target = 'questions',
+    w_ent: float = 1.0,
+    w_rel: float = 0.3,):
+
+    # doing the word embedding pre-filter 
+
+    coarse_top_k = get_topk_word_embedding_batched_cross_sim(
+    questions,
+    codebook_main,
+    top_k,
+    question_batch_size,         # number of query questions processed per time
+    questions_db_batch_size,     # number of db questions processed per time
+    w_ent,
+    w_rel,
+    target
+    )
+
+    # doing the sentence embedding filter 
+
+    top_m_results = rerank_with_sentence_embeddings_score_with_coverage(
+    questions,
+    codebook_main,
+    coarse_top_k,
+    sentence_emb,
+    top_m,
+    custom_linearizer)
+
+
+    return top_m_results
+
+
 
 def add_answers_to_filtered_lst(top_m_results,codebook_main):
 
@@ -1379,6 +1852,31 @@ def get_answers_lst_from_results(result):
     all_answers = [d['answers(edges[i])'] for v in result.values() for d in v]
 
     return all_answers,all_q_indices
+
+
+#### return the facts
+def add_facts_to_filtered_lst(top_m_results,codebook_main):
+
+    result = {}
+                                 
+    for qid, matches in top_m_results.items():
+        
+        result[qid] = []
+    
+        for m in matches:
+            q_idx = m["questions_index"]
+            m_with_feat = m.copy()
+            m_with_feat['facts(edges[i])'] = codebook_main['facts_lst'][q_idx]
+            result[qid].append(m_with_feat)
+
+    return result
+
+def get_facts_lst_from_results(result):
+    # this will return the facts list and it's relative indicies
+    all_f_indices = [d['questions_index'] for v in result.values() for d in v]
+    all_facts = [d['facts(edges[i])'] for v in result.values() for d in v]
+
+    return all_facts,all_f_indices
 
 
 
@@ -2708,14 +3206,16 @@ def _drop_keys(d: Dict[str, Any], matchers) -> Dict[str, Any]:
 # decode ere or edge into words
 def decode_into_words_for_ere_and_edge(final_merged_json: Dict[str, Any],format : str = 'edge',choices = []):
   final_merged_json_copy = deepcopy(final_merged_json)
+  all_transformed_feats = []
 
   if format == 'edge':
     for choice in choices:
       if choice in final_merged_json_copy:
         trans_formed_choice = decode_questions(final_merged_json_copy[choice], final_merged_json_copy, fmt='words')
         final_merged_json_copy[choice.split("(")[0]+'words'] = trans_formed_choice
+        all_transformed_feats.append(choice.split("(")[0]+'words')
         final_merged_json_copy.pop(choice)
-      
+
 
   elif format == 'ere':
     def _triples_to_words(triples, cb):
@@ -2728,9 +3228,11 @@ def decode_into_words_for_ere_and_edge(final_merged_json: Dict[str, Any],format 
         for triples in final_merged_json_copy[choice]:
           trans_formed_choice.append(_triples_to_words(triples, final_merged_json_copy))
         final_merged_json_copy[choice.split("(")[0]+'words'] = trans_formed_choice
+        all_transformed_feats.append(choice.split("(")[0]+'words')
         final_merged_json_copy.pop(choice)
 
-  return final_merged_json_copy
+  return final_merged_json_copy,all_transformed_feats
+
 
 def slice_for_final_merged_json(final_merged_json: Dict[str, Any],use_word_format : bool = True) -> Dict[str, Any]:
     """
@@ -2886,6 +3388,54 @@ combine_ents_choice = [0,1,2]
 def skip_func(a,b):
     return None
 
+def _l2norm_rows(X: np.ndarray, eps: float = 1e-12) -> np.ndarray:
+    return X / (np.linalg.norm(X, axis=1, keepdims=True) + eps)
+
+def _extract_entities_relations_from_run(edge_run: List[int],
+                                         codebook_main: Dict[str, Any]
+                                         ) -> Tuple[Optional[np.ndarray], Optional[np.ndarray]]:
+    """
+    Returns:
+      E: (n_e, de) or None    # heads+tails
+      R: (n_r, dr) or None    # relations
+    """
+    decoded = decode_question(edge_run, codebook_main, fmt='embeddings')
+
+    Es, Rs = [], []
+    for h_vec, r_vec, t_vec in decoded:
+        if h_vec is not None:
+            Es.append(np.asarray(h_vec, dtype=np.float32))
+        if t_vec is not None:
+            Es.append(np.asarray(t_vec, dtype=np.float32))
+        if r_vec is not None:
+            Rs.append(np.asarray(r_vec, dtype=np.float32))
+
+    E = np.vstack(Es).astype(np.float32) if Es else None
+    R = np.vstack(Rs).astype(np.float32) if Rs else None
+    return E, R
+
+def _pairwise_max_cos(A: Optional[np.ndarray], B: Optional[np.ndarray]) -> float:
+    """
+    Max cosine similarity over all pairs between rows of A and B.
+    Returns 0.0 if A or B is None/empty.
+    """
+    if A is None or B is None or A.size == 0 or B.size == 0:
+        return 0.0
+    An = _l2norm_rows(A)
+    Bn = _l2norm_rows(B)
+    # (na, nb) cosine matrix
+    S = An @ Bn.T
+    return float(S.max())
+
+def entrel_maxpair_similarity(Eq, Rq,Ef, Rf,w_ent: float = 1.0, w_rel: float = 0.5) -> float:
+    """
+      score = w_ent * max_{ent pair} cos + w_rel * max_{rel pair} cos
+    """
+    ent_score = _pairwise_max_cos(Eq, Ef)
+    rel_score = _pairwise_max_cos(Rq, Rf)
+    return w_ent * ent_score + w_rel * rel_score
+
+
 class ExactGraphRag_rl:
     def __init__(
         self,
@@ -3032,82 +3582,91 @@ class ExactGraphRag_rl:
         self.set_include_answers()
         self.set_include_facts()
 
-    def preload_context_json(self, json_path: str, chunk_chars: int = 800, overlap: int = 120):
+    def preload_context_json(self, json_path: str, chunk_tokens: int = 1200, overlap_tokens: int = 100, sub_chunk_chars: int = 300, sub_chunk_overlap: int = 50, tokenizer_name: str = "gpt-4o-mini", subchunk_batch: int = 500):
         import json
+        import tiktoken
 
         with open(json_path, "r", encoding="utf-8") as f:
             data = json.load(f)
 
-        def _chunk_text(text: str, *, chunk_chars: int = 800, overlap: int = 120):
+        try:
+            tokenizer = tiktoken.encoding_for_model(tokenizer_name)
+        except KeyError:
+            tokenizer = tiktoken.get_encoding("cl100k_base")
+
+        def _chunk_text(text: str, *, chunk_tokens: int = 1200, overlap_tokens: int = 100, sub_chunk_chars: int = 300, sub_chunk_overlap: int = 50, tokenizer=tokenizer):
             text = (text or "").strip()
             if not text:
                 return []
-            chunks, n = [], len(text)
-            step = max(1, chunk_chars - overlap)
+            tokens = tokenizer.encode(text)
+            token_chunks = []
+            step = max(1, chunk_tokens - overlap_tokens)
             i = 0
-            while i < n:
-                j = min(n, i + chunk_chars)
-                chunk = text[i:j].strip()
-                if chunk:
-                    chunks.append(chunk)
-                if j == n:
+            while i < len(tokens):
+                j = min(len(tokens), i + chunk_tokens)
+                chunk_text = tokenizer.decode(tokens[i:j]).strip()
+                if chunk_text:
+                    token_chunks.append(chunk_text)
+                if j == len(tokens):
                     break
                 i += step
-            return chunks
+
+            def _sub_chunk_by_chars(text, chunk_size, overlap):
+                if not text or len(text) <= chunk_size:
+                    return [text] if text else []
+                sub_chunks = []
+                step = max(1, chunk_size - overlap)
+                i = 0
+                while i < len(text):
+                    j = min(len(text), i + chunk_size)
+                    sub_chunk = text[i:j].strip()
+                    if sub_chunk:
+                        sub_chunks.append(sub_chunk)
+                    if j == len(text):
+                        break
+                    i += step
+                return sub_chunks
+            all_sub_chunks = []
+            for token_chunk in token_chunks:
+                all_sub_chunks.extend(_sub_chunk_by_chars(token_chunk, sub_chunk_chars, sub_chunk_overlap))
+            return all_sub_chunks
 
         items = data if isinstance(data, list) else [data]
-
         all_chunks = []
         for item in items:
             ctx = (item.get("context") or "").strip()
             if ctx:
-                all_chunks.extend(_chunk_text(ctx, chunk_chars=chunk_chars, overlap=overlap))
+                item_chunks = _chunk_text(ctx, chunk_tokens=chunk_tokens, overlap_tokens=overlap_tokens, sub_chunk_chars=sub_chunk_chars, sub_chunk_overlap=sub_chunk_overlap)
+                all_chunks.extend(item_chunks)
+
+        if not all_chunks:
+            return None
 
         total_chunks = len(all_chunks)
-        if total_chunks == 0:
-            return None
-        
-        combined = None  
-        fact_cb = get_code_book(
-            all_chunks,
-            type='facts',
-            rule="Store factual statements.",
-            # batch_size=64, 
-        )
-        if combined is None:
-            combined = {
-                "e": list(fact_cb.get("e", [])),
-                "r": list(fact_cb.get("r", [])),
-                "edge_matrix": list(fact_cb.get("edges([e,r,e])", [])),
-                "facts(edges[i])": [lst for lst in fact_cb.get("facts(edges[i])", [])],
-                "questions_lst": [],
-                "answers_lst": [],
-                "thinkings_lst": [],
-                "rule": fact_cb.get("rule", "Store factual statements."),
-                "e_embeddings": [],
-                "r_embeddings": [],
-            }
-        else:
-            ent_map, _, new_ents = update_the_index(combined, fact_cb, "e")
-            rel_map, _, new_rels = update_the_index(combined, fact_cb, "r")
+        batch_size = max(1, len(all_chunks) // subchunk_batch) if subchunk_batch > 0 else len(all_chunks)
+        num_batches = (total_chunks + batch_size - 1) // batch_size
+        print(f"[preload_context_json] Total chunks: {total_chunks}, batch_size={batch_size}, num_batches: {num_batches}")
 
-            edges_remapped = remap_edges_matrix(
-                fact_cb["edges([e,r,e])"], ent_map, rel_map
+        # combined = None
+        batch_num = 0
+        facts_codebook_lst = []
+        for i in range(0, total_chunks, batch_size):
+
+            batch_chunks = all_chunks[i:i+batch_size]
+            fact_cb = get_code_book(
+                batch_chunks,
+                type='facts',
+                rule="Store factual statements.",
+                batch_size=1,
             )
 
-            edge_map, new_edge_matrix = combine_updated_edges(
-                combined["edge_matrix"], edges_remapped
-            )
+            print(f'batch {batch_num} codebook is generated')
 
-            facts_runs = fact_cb["facts(edges[i])"]
-            facts_runs_mapped = remap_question_indices(facts_runs, edge_map)
-            combined["facts(edges[i])"].extend(facts_runs_mapped)
+            facts_codebook_lst.append(fact_cb)
 
-            combined["e"].extend(new_ents)
-            combined["r"].extend(new_rels)
-            combined["edge_matrix"] = new_edge_matrix
-        print(f"{json_path} chunk num:", total_chunks)
-        return combined
+            batch_num+=1
+
+        return facts_codebook_lst
 
 
     def encode_question(self,q_prompt,rule):
@@ -3142,6 +3701,40 @@ class ExactGraphRag_rl:
             except Exception:
                 continue
         return sep.join(out) if out else "[EMPTY]"
+    
+    def _default_linearizer_new(self, edges_run, codebook_main, sep="; ", max_len=128):
+        """
+        把一条边序列转成可读字符串：'A --r1--> B; B --r2--> C'
+        在索引越界/脏数据时自动跳过，保证不抛异常。
+        """
+        if not edges_run:
+            return "[EMPTY]"
+        e = codebook_main.get("e", [])
+        r = codebook_main.get("r", [])
+        edges = codebook_main.get("edge_matrix", [])
+        out = []
+        for idx in edges_run[:max_len]:
+            try:
+                h, rel, t = edges[int(idx)]
+                # 保护性取值
+                sh = str(e[h]) if 0 <= h < len(e) else f"e[{h}]"
+                sr = str(r[rel]) if 0 <= rel < len(r) else f"r[{rel}]"
+                st = str(e[t]) if 0 <= t < len(e) else f"e[{t}]"
+                out.append(f"{sh} {sr} {st}")
+            except Exception:
+                continue
+        return sep.join(out) if out else "[EMPTY]"
+    
+
+    def _get_linearizer_new(self):
+        """
+        返回一个可调用的 linearizer：
+        - 若 self.custom_linearizer 可调用则用它
+        - 否则回退到 _default_linearizer
+        """
+        if callable(getattr(self, "custom_linearizer", None)):
+            return self.custom_linearizer
+        return lambda run, cb: self._default_linearizer_new(run, cb)
 
     def _get_linearizer(self):
         """
@@ -3212,6 +3805,51 @@ class ExactGraphRag_rl:
         return [(i, float(sims_s[j])) for j, i in zip(chosen_local, chosen_global)]
 
 
+    def _rank_facts_for_query_new(self, query_edges, facts_runs, codebook_main,
+                            pre_topk=50, final_topm=5):
+        if not facts_runs:
+            return []
+        
+        # ent to ent, relation to relation
+        Eq,Rq = _extract_entities_relations_from_run(query_edges,codebook_main)
+        f_fict = {}
+        f_index = 0
+
+        print(f'{len(facts_runs)} facts_runs detected')
+        for f_run in facts_runs:
+            Ef, Rf = _extract_entities_relations_from_run(f_run, codebook_main)
+
+            score = entrel_maxpair_similarity(Eq, Rq,Ef, Rf,
+                                                w_ent = 1.0, w_rel = 0.3)
+            
+            f_fict[f_index] = score
+            f_index+=1
+
+        sorted_f_indexes = sorted(f_fict, key=f_fict.get, reverse=True)
+        k = min(pre_topk, len(sorted_f_indexes))
+        idx1_sorted = sorted_f_indexes[:k]
+
+        lin = self._get_linearizer_new()
+
+        q_text = lin(query_edges, codebook_main)
+        cand_texts = [lin(facts_runs[i], codebook_main) for i in idx1_sorted]
+
+        if hasattr(self.sentence_emb, "embed_query"):
+            qv_s = np.asarray(self.sentence_emb.embed_query(q_text), dtype=np.float32)
+            F_s  = np.asarray(self.sentence_emb.embed_documents(cand_texts), dtype=np.float32)
+        else:
+            qv_s = np.asarray(self.sentence_emb.encode([q_text])[0], dtype=np.float32)
+            F_s  = np.asarray(self.sentence_emb.encode(cand_texts), dtype=np.float32)
+
+        qv_s = qv_s / (np.linalg.norm(qv_s) + 1e-12)
+        F_s  = F_s / (np.linalg.norm(F_s, axis=1, keepdims=True) + 1e-12)
+        sims_s = F_s @ qv_s  
+
+        order_local = np.argsort(-sims_s)
+        chosen_local = order_local[:min(final_topm, order_local.size)]
+        chosen_global = [int(idx1_sorted[i]) for i in chosen_local]
+
+        return [(i, float(sims_s[j])) for j, i in zip(chosen_local, chosen_global)]
 
     def _flatten_facts(self, meta):
         flat, map_idx = [], []
@@ -3234,6 +3872,9 @@ class ExactGraphRag_rl:
 
         questions_edges_index = self.meta_codebook['questions_lst'][-1]
 
+        # due to almost empty prev answer database, give adapted m
+        adapted_m = min(max(1,int(0.1*len(self.meta_codebook['answers_lst']))),self.top_m)
+
         top_m_results = coarse_filter(
                         questions_edges_index,
                         self.meta_codebook,
@@ -3241,7 +3882,7 @@ class ExactGraphRag_rl:
                         self.top_k,                             # word-embedding candidates
                         self.question_batch_size,               # query batch size
                         self.questions_db_batch_size,           # DB batch size
-                        self.top_m,                             # sentence-embedding rerank
+                        adapted_m,                             # sentence-embedding rerank
                         self.custom_linearizer)
         
         result = add_answers_to_filtered_lst(top_m_results,self.meta_codebook)
@@ -3262,6 +3903,49 @@ class ExactGraphRag_rl:
 
         return all_answers, all_q_indices, all_f_indices
     
+    def retrieve_new(self,q_json):
+
+        self.meta_codebook = merging_codebook(self.meta_codebook,q_json,'questions',self.word_emb,True)
+        # take the last one 
+
+        questions_edges_index = self.meta_codebook['questions_lst'][-1]
+
+        # due to almost empty prev answer database, give adapted m
+        adapted_m = min(max(1,int(0.1*len(self.meta_codebook['answers_lst']))),self.top_m)
+
+        top_m_results = coarse_filter_advanced(
+                        questions_edges_index,
+                        self.meta_codebook,
+                        self.sentence_emb,                 # ← move before defaults
+                        self.top_k,                             # word-embedding candidates
+                        self.question_batch_size,               # query batch size
+                        self.questions_db_batch_size,           # DB batch size
+                        adapted_m,                             # sentence-embedding rerank
+                        self.custom_linearizer,
+                        'questions')
+        
+        result = add_answers_to_filtered_lst(top_m_results,self.meta_codebook)
+
+        all_answers,all_q_indices = get_answers_lst_from_results(result)
+        
+
+        top_m_results_for_facts = coarse_filter_advanced(
+                                    questions_edges_index,
+                                    self.meta_codebook,
+                                    self.sentence_emb,                 # ← move before defaults
+                                    self.top_k,                             # word-embedding candidates
+                                    self.question_batch_size,               # query batch size
+                                    self.questions_db_batch_size,           # DB batch size
+                                    self.top_m,                             # sentence-embedding rerank
+                                    self.custom_linearizer,
+                                    'facts')
+        
+        result_facts = add_facts_to_filtered_lst(top_m_results_for_facts,self.meta_codebook) 
+        print('result_facts',result_facts)
+        all_facts,all_f_indices = get_facts_lst_from_results(result_facts)
+
+        return all_answers, all_q_indices, all_facts
+    
     def _gather_facts_by_indices(self, all_f_indices, codebook_main):
         facts_lsts = []
         facts_store = codebook_main.get('facts_lst', [])
@@ -3274,7 +3958,7 @@ class ExactGraphRag_rl:
         return facts_lsts
 
 
-    def find_related_knowledge(self, all_answers, all_q_indices, all_f_indices=None):
+    def find_related_knowledge(self, all_answers, all_q_indices, all_facts):
         domain_knowledge_lst = []
 
         # remove the flatten part
@@ -3305,7 +3989,7 @@ class ExactGraphRag_rl:
 
         # facts 
         if self.include_facts:
-            if all_f_indices:
+            if all_facts:
                 def is_effectively_empty(x):
                     # empty, None, or all inner items are empty
                     if not x:
@@ -3314,24 +3998,25 @@ class ExactGraphRag_rl:
                         return all(is_effectively_empty(i) for i in x)
                     return False
                 
-                facts_lsts = self._gather_facts_by_indices(all_f_indices, self.meta_codebook)
-                print(f'original facts_lsts {facts_lsts}')
-                facts_lsts_copy = copy.deepcopy(facts_lsts) 
+
+                print(f'original facts_lsts {all_facts}')
+                facts_lsts_copy = copy.deepcopy(all_facts) 
 
 
                 if self.facts_choice == 'include_all':
-                    extracted_facts_lsts = facts_lsts_copy
-
+                    extracted_facts_lsts = get_flat_answers_lsts(all_facts)
                 else:
-                    extracted_facts_lsts = self.facts_extract_function(self.meta_codebook,facts_lsts,self.sentence_emb)
+                    extracted_facts_lsts = self.facts_extract_function(self.meta_codebook,get_flat_answers_lsts(all_facts),self.sentence_emb)
 
 
                 print(f'extracted_facts_lsts is {extracted_facts_lsts}')
 
                 # if empty takes oriiginal
                 if  is_effectively_empty(extracted_facts_lsts):
-                    final_facts_lsts = facts_lsts_copy
+                    print('keep original facts_lsts')
+                    final_facts_lsts = get_flat_answers_lsts(facts_lsts_copy)
                 else:
+                    print('use extracted_facts_lsts') 
                     final_facts_lsts = extracted_facts_lsts
 
                     
@@ -3490,11 +4175,19 @@ class ExactGraphRag_rl:
     def update_meta(self, new_json_lst, facts_cb=None):
         if self.include_thinkings:
             codebook_sub_a, codebook_sub_t = new_json_lst
-            self.meta_codebook = merging_codebook(self.meta_codebook, codebook_sub_a, 'answers',   self.word_emb, True)
-            self.meta_codebook = merging_codebook(self.meta_codebook, codebook_sub_t, 'thinkings', self.word_emb, True)
+            if len(codebook_sub_a["edges([e,r,e])"])>0:
+                self.meta_codebook = merging_codebook(self.meta_codebook, codebook_sub_a, 'answers',   self.word_emb, True)
+                self.meta_codebook = merging_codebook(self.meta_codebook, codebook_sub_t, 'thinkings', self.word_emb, True)
+            else:
+                self.meta_codebook['questions_lst'].pop()
+
         else:
             codebook_sub_a = new_json_lst[0]
-            self.meta_codebook = merging_codebook(self.meta_codebook, codebook_sub_a, 'answers',   self.word_emb, True)
+
+            if len(codebook_sub_a["edges([e,r,e])"])>0:
+                self.meta_codebook = merging_codebook(self.meta_codebook, codebook_sub_a, 'answers',   self.word_emb, True)
+            else:
+                self.meta_codebook['questions_lst'].pop()
 
         if facts_cb is not None:
             print("----------fact is loaded------")
@@ -3516,7 +4209,12 @@ class ExactGraphRag_rl:
         elif mode == "coarse":
             self.meta_codebook = coarse_combine(self.meta_codebook,sim_threshold = self.combine_ent_sim)           
 
-    def load_and_merge_facts(self, facts_json_path, chunk_chars=800, overlap=120):
+    def load_and_merge_facts(
+        self, facts_json_path,
+        chunk_tokens=1200, overlap_tokens=100,
+        sub_chunk_chars=600, sub_chunk_overlap=50,
+        tokenizer_name="gpt-4o-mini"
+    ):
         if not facts_json_path:
             return None
         if isinstance(facts_json_path, (list, tuple)):
@@ -3524,18 +4222,20 @@ class ExactGraphRag_rl:
         else:
             paths = [facts_json_path]
 
-        combined_facts_cb = None
         for p in paths:
-            cb = self.preload_context_json(p, chunk_chars, overlap)
-            if not cb:
-                continue
-            if combined_facts_cb is None:
-                combined_facts_cb = cb
-            else:
-                combined_facts_cb = merging_codebook(
-                    combined_facts_cb, cb, 'facts', self.word_emb, False
-                )
-        return combined_facts_cb
+            facts_codebook_lst = self.preload_context_json(
+                p,
+                chunk_tokens=chunk_tokens,
+                overlap_tokens=overlap_tokens,
+                sub_chunk_chars=sub_chunk_chars,
+                sub_chunk_overlap=sub_chunk_overlap,
+                tokenizer_name=tokenizer_name
+            )
+            for cb in facts_codebook_lst:
+                if cb:
+                    self.meta_codebook = merging_codebook(
+                        self.meta_codebook, cb, 'facts', self.word_emb, False
+                    )
 
     def run_work_flow(self, q_prompt, rule="Answer questions", 
                       facts_json_path: list = None, chunk_chars: int = 800, 
@@ -3547,12 +4247,9 @@ class ExactGraphRag_rl:
   
         combined_facts_cb = None
         if not getattr(self, "_facts_preloaded", False) and facts_json_path and False:
-            combined_facts_cb = self.load_and_merge_facts(facts_json_path, chunk_chars, overlap)
-            if combined_facts_cb:
-                self.meta_codebook = merging_codebook(
-                    self.meta_codebook, combined_facts_cb, 'facts', self.word_emb, False
-                )
-                self._facts_preloaded = True
+            self.load_and_merge_facts(facts_json_path, chunk_chars, overlap)
+            self._facts_preloaded = True
+
         if websearch:
             search = DuckDuckGoSearchRun()
             result = search.invoke(q_prompt)
@@ -3560,20 +4257,19 @@ class ExactGraphRag_rl:
             self.meta_codebook = merging_codebook(
                     self.meta_codebook, websearch_cb, 'facts', self.word_emb, False
                 )
-
         if self.meta_codebook:
             t0 = time.perf_counter()
-            all_answers, all_q_indices, all_f_indices = self.retrieve(q_json)
+            all_answers, all_q_indices, all_facts = self.retrieve_new(q_json)
             retrieval_time = time.perf_counter() - t0
             print("all_answers", all_answers)
             print("all_q_indices", all_q_indices)
-            print("all_f_indices", all_f_indices)
+            print("all_facts", all_facts)
 
             print(f'answers choice is {self.answers_choice}')
             print(f'thinkings_choice choice is {self.thinkings_choice}')
             print(f'facts choice is {self.facts_choice}')
 
-            domain_knowledge_lst = self.find_related_knowledge(all_answers, all_q_indices, all_f_indices)
+            domain_knowledge_lst = self.find_related_knowledge(all_answers, all_q_indices, all_facts)
             print("domain_knowledge_lst", domain_knowledge_lst)
             print(f'q_json is {q_json}')
             final_merged_json = self.compact_indicies_for_prompt(q_json, domain_knowledge_lst)
@@ -3583,9 +4279,25 @@ class ExactGraphRag_rl:
 
         print(f'final_merged_json unsliced{final_merged_json}')
 
+        print('============================================================================')
+        print('============================================================================')
+        print('============================================================================')
+
+        
+        print(f"len(self.meta_codebook['answers_lst']) is {len(self.meta_codebook['answers_lst'])}")
+
+
+        print('============================================================================')
+        print('============================================================================')
+        print('============================================================================')
+
+        print(f"len(self.meta_codebook['questions_lst']) is {len(self.meta_codebook['questions_lst'])}")
+
         q_txt, gk_txt, st_txt, ft_txt = select_best_context_by_keys(final_merged_json)
 
         final_merged_json = slice_for_final_merged_json(final_merged_json,self.use_word)
+
+        print(f'final_merged_json sliced{final_merged_json}')
 
         self.cur_fact_context = ft_txt
 
@@ -3669,12 +4381,9 @@ class ExactGraphRag_rl:
   
         combined_facts_cb = None
         if not getattr(self, "_facts_preloaded", False) and facts_json_path and False:
-            combined_facts_cb = self.load_and_merge_facts(facts_json_path, chunk_chars, overlap)
-            if combined_facts_cb:
-                self.meta_codebook = merging_codebook(
-                    self.meta_codebook, combined_facts_cb, 'facts', self.word_emb, False
-                )
-                self._facts_preloaded = True
+            self.load_and_merge_facts(facts_json_path, chunk_chars, overlap)
+            self._facts_preloaded = True
+
         if websearch:
             search = DuckDuckGoSearchRun()
             result = search.invoke(q_prompt)
@@ -3682,15 +4391,14 @@ class ExactGraphRag_rl:
             self.meta_codebook = merging_codebook(
                     self.meta_codebook, websearch_cb, 'facts', self.word_emb, False
                 )
-
         if self.meta_codebook:
             t0 = time.perf_counter()
-            all_answers, all_q_indices, all_f_indices = self.retrieve(q_json)
+            all_answers, all_q_indices, all_facts = self.retrieve_new(q_json)
             retrieval_time = time.perf_counter() - t0
             print("all_answers", all_answers)
             print("all_q_indices", all_q_indices)
-            print("all_f_indices", all_f_indices)
-            domain_knowledge_lst = self.find_related_knowledge(all_answers, all_q_indices, all_f_indices)
+            print("all_facts", all_facts)
+            domain_knowledge_lst = self.find_related_knowledge(all_answers, all_q_indices, all_facts)
             print("domain_knowledge_lst", domain_knowledge_lst)
             print(f'q_json is {q_json}')
             final_merged_json = self.compact_indicies_for_prompt(q_json, domain_knowledge_lst)
@@ -3701,13 +4409,14 @@ class ExactGraphRag_rl:
         print(f'final_merged_json unsliced{final_merged_json}')
 
         q_txt, gk_txt, st_txt, ft_txt = select_best_context_by_keys(final_merged_json)
-
+        
         final_merged_json = slice_for_final_merged_json(final_merged_json,self.use_word)
 
         self.cur_fact_context = ft_txt
 
         print(f'{ft_txt} ft_txt')
 
+        print(f'final_merged_json sliced{final_merged_json}')
         new_result, new_json_lst,metrics_from_llm = self.collect_results_dpo(final_merged_json, questions=q_prompt, retrieval_time=retrieval_time)
 
         self.update_meta(new_json_lst, facts_cb=combined_facts_cb)
@@ -3778,6 +4487,10 @@ class ExactGraphRag_rl:
             self.meta_codebook = merging_codebook(
                 self.meta_codebook, codebook_sub_t, "thinkings", self.word_emb, True
             )
+
+
+
+
     
 
 # from pathlib import Path
@@ -3798,4 +4511,4 @@ class ExactGraphRag_rl:
 
 #     print(final_merged)
 
-# ExactGraphRag_rl
+# AutoPrunedRetriever
