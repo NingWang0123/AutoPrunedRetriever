@@ -4002,10 +4002,9 @@ class ExactGraphRag_rl:
 
 
                 if self.facts_choice == 'include_all':
-                    extracted_facts_lsts = [x for sublist in facts_lsts_copy for x in sublist]
-
+                    extracted_facts_lsts = get_flat_answers_lsts(all_facts)
                 else:
-                    extracted_facts_lsts = self.facts_extract_function(self.meta_codebook,all_facts,self.sentence_emb)
+                    extracted_facts_lsts = self.facts_extract_function(self.meta_codebook,get_flat_answers_lsts(all_facts),self.sentence_emb)
 
 
                 print(f'extracted_facts_lsts is {extracted_facts_lsts}')
@@ -4013,7 +4012,7 @@ class ExactGraphRag_rl:
                 # if empty takes oriiginal
                 if  is_effectively_empty(extracted_facts_lsts):
                     print('keep original facts_lsts')
-                    final_facts_lsts = facts_lsts_copy
+                    final_facts_lsts = get_flat_answers_lsts(facts_lsts_copy)
                 else:
                     print('use extracted_facts_lsts') 
                     final_facts_lsts = extracted_facts_lsts
