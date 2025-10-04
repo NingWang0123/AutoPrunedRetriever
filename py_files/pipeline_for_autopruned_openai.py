@@ -144,6 +144,16 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
 
         print(cr.meta_codebook)
 
+        print('===============================================================')
+        print('===============================================================')
+        print('===============================================================')
+
+        print("len(cr.meta_codebook[facts_lst])",len(cr.meta_codebook["facts_lst"]))
+
+        print('===============================================================')
+        print('===============================================================')
+        print('===============================================================')
+
         def make_json_safe(obj):
             """Recursively convert numpy arrays into lists."""
             if isinstance(obj, np.ndarray):
@@ -156,6 +166,16 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
 
         with open("meta_codebook.json", "w") as f:
             json.dump(make_json_safe(cr.meta_codebook), f, indent=2)
+
+        print('===============================================================')
+        print('===============================================================')
+        print('===============================================================')
+
+        print("after changed len(cr.meta_codebook[facts_lst])",len(cr.meta_codebook["facts_lst"]))
+
+        print('===============================================================')
+        print('===============================================================')
+        print('===============================================================')
 
 
         print(f"[DEBUG] after facts-merge: |E|={len(cr.meta_codebook['e'])} "
@@ -373,7 +393,7 @@ if __name__ == "__main__":
 
     reward_func = reward_func_dpo.reward_sbert_inclusive
 
-    SEED_N       = 2    # change to 20 for training
+    SEED_N       = 20    # change to 20 for training
     TEST_N       = 2042     # change to 980 for rest
 
     
@@ -382,8 +402,8 @@ if __name__ == "__main__":
 
     compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N, 
                             top_m,top_m*10,aft_combine_sim,aft_combine_sim,aft_combine_sim,aft_combine_sim,
-                            Path("meta_codebook.json") ,f"pref_examples_medical_exact_openai_v2.json",reward_func,
-                            reward_func_mode = 'non_llm',final_json_path = f"results/compressrag_medical_data_openai_v2.json")
+                            Path("meta_codebook_new.json") ,f"pref_examples_medical_exact_openai_v3.json",reward_func,
+                            reward_func_mode = 'non_llm',final_json_path = f"results/compressrag_medical_data_openai_v3.json")
 
     # df.to_csv('results/result_sbertinclusive_new_embed_for_exactgraphrag.csv')
 # python pipeline_for_autopruned_openai.py
