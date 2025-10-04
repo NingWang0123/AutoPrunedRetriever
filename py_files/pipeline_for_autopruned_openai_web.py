@@ -11,6 +11,7 @@ from tqdm import tqdm
 from huggingface_hub import hf_hub_download
 from langchain_community.embeddings import HuggingFaceEmbeddings
 
+
 from AutoPrunedRetriever_web import (
     ExactGraphRag_rl, merging_codebook
 )
@@ -19,9 +20,10 @@ from dpo_exactgraphrag import (
     make_preference_dataset_2head, train_dpo_2head,make_preference_dataset_2head_using_llm,
     default_reward, answer_with_auto_strategy,save_pref_examples,load_pref_examples,ANSWERS_CHOICES,THINKINGS_CHOICES,FACTS_CHOICES
 )
-
+from llm_api import OpenAILLM
 from llm_local import Phi4MiniReasoningLLM,Word2VecEmbeddings
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings
+from langchain_openai import ChatOpenAI
 # from evaluation_func_graphrag import compute_answer_correctness
 import reward_func_dpo
 from functools import partial
@@ -53,14 +55,16 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
     sent_emb = HuggingFaceEmbeddings(
         model_name="BAAI/bge-base-en"
     )
-    phi_llm  = Phi4MiniReasoningLLM(
-        include_thinkings=False,
-        model_name="Qwen/Qwen2.5-3B",
+    api_llm = OpenAILLM(  
+        include_thinkings=True,                 
+        model_name="gpt-4o-mini",  
         max_new_tokens=256,
         temperature=0.2,
         top_p=0.9,
+        use_cache=True,
+        api_key="",  
+        # base_url="https://api.openai.com/v1",  # 可选，使用其他兼容服务
     )
-
 
     if ini_meta_json:
         pre_loaded_meta = False
@@ -84,7 +88,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
         ini_meta_codebook = ini,
         sentence_emb      = sent_emb,
         word_emb          = word_emb,
-        llm               = phi_llm,
+        llm               = api_llm,
         thinkings_choice    = 'not_include',
         answers_choice      = 'unique',
         facts_choice = 'include_all',
