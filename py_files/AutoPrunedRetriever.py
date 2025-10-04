@@ -3680,7 +3680,7 @@ class ExactGraphRag_rl:
                 edge_map, new_edge_matrix = combine_updated_edges(combined["edge_matrix"], edges_remapped)
                 facts_runs = fact_cb["facts(edges[i])"]
                 facts_runs_mapped = remap_question_indices(facts_runs, edge_map)
-                combined["facts(edges[i])"].extend(facts_runs_mapped)
+                combined["facts(edges[i])"].append(facts_runs_mapped)
                 combined["e"].extend(new_ents)
                 combined["r"].extend(new_rels)
                 combined["edge_matrix"] = new_edge_matrix
