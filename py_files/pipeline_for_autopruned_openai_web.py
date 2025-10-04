@@ -4,13 +4,12 @@ from pathlib import Path
 from typing import List, Dict, Tuple, Optional
 import json
 import pathlib
-import numpy as np
+import numpy   as np
 import torch
 import pandas as pd
 from tqdm import tqdm
 from huggingface_hub import hf_hub_download
 from langchain_community.embeddings import HuggingFaceEmbeddings
-
 
 from AutoPrunedRetriever_web import (
     ExactGraphRag_rl, merging_codebook
@@ -20,8 +19,8 @@ from dpo_exactgraphrag import (
     make_preference_dataset_2head, train_dpo_2head,make_preference_dataset_2head_using_llm,
     default_reward, answer_with_auto_strategy,save_pref_examples,load_pref_examples,ANSWERS_CHOICES,THINKINGS_CHOICES,FACTS_CHOICES
 )
-from llm_api import OpenAILLM
-from llm_local import Phi4MiniReasoningLLM,Word2VecEmbeddings
+
+from llm_api import OpenAILLM ,Word2VecEmbeddings
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings
 from langchain_openai import ChatOpenAI
 # from evaluation_func_graphrag import compute_answer_correctness
@@ -33,11 +32,11 @@ from sentence_transformers import SentenceTransformer
 # 0) Paths / constants
 # ---------------------------------------------------------------------
 REPO_ID      = "GraphRAG-Bench/GraphRAG-Bench"
-CORPUS_FILE  = "Datasets/Corpus/medical.json"
+CORPUS_FILE  = "GraphRAG-Benchmark/Datasets/Corpus/medical.json"
 QUEST_FILE   = "Datasets/Questions/medical_questions.json"
 
-SEED_N       = 5    # first 30 rows → bootstrap + DPO train
-TEST_N       = 20     # next 20 rows  → evaluation
+SEED_N       = 1    # first 30 rows → bootstrap + DPO train, numbers must be divided by 2. (n%2=0)
+TEST_N       = 1     # next 20 rows  → evaluation
 TOPK_CTX     = 5
 
 # ---------------------------------------------------------------------
@@ -50,10 +49,10 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
                           reward_func = None,reward_func_mode = 'non_llm',final_json_path = "results/compressrag_medical_data_test.json"):
     print("» Initialising embeddings & LLM …")
     word_emb = HuggingFaceEmbeddings(
-        model_name="BAAI/bge-base-en-v1.5"
+        model_name="BAAI/bge-large-en-v1.5"
     )
     sent_emb = HuggingFaceEmbeddings(
-        model_name="BAAI/bge-base-en-v1.5"
+        model_name="BAAI/bge-large-en-v1.5"
     )
     api_llm = OpenAILLM(  
         include_thinkings=True,                 
@@ -65,6 +64,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
         api_key="",  
         # base_url="https://api.openai.com/v1",  # 可选，使用其他兼容服务
     )
+
 
     if ini_meta_json:
         pre_loaded_meta = False
@@ -124,8 +124,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
         train_answers.append(gold_lookup.get(q))
 
     test_questions = all_questions[SEED_N : SEED_N+TEST_N]
-       
-
+        
     # ---------------------------------------------------------------------
     # 4) Build DPO preference dataset on seed Q-A pairs
     # ---------------------------------------------------------------------
@@ -140,7 +139,6 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
         print(f"loaded {len(pref_ds)} cached preference examples")
 
     else:
-
         cr.record_labeled_q_and_a(train_questions, train_answers)
 
         if reward_func_mode == 'llm':
@@ -175,7 +173,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
                     THINKINGS_CHOICES=THINKINGS_CHOICES,
                     FACTS_CHOICES = FACTS_CHOICES,
                     isolate_state = True,
-                    feature_dim = 768
+                    feature_dim = 1024
                 )
                 print(f"   generated {len(pref_ds)} preference examples")
                 save_pref_examples(saved_examples_name, pref_ds)
@@ -190,7 +188,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
                     questions= seed_questions,
                     gold_answers=gold_lookup,
                     per_q_samples = 6,
-                    feature_dim = 768,
+                    feature_dim = 1024,
                     reward_fn = reward_func,
                     seed = 0,
                     isolate_state = True,
@@ -202,7 +200,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
             
 
 
-    policy, _ = train_dpo_2head(pref_ds, input_dim=768)
+    policy, _ = train_dpo_2head(pref_ds, input_dim=1024)
 
     def dump_results(
         questions: List[str],
@@ -260,7 +258,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
                 def get_sbert_model():
                     nonlocal _SbertModel
                     if _SbertModel is None:
-                        _SbertModel = SentenceTransformer("BAAI/bge-base-en", device="cuda")
+                        _SbertModel = SentenceTransformer("BAAI/bge-large-en-v1.5", device="cuda")
                     return _SbertModel
 
                 def reward_sbert_cached(pred: str, gold: str) -> float:
@@ -329,6 +327,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
     generated_rows,answers_choices,thinkings_choices,facts_choices = dump_results(test_questions, out_path= final_json_path)
 
 
+
 if __name__ == "__main__":
 
     aft_combine_sim = 0.9
@@ -345,9 +344,8 @@ if __name__ == "__main__":
 
     compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N, 
                             top_m,top_m*10,aft_combine_sim,aft_combine_sim,aft_combine_sim,aft_combine_sim,
-                            Path("meta_codebook.json") ,f"pref_examples_medical_exact_graph_rag_v6_3b_words_top5.json",reward_func,
-                            reward_func_mode = 'non_llm',final_json_path = f"results/compressrag_medical_data_3b_words_top5.json")
+                            Path("meta_codebook_new.json") ,f"pref_examples_medical_exact_openai_v3.json",reward_func,
+                            reward_func_mode = 'non_llm',final_json_path = f"results/compressrag_medical_data_openai_v3.json")
 
     # df.to_csv('results/result_sbertinclusive_new_embed_for_exactgraphrag.csv')
-
-# python pipeline_for_autopruned_3b_words.py
+# python pipeline_for_autopruned_openai.py
