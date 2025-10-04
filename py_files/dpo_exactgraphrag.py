@@ -41,8 +41,9 @@ def _hashed_char_ngrams(s: str, dims: int = 384, n: int = 3) -> np.ndarray:
     return v / norm if norm else v
 
 
-_ENCODER = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
-_ENCODER = SentenceTransformer("BAAI/bge-base-en")
+# _ENCODER = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+# _ENCODER = SentenceTransformer("BAAI/bge-base-en")
+_ENCODER = SentenceTransformer("BAAI/bge-large-en-v1.5")
 
 
 def featurize_query(q: str, dims: int = 384) -> np.ndarray:
