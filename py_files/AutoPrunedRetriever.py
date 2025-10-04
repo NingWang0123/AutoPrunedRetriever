@@ -3651,49 +3651,17 @@ class ExactGraphRag_rl:
         facts_codebook_lst = []
         for i in range(0, total_chunks, batch_size):
 
-            if batch_num<=5:
-                batch_chunks = all_chunks[i:i+batch_size]
-                print('batch ', batch_num)
-                fact_cb = get_code_book(
-                    batch_chunks,
-                    type='facts',
-                    rule="Store factual statements.",
-                    batch_size=1,
-                )
+            batch_chunks = all_chunks[i:i+batch_size]
+            fact_cb = get_code_book(
+                batch_chunks,
+                type='facts',
+                rule="Store factual statements.",
+                batch_size=1,
+            )
 
-                print(f'batch {batch_num} codebook is generated')
+            print(f'batch {batch_num} codebook is generated')
 
-                facts_codebook_lst.append(fact_cb)
-
-            else:
-                break
-                
-            # if combined is None:
-            #     combined = {
-            #         "e": list(fact_cb.get("e", [])),
-            #         "r": list(fact_cb.get("r", [])),
-            #         "edge_matrix": list(fact_cb.get("edges([e,r,e])", [])),
-            #         "facts(edges[i])": [lst for lst in fact_cb.get("facts(edges[i])", [])],
-            #         "questions_lst": [],
-            #         "answers_lst": [],
-            #         "thinkings_lst": [],
-            #         "rule": fact_cb.get("rule", "Store factual statements."),
-            #         "e_embeddings": [],
-            #         "r_embeddings": [],
-            #     }
-            # else:
-            #     ent_map, _, new_ents = update_the_index(combined, fact_cb, "e")
-            #     rel_map, _, new_rels = update_the_index(combined, fact_cb, "r")
-            #     edges_remapped = remap_edges_matrix(fact_cb["edges([e,r,e])"], ent_map, rel_map)
-            #     edge_map, new_edge_matrix = combine_updated_edges(combined["edge_matrix"], edges_remapped)
-            #     facts_runs = fact_cb["facts(edges[i])"]
-            #     facts_runs_mapped = remap_question_indices(facts_runs, edge_map)
-            #     combined["facts(edges[i])"].append(facts_runs_mapped)
-            #     combined["e"].extend(new_ents)
-            #     combined["r"].extend(new_rels)
-            #     combined["edge_matrix"] = new_edge_matrix
-
-            # print(f'batch {batch_num} is finshed')
+            facts_codebook_lst.append(fact_cb)
 
             batch_num+=1
 
@@ -4044,8 +4012,10 @@ class ExactGraphRag_rl:
 
                 # if empty takes oriiginal
                 if  is_effectively_empty(extracted_facts_lsts):
+                    print('keep original facts_lsts')
                     final_facts_lsts = facts_lsts_copy
                 else:
+                    print('use extracted_facts_lsts') 
                     final_facts_lsts = extracted_facts_lsts
 
                     

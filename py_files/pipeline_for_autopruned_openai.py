@@ -49,10 +49,10 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
                           reward_func = None,reward_func_mode = 'non_llm',final_json_path = "results/compressrag_medical_data_test.json"):
     print("» Initialising embeddings & LLM …")
     word_emb = HuggingFaceEmbeddings(
-        model_name="BAAI/bge-base-en"
+        model_name="BAAI/bge-large-en-v1.5"
     )
     sent_emb = HuggingFaceEmbeddings(
-        model_name="BAAI/bge-base-en"
+        model_name="BAAI/bge-large-en-v1.5"
     )
     api_llm = OpenAILLM(  
         include_thinkings=True,                 
@@ -211,7 +211,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
                     THINKINGS_CHOICES=THINKINGS_CHOICES,
                     FACTS_CHOICES = FACTS_CHOICES,
                     isolate_state = True,
-                    feature_dim = 768
+                    feature_dim = 1024
                 )
                 print(f"   generated {len(pref_ds)} preference examples")
                 save_pref_examples(saved_examples_name, pref_ds)
@@ -226,7 +226,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
                     questions= seed_questions,
                     gold_answers=gold_lookup,
                     per_q_samples = 6,
-                    feature_dim = 768,
+                    feature_dim = 1024,
                     reward_fn = reward_func,
                     seed = 0,
                     isolate_state = True,
@@ -238,7 +238,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
             
 
 
-    policy, _ = train_dpo_2head(pref_ds, input_dim=768)
+    policy, _ = train_dpo_2head(pref_ds, input_dim=1024)
 
     def dump_results(
         questions: List[str],
@@ -296,7 +296,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
                 def get_sbert_model():
                     nonlocal _SbertModel
                     if _SbertModel is None:
-                        _SbertModel = SentenceTransformer("BAAI/bge-base-en", device="cuda")
+                        _SbertModel = SentenceTransformer("BAAI/bge-large-en-v1.5", device="cuda")
                     return _SbertModel
 
                 def reward_sbert_cached(pred: str, gold: str) -> float:
@@ -373,8 +373,8 @@ if __name__ == "__main__":
 
     reward_func = reward_func_dpo.reward_sbert_inclusive
 
-    SEED_N       = 3    # change to 20 for training
-    TEST_N       = 6     # change to 980 for rest
+    SEED_N       = 20    # change to 20 for training
+    TEST_N       = 2042     # change to 980 for rest
 
     
 
@@ -382,8 +382,8 @@ if __name__ == "__main__":
 
     compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N, 
                             top_m,top_m*10,aft_combine_sim,aft_combine_sim,aft_combine_sim,aft_combine_sim,
-                            Path("meta_codebook_new.json") ,f"pref_examples_medical_exact_openai_v1.json",reward_func,
-                            reward_func_mode = 'non_llm',final_json_path = f"results/compressrag_medical_data_openai_test.json")
+                            Path("meta_codebook_new.json") ,f"pref_examples_medical_exact_openai_v2.json",reward_func,
+                            reward_func_mode = 'non_llm',final_json_path = f"results/compressrag_medical_data_openai_v2.json")
 
     # df.to_csv('results/result_sbertinclusive_new_embed_for_exactgraphrag.csv')
 # python pipeline_for_autopruned_openai.py
