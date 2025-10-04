@@ -50,10 +50,10 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
                           reward_func = None,reward_func_mode = 'non_llm',final_json_path = "results/compressrag_medical_data_test.json"):
     print("» Initialising embeddings & LLM …")
     word_emb = HuggingFaceEmbeddings(
-        model_name="BAAI/bge-base-en"
+        model_name="BAAI/bge-base-en-v1.5"
     )
     sent_emb = HuggingFaceEmbeddings(
-        model_name="BAAI/bge-base-en"
+        model_name="BAAI/bge-base-en-v1.5"
     )
     api_llm = OpenAILLM(  
         include_thinkings=True,                 
