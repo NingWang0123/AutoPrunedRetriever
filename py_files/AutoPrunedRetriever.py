@@ -3650,19 +3650,24 @@ class ExactGraphRag_rl:
         batch_num = 0
         facts_codebook_lst = []
         for i in range(0, total_chunks, batch_size):
-            batch_chunks = all_chunks[i:i+batch_size]
-            print('batch ', batch_num)
-            fact_cb = get_code_book(
-                batch_chunks,
-                type='facts',
-                rule="Store factual statements.",
-                batch_size=1,
-            )
 
-            print(f'batch {batch_num} codebook is generated')
+            if batch_num<=5:
+                batch_chunks = all_chunks[i:i+batch_size]
+                print('batch ', batch_num)
+                fact_cb = get_code_book(
+                    batch_chunks,
+                    type='facts',
+                    rule="Store factual statements.",
+                    batch_size=1,
+                )
 
-            facts_codebook_lst.append(fact_cb)
-            
+                print(f'batch {batch_num} codebook is generated')
+
+                facts_codebook_lst.append(fact_cb)
+
+            else:
+                break
+                
             # if combined is None:
             #     combined = {
             #         "e": list(fact_cb.get("e", [])),
@@ -4246,7 +4251,6 @@ class ExactGraphRag_rl:
         else:
             paths = [facts_json_path]
 
-        combined_facts_cb = {}
         for p in paths:
             facts_codebook_lst = self.preload_context_json(
                 p,
@@ -4258,10 +4262,9 @@ class ExactGraphRag_rl:
             )
             for cb in facts_codebook_lst:
                 if cb:
-                    combined_facts_cb = merging_codebook(
-                        combined_facts_cb, cb, 'facts', self.word_emb, False
+                    self.meta_codebook = merging_codebook(
+                        self.meta_codebook, cb, 'facts', self.word_emb, False
                     )
-        return combined_facts_cb
 
     def run_work_flow(self, q_prompt, rule="Answer questions", 
                       facts_json_path: list = None, chunk_chars: int = 800, 
@@ -4273,13 +4276,8 @@ class ExactGraphRag_rl:
   
         combined_facts_cb = None
         if not getattr(self, "_facts_preloaded", False) and facts_json_path:
-            combined_facts_cb = self.load_and_merge_facts(facts_json_path, chunk_chars, overlap)
-            print("combined_facts_cb:", combined_facts_cb)
-            if combined_facts_cb:
-                self.meta_codebook = merging_codebook(
-                    self.meta_codebook, combined_facts_cb, 'facts', self.word_emb, False
-                )
-                self._facts_preloaded = True
+            self.load_and_merge_facts(facts_json_path, chunk_chars, overlap)
+            self._facts_preloaded = True
 
         if self.meta_codebook:
             t0 = time.perf_counter()
@@ -4391,13 +4389,8 @@ class ExactGraphRag_rl:
   
         combined_facts_cb = None
         if not getattr(self, "_facts_preloaded", False) and facts_json_path:
-            combined_facts_cb = self.load_and_merge_facts(facts_json_path, chunk_chars, overlap)
-            print(f'combined_facts_cb: {combined_facts_cb}')
-            if combined_facts_cb:
-                self.meta_codebook = merging_codebook(
-                    self.meta_codebook, combined_facts_cb, 'facts', self.word_emb, False
-                )
-                self._facts_preloaded = True
+            self.load_and_merge_facts(facts_json_path, chunk_chars, overlap)
+            self._facts_preloaded = True
 
         if self.meta_codebook:
             t0 = time.perf_counter()

@@ -131,7 +131,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
     # only load if we do not have ini_meta 
     if not pre_loaded_meta:
         # corpus file is the facts
-        facts_cb = cr.load_and_merge_facts(
+        cr.load_and_merge_facts(
             CORPUS_FILE,
             chunk_tokens=1200,
             overlap_tokens=100,
@@ -142,10 +142,6 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
         cr._facts_preloaded = True
         cr.top_m = 5          # sentence-embedding rerank top-m
 
-        cr.meta_codebook = merging_codebook(
-            cr.meta_codebook, facts_cb,
-            type='facts', word_emb=cr.word_emb, use_thinkings=True
-        )
         print(cr.meta_codebook)
 
         def make_json_safe(obj):
