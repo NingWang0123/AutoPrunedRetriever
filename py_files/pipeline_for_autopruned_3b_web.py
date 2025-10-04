@@ -22,7 +22,6 @@ from dpo_exactgraphrag import (
 
 from llm_local import Phi4MiniReasoningLLM,Word2VecEmbeddings
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings
-from langchain_openai import ChatOpenAI
 # from evaluation_func_graphrag import compute_answer_correctness
 import reward_func_dpo
 from functools import partial
