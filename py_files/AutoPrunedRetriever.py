@@ -3974,7 +3974,7 @@ class ExactGraphRag_rl:
         result_facts = add_facts_to_filtered_lst(top_m_results_for_facts,self.meta_codebook) 
         all_facts,all_f_indices = get_facts_lst_from_results(result_facts)
 
-        return all_answers, all_q_indices, all_f_indices
+        return all_answers, all_q_indices, all_facts
     
     def _gather_facts_by_indices(self, all_f_indices, codebook_main):
         facts_lsts = []
@@ -3988,7 +3988,7 @@ class ExactGraphRag_rl:
         return facts_lsts
 
 
-    def find_related_knowledge(self, all_answers, all_q_indices, all_f_indices=None):
+    def find_related_knowledge(self, all_answers, all_q_indices, all_facts):
         domain_knowledge_lst = []
 
         # remove the flatten part
@@ -4019,7 +4019,7 @@ class ExactGraphRag_rl:
 
         # facts 
         if self.include_facts:
-            if all_f_indices:
+            if all_facts:
                 def is_effectively_empty(x):
                     # empty, None, or all inner items are empty
                     if not x:
@@ -4028,16 +4028,16 @@ class ExactGraphRag_rl:
                         return all(is_effectively_empty(i) for i in x)
                     return False
                 
-                facts_lsts = self._gather_facts_by_indices(all_f_indices, self.meta_codebook)
-                print(f'original facts_lsts {facts_lsts}')
-                facts_lsts_copy = copy.deepcopy(facts_lsts) 
+
+                print(f'original facts_lsts {all_facts}')
+                facts_lsts_copy = copy.deepcopy(all_facts) 
 
 
                 if self.facts_choice == 'include_all':
-                    extracted_facts_lsts = facts_lsts_copy
+                    extracted_facts_lsts = [x for sublist in facts_lsts_copy for x in sublist]
 
                 else:
-                    extracted_facts_lsts = self.facts_extract_function(self.meta_codebook,facts_lsts,self.sentence_emb)
+                    extracted_facts_lsts = self.facts_extract_function(self.meta_codebook,all_facts,self.sentence_emb)
 
 
                 print(f'extracted_facts_lsts is {extracted_facts_lsts}')
@@ -4281,17 +4281,17 @@ class ExactGraphRag_rl:
 
         if self.meta_codebook:
             t0 = time.perf_counter()
-            all_answers, all_q_indices, all_f_indices = self.retrieve_new(q_json)
+            all_answers, all_q_indices, all_facts = self.retrieve_new(q_json)
             retrieval_time = time.perf_counter() - t0
             print("all_answers", all_answers)
             print("all_q_indices", all_q_indices)
-            print("all_f_indices", all_f_indices)
+            print("all_f_indices", all_facts)
 
             print(f'answers choice is {self.answers_choice}')
             print(f'thinkings_choice choice is {self.thinkings_choice}')
             print(f'facts choice is {self.facts_choice}')
 
-            domain_knowledge_lst = self.find_related_knowledge(all_answers, all_q_indices, all_f_indices)
+            domain_knowledge_lst = self.find_related_knowledge(all_answers, all_q_indices, all_facts)
             print("domain_knowledge_lst", domain_knowledge_lst)
             print(f'q_json is {q_json}')
             final_merged_json = self.compact_indicies_for_prompt(q_json, domain_knowledge_lst)
