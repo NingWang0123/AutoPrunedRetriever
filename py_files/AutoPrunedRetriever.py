@@ -4285,7 +4285,7 @@ class ExactGraphRag_rl:
             retrieval_time = time.perf_counter() - t0
             print("all_answers", all_answers)
             print("all_q_indices", all_q_indices)
-            print("all_f_indices", all_facts)
+            print("all_facts", all_facts)
 
             print(f'answers choice is {self.answers_choice}')
             print(f'thinkings_choice choice is {self.thinkings_choice}')
@@ -4394,12 +4394,12 @@ class ExactGraphRag_rl:
 
         if self.meta_codebook:
             t0 = time.perf_counter()
-            all_answers, all_q_indices, all_f_indices = self.retrieve_new(q_json)
+            all_answers, all_q_indices, all_facts = self.retrieve_new(q_json)
             retrieval_time = time.perf_counter() - t0
             print("all_answers", all_answers)
             print("all_q_indices", all_q_indices)
-            print("all_f_indices", all_f_indices)
-            domain_knowledge_lst = self.find_related_knowledge(all_answers, all_q_indices, all_f_indices)
+            print("all_facts", all_facts)
+            domain_knowledge_lst = self.find_related_knowledge(all_answers, all_q_indices, all_facts)
             print("domain_knowledge_lst", domain_knowledge_lst)
             print(f'q_json is {q_json}')
             final_merged_json = self.compact_indicies_for_prompt(q_json, domain_knowledge_lst)
