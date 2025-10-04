@@ -3646,8 +3646,9 @@ class ExactGraphRag_rl:
         num_batches = (total_chunks + batch_size - 1) // batch_size
         print(f"[preload_context_json] Total chunks: {total_chunks}, batch_size={batch_size}, num_batches: {num_batches}")
 
-        combined = None
+        # combined = None
         batch_num = 0
+        facts_codebook_lst = []
         for i in range(0, total_chunks, batch_size):
             batch_chunks = all_chunks[i:i+batch_size]
             print('batch ', batch_num)
@@ -3659,37 +3660,39 @@ class ExactGraphRag_rl:
             )
 
             print(f'batch {batch_num} codebook is generated')
-            
-            if combined is None:
-                combined = {
-                    "e": list(fact_cb.get("e", [])),
-                    "r": list(fact_cb.get("r", [])),
-                    "edge_matrix": list(fact_cb.get("edges([e,r,e])", [])),
-                    "facts(edges[i])": [lst for lst in fact_cb.get("facts(edges[i])", [])],
-                    "questions_lst": [],
-                    "answers_lst": [],
-                    "thinkings_lst": [],
-                    "rule": fact_cb.get("rule", "Store factual statements."),
-                    "e_embeddings": [],
-                    "r_embeddings": [],
-                }
-            else:
-                ent_map, _, new_ents = update_the_index(combined, fact_cb, "e")
-                rel_map, _, new_rels = update_the_index(combined, fact_cb, "r")
-                edges_remapped = remap_edges_matrix(fact_cb["edges([e,r,e])"], ent_map, rel_map)
-                edge_map, new_edge_matrix = combine_updated_edges(combined["edge_matrix"], edges_remapped)
-                facts_runs = fact_cb["facts(edges[i])"]
-                facts_runs_mapped = remap_question_indices(facts_runs, edge_map)
-                combined["facts(edges[i])"].append(facts_runs_mapped)
-                combined["e"].extend(new_ents)
-                combined["r"].extend(new_rels)
-                combined["edge_matrix"] = new_edge_matrix
 
-            print(f'batch {batch_num} is finshed')
+            facts_codebook_lst.append(fact_cb)
+            
+            # if combined is None:
+            #     combined = {
+            #         "e": list(fact_cb.get("e", [])),
+            #         "r": list(fact_cb.get("r", [])),
+            #         "edge_matrix": list(fact_cb.get("edges([e,r,e])", [])),
+            #         "facts(edges[i])": [lst for lst in fact_cb.get("facts(edges[i])", [])],
+            #         "questions_lst": [],
+            #         "answers_lst": [],
+            #         "thinkings_lst": [],
+            #         "rule": fact_cb.get("rule", "Store factual statements."),
+            #         "e_embeddings": [],
+            #         "r_embeddings": [],
+            #     }
+            # else:
+            #     ent_map, _, new_ents = update_the_index(combined, fact_cb, "e")
+            #     rel_map, _, new_rels = update_the_index(combined, fact_cb, "r")
+            #     edges_remapped = remap_edges_matrix(fact_cb["edges([e,r,e])"], ent_map, rel_map)
+            #     edge_map, new_edge_matrix = combine_updated_edges(combined["edge_matrix"], edges_remapped)
+            #     facts_runs = fact_cb["facts(edges[i])"]
+            #     facts_runs_mapped = remap_question_indices(facts_runs, edge_map)
+            #     combined["facts(edges[i])"].append(facts_runs_mapped)
+            #     combined["e"].extend(new_ents)
+            #     combined["r"].extend(new_rels)
+            #     combined["edge_matrix"] = new_edge_matrix
+
+            # print(f'batch {batch_num} is finshed')
 
             batch_num+=1
 
-        return combined
+        return facts_codebook_lst
 
 
     def encode_question(self,q_prompt,rule):
@@ -4243,9 +4246,9 @@ class ExactGraphRag_rl:
         else:
             paths = [facts_json_path]
 
-        combined_facts_cb = None
+        combined_facts_cb = {}
         for p in paths:
-            cb = self.preload_context_json(
+            facts_codebook_lst = self.preload_context_json(
                 p,
                 chunk_tokens=chunk_tokens,
                 overlap_tokens=overlap_tokens,
@@ -4253,14 +4256,11 @@ class ExactGraphRag_rl:
                 sub_chunk_overlap=sub_chunk_overlap,
                 tokenizer_name=tokenizer_name
             )
-            if not cb:
-                continue
-            if combined_facts_cb is None:
-                combined_facts_cb = cb
-            else:
-                combined_facts_cb = merging_codebook(
-                    combined_facts_cb, cb, 'facts', self.word_emb, False
-                )
+            for cb in facts_codebook_lst:
+                if cb:
+                    combined_facts_cb = merging_codebook(
+                        combined_facts_cb, cb, 'facts', self.word_emb, False
+                    )
         return combined_facts_cb
 
     def run_work_flow(self, q_prompt, rule="Answer questions", 
