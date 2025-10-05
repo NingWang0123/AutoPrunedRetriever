@@ -4224,7 +4224,8 @@ class ExactGraphRag_rl:
         self, facts_json_path,
         chunk_tokens=1200, overlap_tokens=100,
         sub_chunk_chars=600, sub_chunk_overlap=50,
-        tokenizer_name="gpt-4o-mini"
+        tokenizer_name="gpt-4o-mini",
+        subchunk_batch = 500
     ):
         if not facts_json_path:
             return None
@@ -4240,7 +4241,8 @@ class ExactGraphRag_rl:
                 overlap_tokens=overlap_tokens,
                 sub_chunk_chars=sub_chunk_chars,
                 sub_chunk_overlap=sub_chunk_overlap,
-                tokenizer_name=tokenizer_name
+                tokenizer_name=tokenizer_name,
+                subchunk_batch = subchunk_batch
             )
             for cb in facts_codebook_lst:
                 if cb:

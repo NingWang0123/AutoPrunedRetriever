@@ -138,7 +138,8 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
             overlap_tokens=100,
             sub_chunk_chars=300,
             sub_chunk_overlap=50,
-            tokenizer_name="gpt-4o-mini"
+            tokenizer_name="gpt-4o-mini",
+            subchunk_batch =1000
         )
         cr._facts_preloaded = True
         cr.top_m = 5          # sentence-embedding rerank top-m
@@ -165,7 +166,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
                 return [make_json_safe(v) for v in obj]
             return obj
 
-        with open("meta_codebook.json", "w") as f:
+        with open("meta_codebook_new.json", "w") as f:
             json.dump(make_json_safe(cr.meta_codebook), f, indent=2)
 
         print('===============================================================')
@@ -411,7 +412,7 @@ if __name__ == "__main__":
 
     compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N, 
                             top_m,top_m*10,aft_combine_sim,aft_combine_sim,aft_combine_sim,0.95,
-                            Path("meta_codebook.json") ,f"pref_examples_medical_exact_openai_v3.json",reward_func,
+                            Path("meta_codebook_new.json") ,f"pref_examples_medical_exact_openai_v3.json",reward_func,
                             reward_func_mode = 'non_llm',final_json_path = f"results/compressrag_medical_data_openai_test.json")
 
     # df.to_csv('results/result_sbertinclusive_new_embed_for_exactgraphrag.csv')
