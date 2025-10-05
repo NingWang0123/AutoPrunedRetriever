@@ -62,7 +62,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
         temperature=0.2,
         top_p=0.9,
         use_cache=True,
-        api_key="",  
+        api_key="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",  
         # base_url="https://api.openai.com/v1",  # 可选，使用其他兼容服务
     )
 
@@ -399,7 +399,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
 if __name__ == "__main__":
 
     aft_combine_sim = 0.9
-    top_m = 10
+    top_m = 15
 
     reward_func = reward_func_dpo.reward_sbert_inclusive
 
@@ -411,9 +411,9 @@ if __name__ == "__main__":
     # change v number to v number +1 if want to recreate
 
     compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N, 
-                            top_m,top_m*10,aft_combine_sim,aft_combine_sim,aft_combine_sim,0.95,
+                            top_m,top_m*10,aft_combine_sim,aft_combine_sim,aft_combine_sim,0.93,
                             Path("meta_codebook_new.json") ,f"pref_examples_medical_exact_openai_v3.json",reward_func,
-                            reward_func_mode = 'non_llm',final_json_path = f"results/compressrag_medical_data_openai_test.json")
+                            reward_func_mode = 'non_llm',final_json_path = f"results/compressrag_medical_data_openai_test_v3.json")
 
     # df.to_csv('results/result_sbertinclusive_new_embed_for_exactgraphrag.csv')
 # python pipeline_for_autopruned_openai_test_ver.py
