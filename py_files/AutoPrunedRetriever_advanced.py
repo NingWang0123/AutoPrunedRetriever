@@ -1857,6 +1857,8 @@ def get_answers_lst_from_results(result):
 
 def get_all_facts(top_m_results,codebook_main):
 
+    # print('top_m_results',top_m_results)
+
     all_facts = []
 
     question_comb = []
@@ -1867,22 +1869,20 @@ def get_all_facts(top_m_results,codebook_main):
             q_idx = m["questions_index"]
             q_jdx = m["question_index"]
             comb = [q_idx,q_jdx]
-            if comb not in question_comb:
+            if comb not in question_comb and m['score']>0.5:
                 question_comb.append(comb)
                 if q_idx not in result_index_dict.keys():
                     result_index_dict[q_idx] = [q_jdx]
                 else:
                     result_index_dict[q_idx].append(q_jdx)
 
-            # m_with_feat = m.copy()
-            # m_with_feat['answers(edges[i])'] = codebook_main['answers_lst'][q_idx]
-            # result[qid].append(m_with_feat)
+    print('result_index_dict',result_index_dict)
 
-    for q_idx, q_jdx_lst in result_index_dict:
+    for q_idx, q_jdx_lst in result_index_dict.items():
         chunks = []
 
         for q_jdx in q_jdx_lst:
-            chunks.append(codebook_main['answers_lst'][q_idx][q_jdx])
+            chunks.append(codebook_main['facts_lst'][q_idx][q_jdx])
 
         all_facts.append(chunks)
             
@@ -3945,10 +3945,10 @@ class ExactGraphRag_rl:
                                     questions_edges_index,
                                     self.meta_codebook,
                                     self.sentence_emb,                 # ← move before defaults
-                                    self.top_k*6,                             # word-embedding candidates
+                                    self.top_k,                             # word-embedding candidates
                                     self.question_batch_size,               # query batch size
                                     self.questions_db_batch_size,           # DB batch size
-                                    self.top_m*6,                             # sentence-embedding rerank
+                                    self.top_m,                             # sentence-embedding rerank
                                     self.custom_linearizer,
                                     'facts')
         
