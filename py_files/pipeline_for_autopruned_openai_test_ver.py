@@ -136,7 +136,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
             CORPUS_FILE,
             chunk_tokens=1200,
             overlap_tokens=100,
-            sub_chunk_chars=600,
+            sub_chunk_chars=300,
             sub_chunk_overlap=50,
             tokenizer_name="gpt-4o-mini"
         )
