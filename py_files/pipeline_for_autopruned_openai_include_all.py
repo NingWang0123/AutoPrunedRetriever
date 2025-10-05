@@ -191,10 +191,6 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
     # 4) Build DPO preference dataset on seed Q-A pairs
     # ---------------------------------------------------------------------
     # print(cr.meta_codebook)
-    print('get the rag train')
-
-    cr_training = copy.deepcopy(cr)
-
     # use cr_training to train
 
     print("» Building preference pairs for DPO …")
@@ -206,7 +202,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
         print(f"loaded {len(pref_ds)} cached preference examples")
 
     else:
-        cr_training.record_labeled_q_and_a(train_questions, train_answers)
+        cr.record_labeled_q_and_a(train_questions, train_answers)
 
         if reward_func_mode == 'llm':
             # check if it is saved or not, reuse the trained one
@@ -228,7 +224,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
                 )
 
                 pref_ds = await make_preference_dataset_2head_using_llm(
-                    cr=cr_training,
+                    cr=cr,
                     questions=seed_questions,
                     gold_answers=gold_lookup,
                     per_q_samples=6,
@@ -251,7 +247,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
         else:
 
             pref_ds = make_preference_dataset_2head(
-                    cr_training,
+                    cr,
                     questions= seed_questions,
                     gold_answers=gold_lookup,
                     per_q_samples = 6,
@@ -265,6 +261,12 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
 
                 )
             
+
+    # throw away the store info from qa
+    cr.meta_codebook['questions_lst'] = []
+    cr.meta_codebook['answers_lst'] = []
+
+             
 
 
     policy, _ = train_dpo_2head(pref_ds, input_dim=1024)
