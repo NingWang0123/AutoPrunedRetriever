@@ -1939,7 +1939,7 @@ def rerank_with_sentence_embeddings_score_with_coverage(
 
     m = min(top_m, len(all_scored["score"]))
 
-    # print('all_scored',all_scored)
+    print('all_scored',all_scored)
 
     combined = list(zip(
         all_scored["score"],
@@ -4116,18 +4116,24 @@ class ExactGraphRag_rl:
         # due to almost empty prev answer database, give adapted m
         adapted_m = min(max(1,int(0.1*len(self.meta_codebook['answers_lst']))),self.top_m)
 
-        top_m_results = coarse_filter_advanced(
-                        questions_edges_index,
-                        self.meta_codebook,
-                        self.sentence_emb,                 # ← move before defaults
-                        self.top_k,                             # word-embedding candidates
-                        self.question_batch_size,               # query batch size
-                        self.questions_db_batch_size,           # DB batch size
-                        adapted_m,                             # sentence-embedding rerank
-                        self.custom_linearizer,
-                        'questions')
-        
-        all_answers,all_q_indices = get_all_results_entire_chunk(top_m_results,self.meta_codebook,'answers')
+        if adapted_m>0:
+
+            top_m_results = coarse_filter_advanced(
+                            questions_edges_index,
+                            self.meta_codebook,
+                            self.sentence_emb,                 # ← move before defaults
+                            self.top_k,                             # word-embedding candidates
+                            self.question_batch_size,               # query batch size
+                            self.questions_db_batch_size,           # DB batch size
+                            adapted_m,                             # sentence-embedding rerank
+                            self.custom_linearizer,
+                            'questions')
+            
+            all_answers,all_q_indices = get_all_results_entire_chunk(top_m_results,self.meta_codebook,'answers')
+
+        else:
+            all_answers = []
+            all_q_indices = []
         
 
         top_m_results_for_facts = coarse_filter_advanced(
@@ -4154,7 +4160,7 @@ class ExactGraphRag_rl:
         # get_overped_or_unique_edge_lists_sentence_emebed
 
         # answers
-        if self.include_answers:
+        if self.include_answers and all_answers:
             final_answers_lsts = self.answers_extract_function(self.meta_codebook, get_flat_answers_lsts(all_answers),self.sentence_emb)
             print(f'self.answers_choice  {self.answers_choice}')
             print(f'final_answers_lsts {final_answers_lsts}')
