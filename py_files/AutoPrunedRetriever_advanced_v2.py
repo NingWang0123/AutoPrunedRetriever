@@ -1939,7 +1939,7 @@ def rerank_with_sentence_embeddings_score_with_coverage(
 
     m = min(top_m, len(all_scored["score"]))
 
-    print('all_scored',all_scored)
+    # print('all_scored',all_scored)
 
     combined = list(zip(
         all_scored["score"],
@@ -4116,7 +4116,7 @@ class ExactGraphRag_rl:
         # due to almost empty prev answer database, give adapted m
         adapted_m = min(max(1,int(0.1*len(self.meta_codebook['answers_lst']))),self.top_m)
 
-        if adapted_m>0:
+        if len(self.meta_codebook['answers_lst'])>0:
 
             top_m_results = coarse_filter_advanced(
                             questions_edges_index,
