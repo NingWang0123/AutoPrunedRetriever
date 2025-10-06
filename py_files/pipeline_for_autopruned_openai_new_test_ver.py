@@ -413,7 +413,7 @@ if __name__ == "__main__":
     compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N, 
                             top_m,top_m*10,aft_combine_sim,aft_combine_sim,aft_combine_sim,0.93,
                             Path("meta_codebook_new3.json") ,f"pref_examples_medical_exact_openai_v3.json",reward_func,
-                            reward_func_mode = 'non_llm',final_json_path = f"results/compressrag_medical_data_openai_test_v3.json")
+                            reward_func_mode = 'non_llm',final_json_path = f"results/compressrag_medical_data_openai_test_new_v3.json")
 
     # df.to_csv('results/result_sbertinclusive_new_embed_for_exactgraphrag.csv')
 # python pipeline_for_autopruned_openai_new_test_ver.py

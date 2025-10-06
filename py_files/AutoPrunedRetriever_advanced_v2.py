@@ -3887,22 +3887,19 @@ class ExactGraphRag_rl:
         batch_num = 0
         facts_codebook_lst = []
         for i in range(0, total_chunks, batch_size):
-            if batch_num<3:
 
-                batch_chunks = all_chunks[i:i+batch_size]
-                fact_cb = get_code_book(
-                    batch_chunks,
-                    type='facts',
-                    rule="Store factual statements.",
-                    batch_size=1,
-                )
+            batch_chunks = all_chunks[i:i+batch_size]
+            fact_cb = get_code_book(
+                batch_chunks,
+                type='facts',
+                rule="Store factual statements.",
+                batch_size=1,
+            )
 
-                print(f'batch {batch_num} codebook is generated')
+            print(f'batch {batch_num} codebook is generated')
 
-                facts_codebook_lst.append(fact_cb)
+            facts_codebook_lst.append(fact_cb)
 
-            else:
-                break
 
             # facts_codebook_lst.append(fact_cb)
 
