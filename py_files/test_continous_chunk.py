@@ -58,6 +58,20 @@ def embed_triples_as_sentences(triples: List[Triple], sent_emb) -> np.ndarray:
     texts = [triple_to_sentence(t) for t in triples]
     return _embed_many_texts(texts, sent_emb)
 
+def ensure_list_of_triples(triples):
+    """
+    Ensures the input is a list of triples (list of tuples or lists).
+    Converts set → list if necessary.
+    """
+    if isinstance(triples, set):
+        triples = list(triples)
+    elif not isinstance(triples, list):
+        raise TypeError(f"Expected list or set, got {type(triples)}")
+
+    # Ensure each triple is also a list (not tuple or other type)
+    triples = [list(t) if not isinstance(t, list) else t for t in triples]
+    return triples
+
 # ---------- segmenter ----------
 def segment_by_centroid_sim(
     triples: List[Triple],
@@ -75,6 +89,9 @@ def segment_by_centroid_sim(
     """
     if not triples:
         return []
+    
+    triples = ensure_list_of_triples(triples)
+    
     assert len(triples) == triple_vecs.shape[0], "vecs and triples length mismatch"
 
     # L2-normalize once (BGE expects cosine)

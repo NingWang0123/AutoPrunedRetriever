@@ -801,18 +801,27 @@ def flatten_edges_with_index(
     chunked_edges: List[List[List[int]]]
 ):
     """
-    Flattens [[[...]], [[...]], ...] -> [[...], ...] and returns an index map
-    from (chunk_idx, triple_idx) -> global_edge_idx
+    Flattens [[[...]], [[...], [...]], ...] -> [[...], [...], ...]
+    and returns:
+      - flat: the flattened edges
+      - idx_map: {(chunk_idx, triple_idx) -> global_edge_idx}
+      - chunk_to_global: [[global_idx,...] per chunk], e.g. [[0],[1,2]]
     """
     flat: List[List[int]] = []
     idx_map: Dict[Tuple[int, int], int] = {}
+    chunk_to_global: List[List[int]] = []
     k = 0
+
     for ci, edges in enumerate(chunked_edges):
+        row: List[int] = []
         for ti, e in enumerate(edges):
             flat.append(e)
             idx_map[(ci, ti)] = k
+            row.append(k)
             k += 1
-    return flat, idx_map
+        chunk_to_global.append(row)
+
+    return flat, idx_map, chunk_to_global
 
 
 ### edit codebook to also take the answers
@@ -897,11 +906,13 @@ def get_code_book(
         )
         codebook, ent2id, rel2id = build_codebook_from_chunks(chunks, rule)
         chunked_edges = edges_from_chunks(chunks, ent2id, rel2id)
-        edges, idx_map = flatten_edges_with_index(chunked_edges)
+        edges, idx_map,chunk_to_global = flatten_edges_with_index(chunked_edges)
         codebook.update({
             "edges([e,r,e])": edges,
-            feat_name: idx_map,
+            feat_name: chunk_to_global,
         })
+
+        print(codebook)
 
     codebook.pop('sid', None)
     return codebook
@@ -1904,7 +1915,7 @@ def rerank_with_sentence_embeddings_score_with_coverage(
 
         results[i] = scored
 
-    for i,scored_lst in results:
+    for i,scored_lst in results.items():
         for scored in scored_lst:
 
             index_comb_scored = scored['index_combo']
@@ -1921,12 +1932,14 @@ def rerank_with_sentence_embeddings_score_with_coverage(
                 all_scored['score'].append(score_comb_scored)
                 all_scored['index_combo'].append(index_comb_scored)
                 all_scored['questions_index'].append(qi)
-                all_scored['questions_index'].append(qj)
+                all_scored['question_index'].append(qj)
                 all_scored['db_source'].append(db_source_comb_scored)
                 # all_scored['text'].append(text_comb_scored)
 
 
     m = min(top_m, len(all_scored["score"]))
+
+    # print('all_scored',all_scored)
 
     combined = list(zip(
         all_scored["score"],
@@ -1940,7 +1953,7 @@ def rerank_with_sentence_embeddings_score_with_coverage(
     combined.sort(key=lambda x: x[0], reverse=True)
 
     # Take top-m
-    top_m = combined[:m]
+    top_m_scored = combined[:m]
 
     # Unzip back
     (
@@ -1949,7 +1962,7 @@ def rerank_with_sentence_embeddings_score_with_coverage(
         all_scored["question_index"],
         all_scored["db_source"],
         all_scored["index_combo"],
-    ) = map(list, zip(*top_m))
+    ) = map(list, zip(*top_m_scored))
 
 
 
@@ -3874,18 +3887,24 @@ class ExactGraphRag_rl:
         batch_num = 0
         facts_codebook_lst = []
         for i in range(0, total_chunks, batch_size):
+            if batch_num<3:
 
-            batch_chunks = all_chunks[i:i+batch_size]
-            fact_cb = get_code_book(
-                batch_chunks,
-                type='facts',
-                rule="Store factual statements.",
-                batch_size=1,
-            )
+                batch_chunks = all_chunks[i:i+batch_size]
+                fact_cb = get_code_book(
+                    batch_chunks,
+                    type='facts',
+                    rule="Store factual statements.",
+                    batch_size=1,
+                )
 
-            print(f'batch {batch_num} codebook is generated')
+                print(f'batch {batch_num} codebook is generated')
 
-            facts_codebook_lst.append(fact_cb)
+                facts_codebook_lst.append(fact_cb)
+
+            else:
+                break
+
+            # facts_codebook_lst.append(fact_cb)
 
 
             batch_num+=1
