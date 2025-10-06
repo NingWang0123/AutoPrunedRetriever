@@ -1836,6 +1836,24 @@ def rerank_with_sentence_embeddings_score_with_coverage(
 
     results: Dict[int, List[Dict[str, Any]]] = {}
 
+    # final_results = {
+    #             "score": [],                 # higher = better
+    #             "questions_index": [],
+    #             "question_index": [],              
+    #             "db_source": [],
+    #             'index_combo':[],
+    #             'text':[]
+    #             }
+
+    all_scored = {
+                "score": [],                 # higher = better
+                "questions_index": [],
+                "question_index": [],              
+                "db_source": [],
+                'index_combo':[],
+                # 'text':[]
+                }
+
     for i, q_edges in enumerate(questions):
         cand = coarse_topk.get(i, [])
         if not cand:
@@ -1884,10 +1902,58 @@ def rerank_with_sentence_embeddings_score_with_coverage(
                 'index_combo':[qi,qj]
             })
 
-        m = min(top_m, len(scored))
-        results[i] = sorted(scored, key=lambda x: x["score"], reverse=True)[:m]
+        results[i] = scored
 
-    return results
+    for i,scored_lst in results:
+        for scored in scored_lst:
+
+            index_comb_scored = scored['index_combo']
+            score_comb_scored = scored['score']
+            db_source_comb_scored = scored['db_source']
+            # text_comb_scored = scored['text']
+
+            if index_comb_scored in all_scored['index_combo']:
+                idx = all_scored['index_combo'].index(index_comb_scored)
+                all_scored['score'][idx] += score_comb_scored
+
+            else:
+                qi,qj = index_comb_scored
+                all_scored['score'].append(score_comb_scored)
+                all_scored['index_combo'].append(index_comb_scored)
+                all_scored['questions_index'].append(qi)
+                all_scored['questions_index'].append(qj)
+                all_scored['db_source'].append(db_source_comb_scored)
+                # all_scored['text'].append(text_comb_scored)
+
+
+    m = min(top_m, len(all_scored["score"]))
+
+    combined = list(zip(
+        all_scored["score"],
+        all_scored["questions_index"],
+        all_scored["question_index"],
+        all_scored["db_source"],
+        all_scored["index_combo"]
+    ))
+
+    # Sort by score (descending)
+    combined.sort(key=lambda x: x[0], reverse=True)
+
+    # Take top-m
+    top_m = combined[:m]
+
+    # Unzip back
+    (
+        all_scored["score"],
+        all_scored["questions_index"],
+        all_scored["question_index"],
+        all_scored["db_source"],
+        all_scored["index_combo"],
+    ) = map(list, zip(*top_m))
+
+
+
+    return all_scored
 
 
 #### new coarse filter using cross sim for first layer and overall score for the coverage, this one can also used for the facts retrival
@@ -1931,6 +1997,49 @@ def coarse_filter_advanced(
 
     return top_m_results
 
+
+
+def get_all_results(top_m_results,codebook_main,target = 'facts'):
+    all_results = []
+    chunk_dict = {}
+    all_indexes = []
+    feat_name = target+'_lst'
+    for i in range(len(top_m_results["score"])):
+        row = {key: top_m_results[key][i] for key in top_m_results}
+        cur_qid,cur_qjd = row['index_combo']
+        if cur_qid in chunk_dict.keys():
+            chunk_dict[cur_qid].append(cur_qjd)
+        else:
+            chunk_dict[cur_qid] = [cur_qjd]
+
+    for q_idx, q_jdx_lst in chunk_dict.items():
+        chunks = []
+        for q_jdx in q_jdx_lst:
+            chunks.append(codebook_main[feat_name][q_idx][q_jdx])
+
+        all_results.append(chunks)
+        all_indexes.append(q_idx)
+
+    return all_results,all_indexes
+
+def get_all_results_entire_chunk(top_m_results,codebook_main,target = 'facts'):
+    all_results = []
+    chunk_dict = {}
+    all_indexes = []
+    feat_name = target+'_lst'
+    for i in range(len(top_m_results["score"])):
+        row = {key: top_m_results[key][i] for key in top_m_results}
+        cur_qid,cur_qjd = row['index_combo']
+        if cur_qid in chunk_dict.keys():
+            chunk_dict[cur_qid].append(cur_qjd)
+        else:
+            chunk_dict[cur_qid] = [cur_qjd]
+
+    for q_idx, q_jdx_lst in chunk_dict.items():
+        all_results.append(codebook_main[feat_name][q_idx])
+        all_indexes.append(q_idx)
+
+    return all_results,all_indexes
 
 
 def add_answers_to_filtered_lst(top_m_results,codebook_main):
