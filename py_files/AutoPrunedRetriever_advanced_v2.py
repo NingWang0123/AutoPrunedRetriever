@@ -28,16 +28,15 @@ import copy
 from optimize_combine_storage import ann_feat_combine,ann_merge_questions_answer_gated
 from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 from rouge_score import rouge_scorer
+from test_continous_chunk import embed_triples_as_sentences,segment_by_centroid_sim 
 
 Triplet = Tuple[str, str, str]
 
-nlp = spacy.load("en_core_web_sm")
+
 
 #word_emb = WordAvgEmbeddings(model_path="gensim-data/glove-wiki-gigaword-100/glove-wiki-gigaword-100.model")
 #word_emb = Word2VecEmbeddings(model_name="word2vec-google-news-300")
-word_emb = HuggingFaceEmbeddings(
-        model_name="BAAI/bge-base-en"
-    )
+word_emb = HuggingFaceEmbeddings(model_name="BAAI/bge-large-en-v1.5")
 
 SUBJ_DEPS = {"nsubj", "nsubjpass", "csubj", "csubjpass"}
 OBJ_DEPS  = {"dobj", "obj", "attr", "oprd", "dative"}
@@ -735,6 +734,86 @@ def _normalize_embeddings_shape(embeddings_list, target_dim=None):
     
     return normalized_embeddings
 
+def json_dump_str(obj: Any) -> str:
+    return json.dumps(obj, ensure_ascii=False, separators=(",", ":"), sort_keys=True)
+
+# ========= Build ONE global codebook from chunked triples =========
+
+Triple = Tuple[str, str, str]
+
+def build_codebook_from_chunks(
+    chunks: List[List[Triple]],
+    rule: str = "Reply with a Y/N/? string in order only; no explanations."
+):
+    """
+    Builds a single global codebook (shared dictionaries) across all chunks.
+    Returns:
+      codebook: {"sid","e","r","rule"}
+      ent2id, rel2id: global maps
+    """
+    ent2id: Dict[str, int] = {}
+    rel2id: Dict[str, int] = {}
+    entities: List[str] = []
+    relations: List[str] = []
+
+    def _eid(x: str) -> int:
+        if x not in ent2id:
+            ent2id[x] = len(entities)
+            entities.append(x)
+        return ent2id[x]
+
+    def _rid(x: str) -> int:
+        if x not in rel2id:
+            rel2id[x] = len(relations)
+            relations.append(x)
+        return rel2id[x]
+
+    # Touch all nodes/relations
+    for triples in chunks:
+        for h, r, t in triples:
+            _eid(h); _rid(r); _eid(t)
+
+    # Stable short id
+    sid_src = json_dump_str({"e": entities, "r": relations})
+    sid = hashlib.sha1(sid_src.encode("utf-8")).hexdigest()[:10]
+
+    codebook = {"sid": sid, "e": entities, "r": relations, "rule": rule}
+    return codebook, ent2id, rel2id
+
+# ========= Convert chunked triples to edges using GLOBAL ids =========
+def edges_from_chunks(
+    chunks: List[List[Triple]],
+    ent2id: Dict[str, int],
+    rel2id: Dict[str, int],
+) -> List[List[List[int]]]:
+    """
+    Returns chunked edges with global ids: [[[h,r,t],...], ...]
+    """
+    out: List[List[List[int]]] = []
+    for triples in chunks:
+        g = []
+        for h, r, t in triples:
+            g.append([ent2id[h], rel2id[r], ent2id[t]])
+        out.append(g)
+    return out
+
+def flatten_edges_with_index(
+    chunked_edges: List[List[List[int]]]
+):
+    """
+    Flattens [[[...]], [[...]], ...] -> [[...], ...] and returns an index map
+    from (chunk_idx, triple_idx) -> global_edge_idx
+    """
+    flat: List[List[int]] = []
+    idx_map: Dict[Tuple[int, int], int] = {}
+    k = 0
+    for ci, edges in enumerate(chunked_edges):
+        for ti, e in enumerate(edges):
+            flat.append(e)
+            idx_map[(ci, ti)] = k
+            k += 1
+    return flat, idx_map
+
 
 ### edit codebook to also take the answers
 def _merge_sets(sets: Iterable[Set[Triplet]]) -> Set[Triplet]:
@@ -750,15 +829,20 @@ def get_code_book(
     rule: str = "Answer questions.",
     factparser: bool = False,   
     *,
-    batch_size: int = 1      
+    batch_size: int = 1,
+    sent_emb = word_emb      
 ):
     valid_types = {'questions', 'answers', 'thinkings', 'facts'}
+
+    processing_texts_lst = False
+
     if type not in valid_types:
         raise ValueError(f"type must be one of {valid_types}, got: {type}")
 
     if isinstance(prompt, str):
         triples_merged: Set[Triplet] = triplet_parser(prompt)  # Set[Triplet]
     else:
+        processing_texts_lst = True
         texts: List[str] = [t for t in prompt if isinstance(t, str) and t.strip()]
         if not texts:
             triples_merged = set()
@@ -793,14 +877,32 @@ def get_code_book(
             "rule": rule,
         }
 
-    codebook, ent2id, rel2id = build_codebook_from_triples(triples_merged, rule)
-    edges = edges_from_triples(triples_merged, ent2id, rel2id)
     feat_name = f"{type}(edges[i])"
 
-    codebook.update({
-        "edges([e,r,e])": edges,
-        feat_name: all_chains_no_subchains(edges, False),
-    })
+    if not processing_texts_lst:
+        codebook, ent2id, rel2id = build_codebook_from_triples(triples_merged, rule)
+        edges = edges_from_triples(triples_merged, ent2id, rel2id)
+        codebook.update({
+            "edges([e,r,e])": edges,
+            feat_name: all_chains_no_subchains(edges, False),
+        })
+    else:
+        T_vecs = embed_triples_as_sentences(triples_merged, sent_emb)
+        chunks = segment_by_centroid_sim(
+            triples_merged, T_vecs,
+            tau=0.7,           
+            patience=0,
+            bonus_tail_head=True,
+            tail_head_bonus=0.05
+        )
+        codebook, ent2id, rel2id = build_codebook_from_chunks(chunks, rule)
+        chunked_edges = edges_from_chunks(chunks, ent2id, rel2id)
+        edges, idx_map = flatten_edges_with_index(chunked_edges)
+        codebook.update({
+            "edges([e,r,e])": edges,
+            feat_name: idx_map,
+        })
+
     codebook.pop('sid', None)
     return codebook
 
@@ -1771,14 +1873,15 @@ def rerank_with_sentence_embeddings_score_with_coverage(
                 distinct_weight=0.10, distinct_tau=0.50,
             )
 
-            # Use YOUR linearizer for the display text
+            # Use linearizer for the display text
             text = make_question_text(chunk_edges, codebook_main, custom_linearizer)
             scored.append({
                 "score": float(s),                 # higher = better
                 "questions_index": qi,
                 "question_index": qj,
-                "text": text,                      # from your linearizer
+                "text": text,                      # from linearizer
                 "db_source": src,
+                'index_combo':[qi,qj]
             })
 
         m = min(top_m, len(scored))
