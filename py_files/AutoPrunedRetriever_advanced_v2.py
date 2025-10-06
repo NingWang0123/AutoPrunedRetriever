@@ -2042,64 +2042,64 @@ def get_all_results_entire_chunk(top_m_results,codebook_main,target = 'facts'):
     return all_results,all_indexes
 
 
-def add_answers_to_filtered_lst(top_m_results,codebook_main):
+# def add_answers_to_filtered_lst(top_m_results,codebook_main):
 
-    result = {}
+#     result = {}
                                  
-    for qid, matches in top_m_results.items():
+#     for qid, matches in top_m_results.items():
         
-        result[qid] = []
+#         result[qid] = []
     
-        for m in matches:
-            q_idx = m["questions_index"]
-            m_with_feat = m.copy()
-            m_with_feat['answers(edges[i])'] = codebook_main['answers_lst'][q_idx]
-            result[qid].append(m_with_feat)
+#         for m in matches:
+#             q_idx = m["questions_index"]
+#             m_with_feat = m.copy()
+#             m_with_feat['answers(edges[i])'] = codebook_main['answers_lst'][q_idx]
+#             result[qid].append(m_with_feat)
 
-    return result
+#     return result
 
-def get_answers_lst_from_results(result):
-    # this will return the answers list and it's relative indicies
-    all_q_indices = [d['questions_index'] for v in result.values() for d in v]
-    all_answers = [d['answers(edges[i])'] for v in result.values() for d in v]
+# def get_answers_lst_from_results(result):
+#     # this will return the answers list and it's relative indicies
+#     all_q_indices = [d['questions_index'] for v in result.values() for d in v]
+#     all_answers = [d['answers(edges[i])'] for v in result.values() for d in v]
 
-    return all_answers,all_q_indices
+#     return all_answers,all_q_indices
 
 
 
-def get_all_facts(top_m_results,codebook_main):
+# def get_all_facts(top_m_results,codebook_main):
 
-    # print('top_m_results',top_m_results)
+#     # print('top_m_results',top_m_results)
 
-    all_facts = []
+#     all_facts = []
 
-    question_comb = []
-    result_index_dict = {}
+#     question_comb = []
+#     result_index_dict = {}
                                  
-    for qid, matches in top_m_results.items():    
-        for m in matches:
-            q_idx = m["questions_index"]
-            q_jdx = m["question_index"]
-            comb = [q_idx,q_jdx]
-            if comb not in question_comb and m['score']>0.5:
-                question_comb.append(comb)
-                if q_idx not in result_index_dict.keys():
-                    result_index_dict[q_idx] = [q_jdx]
-                else:
-                    result_index_dict[q_idx].append(q_jdx)
+#     for qid, matches in top_m_results.items():    
+#         for m in matches:
+#             q_idx = m["questions_index"]
+#             q_jdx = m["question_index"]
+#             comb = [q_idx,q_jdx]
+#             if comb not in question_comb and m['score']>0.5:
+#                 question_comb.append(comb)
+#                 if q_idx not in result_index_dict.keys():
+#                     result_index_dict[q_idx] = [q_jdx]
+#                 else:
+#                     result_index_dict[q_idx].append(q_jdx)
 
-    print('result_index_dict',result_index_dict)
+#     print('result_index_dict',result_index_dict)
 
-    for q_idx, q_jdx_lst in result_index_dict.items():
-        chunks = []
+#     for q_idx, q_jdx_lst in result_index_dict.items():
+#         chunks = []
 
-        for q_jdx in q_jdx_lst:
-            chunks.append(codebook_main['facts_lst'][q_idx][q_jdx])
+#         for q_jdx in q_jdx_lst:
+#             chunks.append(codebook_main['facts_lst'][q_idx][q_jdx])
 
-        all_facts.append(chunks)
+#         all_facts.append(chunks)
             
 
-    return all_facts
+#     return all_facts
 
 
 
@@ -4089,43 +4089,6 @@ class ExactGraphRag_rl:
                             map_idx.append([gi, fj])  # ← 用列表
         return flat, map_idx
 
-    def retrieve(self,q_json):
-
-        self.meta_codebook = merging_codebook(self.meta_codebook,q_json,'questions',self.word_emb,True)
-        # take the last one 
-
-        questions_edges_index = self.meta_codebook['questions_lst'][-1]
-
-        # due to almost empty prev answer database, give adapted m
-        adapted_m = min(max(1,int(0.1*len(self.meta_codebook['answers_lst']))),self.top_m)
-
-        top_m_results = coarse_filter(
-                        questions_edges_index,
-                        self.meta_codebook,
-                        self.sentence_emb,                 # ← move before defaults
-                        self.top_k,                             # word-embedding candidates
-                        self.question_batch_size,               # query batch size
-                        self.questions_db_batch_size,           # DB batch size
-                        adapted_m,                             # sentence-embedding rerank
-                        self.custom_linearizer)
-        
-        result = add_answers_to_filtered_lst(top_m_results,self.meta_codebook)
-
-        all_answers,all_q_indices = get_answers_lst_from_results(result)
-        
-
-        flat_facts, facts_map = self._flatten_facts(self.meta_codebook)  
-
-        all_facts = []
-        all_f_indices = []   
-
-        for q_edges in questions_edges_index:
-            ranked = self._rank_facts_for_query(q_edges, flat_facts, self.meta_codebook, final_topm=self.top_m)
-            for fact_idx, _score in ranked:
-                all_facts.append(flat_facts[fact_idx])
-                all_f_indices.append(facts_map[fact_idx])
-
-        return all_answers, all_q_indices, all_f_indices
     
     def retrieve_new(self,q_json):
 
@@ -4148,9 +4111,7 @@ class ExactGraphRag_rl:
                         self.custom_linearizer,
                         'questions')
         
-        result = add_answers_to_filtered_lst(top_m_results,self.meta_codebook)
-
-        all_answers,all_q_indices = get_answers_lst_from_results(result)
+        all_answers,all_q_indices = get_all_results_entire_chunk(top_m_results,self.meta_codebook,'answers')
         
 
         top_m_results_for_facts = coarse_filter_advanced(
@@ -4164,22 +4125,11 @@ class ExactGraphRag_rl:
                                     self.custom_linearizer,
                                     'facts')
         
-        all_facts = get_all_facts(top_m_results_for_facts,self.meta_codebook) 
+        all_facts,_ = get_all_results(top_m_results_for_facts,self.meta_codebook) 
         print('all_facts',all_facts)
 
         return all_answers, all_q_indices, all_facts
     
-    def _gather_facts_by_indices(self, all_f_indices, codebook_main):
-        facts_lsts = []
-        facts_store = codebook_main.get('facts_lst', [])
-        for fi, fj in all_f_indices or []:
-            try:
-                facts_lsts.append(facts_store[int(fi)][int(fj)])
-            except Exception:
-                # 越界或结构不符时跳过
-                pass
-        return facts_lsts
-
 
     def find_related_knowledge(self, all_answers, all_q_indices, all_facts):
         domain_knowledge_lst = []
