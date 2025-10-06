@@ -62,7 +62,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
         temperature=0.2,
         top_p=0.9,
         use_cache=True,
-        api_key="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",  
+        api_key="",  
         # base_url="https://api.openai.com/v1",  # 可选，使用其他兼容服务
     )
 
@@ -139,7 +139,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
             sub_chunk_chars=300,
             sub_chunk_overlap=50,
             tokenizer_name="gpt-4o-mini",
-            subchunk_batch =1000
+            subchunk_batch =2000
         )
         cr._facts_preloaded = True
         cr.top_m = 5          # sentence-embedding rerank top-m
@@ -399,7 +399,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
 if __name__ == "__main__":
 
     aft_combine_sim = 0.9
-    top_m = 15
+    top_m = 30
 
     reward_func = reward_func_dpo.reward_sbert_inclusive
 
