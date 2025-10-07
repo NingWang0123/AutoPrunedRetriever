@@ -63,7 +63,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
         top_p=0.9,
         use_cache=True,
         api_key="",  
-        # base_url="https://api.openai.com/v1",  # 可选，使用其他兼容服务
+        # base_url="https://api.openai.com/v1",
     )
 
 
@@ -136,13 +136,13 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
             CORPUS_FILE,
             chunk_tokens=1200,
             overlap_tokens=100,
-            sub_chunk_chars=300,
+            sub_chunk_chars=200,
             sub_chunk_overlap=50,
             tokenizer_name="gpt-4o-mini",
-            subchunk_batch =2000
+            subchunk_batch =1000
         )
         cr._facts_preloaded = True
-        cr.top_m = 5          # sentence-embedding rerank top-m
+        # cr.top_m = 5          # sentence-embedding rerank top-m
 
         print(cr.meta_codebook)
 
@@ -399,7 +399,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
 if __name__ == "__main__":
 
     aft_combine_sim = 0.9
-    top_m = 30
+    top_m = 15
 
     reward_func = reward_func_dpo.reward_sbert_inclusive
 
@@ -412,7 +412,7 @@ if __name__ == "__main__":
 
     compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N, 
                             top_m,top_m*10,aft_combine_sim,aft_combine_sim,aft_combine_sim,0.93,
-                            Path("meta_codebook_new3.json") ,f"pref_examples_medical_exact_openai_v3.json",reward_func,
+                            Path("meta_codebook_new2.json") ,f"pref_examples_medical_exact_openai_v3.json",reward_func,
                             reward_func_mode = 'non_llm',final_json_path = f"results/compressrag_medical_data_openai_test_new_v3.json")
 
     # df.to_csv('results/result_sbertinclusive_new_embed_for_exactgraphrag.csv')
