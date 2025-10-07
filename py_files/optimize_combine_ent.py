@@ -1316,6 +1316,11 @@ def combine_ents_ann_knn(
 
     logger.info(f"Created {edges_created} union edges at threshold {config.similarity_threshold}")
 
+    # If nothing actually merged, bail early (no changes)
+    if edges_created == 0:
+        logger.info("No merges formed; returning original codebook unchanged.")
+        return codebook_main
+
     # Build clusters
     clusters = uf.get_clusters()
 
