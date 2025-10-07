@@ -3803,10 +3803,10 @@ class ExactGraphRag_rl:
 
     def set_include_facts(self):
         if self.facts_choice == "not_include":
-            self.include_answers = False
+            self.include_facts = False
 
         else:
-            self.include_answers = True
+            self.include_facts = True
             if self.facts_choice == "overlap":
                 self.facts_extract_function =  partial(get_unique_or_overlap_by_sentence_embedded,sim_threshold=self.semantic_overlap_sim)
             elif self.facts_choice == "unique":
