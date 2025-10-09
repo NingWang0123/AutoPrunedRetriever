@@ -172,75 +172,80 @@ async def compute_answer_correctness(
     return float(np.average([factuality_score, similarity_score], weights=weights))
 
 async def generate_statements(
-    llm: BaseLanguageModel, question: str, answer:str, callbacks: Callbacks
+    llm: BaseLanguageModel, question: str, answer: str, callbacks: Callbacks,
+    max_retry: int = 3, attempt: int = 0
 ) -> List[str]:
-    """Generate concise factual statements from text"""
-    print(f"\n[STATEMENT_GEN] Input text: {answer[:100]}...")
+    """Generate concise factual statements from text, with recursive retry"""
+    print(f"\n🔄 [STATEMENT_GEN] Input text: {answer[:100]}...")
     handler = JSONHandler()
     prompt = STATEMENT_GENERATOR_PROMPT.format(question=question, answer=answer)
     response = await llm.ainvoke(prompt, config={"callbacks": callbacks})
-    print(f"[STATEMENT_GEN] LLM raw output: {response.content[:200]}...")
-    max_retry = 3
-    for attempt in range(max_retry):
-        try:
-            statements = await handler.parse_with_fallbacks(response.content)
-            print(f"[STATEMENT_GEN] Parse succeeded, got {len(statements)} statements: {statements[:2]}...")
-            return statements
-        except Exception as e:
-            print(f"[STATEMENT_GEN] Parse failed (attempt {attempt+1}): {e}")
-            print(f"[STATEMENT_GEN] Raw content: {response.content}")
-    print(f"[STATEMENT_GEN] All {max_retry} attempts failed to parse, fallback to empty list")
-    return []
-
+    print(f"📤 [STATEMENT_GEN] LLM raw output: {response.content[:200]}...")
+    try:
+        statements = await handler.parse_with_fallbacks(response.content)
+        print(f"✅ [STATEMENT_GEN] Parse succeeded, got {len(statements)} statements: {statements[:2]}...")
+        return statements
+    except Exception as e:
+        print(f"❌ [STATEMENT_GEN] Parse failed (attempt {attempt+1}): {e}")
+        print(f"❌ [STATEMENT_GEN] Raw content: {response.content}")
+        if attempt + 1 < max_retry:
+            return await generate_statements(
+                llm, question, answer, callbacks, max_retry, attempt + 1
+            )
+        print(f"❌ [STATEMENT_GEN] All {max_retry} attempts failed to parse, fallback to empty list")
+        return []
+    
 async def calculate_factuality(
     llm: BaseLanguageModel,
     question: str,
     answer_stmts: List[str],
     gt_stmts: List[str],
     callbacks: Callbacks,
-    beta: float
+    beta: float,
+    max_retry: int = 3,
+    attempt: int = 0
 ) -> float:
-    """Classify statements and calculate factuality F-beta score"""
-    print(f"\n[FACTUALITY] Start classification scoring...")
-    print(f"[FACTUALITY] Answer statements ({len(answer_stmts)}): {answer_stmts[:2]}...")
-    print(f"[FACTUALITY] Ground Truth statements ({len(gt_stmts)}): {gt_stmts[:2]}...")
+    """Classify statements and calculate factuality F-beta score, with recursive retry"""
+    print(f"\n🔄 [FACTUALITY] Start classification scoring (attempt {attempt+1})...")
+    print(f"📊 [FACTUALITY] Answer statements ({len(answer_stmts)}): {answer_stmts[:2]}...")
+    print(f"📊 [FACTUALITY] Ground Truth statements ({len(gt_stmts)}): {gt_stmts[:2]}...")
     
     if not answer_stmts and not gt_stmts:
-        print(f"[FACTUALITY] Both lists are empty, return perfect score 1.0")
+        print(f"✅ [FACTUALITY] Both lists are empty, return perfect score 1.0")
         return 1.0  # Perfect score if both empty
 
-    # Prepare examples for prompt
     examples = "\n".join(
         f"Input: {json.dumps(ex['input'])}\nOutput: {json.dumps(ex['output'])}"
         for ex in CORRECTNESS_EXAMPLES
     )
 
-    # Generate classification
     prompt = CORRECTNESS_PROMPT_TEMPLATE.format(
         examples=examples,
         question=question,
         answer=json.dumps(answer_stmts),
         ground_truth=json.dumps(gt_stmts)
     )
-    max_retry = 3
-    for attempt in range(max_retry):
-        response = await llm.ainvoke(prompt, config={"callbacks": callbacks})
-        print(f"📤 [FACTUALITY] LLM raw output: {response.content[:300]}...")
-        try:
-            classification_dict = json.loads(response.content)
-            print(f"✅ [FACTUALITY] JSON parsed successfully: TP={len(classification_dict.get('TP', []))}, FP={len(classification_dict.get('FP', []))}, FN={len(classification_dict.get('FN', []))}")
-            classification = ClassificationWithReason(**classification_dict)
-            tp = len(classification.TP)
-            fp = len(classification.FP)
-            fn = len(classification.FN)
-            score = fbeta_score(tp, fp, fn, beta)
-            print(f"📊 [FACTUALITY] Result: TP={tp}, FP={fp}, FN={fn}, F-beta={score:.4f}")
-            return score
-        except (json.JSONDecodeError, TypeError) as e:
-            print(f"❌ [FACTUALITY] JSON parse failed (attempt {attempt+1}): {e}")
-            print(f"❌ [FACTUALITY] Raw content: {response.content}")
-    print(f"❌ [FACTUALITY] All {max_retry} attempts failed to parse JSON, fallback to 0 score")
-    return 0.0  # Return minimum score on repeated failure
+    response = await llm.ainvoke(prompt, config={"callbacks": callbacks})
+    print(f"📤 [FACTUALITY] LLM raw output: {response.content[:300]}...")
+    try:
+        classification_dict = json.loads(response.content)
+        print(f"✅ [FACTUALITY] JSON parsed successfully: TP={len(classification_dict.get('TP', []))}, FP={len(classification_dict.get('FP', []))}, FN={len(classification_dict.get('FN', []))}")
+        classification = ClassificationWithReason(**classification_dict)
+        tp = len(classification.TP)
+        fp = len(classification.FP)
+        fn = len(classification.FN)
+        score = fbeta_score(tp, fp, fn, beta)
+        print(f"📊 [FACTUALITY] Result: TP={tp}, FP={fp}, FN={fn}, F-beta={score:.4f}")
+        return score
+    except (json.JSONDecodeError, TypeError) as e:
+        print(f"❌ [FACTUALITY] JSON parse failed (attempt {attempt+1}): {e}")
+        print(f"❌ [FACTUALITY] Raw content: {response.content}")
+        if attempt + 1 < max_retry:
+            return await calculate_factuality(
+                llm, question, answer_stmts, gt_stmts, callbacks, beta, max_retry, attempt + 1
+            )
+        print(f"❌ [FACTUALITY] All {max_retry} attempts failed to parse JSON, fallback to 0 score")
+        return 0.0  # Return minimum score on repeated failure
 
 async def calculate_semantic_similarity(
     embeddings: Embeddings, answer: str, ground_truth: str
