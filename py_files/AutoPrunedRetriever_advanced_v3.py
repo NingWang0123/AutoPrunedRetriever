@@ -4540,7 +4540,7 @@ class ExactGraphRag_rl:
 
         if len(self.meta_codebook['answers_lst'])>0:
 
-            top_m_results = coarse_filter_advanced(
+            top_m_results = coarse_filter_optimized(
                             questions_edges_index,
                             self.meta_codebook,
                             self.sentence_emb,                 # ← move before defaults
@@ -4558,7 +4558,7 @@ class ExactGraphRag_rl:
             all_q_indices = []
         
 
-        top_m_results_for_facts = coarse_filter_advanced(
+        top_m_results_for_facts = coarse_filter_optimized(
                                     questions_edges_index,
                                     self.meta_codebook,
                                     self.sentence_emb,                 # ← move before defaults
