@@ -1836,100 +1836,475 @@ def _score_query_vs_chunk_with_bonus(
 
 
 
-# edit this 
-# instead of getting embeddings one by one, this could get the overall score for the selected chunk edges
-def _score_query_vs_chunk_with_bonus_optimized(
-    questions: List[List[int]],
-    coarse_topk: Dict[int, List[Dict[str, Any]]],
-    chunk_selected: tuple(int,int,str),
-    q_edges_embeddings_lst_dict, 
-    questions_embeddings, # the embeddings for the questions
+# # edit this 
+# # instead of getting embeddings one by one, this could get the overall score for the selected chunk edges
+# def _score_query_vs_chunk_with_bonus_optimized(
+#     questions: List[List[int]],
+#     coarse_topk: Dict[int, List[Dict[str, Any]]],
+#     chunk_selected: tuple(int,int,str),
+#     q_edges_embeddings_lst_dict, 
+#     questions_embeddings, # the embeddings for the questions
+#     codebook_main: Dict[str, Any],
+#     emb,
+#     top_t: int = 3,
+#     cov_tau: float = 0.45, cov_weight: float = 0.10,
+#     pair_tau: float = 0.55, pair_temp: float = 0.10, pair_weight: float = 0.20, pair_norm: str = "sqrt",
+#     distinct_weight: float = 0.10, distinct_tau: float = 0.50,
+#     whole_weight: float = 0.10,            # small; tune 0.05–0.15
+#     whole_gate_tau: float = 0.55,          # gate threshold
+#     whole_gate_temp: float = 0.15,         # gate sharpness
+#     whole_len_norm: str = "sqrt_nc"        # {"none","sqrt_nc","log_nc"}
+# ) -> float:
+    
+
+#     # get all the selected q_edges that pick chunk_selected in their top k
+#     q_edges_lst = []
+    
+#     for i, q_edges in enumerate(questions):
+#         cand = coarse_topk.get(i, [])
+#         for item in cand:
+#             qi = int(item["questions_index"])
+#             qj = int(item["question_index"])
+#             src = item.get("db_source", "questions")
+#             key = (qi, qj,src)
+
+#             if key == chunk_selected:
+#                 q_edges_lst.append(i)
+
+
+#     if src == "questions":
+#         groups = codebook_main["questions_lst"]
+
+#     elif src == 'answers':
+#         groups = codebook_main["answers_lst"]
+
+#     else:
+#         groups = codebook_main["facts_lst"]
+
+
+#     # get the selected chunk_edges
+#     chunk_edges = groups[chunk_selected[0]][chunk_selected[1]]
+
+#     c_triples = _triples_words(chunk_edges, codebook_main)
+
+#     # fall back for no generation
+#     if not c_triples:
+#         return 0.0
+
+#     # per-triple lines for embeddings
+#     c_lines = [f"{h} {r} {t}" for h, r, t in c_triples]
+
+#     Q_lst = [q_edges_embeddings_lst_dict[i] for i in q_edges_lst]
+
+#     C = _embed_lines(c_lines, emb)   # (nc,d)
+
+#     S_lst = [_cosine_sim_matrix(Q, C) for Q in Q_lst]
+
+#     score = 0
+
+#     def get_score(S):
+#         nq, nc = S.shape
+
+#         # base: adaptive top-t mean over ALL pairs
+#         t_pairs = max(1, min(top_t, nq * nc))
+#         flat = S.ravel()
+#         idx = np.argpartition(flat, -t_pairs)[-t_pairs:]
+#         rel = float(flat[idx].mean())
+
+#         # coverage: fraction of query triples with a good match
+#         best_per_q = S.max(axis=1)
+#         coverage = float((best_per_q >= cov_tau).mean())
+
+#         # many-to-many good-pairs bonus (soft count + diminishing returns)
+#         soft_hits = 1.0 / (1.0 + np.exp(-(S - pair_tau) / max(1e-6, pair_temp)))
+#         good_pairs_soft = float(soft_hits.sum())
+#         if pair_norm == "sqrt":
+#             norm = np.sqrt(nq * nc) + 1e-12
+#         elif pair_norm == "log":
+#             norm = np.log1p(nq * nc) + 1e-12
+#         else:
+#             norm = 1.0
+#         good_pairs_bonus = np.log1p(good_pairs_soft / norm)
+
+#         # distinct (one-to-one) greedy bonus
+#         distinct_bonus = 0.0
+#         if distinct_weight > 0.0:
+#             S_work = S.copy()
+#             taken = 0
+#             for _ in range(min(nq, nc)):
+#                 r, c = divmod(int(S_work.argmax()), S_work.shape[1])
+#                 val = S_work[r, c]
+#                 if val < distinct_tau:
+#                     break
+#                 distinct_bonus += float(val)
+#                 S_work[r, :] = -np.inf
+#                 S_work[:, c] = -np.inf
+#                 taken += 1
+#             if taken > 0:
+#                 distinct_bonus /= np.sqrt(taken)
+
+#         score = (
+#             rel
+#             + cov_weight * coverage
+#             + pair_weight * good_pairs_bonus
+#             + distinct_weight * distinct_bonus
+#         )
+
+#         return score
+    
+#     for S in S_lst:
+#         score+=get_score(S)
+
+
+#     if questions_embeddings:
+#         nq, nc = S[0].shape
+#         c_text = ",".join([f"[H]{h} [R]{r} [T]{t}" for h, r, t in c_triples])
+#         C_full = _embed_lines(c_text, emb) 
+#         vq = _l2norm_rows(questions_embeddings)
+#         vc = _l2norm_rows(C_full)
+#         s_whole = float(vq @ vc.T)  # cosine in [-1,1] (typically [0,1])
+#         # Length normalization to avoid "long text wins"
+#         if whole_len_norm == "sqrt_nc":
+#             len_factor = np.sqrt(nc) + 1e-12
+#         elif whole_len_norm == "log_nc":
+#             len_factor = np.log1p(nc) + 1e-12
+#         else:
+#             len_factor = 1.0
+#         s_whole_adj = s_whole / len_factor
+
+#         # Soft gate so the term contributes only when the whole-text match is decent
+#         whole_gate = 1.0 / (1.0 + np.exp(-(s_whole - whole_gate_tau) / max(1e-6, whole_gate_temp)))
+#         whole_bonus = whole_weight * (whole_gate * s_whole_adj)
+#         score+whole_bonus
+
+#     # optional: damp very long chunks
+#     # score /= (np.sqrt(nc) + 1e-12)
+#     return float(score)
+
+
+# def rerank_with_sentence_embeddings_score_with_coverage_optimized(
+#     questions: List[List[int]],
+#     codebook_main: Dict[str, Any],
+#     coarse_topk: Dict[int, List[Dict[str, Any]]],
+#     emb,                             # HuggingFaceEmbeddings (or compatible)
+#     top_m: int = 1,
+#     custom_linearizer: Optional[Callable[[List[List[str]]], str]] = None,
+#     use_attention:bool=True) -> Dict[int, List[Dict[str, Any]]]:
+
+
+#     questions_embeddings = None
+
+#     flattened_q = [x for sublist in questions for x in sublist]
+#     if len(flattened_q)>1:
+#         all_q_triples = _triples_words(flattened_q, codebook_main)
+#         full_q_text = " || ".join([f"[H]{h} [R]{r} [T]{t}" for h, r, t in all_q_triples])
+#         questions_embeddings = _embed_lines(full_q_text, emb)   # shape (2, d)
+
+#     results: Dict[int, List[Dict[str, Any]]] = {}
+
+
+#     all_scored = {
+#                 "score": [],                 # higher = better
+#                 "questions_index": [],
+#                 "question_index": [],              
+#                 "db_source": [],
+#                 'index_combo':[],
+#                 # 'text':[]
+#                 }
+    
+
+#     q_edges_embeddings_lst_dict = {}
+#     q_edge_attention = {}
+#     q_edge_attention_raw = {}         # per-question flat sims (1 per triple)
+#     q_edge_attention_weights = {}     # per-question nested per-edge weights (list of dicts)
+#     q_edge_attention_index = {}       # optional: flat-to-edge mapping metadata
+
+#     # store all the q_edges embeddings
+#     if questions_embeddings and use_attention:
+#         vq = _l2norm_rows(questions_embeddings)
+
+#     for i, q_edges in enumerate(questions):
+#         q_triples = _triples_words(q_edges, codebook_main)
+#         q_lines = [f"{h} {r} {t}" for h, r, t in q_triples]
+#         Q = _embed_lines(q_lines, emb)   
+#         q_edges_embeddings_lst_dict[i] = Q
+
+#         if questions_embeddings and use_attention:
+#             for q_sub in Q:
+#                 vq_sub = _l2norm_rows(q_sub)
+#                 s_sub = float(vq @ vq_sub.T)
+
+#                 if i in q_edge_attention.keys():
+#                     q_edge_attention[i].append(s_sub)
+#                 else:
+#                     q_edge_attention[i] = [s_sub]
+
+#         # --- Attention (triple-level) vs whole-question embedding ---
+#         if vq is not None and use_attention:
+#             vqi = vq[i:i+1, :]                # (1, d)
+#             VQ_sub = _l2norm_rows(Q)          # (total_triples_i, d)
+#             sims = (VQ_sub @ vqi.T).ravel().astype(np.float32)   # (total_triples_i,)
+#             q_edge_attention_raw[i] = sims.tolist()
+
+#             # Global softmax over all triples for this question
+#             s = sims - sims.max()
+#             exp_s = np.exp(s, dtype=np.float64)
+#             w_global = (exp_s / (exp_s.sum() + 1e-12)).astype(np.float32)  # (total_triples_i,)
+#         else:
+#             # No attention → uniform per triple
+#             sims = np.zeros((Q.shape[0],), dtype=np.float32)
+#             q_edge_attention_raw[i] = sims.tolist()
+#             w_global = np.full(Q.shape[0], 1.0 / Q.shape[0], dtype=np.float32)
+
+#         # # --- Package weights back per edge and per triple ---
+#         # nested = []
+#         # for (edge_idx, s0, s1, triples_e) in edge_slices:
+#         #     if s1 > s0:
+#         #         weights_e = w_global[s0:s1]
+#         #         # Optional: also provide per-edge-normalized weights if you prefer local softmax
+#         #         # ws = weights_e - weights_e.max()
+#         #         # w_edge = np.exp(ws) / (np.exp(ws).sum() + 1e-12)
+#         #         nested.append({
+#         #             "edge_index": edge_idx,
+#         #             "triples": triples_e,                     # [(h,r,t), ...]
+#         #             "weights_global": weights_e.tolist(),     # aligns 1-1 with triples_e
+#         #             # "weights_edge": w_edge.tolist(),        # uncomment if you want per-edge normalization
+#         #             "slice": [int(s0), int(s1)]               # back-reference into the flat arrays
+#         #         })
+#         #     else:
+#         #         nested.append({
+#         #             "edge_index": edge_idx,
+#         #             "triples": [],
+#         #             "weights_global": [],
+#         #             "slice": [int(s0), int(s1)]
+#         #         })
+
+#         # q_edge_attention_weights[i] = nested
+#         # q_edge_attention_index[i] = {
+#         #     "weights_global": w_global.tolist(),
+#         #     "edge_slices": [
+#         #         {"edge_index": idx, "start": int(s0), "end": int(s1)}
+#         #         for (idx, s0, s1, _) in edge_slices
+#         #     ]
+#         # }
+
+
+#         cand = coarse_topk.get(i, [])
+#         if not cand:
+#             results[i] = []
+#             continue
+
+#         seen = set()
+#         scored = []
+
+#         for item in cand:
+#             qi = int(item["questions_index"])
+#             qj = int(item["question_index"])
+#             src = item.get("db_source", "questions")
+#             key = (qi, qj, src)
+#             if key in seen:
+#                 continue
+#             seen.add(key)
+
+
+#         # getting the attention factor 
+#         q_attention_factor = []
+#         if q_edge_attention:
+#             print(1)
+
+
+
+
+#         for chunk_selected in seen:
+#             # need add attention in this func
+#             score = _score_query_vs_chunk_with_bonus_optimized(
+#                     questions,
+#                     coarse_topk,
+#                     chunk_selected,
+#                     q_edges_embeddings_lst_dict, 
+#                     questions_embeddings, # the embeddings for the questions
+#                     codebook_main,
+#                     emb)
+            
+#             qi, qj, src = chunk_selected
+            
+#             all_scored['score'].append(score)
+#             all_scored['questions_index'].append(qi)
+#             all_scored['question_index'].append(qj)
+#             all_scored['db_source'].append(src)
+#             all_scored['index_combo'].append([qi, qj])
+
+#     m = min(top_m, len(all_scored["score"]))
+
+#     # print('all_scored',all_scored)
+
+#     combined = list(zip(
+#         all_scored["score"],
+#         all_scored["questions_index"],
+#         all_scored["question_index"],
+#         all_scored["db_source"],
+#         all_scored["index_combo"]
+#     ))
+
+#     # Sort by score (descending)
+#     combined.sort(key=lambda x: x[0], reverse=True)
+
+#     # Take top-m
+#     top_m_scored = combined[:m]
+
+#     # Unzip back
+#     (
+#         all_scored["score"],
+#         all_scored["questions_index"],
+#         all_scored["question_index"],
+#         all_scored["db_source"],
+#         all_scored["index_combo"],
+#     ) = map(list, zip(*top_m_scored))
+
+
+
+#     return all_scored
+
+def _build_whole_question_embeddings(
+    questions: List[List[List[int]]],  # each question is a list of q_edges; each q_edge is edge_run list[int]
     codebook_main: Dict[str, Any],
     emb,
+    sep: str = " <SEP> "
+) -> np.ndarray:
+    """One (normalized) embedding per question: (num_questions, d)."""
+    rows = []
+    d = None
+    for q_edges in questions:
+        q_triples = _triples_words(q_edges, codebook_main)  # [(h,r,t),...]
+        if not q_triples:
+            # placeholder; patched to correct dim after we see first real vec
+            rows.append(np.zeros((1, 1), dtype=np.float32))
+            continue
+        full_q_text = sep.join([f"[H]{h} [R]{r} [T]{t}" for h, r, t in q_triples])
+        v = _embed_lines([full_q_text], emb)  # (1,d)
+        d = v.shape[1] if d is None else d
+        rows.append(v)
+
+    if d is None:
+        # no questions at all; return (0, 0)
+        return np.zeros((0, 0), dtype=np.float32)
+
+    # fix placeholders to correct width
+    rows = [r if r.shape[1] == d else np.zeros((1, d), dtype=np.float32) for r in rows]
+    V = np.vstack(rows).astype(np.float32)  # (N,d)
+    return _l2norm_rows(V)
+
+
+def _score_query_vs_chunk_with_bonus_optimized(
+    questions: List[List[List[int]]],
+    coarse_topk: Dict[int, List[Dict[str, Any]]],
+    chunk_selected: Tuple[int, int, str],
+    q_edges_embeddings_lst_dict: Dict[int, np.ndarray],
+    questions_embeddings: Optional[np.ndarray],
+    codebook_main: Dict[str, Any],
+    emb,
+    # NEW: per-question attention over triples (aligned with rows of Q)
+    q_triple_attention: Optional[Dict[int, np.ndarray]] = None,
     top_t: int = 3,
     cov_tau: float = 0.45, cov_weight: float = 0.10,
     pair_tau: float = 0.55, pair_temp: float = 0.10, pair_weight: float = 0.20, pair_norm: str = "sqrt",
     distinct_weight: float = 0.10, distinct_tau: float = 0.50,
-    whole_weight: float = 0.10,            # small; tune 0.05–0.15
-    whole_gate_tau: float = 0.55,          # gate threshold
-    whole_gate_temp: float = 0.15,         # gate sharpness
-    whole_len_norm: str = "sqrt_nc"        # {"none","sqrt_nc","log_nc"}
+    whole_weight: float = 0.10,
+    whole_gate_tau: float = 0.55,
+    whole_gate_temp: float = 0.15,
+    whole_len_norm: str = "sqrt_nc"
 ) -> float:
-    
-
-    # get all the selected q_edges that pick chunk_selected in their top k
-    q_edges_lst = []
-    
-    for i, q_edges in enumerate(questions):
-        cand = coarse_topk.get(i, [])
-        for item in cand:
-            qi = int(item["questions_index"])
-            qj = int(item["question_index"])
-            src = item.get("db_source", "questions")
-            key = (qi, qj,src)
-
+    sel_qi, sel_qj, sel_src = chunk_selected
+    q_edges_lst: List[int] = []
+    for i, _q_edges in enumerate(questions):
+        for item in coarse_topk.get(i, []):
+            key = (int(item["questions_index"]), int(item["question_index"]), item.get("db_source", "questions"))
             if key == chunk_selected:
                 q_edges_lst.append(i)
+                break
+    if not q_edges_lst:
+        return 0.0
 
-
-    if src == "questions":
+    # resolve chunk
+    if sel_src == "questions":
         groups = codebook_main["questions_lst"]
-
-    elif src == 'answers':
+    elif sel_src == "answers":
         groups = codebook_main["answers_lst"]
-
     else:
         groups = codebook_main["facts_lst"]
-
-
-    # get the selected chunk_edges
-    chunk_edges = groups[chunk_selected[0]][chunk_selected[1]]
-
+    chunk_edges = groups[sel_qi][sel_qj]
     c_triples = _triples_words(chunk_edges, codebook_main)
-
-    # fall back for no generation
     if not c_triples:
         return 0.0
 
-    # per-triple lines for embeddings
     c_lines = [f"{h} {r} {t}" for h, r, t in c_triples]
+    C = _embed_lines(c_lines, emb)  # (nc, d)
 
-    Q_lst = [q_edges_embeddings_lst_dict[i] for i in q_edges_lst]
+    S_list = []
+    A_list = []  # attention vectors aligned to S rows
+    for i in q_edges_lst:
+        Q = np.asarray(q_edges_embeddings_lst_dict.get(i, np.zeros((0, C.shape[1]), dtype=np.float32)), dtype=np.float32)
+        if Q.size == 0:
+            continue
+        S = _cosine_sim_matrix(Q, C)  # (nq_i, nc)
+        S_list.append(S)
 
-    C = _embed_lines(c_lines, emb)   # (nc,d)
+        if q_triple_attention is not None and i in q_triple_attention:
+            a = np.asarray(q_triple_attention[i], dtype=np.float32).ravel()
+            # safety: trim/extend to nq_i
+            if a.size != S.shape[0]:
+                if a.size > S.shape[0]:
+                    a = a[:S.shape[0]]
+                else:
+                    pad = np.full((S.shape[0] - a.size,), 1.0 / S.shape[0], dtype=np.float32)
+                    a = np.concatenate([a, pad], axis=0)
+        else:
+            a = np.full((S.shape[0],), 1.0 / max(1, S.shape[0]), dtype=np.float32)
+        # normalize attention to sum=1 over triples to keep scales sane
+        a = a / (a.sum() + 1e-12)
+        A_list.append(a)
 
-    S_lst = [_cosine_sim_matrix(Q, C) for Q in Q_lst]
+    if not S_list:
+        return 0.0
 
-    score = 0
-
-    def get_score(S):
+    def score_from_S(S: np.ndarray, a: np.ndarray) -> float:
+        """
+        Apply attention as row-weights:
+          - S_attn = a[:, None] * S (each row downweighted/upweighted)
+          - Coverage becomes attention-weighted fraction of rows that pass threshold
+        """
         nq, nc = S.shape
+        if nq == 0 or nc == 0:
+            return 0.0
 
-        # base: adaptive top-t mean over ALL pairs
+        S_attn = (a[:, None] * S).astype(np.float32)
+
+        # (a) adaptive top-t over ALL pairs (weighted matrix)
         t_pairs = max(1, min(top_t, nq * nc))
-        flat = S.ravel()
+        flat = S_attn.ravel()
         idx = np.argpartition(flat, -t_pairs)[-t_pairs:]
         rel = float(flat[idx].mean())
 
-        # coverage: fraction of query triples with a good match
-        best_per_q = S.max(axis=1)
-        coverage = float((best_per_q >= cov_tau).mean())
+        # (b) attention-weighted coverage over rows
+        best_per_q = S.max(axis=1)  # thresholding should consider true similarity
+        covered = (best_per_q >= cov_tau).astype(np.float32)
+        coverage = float((covered * a).sum())  # already normalized since sum(a)=1
 
-        # many-to-many good-pairs bonus (soft count + diminishing returns)
-        soft_hits = 1.0 / (1.0 + np.exp(-(S - pair_tau) / max(1e-6, pair_temp)))
+        # (c) many-to-many bonus on weighted matrix
+        soft_hits = 1.0 / (1.0 + np.exp(-(S_attn - pair_tau) / max(1e-6, pair_temp)))
         good_pairs_soft = float(soft_hits.sum())
         if pair_norm == "sqrt":
-            norm = np.sqrt(nq * nc) + 1e-12
+            norm = np.sqrt(max(1, nq * nc))
         elif pair_norm == "log":
-            norm = np.log1p(nq * nc) + 1e-12
+            norm = np.log1p(max(1, nq * nc))
         else:
             norm = 1.0
-        good_pairs_bonus = np.log1p(good_pairs_soft / norm)
+        good_pairs_bonus = np.log1p(good_pairs_soft / (norm + 1e-12))
 
-        # distinct (one-to-one) greedy bonus
+        # (d) distinct one-to-one greedy on weighted matrix
         distinct_bonus = 0.0
         if distinct_weight > 0.0:
-            S_work = S.copy()
+            S_work = S_attn.copy()
             taken = 0
             for _ in range(min(nq, nc)):
                 r, c = divmod(int(S_work.argmax()), S_work.shape[1])
@@ -1943,151 +2318,128 @@ def _score_query_vs_chunk_with_bonus_optimized(
             if taken > 0:
                 distinct_bonus /= np.sqrt(taken)
 
-        score = (
+        return (
             rel
             + cov_weight * coverage
             + pair_weight * good_pairs_bonus
             + distinct_weight * distinct_bonus
         )
 
-        return score
-    
-    for S in S_lst:
-        score+=get_score(S)
+    score = sum(score_from_S(S, a) for S, a in zip(S_list, A_list))
 
-
-    if questions_embeddings:
-        nq, nc = S[0].shape
-        c_text = ",".join([f"[H]{h} [R]{r} [T]{t}" for h, r, t in c_triples])
-        C_full = _embed_lines(c_text, emb) 
-        vq = _l2norm_rows(questions_embeddings)
+    # whole-question vs whole-chunk bonus (unchanged; averaged over voter questions)
+    if questions_embeddings is not None and whole_weight > 0.0:
+        c_text = " <SEP> ".join([f"[H]{h} [R]{r} [T]{t}" for h, r, t in c_triples])
+        C_full = _embed_lines([c_text], emb)  # (1,d)
         vc = _l2norm_rows(C_full)
-        s_whole = float(vq @ vc.T)  # cosine in [-1,1] (typically [0,1])
-        # Length normalization to avoid "long text wins"
-        if whole_len_norm == "sqrt_nc":
-            len_factor = np.sqrt(nc) + 1e-12
-        elif whole_len_norm == "log_nc":
-            len_factor = np.log1p(nc) + 1e-12
-        else:
-            len_factor = 1.0
-        s_whole_adj = s_whole / len_factor
+        vq_all = _l2norm_rows(questions_embeddings)
+        sims = []
+        for i in q_edges_lst:
+            vqi = vq_all[i:i+1, :]
+            sims.append(float(vqi @ vc.T))
+        if sims:
+            s_whole = float(np.mean(sims))
+            nc = len(c_triples)
+            if whole_len_norm == "sqrt_nc":
+                len_factor = np.sqrt(nc) + 1e-12
+            elif whole_len_norm == "log_nc":
+                len_factor = np.log1p(nc) + 1e-12
+            else:
+                len_factor = 1.0
+            s_whole_adj = s_whole / len_factor
+            whole_gate = 1.0 / (1.0 + np.exp(-(s_whole - whole_gate_tau) / max(1e-6, whole_gate_temp)))
+            score += whole_weight * (whole_gate * s_whole_adj)
 
-        # Soft gate so the term contributes only when the whole-text match is decent
-        whole_gate = 1.0 / (1.0 + np.exp(-(s_whole - whole_gate_tau) / max(1e-6, whole_gate_temp)))
-        whole_bonus = whole_weight * (whole_gate * s_whole_adj)
-        score+whole_bonus
-
-    # optional: damp very long chunks
-    # score /= (np.sqrt(nc) + 1e-12)
     return float(score)
 
-
 def rerank_with_sentence_embeddings_score_with_coverage_optimized(
-    questions: List[List[int]],
+    questions: List[List[List[int]]],
     codebook_main: Dict[str, Any],
     coarse_topk: Dict[int, List[Dict[str, Any]]],
-    emb,                             # HuggingFaceEmbeddings (or compatible)
+    emb,
     top_m: int = 1,
-    custom_linearizer: Optional[Callable[[List[List[str]]], str]] = None) -> Dict[int, List[Dict[str, Any]]]:
+    custom_linearizer: Optional[Callable[[List[List[str]]], str]] = None,
+    use_attention: bool = True
+) -> Dict[int, List[Dict[str, Any]]]:
 
+    questions_embeddings = _build_whole_question_embeddings(questions, codebook_main, emb)  # (N,d), L2-normalized
 
-    questions_embeddings = None
-
-    flattened_q = [x for sublist in questions for x in sublist]
-    if len(flattened_q)>1:
-        all_q_triples = _triples_words(flattened_q, codebook_main)
-        full_q_text = " || ".join([f"[H]{h} [R]{r} [T]{t}" for h, r, t in all_q_triples])
-        questions_embeddings = _embed_lines(full_q_text, emb)   # shape (2, d)
-
-    results: Dict[int, List[Dict[str, Any]]] = {}
-
-
-    all_scored = {
-                "score": [],                 # higher = better
-                "questions_index": [],
-                "question_index": [],              
-                "db_source": [],
-                'index_combo':[],
-                # 'text':[]
-                }
-    
-
-    q_edges_embeddings_lst_dict = {}
-
-    # store all the q_edges embeddings
+    # Precompute per-triple embeddings and attention per question
+    q_edges_embeddings_lst_dict: Dict[int, np.ndarray] = {}
+    q_triple_attention: Dict[int, np.ndarray] = {}
 
     for i, q_edges in enumerate(questions):
         q_triples = _triples_words(q_edges, codebook_main)
         q_lines = [f"{h} {r} {t}" for h, r, t in q_triples]
-        Q = _embed_lines(q_lines, emb)   
+        Q = _embed_lines(q_lines, emb) if q_lines else np.zeros((0, questions_embeddings.shape[1] if questions_embeddings.size else 0), dtype=np.float32)
         q_edges_embeddings_lst_dict[i] = Q
 
+        # --- attention: whole-question vs each triple ---
+        if use_attention and Q.size > 0 and questions_embeddings.size > 0:
+            vqi = questions_embeddings[i:i+1, :]              # (1,d), already L2-normalized
+            VQ = _l2norm_rows(Q)                               # (nq_i, d)
+            sims = (VQ @ vqi.T).ravel().astype(np.float32)     # (nq_i,)
+            # softmax
+            s = sims - sims.max()
+            w = np.exp(s, dtype=np.float64)
+            w = (w / (w.sum() + 1e-12)).astype(np.float32)     # sum=1
+            q_triple_attention[i] = w
+        else:
+            if Q.shape[0] > 0:
+                q_triple_attention[i] = np.full((Q.shape[0],), 1.0 / Q.shape[0], dtype=np.float32)
+            else:
+                q_triple_attention[i] = np.zeros((0,), dtype=np.float32)
+
+    # Score all unique candidates
+    all_scored = {"score": [], "questions_index": [], "question_index": [], "db_source": [], "index_combo": []}
+
+    for i, _ in enumerate(questions):
         cand = coarse_topk.get(i, [])
         if not cand:
-            results[i] = []
             continue
-
-        seen = set()
-        scored = []
-
-        for item in cand:
-            qi = int(item["questions_index"])
-            qj = int(item["question_index"])
-            src = item.get("db_source", "questions")
-            key = (qi, qj, src)
-            if key in seen:
-                continue
-            seen.add(key)
-
+        seen = set((int(x["questions_index"]), int(x["question_index"]), x.get("db_source", "questions")) for x in cand)
 
         for chunk_selected in seen:
-            score = _score_query_vs_chunk_with_bonus_optimized(
-                    questions,
-                    coarse_topk,
-                    chunk_selected,
-                    q_edges_embeddings_lst_dict, 
-                    questions_embeddings, # the embeddings for the questions
-                    codebook_main,
-                    emb)
-            
+            sc = _score_query_vs_chunk_with_bonus_optimized(
+                questions=questions,
+                coarse_topk=coarse_topk,
+                chunk_selected=chunk_selected,
+                q_edges_embeddings_lst_dict=q_edges_embeddings_lst_dict,
+                questions_embeddings=questions_embeddings,
+                codebook_main=codebook_main,
+                emb=emb,
+                q_triple_attention=q_triple_attention,  # <<< PASS ATTENTION
+            )
             qi, qj, src = chunk_selected
-            
-            all_scored['score'].append(score)
-            all_scored['questions_index'].append(qi)
-            all_scored['question_index'].append(qj)
-            all_scored['db_source'].append(src)
-            all_scored['index_combo'].append([qi, qj])
+            all_scored["score"].append(sc)
+            all_scored["questions_index"].append(qi)
+            all_scored["question_index"].append(qj)
+            all_scored["db_source"].append(src)
+            all_scored["index_combo"].append([qi, qj])
 
-    m = min(top_m, len(all_scored["score"]))
-
-    # print('all_scored',all_scored)
-
+    # global top-m
     combined = list(zip(
         all_scored["score"],
         all_scored["questions_index"],
         all_scored["question_index"],
         all_scored["db_source"],
-        all_scored["index_combo"]
-    ))
-
-    # Sort by score (descending)
-    combined.sort(key=lambda x: x[0], reverse=True)
-
-    # Take top-m
-    top_m_scored = combined[:m]
-
-    # Unzip back
-    (
-        all_scored["score"],
-        all_scored["questions_index"],
-        all_scored["question_index"],
-        all_scored["db_source"],
         all_scored["index_combo"],
-    ) = map(list, zip(*top_m_scored))
+    ))
+    combined.sort(key=lambda x: x[0], reverse=True)
+    combined = combined[: min(top_m, len(combined))]
+
+    results_by_q: Dict[int, List[Dict[str, Any]]] = {}
+    for sc, qi, qj, src, idx_combo in combined:
+        results_by_q.setdefault(qi, []).append({
+            "score": float(sc),
+            "questions_index": qi,
+            "question_index": qj,
+            "db_source": src,
+            "index_combo": idx_combo,
+        })
+    return results_by_q
 
 
-
-    return all_scored
 
 def coarse_filter_optimized(
     questions: List[List[int]],
