@@ -16,7 +16,7 @@ env["PYTHONPATH"] = str(REPO_ROOT) + os.pathsep + env.get("PYTHONPATH", "")
 env["LLM_API_KEY"] = "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"
 
 def run_eval(cmd, outfile):
-    proc = subprocess.run(cmd, env=env, capture_output=True, text=True)
+    proc = subprocess.run(cmd, env=env, text=True)
     if proc.returncode != 0:
         print("----- evaluator stdout -----\n", proc.stdout)
         print("----- evaluator stderr -----\n", proc.stderr)
