@@ -2195,7 +2195,7 @@ def _build_whole_question_embeddings(
     return _l2norm_rows(V)
 
 
-# --- scorer with attention row-weights (unchanged from last message) ---
+# --- scorer with attention row-weights---
 def _score_query_vs_chunk_with_bonus_optimized(
     questions,
     coarse_topk,
@@ -4277,6 +4277,29 @@ def slice_for_final_merged_json(final_merged_json: Dict[str, Any],use_word_forma
 
         return ere_view
       
+
+def remove_duplicate_inner_lists(lst, seen=None):
+    if seen is None:
+        seen = set()
+
+    if isinstance(lst, list) and all(isinstance(x, int) for x in lst):
+        tup = tuple(lst)
+        if tup in seen:
+            return None  # mark as duplicate
+        seen.add(tup)
+        return lst
+
+    elif isinstance(lst, list):
+        new_list = []
+        for x in lst:
+            res = remove_duplicate_inner_lists(x, seen)
+            if res is not None:
+                new_list.append(res)
+        return new_list
+
+    else:
+        return lst
+      
 # thinkings extraction choice: keep the overlap(default), not include the thinking, keep the unique thinking
 # answers extraction choice: keep the unique (default), not include the answers, keep the overlap
 # combine ents choice: not combine, combine per round, combine per 3 round
@@ -5196,6 +5219,12 @@ class ExactGraphRag_rl:
 
         self.combine_ents_func(mode=warm_start) 
 
+
+        print('remove the duplicates ...')
+        if 'facts_lst' in self.meta_codebook:
+            if len(self.meta_codebook['facts_lst'])>=2:
+                self.meta_codebook['facts_lst'] = remove_duplicate_inner_lists(self.meta_codebook['facts_lst'])
+
         # after combine ents combine others
         # combine qas if avaliable
         # if 'questions_lst' in self.meta_codebook and 'answers_lst' in self.meta_codebook:
@@ -5273,6 +5302,10 @@ class ExactGraphRag_rl:
 
         # replace the learning periodical combine ents with trapped by ram
         self.combine_ents_func(mode=warm_start) 
+
+        if 'facts_lst' in self.meta_codebook:
+            if len(self.meta_codebook['facts_lst'])>=2:
+                self.meta_codebook['facts_lst'] = remove_duplicate_inner_lists(self.meta_codebook['facts_lst'])
 
         # after combine ents combine others
         # after combine ents combine others

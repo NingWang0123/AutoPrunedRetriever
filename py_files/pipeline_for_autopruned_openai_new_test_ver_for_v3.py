@@ -403,7 +403,7 @@ if __name__ == "__main__":
 
     reward_func = reward_func_dpo.reward_sbert_inclusive
 
-    SEED_N       = 3    # change to 20 for training
+    SEED_N       = 20    # change to 20 for training
     TEST_N       = 2042     # change to 980 for rest
 
     
