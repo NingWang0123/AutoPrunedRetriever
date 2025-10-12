@@ -2,7 +2,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import re
 import json, hashlib
-from typing import List, Tuple, Dict, Optional,Iterable,Any,Callable, Set, Union,Sequence
+from typing import List, Tuple, Dict, Optional,Iterable,Any,Callable, Set, Union
 import itertools
 from collections import defaultdict
 import numpy as np
@@ -510,58 +510,6 @@ def json_dump_str(obj, indent=0):
 
 
 
-# ---------- ) Codebook ----------
-
-# def all_chains_no_subchains(edges,use_full_edges = True):
-#     """
-#     Generate all simple chains where edges[i].tail == edges[j].head for consecutive edges,
-#     then remove any chain that appears contiguously inside a longer chain (order matters).
-#     Returns a list of chains (each chain is a list of edge triples).
-#     """
-#     n = len(edges)
-#     # Build head->indices and adjacency i->list(j) if edges[i].t == edges[j].h
-#     head_to_idxs = defaultdict(list)
-#     for i, (h, _, _) in enumerate(edges):
-#         head_to_idxs[h].append(i)
-#     adj = [[] for _ in range(n)]
-#     for i, (_, _, t) in enumerate(edges):
-#         adj[i] = head_to_idxs.get(t, [])
-
-#     # DFS from every edge to enumerate all simple paths (as tuples of indices)
-#     all_paths = set()
-#     for s in range(n):
-#         stack = [(s, (s,))]
-#         while stack:
-#             cur, path = stack.pop()
-#             all_paths.add(path)
-#             for j in adj[cur]:
-#                 if j not in path:  # no edge reuse
-#                     stack.append((j, path + (j,)))
-
-#     # prune paths that are contiguous subchains of longer ones
-#     paths = list(all_paths)
-#     def is_contig_subseq(a, b):
-#         if len(a) >= len(b): return False
-#         la = len(a)
-#         for i in range(len(b)-la+1):
-#             if b[i:i+la] == a:
-#                 return True
-#         return False
-
-#     keep = []
-#     for a in paths:
-#         if not any(is_contig_subseq(a, b) for b in paths if b is not a):
-#             keep.append(a)
-
-#     # map back to triples
-#     if use_full_edges:
-#       keep_chains = [[edges[i] for i in tup] for tup in keep]
-#     else:
-#       keep_chains = [[i for i in tup] for tup in keep]
-#     # (optional) sort by length desc then lexicographically by indices for stable output
-#     keep_chains.sort(key=lambda c: (-len(c), c))
-#     return keep_chains
-
 
 def all_chains_no_subchains(edges, use_full_edges=True):
     chain = [edges]
@@ -1042,7 +990,7 @@ def remap_question_indices(questions, idx_map, max_dense_size=10_000_000):
 
 
 
-#### making the merging codebook also able to merge the answer code book
+#### making the merging codebook also able to merge the answer code book and cached edges embeddings
 def merging_codebook(codebook_main, codebook_sub, type='questions', word_emb=word_emb, use_thinkings=False):
     if type == 'fact':
         type = 'facts'
@@ -1069,6 +1017,7 @@ def merging_codebook(codebook_main, codebook_sub, type='questions', word_emb=wor
         unupdated_feat_name1 = 'questions_lst'
         unupdated_feat_name2 = 'answers_lst'
 
+    # === CASE 1: main codebook exists ===
     if codebook_main:
         codebook_main.setdefault('answers_lst', [])
         codebook_main.setdefault('thinkings_lst', [])
@@ -1082,66 +1031,78 @@ def merging_codebook(codebook_main, codebook_sub, type='questions', word_emb=wor
         edge_mat_needs_merged = codebook_sub.get('edges([e,r,e])', codebook_sub.get('edge_matrix'))
         edge_mat_main = codebook_main['edge_matrix']
 
+        # --- Update entity and relation indices ---
         new_index_replacement_for_ent_sub, index_ent_main, new_added_ents = update_the_index(codebook_main, codebook_sub, 'e')
         new_index_replacement_for_r_sub, index_r_main, new_added_rs = update_the_index(codebook_main, codebook_sub, 'r')
 
+        # --- Compute new entity/relation embeddings ---
         new_ent_embeds = get_word_embeddings(new_added_ents, word_emb)
         new_r_embeds = get_word_embeddings(new_added_rs, word_emb)
 
-        # Normalize embedding dimensions to ensure consistency
         existing_e_embeds = codebook_main.get('e_embeddings', [])
         existing_r_embeds = codebook_main.get('r_embeddings', [])
-        
-        # Get target dimensions from existing embeddings
-        e_target_dim = None
-        r_target_dim = None
-        if existing_e_embeds:
-            e_target_dim = len(np.asarray(existing_e_embeds[0]).flatten())
-        if existing_r_embeds:
-            r_target_dim = len(np.asarray(existing_r_embeds[0]).flatten())
-            
-        # Normalize new embeddings to match existing dimensions
+        existing_edge_embeds = codebook_main.get('edge_matrix_embedding', [])
+
+        # Normalize new embeddings’ dimension if needed
+        e_target_dim = len(existing_e_embeds[0]) if existing_e_embeds else None
+        r_target_dim = len(existing_r_embeds[0]) if existing_r_embeds else None
+        edge_target_dim = len(existing_edge_embeds[0]) if existing_edge_embeds else None
+
         if new_ent_embeds:
             new_ent_embeds = _normalize_embeddings_shape(new_ent_embeds, e_target_dim)
         if new_r_embeds:
             new_r_embeds = _normalize_embeddings_shape(new_r_embeds, r_target_dim)
 
+        # --- Remap edges and questions ---
         edge_mat_needs_merged_remapped = remap_edges_matrix(edge_mat_needs_merged, new_index_replacement_for_ent_sub, new_index_replacement_for_r_sub)
-
         new_index_replacement_for_edges_sub, index_edges_main = combine_updated_edges(edge_mat_main, edge_mat_needs_merged_remapped)
-
         updated_questions_sub = remap_question_indices(questions_needs_merged, new_index_replacement_for_edges_sub)
-
         lst_questions_main.append(updated_questions_sub)
 
-        ### add the knowledge graph and it's related index
+        # --- Compute embeddings ONLY for new edges ---
+        new_edges = [edge for edge in index_edges_main[len(edge_mat_main):]]
+        if new_edges:
+            edge_texts_new = [f"{codebook_main['e'][h]} {codebook_main['r'][r]} {codebook_main['e'][t]}"
+                              for h, r, t in new_edges]
+            new_edge_embeds = get_word_embeddings(edge_texts_new, word_emb)
+            if edge_target_dim:
+                new_edge_embeds = _normalize_embeddings_shape(new_edge_embeds, edge_target_dim)
+        else:
+            new_edge_embeds = []
+
+        # --- Update codebook_main with merged content ---
         codebook_main["e"].extend(new_added_ents)
         codebook_main["r"].extend(new_added_rs)
         codebook_main["edge_matrix"] = index_edges_main
         codebook_main[main_feat_name] = lst_questions_main
-        
-        # Ensure all existing embeddings are normalized too
+
+        # Update entity/relation embeddings incrementally
         if existing_e_embeds and new_ent_embeds:
-            all_e_embeds = _normalize_embeddings_shape(existing_e_embeds + new_ent_embeds)
-            codebook_main["e_embeddings"] = all_e_embeds
+            codebook_main["e_embeddings"] = existing_e_embeds + new_ent_embeds
         elif new_ent_embeds:
             codebook_main["e_embeddings"] = new_ent_embeds
-            
+
         if existing_r_embeds and new_r_embeds:
-            all_r_embeds = _normalize_embeddings_shape(existing_r_embeds + new_r_embeds)
-            codebook_main["r_embeddings"] = all_r_embeds
+            codebook_main["r_embeddings"] = existing_r_embeds + new_r_embeds
         elif new_r_embeds:
             codebook_main["r_embeddings"] = new_r_embeds
+
+        # Update edge_matrix_embedding incrementally
+        if existing_edge_embeds and new_edge_embeds:
+            codebook_main["edge_matrix_embedding"] = existing_edge_embeds + new_edge_embeds
+        elif new_edge_embeds:
+            codebook_main["edge_matrix_embedding"] = new_edge_embeds
 
         if type == 'thinkings':
             codebook_main['questions_to_thinkings'][len(codebook_main['questions_lst']) - 1] = len(codebook_main[main_feat_name]) - 1
 
+    # === CASE 2: main codebook is empty ===
     else:
-        # main codebook is empty
+        edge_matrix = codebook_sub.get('edges([e,r,e])', codebook_sub.get('edge_matrix'))
         codebook_main = {
             "e": codebook_sub['e'],
             "r": codebook_sub['r'],
-            'edge_matrix': codebook_sub.get('edges([e,r,e])', codebook_sub.get('edge_matrix')),  # ← 同样兜底
+            'edge_matrix': edge_matrix,
             main_feat_name: [codebook_sub[feat_name]],
             unupdated_feat_name1: [],
             "rule": codebook_sub['rule'],
@@ -1149,11 +1110,17 @@ def merging_codebook(codebook_main, codebook_sub, type='questions', word_emb=wor
             "r_embeddings": get_word_embeddings(codebook_sub['r'], word_emb),
         }
 
+        # Compute edge embeddings only once
+        edge_texts = [f"{codebook_main['e'][h]} {codebook_main['r'][r]} {codebook_main['e'][t]}"
+                      for h, r, t in edge_matrix]
+        codebook_main["edge_matrix_embedding"] = get_word_embeddings(edge_texts, word_emb)
+
         if use_thinkings:
             codebook_main[unupdated_feat_name2] = []
             codebook_main['questions_to_thinkings'] = {}
 
     return codebook_main
+
 
 
 
@@ -1227,260 +1194,6 @@ def decode_questions(questions, questions_source_codebook, fmt='words'):
         Each inner list is a sequence of edge indices.
     """
     return [decode_question(q, questions_source_codebook, fmt=fmt) for q in questions]
-
-
-
-def decode_subchunk(question, codebook_main, fmt='words'):
-
-    edges = codebook_main["edge_matrix"]
-
-    idxs = list(question)
-
-    def get_edge(i):
-        # works for both list and numpy array
-        return edges[i]
-
-    if fmt == 'words':
-        E, R = codebook_main["e"], codebook_main["r"]
-        decoded = [[E[h], R[r], E[t]] for (h, r, t) in (get_edge(i) for i in idxs)]
-    elif fmt == 'embeddings':
-        Ee = codebook_main.get("e_embeddings")
-        Re = codebook_main.get("r_embeddings")
-        if Ee is None or Re is None:
-            raise KeyError("e_embeddings and r_embeddings are required for fmt='embeddings'.")
-        decoded = [[Ee[h], Re[r], Ee[t]] for (h, r, t) in (get_edge(i) for i in idxs)]
-    elif fmt == 'edges':
-        decoded = [[h,r,t] for (h, r, t) in (get_edge(i) for i in idxs)]
-
-    else:
-        raise ValueError("fmt must be 'words', 'embeddings' or 'edges'.")
-
-    return decoded
-
-
-def decode_chunk(questions, questions_source_codebook, fmt='words'):
-
-    """
-    questions_source_codebook must be the codebook that contain the questions
-    Decode a list of questions using decode_question.
-    
-    questions: list of list[int]
-        Each inner list is a sequence of edge indices.
-    """
-    return [decode_subchunk(q, questions_source_codebook, fmt=fmt) for q in questions]
-
-def decode_chunk_lst(questions_lst, questions_source_codebook, fmt='words'):
-
-    """
-    questions_source_codebook must be the codebook that contain the questions
-    Decode a list of questions using decode_question.
-    
-    questions: list of list[int]
-        Each inner list is a sequence of edge indices.
-    """
-    return [decode_chunk(questions, questions_source_codebook, fmt=fmt) for questions in questions_lst]
-
-
-
-##################################### newly added graph format
-# ---------- utils ----------
-def _to_int(x): 
-    try: return int(x)
-    except Exception: return x
-
-def _l2(x: np.ndarray) -> np.ndarray:
-    n = np.linalg.norm(x) + 1e-12
-    return x / n
-
-def _cos(a: np.ndarray, b: np.ndarray) -> float:
-    return float(np.dot(_l2(a), _l2(b)))
-
-# ---------- core: subchunk -> single graph ----------
-def build_single_graph_from_subchunk(
-    subchunk: Sequence[int] | Sequence[Sequence[int]],
-    codebook: Dict[str, Any],
-    *,
-    use_edge_indices: bool = True,
-    tau_ent: float = 0.92,
-    tau_rel: Optional[float] = None,   # None to ignore relation similarity
-    directed: bool = True,
-    include_words: bool = False
-) -> Tuple[nx.Graph, Dict[str, Any]]:
-    """
-    Build ONE graph from one subchunk using:
-      Phase 1: exact-entity seeding/expansion
-      Phase 2: cosine-similarity expansion
-    Returns (G, stats).
-    """
-    edges_src = codebook["edge_matrix"]
-    e_emb = codebook["e_embeddings"]
-    r_emb = codebook.get("r_embeddings")
-    E = codebook.get("e"); R = codebook.get("r")
-
-    # materialize triples [[h,r,t], ...]
-    if use_edge_indices:
-        triples = [list(map(_to_int, edges_src[_to_int(i)])) for i in subchunk]
-    else:
-        triples = [list(map(_to_int, e)) for e in subchunk]
-
-    G = nx.DiGraph() if directed else nx.Graph()
-
-    def _add_edge(h, r, t, order):
-        if not G.has_node(h):
-            G.add_node(h, ent_idx=h, ent_emb=np.asarray(e_emb[h]))
-            if include_words and E is not None: G.nodes[h]["ent_word"] = E[h]
-        if not G.has_node(t):
-            G.add_node(t, ent_idx=t, ent_emb=np.asarray(e_emb[t]))
-            if include_words and E is not None: G.nodes[t]["ent_word"] = E[t]
-        G.add_edge(h, t, rel_idx=r, edge_order=order)
-        if r_emb is not None: 
-            G.edges[h, t]["rel_emb"] = np.asarray(r_emb[r])
-        if include_words and R is not None:
-            G.edges[h, t]["rel_word"] = R[r]
-
-    if not triples:
-        return G, {"added": 0, "skipped": 0, "phase1": 0, "phase2": 0}
-
-    # Phase 0: seed with first edge
-    _add_edge(*triples[0], order=0)
-    remaining = [(k+1, *tr) for k, tr in enumerate(triples[1:])]
-
-    # Phase 1: exact node-id match
-    phase1 = 0
-    changed = True
-    while changed:
-        changed = False
-        keep = []
-        present = set(G.nodes())
-        for order, h, r, t in remaining:
-            if h in present or t in present:
-                _add_edge(h, r, t, order); phase1 += 1; changed = True
-            else:
-                keep.append((order, h, r, t))
-        remaining = keep
-
-    # Optional relation centroid
-    rel_centroid = None
-    if tau_rel is not None and r_emb is not None and G.number_of_edges() > 0:
-        mats = [d["rel_emb"] for _, _, d in G.edges(data=True) if "rel_emb" in d]
-        if mats:
-            rel_centroid = _l2(np.mean(np.vstack(mats), axis=0))
-
-    # helper: max entity sim to any current node
-    def _max_ent_sim(idx: int) -> float:
-        v = np.asarray(e_emb[idx])
-        return max(_cos(v, data["ent_emb"]) for _, data in G.nodes(data=True))
-
-    # Phase 2: semantic expansion
-    phase2 = 0
-    while remaining:
-        keep = []
-        progressed = False
-        for order, h, r, t in remaining:
-            ent_ok = max(_max_ent_sim(h), _max_ent_sim(t)) >= tau_ent
-            rel_ok = True
-            if tau_rel is not None and rel_centroid is not None and r_emb is not None:
-                rel_ok = _cos(np.asarray(r_emb[r]), rel_centroid) >= tau_rel
-            if ent_ok and rel_ok:
-                _add_edge(h, r, t, order); phase2 += 1; progressed = True
-            else:
-                keep.append((order, h, r, t))
-        remaining = keep
-        if not progressed:
-            break
-
-    stats = {"added": 1 + phase1 + phase2, "skipped": len(remaining), "phase1": phase1, "phase2": phase2}
-    return G, stats
-
-# ---------- decode one graph back ----------
-def graph_to_edge_list(G: nx.Graph, *, use_edge_order: bool = True) -> List[List[int]]:
-    edges = []
-    for u, v, d in G.edges(data=True):
-        r = d.get("rel_idx")
-        if r is None:
-            raise KeyError("Edge missing rel_idx; cannot decode.")
-        order = d.get("edge_order")
-        edges.append((order, _to_int(u), _to_int(r), _to_int(v)))
-    if use_edge_order and any(o is not None for o, *_ in edges):
-        edges.sort(key=lambda x: (x[0] is None, x[0]))
-    return [[h, r, t] for _, h, r, t in edges]
-
-# ---------- CHUNK level: list[subchunk] -> list[Graph] ----------
-def build_graphs_from_chunk(
-    chunk: Sequence[Sequence[int] | Sequence[Sequence[int]]],
-    codebook: Dict[str, Any],
-    *,
-    use_edge_indices: bool = True,
-    tau_ent: float = 0.92,
-    tau_rel: Optional[float] = None,
-    directed: bool = True,
-    include_words: bool = False
-) -> Tuple[List[nx.Graph], List[Dict[str, Any]]]:
-    """
-    For one chunk (list of subchunks), build one Graph per subchunk.
-    Returns (graphs, stats_list) aligned by subchunk order.
-    """
-    graphs, stats_list = [], []
-    for subchunk in chunk:
-        G, stats = build_single_graph_from_subchunk(
-            subchunk, codebook,
-            use_edge_indices=use_edge_indices,
-            tau_ent=tau_ent, tau_rel=tau_rel,
-            directed=directed, include_words=include_words
-        )
-        graphs.append(G); stats_list.append(stats)
-    return graphs, stats_list
-
-def decode_chunk_graphs_to_edge_lists(
-    graphs: Sequence[nx.Graph], *, use_edge_order: bool = True
-) -> List[List[List[int]]]:
-    """
-    Decode a chunk's list[Graph] back to list[ list[h,r,t] ] (one per subchunk-graph).
-    """
-    return [graph_to_edge_list(G, use_edge_order=use_edge_order) for G in graphs]
-
-# ---------- CHUNK_LST level: list[chunk] -> list[list[Graph]] ----------
-def build_graphs_from_chunk_list(
-    chunk_lst: Sequence[Sequence[Sequence[int] | Sequence[Sequence[int]]]] ,
-    codebook: Dict[str, Any],
-    *,
-    use_edge_indices: bool = True,
-    tau_ent: float = 0.92,
-    tau_rel: Optional[float] = None,
-    directed: bool = True,
-    include_words: bool = False
-) -> Tuple[List[List[nx.Graph]], List[List[Dict[str, Any]]]]:
-    """
-    For chunk_lst (list of chunks), return nested list of graphs and stats:
-      graphs_nested[i] corresponds to chunk i (a list of graphs for its subchunks).
-    """
-    graphs_nested: List[List[nx.Graph]] = []
-    stats_nested: List[List[Dict[str, Any]]] = []
-    for chunk in chunk_lst:
-        graphs, stats = build_graphs_from_chunk(
-            chunk, codebook,
-            use_edge_indices=use_edge_indices,
-            tau_ent=tau_ent, tau_rel=tau_rel,
-            directed=directed, include_words=include_words
-        )
-        graphs_nested.append(graphs)
-        stats_nested.append(stats)
-    return graphs_nested, stats_nested
-
-def decode_chunk_list_graphs_to_edge_lists(
-    graphs_nested: Sequence[Sequence[nx.Graph]],
-    *,
-    use_edge_order: bool = True
-) -> List[List[List[List[int]]]]:
-    """
-    Decode nested graphs (list[list[Graph]]) back to:
-      list[ list[ list[h,r,t] ] ]  — i.e., chunk_lst shape.
-    """
-    return [
-        [graph_to_edge_list(G, use_edge_order=use_edge_order) for G in graphs_row]
-        for graphs_row in graphs_nested
-    ]
-
 
 
 ##### word embedding top k search
@@ -2090,7 +1803,6 @@ def _score_query_vs_chunk_with_bonus(
 
 
 
-
 def _build_whole_question_embeddings(
     questions: List[List[List[int]]],  # each question is a list of q_edges; each q_edge is edge_run list[int]
     codebook_main: Dict[str, Any],
@@ -2122,6 +1834,8 @@ def _build_whole_question_embeddings(
 
 
 # --- scorer with attention row-weights---
+
+# used cached chunk embeddingsß
 def _score_query_vs_chunk_with_bonus_optimized(
     questions,
     coarse_topk,
@@ -2176,12 +1890,16 @@ def _score_query_vs_chunk_with_bonus_optimized(
         groups = codebook_main["facts_lst"]
 
     chunk_edges = groups[sel_qi][sel_qj]
-    c_triples = _triples_words(chunk_edges, codebook_main)
-    if not c_triples:
-        return 0.0
 
-    c_lines = [f"{h} {r} {t}" for h, r, t in c_triples]
-    C = _embed_lines(c_lines, emb)  # (nc,d)
+    # using the cache embeddings
+    C = [codebook_main['edge_matrix_embedding'][edge_i] for edge_i in chunk_edges]
+
+    c_triples = _triples_words(chunk_edges, codebook_main)
+    # if not c_triples:
+    #     return 0.0
+
+    # c_lines = [f"{h} {r} {t}" for h, r, t in c_triples]
+    # C = _embed_lines(c_lines, emb)  # (nc,d)
 
     S_list, A_list = [], []
     for i in voters:
@@ -2644,6 +2362,30 @@ def get_all_results_entire_chunk(top_m_results,codebook_main,target = 'facts'):
         all_indexes.append(q_idx)
 
     return all_results,all_indexes
+
+
+# def add_answers_to_filtered_lst(top_m_results,codebook_main):
+
+#     result = {}
+                                 
+#     for qid, matches in top_m_results.items():
+        
+#         result[qid] = []
+    
+#         for m in matches:
+#             q_idx = m["questions_index"]
+#             m_with_feat = m.copy()
+#             m_with_feat['answers(edges[i])'] = codebook_main['answers_lst'][q_idx]
+#             result[qid].append(m_with_feat)
+
+#     return result
+
+# def get_answers_lst_from_results(result):
+#     # this will return the answers list and it's relative indicies
+#     all_q_indices = [d['questions_index'] for v in result.values() for d in v]
+#     all_answers = [d['answers(edges[i])'] for v in result.values() for d in v]
+
+#     return all_answers,all_q_indices
 
 
 
@@ -3715,8 +3457,6 @@ def combine_ents(codebook_main: Dict[str, Any],
 
     return codebook_main
 
-
-    
 ### CompressRag RL version
 
 ###### adding slicing func
@@ -4063,8 +3803,7 @@ class ExactGraphRag_rl:
         combine_ent_sim = 0.9,
         q_combine_sim = 0.9,
         aft_combine_sim = 0.9,
-        semantic_overlap_sim = 0.9,
-        use_graph = True
+        semantic_overlap_sim = 0.9
     ):
         """
         thinkings_choice and answers_choice must be one of 'overlap','unique','not_include'
@@ -4079,8 +3818,6 @@ class ExactGraphRag_rl:
         self.llm = llm
         self.cur_fact_context = None
         self.use_word = use_word
-        self.use_graph = use_graph
-        self.graph_set = False
 
         # Embeddings
         self.sentence_emb = sentence_emb 
@@ -4285,26 +4022,6 @@ class ExactGraphRag_rl:
             batch_num+=1
 
         return facts_codebook_lst
-    
-
-
-    def encode_all_graph(self):
-        if 'questions_lst' in self.meta_codebook and 'answers_lst' in self.meta_codebook:
-            if len(self.meta_codebook['questions_lst'])>=2:
-                
-                self.meta_codebook['questions_lst'] = build_graphs_from_chunk_list(self.meta_codebook['questions_lst'],self.meta_codebook)
-                self.meta_codebook['answers_lst'] = build_graphs_from_chunk_list(self.meta_codebook['answers_lst'],self.meta_codebook)
-
-        if 'facts_lst' in self.meta_codebook:
-            if len(self.meta_codebook['facts_lst'])>=2:                
-                self.meta_codebook['facts_lst'] = build_graphs_from_chunk_list(self.meta_codebook['facts_lst'],self.meta_codebook)
-
-
-        if 'thinkings_lst' in self.meta_codebook:
-            if len(self.meta_codebook['thinkings_lst'])>=2:
-                
-                self.meta_codebook['thinkings_lst'] = build_graphs_from_chunk_list(self.meta_codebook['thinkings_lst'],self.meta_codebook)
-
 
 
     def encode_question(self,q_prompt,rule):
@@ -4316,6 +4033,14 @@ class ExactGraphRag_rl:
         # 利用你已有的 _avg_vec_from_decoded
         dim = len(codebook_main["e_embeddings"][0]) if codebook_main.get("e_embeddings") else 64
         return _avg_vec_from_decoded(decoded, dim)
+    
+
+    # newly added
+    def ensure_edge_matrix_embedding_in(self):
+        if "edge_matrix_embedding" not in self.meta_codebook.keys():
+            edge_texts = [f"{self.meta_codebook['e'][h]} {self.meta_codebook['r'][r]} {self.meta_codebook['e'][t]}"
+                        for h, r, t in self.meta_codebook['edge_matrix']]
+            self.meta_codebook["edge_matrix_embedding"] = get_word_embeddings(edge_texts, word_emb)
 
     def _default_linearizer(self, edges_run, codebook_main, sep="; ", max_len=128):
         """
@@ -4788,36 +4513,6 @@ class ExactGraphRag_rl:
             self._facts_preloaded = True
 
 
-
-    def update_meta_graph(self, new_json_lst, facts_cb=None):
-        if self.include_thinkings:
-            codebook_sub_a, codebook_sub_t = new_json_lst
-            if len(codebook_sub_a["edges([e,r,e])"])>0:
-                self.meta_codebook['questions_lst'][-1] = build_graphs_from_chunk(self.meta_codebook['questions_lst'][-1],self.meta_codebook)
-                self.meta_codebook = merging_codebook(self.meta_codebook, codebook_sub_a, 'answers',   self.word_emb, True)
-                self.meta_codebook['answers_lst'][-1] = build_graphs_from_chunk(self.meta_codebook['answers_lst'][-1],self.meta_codebook)
-                self.meta_codebook = merging_codebook(self.meta_codebook, codebook_sub_t, 'thinkings', self.word_emb, True)
-                self.meta_codebook['thinkings_lst'][-1] = build_graphs_from_chunk(self.meta_codebook['thinkings_lst'][-1],self.meta_codebook)
-            else:
-                self.meta_codebook['questions_lst'].pop()
-
-        else:
-            codebook_sub_a = new_json_lst[0]
-
-            if len(codebook_sub_a["edges([e,r,e])"])>0:
-                self.meta_codebook['questions_lst'][-1] = build_graphs_from_chunk(self.meta_codebook['questions_lst'][-1],self.meta_codebook)
-                self.meta_codebook = merging_codebook(self.meta_codebook, codebook_sub_a, 'answers',   self.word_emb, True)
-                self.meta_codebook['answers_lst'][-1] = build_graphs_from_chunk(self.meta_codebook['answers_lst'][-1],self.meta_codebook)
-            else:
-                self.meta_codebook['questions_lst'].pop()
-
-        if facts_cb is not None:
-            print("----------fact is loaded------")
-            self.meta_codebook = merging_codebook(self.meta_codebook, facts_cb, 'facts', self.word_emb, False)
-            self.meta_codebook['facts_lst'][-1] = build_graphs_from_chunk(self.meta_codebook['facts_lst'][-1],self.meta_codebook)
-            self._facts_preloaded = True
-
-
     def combine_ents_func(self, mode="auto"):
         if mode == "auto":
             self.meta_codebook = combine_ents_auto(self.meta_codebook,
@@ -4879,10 +4574,6 @@ class ExactGraphRag_rl:
         #prevent dpo change choice but not change includings
         self.set_includings()
         q_json = self.encode_question(q_prompt, rule)
-
-
-        if not self.graph_set:
-            self.encode_all_graph()
   
         combined_facts_cb = None
         if not getattr(self, "_facts_preloaded", False) and facts_json_path:
@@ -4957,13 +4648,7 @@ class ExactGraphRag_rl:
                     pass
             metrics_map = {qk: gen_info}
 
-
-
-        if self.use_graph:
-            self.update_meta_graph(new_json_lst, facts_cb=combined_facts_cb)
-
-        else:
-            self.update_meta(new_json_lst, facts_cb=combined_facts_cb)
+        self.update_meta(new_json_lst, facts_cb=combined_facts_cb)
 
         # replace the learning periodical combine ents with trapped by ram
 
@@ -5013,10 +4698,6 @@ class ExactGraphRag_rl:
         #prevent dpo change choice but not change includings
         self.set_includings()
         q_json = self.encode_question(q_prompt, rule)
-
-
-        if not self.graph_set:
-            self.encode_all_graph()
   
         combined_facts_cb = None
         if not getattr(self, "_facts_preloaded", False) and facts_json_path:
@@ -5051,11 +4732,7 @@ class ExactGraphRag_rl:
         print(f'final_merged_json sliced{final_merged_json}')
         new_result, new_json_lst,metrics_from_llm = self.collect_results_dpo(final_merged_json, questions=q_prompt, retrieval_time=retrieval_time)
 
-        if self.use_graph:
-            self.update_meta_graph(new_json_lst, facts_cb=combined_facts_cb)
-
-        else:
-            self.update_meta(new_json_lst, facts_cb=combined_facts_cb)
+        self.update_meta(new_json_lst, facts_cb=combined_facts_cb)
 
 
         # replace the learning periodical combine ents with trapped by ram
@@ -5151,4 +4828,4 @@ class ExactGraphRag_rl:
 
 #     print(final_merged)
 
-# AutoPrunedRetriever_advanced_graph
+# AutoPrunedRetriever_advanced_cached
