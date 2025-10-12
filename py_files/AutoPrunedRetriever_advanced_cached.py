@@ -14,7 +14,7 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
-from optimize_combine_ent import combine_ents_auto, combine_ents_ann_knn, coarse_combine
+from combine_ent_cached import combine_ents_auto, combine_ents_ann_knn, coarse_combine
 from copy import deepcopy
 from textwrap import dedent
 from graph_generator.rebel_large import triplet_parser
@@ -995,24 +995,25 @@ def merging_codebook(codebook_main, codebook_sub, type='questions', word_emb=wor
     if type == 'fact':
         type = 'facts'
 
-    feat_name = type + '(edges[i])'
+    # sub-codebooks may store per-item lists as "questions(edges[i])" or "*_lst"
+    feat_name_candidates = [f"{type}(edges[i])", f"{type}_lst"]
+    feat_name = next((k for k in feat_name_candidates if k in codebook_sub), None)
+    if feat_name is None:
+        raise KeyError(f"Expected one of {feat_name_candidates} in codebook_sub")
 
     if type == 'questions':
         main_feat_name = 'questions_lst'
         unupdated_feat_name1 = 'answers_lst'
         unupdated_feat_name2 = 'thinkings_lst'
-
     elif type == 'answers':
         main_feat_name = 'answers_lst'
         unupdated_feat_name1 = 'questions_lst'
         unupdated_feat_name2 = 'thinkings_lst'
-
     elif type == 'thinkings':
         main_feat_name = 'thinkings_lst'
         unupdated_feat_name1 = 'questions_lst'
         unupdated_feat_name2 = 'answers_lst'
-
-    elif type == 'facts':             
+    elif type == 'facts':
         main_feat_name = 'facts_lst'
         unupdated_feat_name1 = 'questions_lst'
         unupdated_feat_name2 = 'answers_lst'
@@ -1025,73 +1026,82 @@ def merging_codebook(codebook_main, codebook_sub, type='questions', word_emb=wor
         codebook_main.setdefault('facts_lst', [])
         codebook_main.setdefault('questions_to_thinkings', {})
 
-        questions_needs_merged = codebook_sub[feat_name]
-        lst_questions_main = codebook_main[main_feat_name]
+        items_needs_merged = codebook_sub[feat_name]
+        lst_main = codebook_main[main_feat_name]
 
         edge_mat_needs_merged = codebook_sub.get('edges([e,r,e])', codebook_sub.get('edge_matrix'))
         edge_mat_main = codebook_main['edge_matrix']
 
-        # --- Update entity and relation indices ---
-        new_index_replacement_for_ent_sub, index_ent_main, new_added_ents = update_the_index(codebook_main, codebook_sub, 'e')
-        new_index_replacement_for_r_sub, index_r_main, new_added_rs = update_the_index(codebook_main, codebook_sub, 'r')
+        # --- Update entity and relation indices (incremental) ---
+        new_idx_map_ent_sub, index_ent_main, new_added_ents = update_the_index(codebook_main, codebook_sub, 'e')
+        new_idx_map_r_sub,   index_r_main,  new_added_rs   = update_the_index(codebook_main, codebook_sub, 'r')
 
-        # --- Compute new entity/relation embeddings ---
-        new_ent_embeds = get_word_embeddings(new_added_ents, word_emb)
-        new_r_embeds = get_word_embeddings(new_added_rs, word_emb)
-
+        # --- Compute embeddings ONLY for newly added entities & relations ---
         existing_e_embeds = codebook_main.get('e_embeddings', [])
         existing_r_embeds = codebook_main.get('r_embeddings', [])
         existing_edge_embeds = codebook_main.get('edge_matrix_embedding', [])
 
-        # Normalize new embeddings’ dimension if needed
         e_target_dim = len(existing_e_embeds[0]) if existing_e_embeds else None
         r_target_dim = len(existing_r_embeds[0]) if existing_r_embeds else None
         edge_target_dim = len(existing_edge_embeds[0]) if existing_edge_embeds else None
 
-        if new_ent_embeds:
+        new_ent_embeds = get_word_embeddings(new_added_ents, word_emb) if new_added_ents else []
+        new_r_embeds   = get_word_embeddings(new_added_rs,   word_emb) if new_added_rs   else []
+
+        if new_ent_embeds and e_target_dim is not None:
             new_ent_embeds = _normalize_embeddings_shape(new_ent_embeds, e_target_dim)
-        if new_r_embeds:
-            new_r_embeds = _normalize_embeddings_shape(new_r_embeds, r_target_dim)
+        if new_r_embeds and r_target_dim is not None:
+            new_r_embeds   = _normalize_embeddings_shape(new_r_embeds, r_target_dim)
 
-        # --- Remap edges and questions ---
-        edge_mat_needs_merged_remapped = remap_edges_matrix(edge_mat_needs_merged, new_index_replacement_for_ent_sub, new_index_replacement_for_r_sub)
-        new_index_replacement_for_edges_sub, index_edges_main = combine_updated_edges(edge_mat_main, edge_mat_needs_merged_remapped)
-        updated_questions_sub = remap_question_indices(questions_needs_merged, new_index_replacement_for_edges_sub)
-        lst_questions_main.append(updated_questions_sub)
+        # --- Remap edges and item edge-index lists ---
+        edge_mat_needs_merged_remapped = remap_edges_matrix(
+            edge_mat_needs_merged, new_idx_map_ent_sub, new_idx_map_r_sub
+        )
+        new_idx_map_edges_sub, index_edges_main = combine_updated_edges(edge_mat_main, edge_mat_needs_merged_remapped)
 
-        # --- Compute embeddings ONLY for new edges ---
-        new_edges = [edge for edge in index_edges_main[len(edge_mat_main):]]
+        updated_items_sub = remap_question_indices(items_needs_merged, new_idx_map_edges_sub)
+        lst_main.append(updated_items_sub)
+
+        # --- Prepare *post-merge* vocab so new edges can be textualized safely ---
+        # Extend E/R before building texts for newly-added edges
+        if new_added_ents:
+            codebook_main["e"].extend(new_added_ents)
+        if new_added_rs:
+            codebook_main["r"].extend(new_added_rs)
+
+        # Identify only the edges that were appended by combine_updated_edges
+        new_edges = index_edges_main[len(edge_mat_main):]
+
+        # Build texts for new edges using post-merge E/R vocab
         if new_edges:
-            edge_texts_new = [f"{codebook_main['e'][h]} {codebook_main['r'][r]} {codebook_main['e'][t]}"
-                              for h, r, t in new_edges]
+            E_all = codebook_main['e']
+            R_all = codebook_main['r']
+            edge_texts_new = [f"{E_all[h]} {R_all[r]} {E_all[t]}" for h, r, t in new_edges]
             new_edge_embeds = get_word_embeddings(edge_texts_new, word_emb)
-            if edge_target_dim:
+            if edge_target_dim is not None:
                 new_edge_embeds = _normalize_embeddings_shape(new_edge_embeds, edge_target_dim)
         else:
             new_edge_embeds = []
 
-        # --- Update codebook_main with merged content ---
-        codebook_main["e"].extend(new_added_ents)
-        codebook_main["r"].extend(new_added_rs)
+        # --- Commit merged structures ---
         codebook_main["edge_matrix"] = index_edges_main
-        codebook_main[main_feat_name] = lst_questions_main
+        codebook_main[main_feat_name] = lst_main
 
-        # Update entity/relation embeddings incrementally
-        if existing_e_embeds and new_ent_embeds:
-            codebook_main["e_embeddings"] = existing_e_embeds + new_ent_embeds
-        elif new_ent_embeds:
-            codebook_main["e_embeddings"] = new_ent_embeds
+        # Incremental updates (no recompute for existing vectors)
+        if new_ent_embeds:
+            codebook_main["e_embeddings"] = (existing_e_embeds or []) + new_ent_embeds
+        elif existing_e_embeds is not None and "e_embeddings" not in codebook_main:
+            codebook_main["e_embeddings"] = existing_e_embeds
 
-        if existing_r_embeds and new_r_embeds:
-            codebook_main["r_embeddings"] = existing_r_embeds + new_r_embeds
-        elif new_r_embeds:
-            codebook_main["r_embeddings"] = new_r_embeds
+        if new_r_embeds:
+            codebook_main["r_embeddings"] = (existing_r_embeds or []) + new_r_embeds
+        elif existing_r_embeds is not None and "r_embeddings" not in codebook_main:
+            codebook_main["r_embeddings"] = existing_r_embeds
 
-        # Update edge_matrix_embedding incrementally
-        if existing_edge_embeds and new_edge_embeds:
-            codebook_main["edge_matrix_embedding"] = existing_edge_embeds + new_edge_embeds
-        elif new_edge_embeds:
-            codebook_main["edge_matrix_embedding"] = new_edge_embeds
+        if new_edge_embeds:
+            codebook_main["edge_matrix_embedding"] = (existing_edge_embeds or []) + new_edge_embeds
+        elif existing_edge_embeds is not None and "edge_matrix_embedding" not in codebook_main:
+            codebook_main["edge_matrix_embedding"] = existing_edge_embeds
 
         if type == 'thinkings':
             codebook_main['questions_to_thinkings'][len(codebook_main['questions_lst']) - 1] = len(codebook_main[main_feat_name]) - 1
@@ -1102,17 +1112,15 @@ def merging_codebook(codebook_main, codebook_sub, type='questions', word_emb=wor
         codebook_main = {
             "e": codebook_sub['e'],
             "r": codebook_sub['r'],
-            'edge_matrix': edge_matrix,
+            "edge_matrix": edge_matrix,
             main_feat_name: [codebook_sub[feat_name]],
             unupdated_feat_name1: [],
-            "rule": codebook_sub['rule'],
+            "rule": codebook_sub.get('rule'),
             "e_embeddings": get_word_embeddings(codebook_sub['e'], word_emb),
             "r_embeddings": get_word_embeddings(codebook_sub['r'], word_emb),
         }
-
-        # Compute edge embeddings only once
-        edge_texts = [f"{codebook_main['e'][h]} {codebook_main['r'][r]} {codebook_main['e'][t]}"
-                      for h, r, t in edge_matrix]
+        # Compute edge embeddings once from "{h} {r} {t}"
+        edge_texts = [f"{codebook_main['e'][h]} {codebook_main['r'][r]} {codebook_main['e'][t]}" for h, r, t in edge_matrix]
         codebook_main["edge_matrix_embedding"] = get_word_embeddings(edge_texts, word_emb)
 
         if use_thinkings:
@@ -1120,6 +1128,7 @@ def merging_codebook(codebook_main, codebook_sub, type='questions', word_emb=wor
             codebook_main['questions_to_thinkings'] = {}
 
     return codebook_main
+
 
 
 
