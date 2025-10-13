@@ -35,7 +35,7 @@ import sys
 # ---------------------------------------------------------------------
 REPO_ID      = "GraphRAG-Bench/GraphRAG-Bench"
 CORPUS_FILE  = "GraphRAG-Benchmark/Datasets/Corpus/medical.json"
-QUEST_FILE   = "Datasets/Questions/lowest_500_questions.json"
+QUEST_FILE   = "Datasets/Questions/medical_questions.json"
 
 SEED_N       = 1    # first 30 rows → bootstrap + DPO train, numbers must be divided by 2. (n%2=0)
 TEST_N       = 1     # next 20 rows  → evaluation
@@ -397,7 +397,7 @@ if __name__ == "__main__":
 
     reward_func = reward_func_dpo.reward_sbert_inclusive
 
-    SEED_N       = 20    # change to 20 for training
+    SEED_N       = 1    # change to 20 for training
     TEST_N       = 2042     # change to 980 for rest
 
     

@@ -1901,7 +1901,7 @@ def _score_query_vs_chunk_with_bonus_optimized(
     chunk_edges = groups[sel_qi][sel_qj]
 
     # using the cache embeddings
-    C = [codebook_main['edge_matrix_embedding'][edge_i] for edge_i in chunk_edges]
+    C = np.array([codebook_main['edge_matrix_embedding'][edge_i] for edge_i in chunk_edges], dtype=np.float32)
 
     c_triples = _triples_words(chunk_edges, codebook_main)
     # if not c_triples:
@@ -4532,7 +4532,8 @@ class ExactGraphRag_rl:
                     k_grid_size = self.k_grid_size
                     ) 
         elif mode == "knn":
-            self.meta_codebook = combine_ents_ann_knn(self.meta_codebook,sim_threshold = self.combine_ent_sim)
+            self.meta_codebook = combine_ents_ann_knn(self.meta_codebook,sim_threshold = self.combine_ent_sim,
+                                                      word_emb = self.sentence_emb)
         elif mode == "coarse":
             self.meta_codebook = coarse_combine(self.meta_codebook,sim_threshold = self.combine_ent_sim)           
 
