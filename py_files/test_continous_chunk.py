@@ -277,35 +277,53 @@ def merge_chunks_by_boundary(
     merged.append(cur)
     return merged
 
-# # ---------- example wiring ----------
-# if __name__ == "__main__":
-#     # Your provided embedding object:
-#     # from langchain_huggingface import HuggingFaceEmbeddings
-#     sent_emb = HuggingFaceEmbeddings(model_name="BAAI/bge-large-en-v1.5")
+# ---------- example wiring ----------
+if __name__ == "__main__":
+    # Your provided embedding object:
+    # from langchain_huggingface import HuggingFaceEmbeddings
+    sent_emb = HuggingFaceEmbeddings(model_name="BAAI/bge-large-en-v1.5")
 
-#     triples = [
-#         ("Basal cell carcinoma","subclass of","skin cancer"),
-#         ("skin cancer","has part","lesion"),
-#         ("UV radiation","causes","skin cancer"),
-#         ("Melanocyte","produces","melanin"),
-#         ("melanin","located in","epidermis"),
-#         ("tanning beds","emit","UV radiation"),
-#     ]
+    triples = [
+        ("Basal cell carcinoma","subclass of","skin cancer"),
+        ("skin cancer","has part","lesion"),
+        ("UV radiation","causes","skin cancer"),
+        ("Melanocyte","produces","melanin"),
+        ("melanin","located in","epidermis"),
+        ("tanning beds","emit","UV radiation"),
+    ]
 
-#     # (1) Embed whole triples as sentences
-#     T_vecs = embed_triples_as_sentences(triples, sent_emb)
+    # (1) Embed whole triples as sentences
+    T_vecs = embed_triples_as_sentences(triples, sent_emb)
 
-#     # (2) Segment
-#     chunks = segment_by_centroid_sim(
-#         triples, T_vecs,
-#         tau=0.7,           # tighter -> more chunks; looser -> fewer chunks
-#         patience=0,
-#         bonus_tail_head=True,
-#         tail_head_bonus=0.05
-#     )
+    # (2) Segment
+    chunk1 = segment_by_centroid_sim(
+        triples, T_vecs,
+        tau=0.7,           # tighter -> more chunks; looser -> fewer chunks
+        patience=0,
+        bonus_tail_head=True,
+        tail_head_bonus=0.05
+    )
 
-#     for i, ch in enumerate(chunks, 1):
-#         print(f"Chunk {i}: {ch}")
+    for i, ch in enumerate(chunk1, 1):
+        print(f"Chunk {i}: {ch}")
+
+    triples2 = [
+        ("UV radiation","causes","cancer"),
+    ]
+
+    T_vecs2 = embed_triples_as_sentences(triples2, sent_emb)
+
+    chunk2 = segment_by_centroid_sim(
+        triples2, T_vecs2,
+        tau=0.7,           # tighter -> more chunks; looser -> fewer chunks
+        patience=0,
+        bonus_tail_head=True,
+        tail_head_bonus=0.05
+    )
+
+    new_chunks = merge_chunks_by_boundary([chunk1,chunk2])
+
+    print(f'new chunk {new_chunks}')
 
     # Optional: also embed single entities / relations if you want them separately
     # E_vecs = embed_entities(["Basal cell carcinoma", "skin cancer", "melanin"], sent_emb)
