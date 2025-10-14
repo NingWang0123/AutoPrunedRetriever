@@ -1487,7 +1487,8 @@ def coarse_combine(codebook_main: Dict[str, Any],
                    backend: str = 'auto',
                    config: Optional["ClusteringConfig"] = None,
                    ram_threshold: float = 70.0,  # percentage,
-                   sim_threshold: float = 0.9
+                   sim_threshold: float = 0.9,
+                   word_emb=None
                    ):
     """
     Combines entities in two stages:
@@ -1507,7 +1508,8 @@ def coarse_combine(codebook_main: Dict[str, Any],
         config,
         use_thinking,
         use_facts,
-        sim_threshold
+        sim_threshold,
+        word_emb=word_emb
     )
 
     # Check RAM usage before doing the aggressive combine
@@ -1526,7 +1528,8 @@ def coarse_combine(codebook_main: Dict[str, Any],
             sample_size_prop,
             k_grid_size,
             scoring,
-            backend
+            backend,
+            word_emb=word_emb
         )
     else:
         print(f"[WARN] RAM usage {ram_used_percent:.2f}% exceeds threshold {ram_threshold}%. "
