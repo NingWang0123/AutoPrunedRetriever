@@ -134,6 +134,149 @@ def segment_by_centroid_sim(
         chunks.append(cur)
     return chunks
 
+
+# ---- boundary test using default segmenter ----
+def decode_subchunk(question, codebook_main, fmt='words'):
+
+    edges = codebook_main["edge_matrix"]
+
+    idxs = list(question)
+
+    def get_edge(i):
+        # works for both list and numpy array
+        return edges[i]
+
+    if fmt == 'words':
+        E, R = codebook_main["e"], codebook_main["r"]
+        decoded = [[E[h], R[r], E[t]] for (h, r, t) in (get_edge(i) for i in idxs)]
+    elif fmt == 'embeddings':
+        Ee = codebook_main.get("e_embeddings")
+        Re = codebook_main.get("r_embeddings")
+        if Ee is None or Re is None:
+            raise KeyError("e_embeddings and r_embeddings are required for fmt='embeddings'.")
+        decoded = [[Ee[h], Re[r], Ee[t]] for (h, r, t) in (get_edge(i) for i in idxs)]
+    elif fmt == 'edges':
+        decoded = [[h,r,t] for (h, r, t) in (get_edge(i) for i in idxs)]
+
+    else:
+        raise ValueError("fmt must be 'words', 'embeddings' or 'edges'.")
+
+    return decoded
+
+
+def _safe_len(x) -> int:
+    try:
+        return len(x)
+    except Exception:
+        return 0
+
+def should_merge_boundary(
+    last_encoded: List[int],
+    next_encoded: List[int],
+    segment_by_centroid_sim: Callable[..., List[List[Triple]]],
+    *,
+    tau: float = 0.58,
+    min_chunk_len: int = 1,
+    patience: int = 0,
+    relu_floor: float = 0.0,
+    bonus_tail_head: bool = True,
+    tail_head_bonus: float = 0.05,
+) -> bool:
+    """
+    Returns True iff the segmenter would *not* place a cut between the two
+    subchunks (i.e., it's safe to merge the adjacent parent chunks).
+    """
+    # Decode both sides into triples
+    last_triples = decode_subchunk(last_encoded,'edges') 
+    next_triples = decode_subchunk(next_encoded,'edges')
+    if not last_triples or not next_triples:
+        # If either side has no triples, be conservative: don't merge.
+        return False
+
+    # Concatenate in boundary order
+    all_triples = last_triples + next_triples
+    vecs = decode_subchunk(all_triples)
+
+    # Run segmenter over the concatenation
+    chunks = segment_by_centroid_sim(
+        all_triples,
+        vecs,
+        tau=tau,
+        min_chunk_len=min_chunk_len,
+        patience=patience,
+        relu_floor=relu_floor,
+        bonus_tail_head=bonus_tail_head,
+        tail_head_bonus=tail_head_bonus,
+    )
+
+    # If there's exactly 1 chunk, the boundary isn't justified → merge.
+    if len(chunks) == 1:
+        return True
+
+    # If there are 2+ chunks, check if the first cut lands exactly at the boundary.
+    # Simple heuristic: if the first chunk length equals len(last_triples),
+    # the model wants a cut exactly where your boundary is → don't merge.
+    first_len = _safe_len(chunks[0]) if chunks else 0
+    return first_len != len(last_triples)
+
+# ---- main routine: pass over chunk list and merge neighbors when boundary is weak ----
+def merge_chunks_by_boundary(
+    chunks: List[List[List[int]]],  # [[[int,...], ...], ...]
+    segment_by_centroid_sim: Callable[..., List[List[Triple]]],
+    *,
+    tau: float = 0.58,
+    min_chunk_len: int = 1,
+    patience: int = 0,
+    relu_floor: float = 0.0,
+    bonus_tail_head: bool = True,
+    tail_head_bonus: float = 0.05,
+) -> List[List[List[int]]]:
+    """
+    Walks boundaries between chunks and merges chunk i with i+1 if the
+    last subchunk of i and first subchunk of i+1 *should* be together,
+    as judged by segment_by_centroid_sim on decoded+embedded triples.
+    """
+    if not chunks:
+        return []
+
+    merged: List[List[List[int]]] = []
+    cur = chunks[0]
+
+    for i in range(len(chunks) - 1):
+        left = cur
+        right = chunks[i + 1]
+        if not left or not right:
+            # If either side has no subchunks, do not merge
+            merged.append(left)
+            cur = right
+            continue
+
+        last_left_encoded = left[-1]
+        first_right_encoded = right[0]
+
+        merge = should_merge_boundary(
+            last_left_encoded,
+            first_right_encoded,
+            segment_by_centroid_sim,
+            tau=tau,
+            min_chunk_len=min_chunk_len,
+            patience=patience,
+            relu_floor=relu_floor,
+            bonus_tail_head=bonus_tail_head,
+            tail_head_bonus=tail_head_bonus,
+        )
+
+        if merge:
+            # Merge entire chunks: concatenate subchunk lists
+            cur = left + right
+        else:
+            merged.append(left)
+            cur = right
+
+    # push the last carried chunk
+    merged.append(cur)
+    return merged
+
 # # ---------- example wiring ----------
 # if __name__ == "__main__":
 #     # Your provided embedding object:
