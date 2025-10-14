@@ -4520,37 +4520,108 @@ class ExactGraphRag_rl:
             tokenizer = tiktoken.get_encoding("cl100k_base")
 
         def _chunk_text(text: str, *, chunk_tokens: int = 1200, overlap_tokens: int = 100, sub_chunk_chars: int = 300, sub_chunk_overlap: int = 50, tokenizer=tokenizer):
+            import re
+            
             text = (text or "").strip()
             if not text:
                 return []
-            tokens = tokenizer.encode(text)
+            
+            sentence_pattern = r'(?<=[.!?])\s+(?=[A-Z])|(?<=[。！？])\s*'
+            sentences = re.split(sentence_pattern, text)
+            sentences = [s.strip() for s in sentences if s.strip()]
+            
+            if not sentences:
+                return [text]  
+            
+
             token_chunks = []
-            step = max(1, chunk_tokens - overlap_tokens)
-            i = 0
-            while i < len(tokens):
-                j = min(len(tokens), i + chunk_tokens)
-                chunk_text = tokenizer.decode(tokens[i:j]).strip()
+            current_chunk_sentences = []
+            current_chunk_tokens = 0
+            
+            for sentence in sentences:
+                sentence_tokens = len(tokenizer.encode(sentence))
+                
+                if current_chunk_tokens + sentence_tokens > chunk_tokens and current_chunk_sentences:
+                    chunk_text = ' '.join(current_chunk_sentences).strip()
+                    if chunk_text:
+                        token_chunks.append(chunk_text)
+
+                    if overlap_tokens > 0 and current_chunk_sentences:
+                        overlap_sentences = []
+                        overlap_token_count = 0
+                        
+                        for prev_sentence in reversed(current_chunk_sentences):
+                            prev_tokens = len(tokenizer.encode(prev_sentence))
+                            if overlap_token_count + prev_tokens <= overlap_tokens:
+                                overlap_sentences.insert(0, prev_sentence)
+                                overlap_token_count += prev_tokens
+                            else:
+                                break
+                        
+                        current_chunk_sentences = overlap_sentences
+                        current_chunk_tokens = overlap_token_count
+                    else:
+                        current_chunk_sentences = []
+                        current_chunk_tokens = 0
+
+                current_chunk_sentences.append(sentence)
+                current_chunk_tokens += sentence_tokens
+
+            if current_chunk_sentences:
+                chunk_text = ' '.join(current_chunk_sentences).strip()
                 if chunk_text:
                     token_chunks.append(chunk_text)
-                if j == len(tokens):
-                    break
-                i += step
 
             def _sub_chunk_by_chars(text, chunk_size, overlap):
                 if not text or len(text) <= chunk_size:
                     return [text] if text else []
+
+                sentences = re.split(sentence_pattern, text)
+                sentences = [s.strip() for s in sentences if s.strip()]
+                
+                if not sentences:
+                    return [text]
+                
                 sub_chunks = []
-                step = max(1, chunk_size - overlap)
-                i = 0
-                while i < len(text):
-                    j = min(len(text), i + chunk_size)
-                    sub_chunk = text[i:j].strip()
-                    if sub_chunk:
-                        sub_chunks.append(sub_chunk)
-                    if j == len(text):
-                        break
-                    i += step
-                return sub_chunks
+                current_chunk_sentences = []
+                current_chunk_chars = 0
+                
+                for sentence in sentences:
+                    sentence_chars = len(sentence)
+  
+                    if current_chunk_chars + sentence_chars + 1 > chunk_size and current_chunk_sentences:  # +1 for space
+                        sub_chunk_text = ' '.join(current_chunk_sentences).strip()
+                        if sub_chunk_text:
+                            sub_chunks.append(sub_chunk_text)
+                        
+                        if overlap > 0 and current_chunk_sentences:
+                            overlap_sentences = []
+                            overlap_char_count = 0
+                            
+                            for prev_sentence in reversed(current_chunk_sentences):
+                                prev_chars = len(prev_sentence)
+                                if overlap_char_count + prev_chars + 1 <= overlap:  # +1 for space
+                                    overlap_sentences.insert(0, prev_sentence)
+                                    overlap_char_count += prev_chars + 1
+                                else:
+                                    break
+                            
+                            current_chunk_sentences = overlap_sentences
+                            current_chunk_chars = overlap_char_count
+                        else:
+                            current_chunk_sentences = []
+                            current_chunk_chars = 0
+                    
+                    current_chunk_sentences.append(sentence)
+                    current_chunk_chars += sentence_chars + (1 if current_chunk_sentences else 0)  # +1 for space if not first
+                
+                if current_chunk_sentences:
+                    sub_chunk_text = ' '.join(current_chunk_sentences).strip()
+                    if sub_chunk_text:
+                        sub_chunks.append(sub_chunk_text)
+                
+                return sub_chunks if sub_chunks else [text]
+            
             all_sub_chunks = []
             for token_chunk in token_chunks:
                 all_sub_chunks.extend(_sub_chunk_by_chars(token_chunk, sub_chunk_chars, sub_chunk_overlap))
