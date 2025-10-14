@@ -181,21 +181,25 @@ def should_merge_boundary(
     relu_floor: float = 0.0,
     bonus_tail_head: bool = True,
     tail_head_bonus: float = 0.05,
+    sent_emb:HuggingFaceEmbeddings = None
 ) -> bool:
     """
     Returns True iff the segmenter would *not* place a cut between the two
     subchunks (i.e., it's safe to merge the adjacent parent chunks).
     """
     # Decode both sides into triples
-    last_triples = decode_subchunk(last_encoded,'edges') 
-    next_triples = decode_subchunk(next_encoded,'edges')
+    last_triples = decode_subchunk(last_encoded,'words') 
+    next_triples = decode_subchunk(next_encoded,'words')
     if not last_triples or not next_triples:
         # If either side has no triples, be conservative: don't merge.
         return False
 
     # Concatenate in boundary order
     all_triples = last_triples + next_triples
-    vecs = decode_subchunk(all_triples)
+
+    # print('all_triples',all_triples)
+
+    vecs = embed_triples_as_sentences(all_triples, sent_emb) 
 
     # Run segmenter over the concatenation
     chunks = segment_by_centroid_sim(
@@ -208,6 +212,8 @@ def should_merge_boundary(
         bonus_tail_head=bonus_tail_head,
         tail_head_bonus=tail_head_bonus,
     )
+
+    # print('new chunks is',chunks)
 
     # If there's exactly 1 chunk, the boundary isn't justified → merge.
     if len(chunks) == 1:
@@ -222,7 +228,7 @@ def should_merge_boundary(
 # ---- main routine: pass over chunk list and merge neighbors when boundary is weak ----
 def merge_chunks_by_boundary(
     chunks: List[List[List[int]]],  # [[[int,...], ...], ...]
-    segment_by_centroid_sim: Callable[..., List[List[Triple]]],
+    segment_by_centroid_sim: Callable[..., List[List[Triple]]] = segment_by_centroid_sim,
     *,
     tau: float = 0.58,
     min_chunk_len: int = 1,
@@ -230,6 +236,7 @@ def merge_chunks_by_boundary(
     relu_floor: float = 0.0,
     bonus_tail_head: bool = True,
     tail_head_bonus: float = 0.05,
+    sent_emb:HuggingFaceEmbeddings = None
 ) -> List[List[List[int]]]:
     """
     Walks boundaries between chunks and merges chunk i with i+1 if the
@@ -245,11 +252,17 @@ def merge_chunks_by_boundary(
     for i in range(len(chunks) - 1):
         left = cur
         right = chunks[i + 1]
-        if not left or not right:
-            # If either side has no subchunks, do not merge
-            merged.append(left)
+
+        if not left and not right:
+            continue
+
+        if not left:
             cur = right
             continue
+
+        if not right:
+            continue
+
 
         last_left_encoded = left[-1]
         first_right_encoded = right[0]
@@ -264,11 +277,21 @@ def merge_chunks_by_boundary(
             relu_floor=relu_floor,
             bonus_tail_head=bonus_tail_head,
             tail_head_bonus=tail_head_bonus,
+            sent_emb=sent_emb
         )
 
         if merge:
-            # Merge entire chunks: concatenate subchunk lists
-            cur = left + right
+            # print('merging success')
+            # # Merge entire chunks: concatenate subchunk lists
+            # print('left',last_left_encoded)
+            # print('right',first_right_encoded)
+            left[-1] = last_left_encoded+first_right_encoded
+            cur = right[1:]
+            # if merging make the right empty, we still use the cur as the next cur
+            if not cur:
+                cur = left
+            else:
+                merged.append(left)
         else:
             merged.append(left)
             cur = right
@@ -278,57 +301,172 @@ def merge_chunks_by_boundary(
     return merged
 
 # ---------- example wiring ----------
-if __name__ == "__main__":
-    # Your provided embedding object:
-    # from langchain_huggingface import HuggingFaceEmbeddings
-    sent_emb = HuggingFaceEmbeddings(model_name="BAAI/bge-large-en-v1.5")
+# if __name__ == "__main__":
+#     # Your provided embedding object:
+#     # from langchain_huggingface import HuggingFaceEmbeddings
+#     sent_emb = HuggingFaceEmbeddings(model_name="BAAI/bge-large-en-v1.5")
 
-    triples = [
-        ("Basal cell carcinoma","subclass of","skin cancer"),
-        ("skin cancer","has part","lesion"),
-        ("UV radiation","causes","skin cancer"),
-        ("Melanocyte","produces","melanin"),
-        ("melanin","located in","epidermis"),
-        ("tanning beds","emit","UV radiation"),
-    ]
 
-    # (1) Embed whole triples as sentences
-    T_vecs = embed_triples_as_sentences(triples, sent_emb)
+#     # -----------------------------------------------------------------------------
+#     # 0) Build a minimal codebook_main with entities, relations, and edge_matrix
+#     # -----------------------------------------------------------------------------
+#     E = [
+#         "Basal cell carcinoma",  # 0
+#         "skin cancer",           # 1
+#         "lesion",                # 2
+#         "UV radiation",          # 3
+#         "Melanocyte",            # 4
+#         "melanin",               # 5
+#         "epidermis",             # 6
+#         "tanning beds",          # 7
+#         "cancer",                # 8
+#     ]
+#     R = [
+#         "subclass of",  # 0
+#         "has part",     # 1
+#         "causes",       # 2
+#         "produces",     # 3
+#         "located in",   # 4
+#         "emit",         # 5
+#     ]
+#     EIDX = {s: i for i, s in enumerate(E)}
+#     RIDX = {s: i for i, s in enumerate(R)}
 
-    # (2) Segment
-    chunk1 = segment_by_centroid_sim(
-        triples, T_vecs,
-        tau=0.7,           # tighter -> more chunks; looser -> fewer chunks
-        patience=0,
-        bonus_tail_head=True,
-        tail_head_bonus=0.05
-    )
+#     EDGE_MATRIX = [
+#         [EIDX["Basal cell carcinoma"], RIDX["subclass of"], EIDX["skin cancer"]],
+#         [EIDX["skin cancer"],          RIDX["has part"],    EIDX["lesion"]],
+#         [EIDX["UV radiation"],         RIDX["causes"],      EIDX["skin cancer"]],
+#         [EIDX["Melanocyte"],           RIDX["produces"],    EIDX["melanin"]],
+#         [EIDX["melanin"],              RIDX["located in"],  EIDX["epidermis"]],
+#         [EIDX["tanning beds"],         RIDX["emit"],        EIDX["UV radiation"]],
+#         [EIDX["UV radiation"],         RIDX["causes"],      EIDX["cancer"]],
+#     ]
 
-    for i, ch in enumerate(chunk1, 1):
-        print(f"Chunk {i}: {ch}")
+#     codebook_main = {
+#         "e": E,
+#         "r": R,
+#         "edge_matrix": EDGE_MATRIX,
+#     }
 
-    triples2 = [
-        ("UV radiation","causes","cancer"),
-    ]
+#     # Make codebook globally visible for the adapter below
+#     CODEBOOK_MAIN = codebook_main
 
-    T_vecs2 = embed_triples_as_sentences(triples2, sent_emb)
+#     # -----------------------------------------------------------------------------
+#     # 1) OPTIONAL: add entity & relation embeddings to support fmt='embeddings'
+#     # -----------------------------------------------------------------------------
+#     try:
+#         sent_emb = HuggingFaceEmbeddings(model_name="BAAI/bge-large-en-v1.5")
+#         codebook_main["e_embeddings"] = embed_entities(codebook_main["e"], sent_emb)
+#         codebook_main["r_embeddings"] = embed_relations(codebook_main["r"], sent_emb)
+#     except Exception as e:
+#         print(f"[warn] Could not compute e/r embeddings (that's OK unless you use fmt='embeddings'): {e}")
 
-    chunk2 = segment_by_centroid_sim(
-        triples2, T_vecs2,
-        tau=0.7,           # tighter -> more chunks; looser -> fewer chunks
-        patience=0,
-        bonus_tail_head=True,
-        tail_head_bonus=0.05
-    )
+#     # -----------------------------------------------------------------------------
+#     # 2) Compatibility adapter (no body edits): make your existing calls work
+#     # -----------------------------------------------------------------------------
+#     # Your should_merge_boundary currently calls:
+#     #   decode_subchunk(last_encoded, 'edges')
+#     #   decode_subchunk(next_encoded, 'edges')
+#     #   decode_subchunk(all_triples)   # etc.
+#     # but the defined signature is decode_subchunk(question, codebook_main, fmt='words').
+#     # We add a tiny adapter that preserves your name but routes calls correctly.
+#     try:
+#         _orig_decode_subchunk = decode_subchunk  # keep original
 
-    new_chunks = merge_chunks_by_boundary([chunk1,chunk2])
+#         def decode_subchunk(*args, **kwargs):
+#             """
+#             Compatibility adapter:
+#             - If called like decode_subchunk(indices, 'edges'), assume global CODEBOOK_MAIN.
+#             - If called like decode_subchunk(indices, CODEBOOK_MAIN, fmt='words'), pass through.
+#             - If called with actual triple rows (list[list[h,r,t]]) and no fmt provided,
+#             treat them as *indices* only if they are ints; otherwise, if they look like triples,
+#             just return them (segmenter expects words/edges already).
+#             """
+#             # Case A: the "correct" signature (indices, codebook_main, fmt=...)
+#             if len(args) >= 2 and isinstance(args[1], dict) and "edge_matrix" in args[1]:
+#                 return _orig_decode_subchunk(*args, **kwargs)
 
-    print(f'new chunk {new_chunks}')
+#             # Case B: the "in-code" usage you have (indices, 'edges'|'words')
+#             if len(args) == 2 and isinstance(args[0], (list, tuple)) and isinstance(args[1], str):
+#                 indices, fmt = args
+#                 return _orig_decode_subchunk(indices, CODEBOOK_MAIN, fmt=fmt)
 
-    # Optional: also embed single entities / relations if you want them separately
-    # E_vecs = embed_entities(["Basal cell carcinoma", "skin cancer", "melanin"], sent_emb)
-    # R_vecs = embed_relations(["subclass of", "has part", "causes"], sent_emb)
+#             # Case C: decode_subchunk(all_triples) — if they're already triplets, return them
+#             if len(args) == 1 and isinstance(args[0], (list, tuple)) and args[0]:
+#                 first = args[0][0]
+#                 # If they look like [h, r, t] (either ints or strings), just return as-is
+#                 if isinstance(first, (list, tuple)) and len(first) == 3:
+#                     return args[0]
 
+#             # Fallback to original
+#             return _orig_decode_subchunk(*args, **kwargs)
+
+#     except NameError:
+#         # If decode_subchunk wasn't defined yet for some reason, skip
+#         pass
+
+#     # -----------------------------------------------------------------------------
+#     # 3) Prepare triples and sentence embeddings for the segmenter
+#     # -----------------------------------------------------------------------------
+#     triples_all = [
+#         ("Basal cell carcinoma","subclass of","skin cancer"),
+#         ("skin cancer","has part","lesion"),
+#         ("UV radiation","causes","skin cancer"),
+#         ("Melanocyte","produces","melanin"),
+#         ("melanin","located in","epidermis"),
+#         ("tanning beds","emit","UV radiation"),
+#     ]
+#     T_vecs = embed_triples_as_sentences(triples_all, sent_emb)
+
+#     # Show segmentation behavior on a single contiguous list
+#     print("\n=== Segment result on the full triple list ===")
+#     chunked = segment_by_centroid_sim(
+#         triples_all, T_vecs,
+#         tau=0.70,           # tighter threshold -> more cuts
+#         patience=0,
+#         relu_floor=0.0,
+#         bonus_tail_head=True,
+#         tail_head_bonus=0.05,
+#     )
+#     for i, ch in enumerate(chunked, 1):
+#         print(f"Chunk {i}: {ch}")
+
+#     # -----------------------------------------------------------------------------
+#     # 4) Build chunked edges (indices) like your real pipeline, then test merging
+#     # -----------------------------------------------------------------------------
+#     # We'll create two "chunks", each holding subchunks = lists of edge indices
+#     # chunk_left contains edges [0,1] and [2]
+#     # chunk_right contains edges [3] and [4,5] (two subchunks)
+#     chunk_left  = [[2],[0]]       # two subchunks on the left side
+#     chunk_right = [[1]]       # two subchunks on the right side
+
+#     chunks_indices = [chunk_left, chunk_right,[[3]],[[4]]]  # [[[...],[...]], [[...],[...]]]
+#     print("\n=== Raw chunks (by edge indices) ===")
+#     print(chunks_indices)
+
+#     # Sanity check: decode the last subchunk of left and first subchunk of right (words)
+#     print("\nDecoded last-left (words):")
+#     print(decode_subchunk(chunk_left[-1], codebook_main, fmt='words'))
+#     print("\nDecoded first-right (words):")
+#     print(decode_subchunk(chunk_right[0], codebook_main, fmt='words'))
+
+#     # -----------------------------------------------------------------------------
+#     # 5) Run the boundary-based merge pass
+#     # -----------------------------------------------------------------------------
+#     print("\n=== Merging pass over chunk boundaries ===")
+#     merged_chunks = merge_chunks_by_boundary(
+#         chunks_indices,
+#         segment_by_centroid_sim=segment_by_centroid_sim,
+#         tau=0.70,
+#         min_chunk_len=1,
+#         patience=0,
+#         relu_floor=0.0,
+#         bonus_tail_head=True,
+#         tail_head_bonus=0.05,
+#         sent_emb = sent_emb
+#     )
+#     print("Merged result (by edge indices):")
+#     print(merged_chunks)
 
 
 # python test_continous_chunk.py
