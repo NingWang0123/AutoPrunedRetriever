@@ -5211,6 +5211,8 @@ class ExactGraphRag_rl:
         self.meta_codebook['facts_lst'] = merge_chunks_by_boundary(chunks = self.meta_codebook['facts_lst'],
                                                                    codebook_main = self.meta_codebook,
                                                                    sent_emb = self.sentence_emb)
+        
+        self.meta_codebook['facts_lst'] = remove_duplicate_inner_lists(self.meta_codebook['facts_lst'])
 
     def run_work_flow(self, q_prompt, rule="Answer questions", 
                       facts_json_path: list = None, chunk_chars: int = 800, 
