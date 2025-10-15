@@ -76,7 +76,7 @@ def ensure_list_of_triples(triples):
 def segment_by_centroid_sim(
     triples: List[Triple],
     triple_vecs: np.ndarray,
-    tau: float = 0.58,            # similarity threshold to stay in chunk
+    tau: float = 0.7,            # similarity threshold to stay in chunk
     min_chunk_len: int = 1,
     patience: int = 0,            # consecutive below-threshold sims before cutting
     relu_floor: float = 0.0,      # clamp negative sims up to 0 if desired
@@ -175,7 +175,7 @@ def should_merge_boundary(
     next_encoded: List[int],
     segment_by_centroid_sim: Callable[..., List[List[Triple]]],
     *,
-    tau: float = 0.58,
+    tau: float = 0.7,
     min_chunk_len: int = 1,
     patience: int = 0,
     relu_floor: float = 0.0,
@@ -230,7 +230,7 @@ def merge_chunks_by_boundary(
     chunks: List[List[List[int]]],  # [[[int,...], ...], ...]
     segment_by_centroid_sim: Callable[..., List[List[Triple]]] = segment_by_centroid_sim,
     *,
-    tau: float = 0.58,
+    tau: float = 0.7,
     min_chunk_len: int = 1,
     patience: int = 0,
     relu_floor: float = 0.0,

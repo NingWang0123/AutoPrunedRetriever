@@ -27,7 +27,7 @@ import copy
 from optimize_combine_storage import ann_feat_combine,ann_merge_questions_answer_gated
 from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 from rouge_score import rouge_scorer
-from test_continous_chunk import embed_triples_as_sentences,segment_by_centroid_sim 
+from test_continous_chunk import embed_triples_as_sentences,segment_by_centroid_sim,merge_chunks_by_boundary 
 
 Triplet = Tuple[str, str, str]
 
@@ -5203,6 +5203,10 @@ class ExactGraphRag_rl:
                     print('===============================================================')
                     print('===============================================================')
                     print('===============================================================')
+
+            # newly adding trying to merge boundaries
+        self.meta_codebook['facts_lst'] = merge_chunks_by_boundary(chunks = self.meta_codebook['facts_lst'],
+                                                                   sent_emb = self.sentence_emb)
 
     def run_work_flow(self, q_prompt, rule="Answer questions", 
                       facts_json_path: list = None, chunk_chars: int = 800, 
