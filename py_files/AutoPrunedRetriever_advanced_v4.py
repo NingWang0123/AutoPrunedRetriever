@@ -4648,6 +4648,8 @@ class ExactGraphRag_rl:
         facts_codebook_lst = []
         for i in range(0, total_chunks, batch_size):
 
+
+
             batch_chunks = all_chunks[i:i+batch_size]
             fact_cb = get_code_book(
                 batch_chunks,
@@ -5205,7 +5207,9 @@ class ExactGraphRag_rl:
                     print('===============================================================')
 
             # newly adding trying to merge boundaries
+        print('starting to check whether to merge boundaries')
         self.meta_codebook['facts_lst'] = merge_chunks_by_boundary(chunks = self.meta_codebook['facts_lst'],
+                                                                   codebook_main = self.meta_codebook,
                                                                    sent_emb = self.sentence_emb)
 
     def run_work_flow(self, q_prompt, rule="Answer questions", 

@@ -174,6 +174,7 @@ def should_merge_boundary(
     last_encoded: List[int],
     next_encoded: List[int],
     segment_by_centroid_sim: Callable[..., List[List[Triple]]],
+    codebook_main = None,
     *,
     tau: float = 0.7,
     min_chunk_len: int = 1,
@@ -188,8 +189,8 @@ def should_merge_boundary(
     subchunks (i.e., it's safe to merge the adjacent parent chunks).
     """
     # Decode both sides into triples
-    last_triples = decode_subchunk(last_encoded,'words') 
-    next_triples = decode_subchunk(next_encoded,'words')
+    last_triples = decode_subchunk(last_encoded,codebook_main,'words') 
+    next_triples = decode_subchunk(next_encoded,codebook_main,'words')
     if not last_triples or not next_triples:
         # If either side has no triples, be conservative: don't merge.
         return False
@@ -199,7 +200,7 @@ def should_merge_boundary(
 
     # print('all_triples',all_triples)
 
-    vecs = embed_triples_as_sentences(all_triples, sent_emb) 
+    vecs = embed_triples_as_sentences(all_triples,sent_emb) 
 
     # Run segmenter over the concatenation
     chunks = segment_by_centroid_sim(
@@ -229,6 +230,7 @@ def should_merge_boundary(
 def merge_chunks_by_boundary(
     chunks: List[List[List[int]]],  # [[[int,...], ...], ...]
     segment_by_centroid_sim: Callable[..., List[List[Triple]]] = segment_by_centroid_sim,
+    codebook_main = None,
     *,
     tau: float = 0.7,
     min_chunk_len: int = 1,
@@ -267,10 +269,14 @@ def merge_chunks_by_boundary(
         last_left_encoded = left[-1]
         first_right_encoded = right[0]
 
+        # print('left',last_left_encoded)
+        # print('right',first_right_encoded)
+
         merge = should_merge_boundary(
             last_left_encoded,
             first_right_encoded,
             segment_by_centroid_sim,
+            codebook_main = codebook_main,
             tau=tau,
             min_chunk_len=min_chunk_len,
             patience=patience,
@@ -292,6 +298,8 @@ def merge_chunks_by_boundary(
                 cur = left
             else:
                 merged.append(left)
+
+            print(f'merging boundary for chunk{i} and chunk{i+1}')
         else:
             merged.append(left)
             cur = right

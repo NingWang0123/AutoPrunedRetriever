@@ -12,7 +12,7 @@ import copy
 from huggingface_hub import hf_hub_download
 from langchain_community.embeddings import HuggingFaceEmbeddings
 
-from AutoPrunedRetriever_advanced_v3 import (
+from AutoPrunedRetriever_advanced_v4 import (
     ExactGraphRag_rl, merging_codebook
 )
 
@@ -35,7 +35,7 @@ import sys
 # ---------------------------------------------------------------------
 REPO_ID      = "GraphRAG-Bench/GraphRAG-Bench"
 CORPUS_FILE  = "GraphRAG-Benchmark/Datasets/Corpus/medical.json"
-QUEST_FILE   = "Datasets/Questions/lowest_500_questions.json"
+QUEST_FILE   = "Datasets/Questions/medical_questions.json"
 
 SEED_N       = 1    # first 30 rows → bootstrap + DPO train, numbers must be divided by 2. (n%2=0)
 TEST_N       = 1     # next 20 rows  → evaluation
@@ -402,8 +402,8 @@ if __name__ == "__main__":
 
     compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N, 
                             top_m,top_m*10,aft_combine_sim,aft_combine_sim,aft_combine_sim,0.93,
-                            Path("meta_codebook_new2.json") ,f"pref_examples_medical_exact_openai_v3.json",reward_func,
-                            reward_func_mode = 'non_llm',final_json_path = f"results/compressrag_medical_data_openai_test_new_v3_for_aprv3.json")
+                            Path("meta_codebook_new3.json") ,f"pref_examples_medical_exact_openai_v3.json",reward_func,
+                            reward_func_mode = 'non_llm',final_json_path = f"results/compressrag_medical_data_openai_test_new_v3_for_aprv4.json")
 
     # df.to_csv('results/result_sbertinclusive_new_embed_for_exactgraphrag.csv')
 # python pipeline_for_autopruned_openai_new_test_ver_for_v3.py
