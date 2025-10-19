@@ -2286,90 +2286,103 @@ def _score_query_vs_chunk_with_bonus_optimized(
         return 0.0
 
     def score_from_S(S, a):
+        import numpy as np
+
         nq, nc = S.shape
         if nq == 0 or nc == 0:
             return 0.0
 
+        # Attention-weight each row
         S_attn = (a[:, None] * S).astype(np.float32)
 
-        # adaptive top-t mean (weighted matrix)
+        # --- Top-t seeds by attention-weighted score over the matrix ---
         t_pairs = max(1, min(top_t, nq * nc))
         flat = S_attn.ravel()
-        idx = np.argpartition(flat, -t_pairs)[-t_pairs:]
+        idx = np.argpartition(flat, -t_pairs)[-t_pairs:]  # flat indices over (nq*nc)
 
-        # newly added the following triples lst
-
-        # --- 1) Rank the top-t seeds by score and map to triples ---
         rows = (idx // nc).astype(int)
         cols = (idx % nc).astype(int)
-        order = np.argsort(-flat[idx])                 # sort top-t by descending score
+        order = np.argsort(-flat[idx])                    # descending by seed strength
         rows, cols = rows[order], cols[order]
-        seed_scores = flat[idx][order]                 # optional want to use seed strength
+        seed_scores = flat[idx][order]                    # seed strengths (already attention-weighted)
 
+        # Map seeds to triples (within this chunk)
         selected_c_triples_sorted = [c_triples[c] for c in cols.tolist()]
 
-        # --- 2) Call updated helper ONCE (returns list-of-lists aligned to seeds) ---
-        # IMPORTANT: pass a local copy so we don't mutate the original chunk state elsewhere
-        per_seed_paths = get_all_following_triples_for_topt(list(c_triples.copy()), selected_c_triples_sorted.copy())
+        # --- Use your helper ONCE: returns list-of-lists aligned with seeds ---
+        # Work on a local copy so nothing outside is mutated.
+        per_seed_paths = get_all_following_triples_for_topt(list(c_triples), selected_c_triples_sorted)
 
-        # --- 3) Build unique followings per seed (drop the seed itself) ---
+        # Keep only true "following" (drop the seed itself)
         per_seed_follow = []
         for seed_tr, path in zip(selected_c_triples_sorted, per_seed_paths):
             uniq_follow = [tr for tr in path if tr != seed_tr]
             per_seed_follow.append(uniq_follow)
 
-        # --- 4) Rank-penalized, (optionally) similarity-weighted bonus ---
-        base_penalty = 10.0        # rank 1 -> 1/10, rank 2 -> 1/20, ...
-        use_sim_weight = True      # False = count-only
-        k_follow_cap = 64          # cap per seed to avoid long-path domination
+        # --- Seed-softmax budget + length normalization, then (optionally) similarity weighting ---
+        # knobs
+        use_sim_weight = True     # False -> count-only
+        alpha = 0.5               # length normalization exponent: 0, 0.5, or 1.0
+        k_follow_cap = 64         # cap per seed to avoid long-path domination
+        tau = 0.10                # softmax temperature for seed strengths
         gate_tau, gate_temp = 0.15, 0.10
-        path_bonus_weight = 0.5
-        contribs = []
+        path_bonus_weight = 0.5   # global scale for the path bonus (tune as needed)
 
-        # map triple -> col index once for similarity lookup
-        col_index = {tr: j for j, tr in enumerate(c_triples)}
-
-        assigned_total = 0
-        for rank, (follow_trs, seed_w) in enumerate(zip(per_seed_follow, seed_scores.tolist()), start=1):
-            if not follow_trs:
-                continue
-            if k_follow_cap:
-                follow_trs = follow_trs[:k_follow_cap]
-
-            F_idx = [col_index[tr] for tr in follow_trs if tr in col_index]
-            if not F_idx:
-                continue
-            F_idx = np.array(F_idx, dtype=int)
-            assigned_total += len(F_idx)
-
-            rank_pen = 1.0 / (base_penalty * rank)
-
-            if use_sim_weight:
-                # credit per followed edge: max over rows (avoid double counting across question rows)
-                sim_seed_to_F = float(S_attn[:, F_idx].max(axis=0).sum())
-                contrib = rank_pen * sim_seed_to_F
-                # Optional: tie even more to seed strength:
-                # contrib = rank_pen * seed_w * sim_seed_to_F
-            else:
-                contrib = rank_pen * float(len(F_idx))  # count-only
-
-            contribs.append(contrib)
-
-        # --- 5) Normalize + gate, then form final path bonus ---
-        if contribs:
-            raw_signal = float(sum(contribs))
-            signal = raw_signal / np.sqrt(max(1, nq * max(1, assigned_total)))  # √ normalization
+        # Softmax over seed_scores (stable)
+        seed_scores_arr = np.asarray(seed_scores, dtype=float)
+        if seed_scores_arr.size == 0:
+            path_bonus = 0.0
         else:
-            signal = 0.0
+            s_shift = seed_scores_arr - seed_scores_arr.max()
+            w = np.exp(s_shift / max(1e-6, tau))
+            Z = float(w.sum())
+            p = w / (Z if Z > 0 else 1.0)  # p_k sums to 1
 
-        gate = 1.0 / (1.0 + np.exp(-(signal - gate_tau) / max(1e-6, gate_temp)))
-        path_bonus = path_bonus_weight * (gate * signal)
+            # For similarity lookup
+            col_index = {tr: j for j, tr in enumerate(c_triples)}
 
-        # Add `path_bonus` into the return expression for this voter:
-        
+            contribs = []
+            assigned_total = 0
+
+            for k, follow_trs in enumerate(per_seed_follow):
+                if not follow_trs:
+                    continue
+                if k_follow_cap:
+                    follow_trs = follow_trs[:k_follow_cap]
+
+                # length normalization in the penalty
+                L = max(1, len(follow_trs))
+                pen_k = float(p[k]) / (L ** alpha)
+
+                # map followed triples to column indices (stay within this chunk)
+                F_idx = [col_index[tr] for tr in follow_trs if tr in col_index]
+                if not F_idx:
+                    continue
+                F_idx = np.array(F_idx, dtype=int)
+                assigned_total += len(F_idx)
+
+                if use_sim_weight:
+                    # Credit per followed edge = max over rows to avoid double-count across question rows, then sum
+                    sim_seed_to_F = float(S_attn[:, F_idx].max(axis=0).sum())
+                    contribs.append(pen_k * sim_seed_to_F)
+                else:
+                    contribs.append(pen_k * float(len(F_idx)))
+
+            # Final normalization + gate (prevents length bias / noise)
+            if contribs:
+                raw_signal = float(sum(contribs))
+                signal = raw_signal / np.sqrt(max(1, nq * max(1, assigned_total)))
+            else:
+                signal = 0.0
+
+            gate = 1.0 / (1.0 + np.exp(-(signal - gate_tau) / max(1e-6, gate_temp)))
+            path_bonus = float(path_bonus_weight * (gate * signal))
+
+        # --- Base terms---
+        # relevance from top-t mean
         rel = float(flat[idx].mean())
 
-        # attention-weighted coverage (threshold on true best row sims)
+        # attention-weighted coverage (threshold on best row sims)
         best_per_q = S.max(axis=1)
         covered = (best_per_q >= cov_tau).astype(np.float32)
         coverage = float((covered * a).sum())
@@ -2402,7 +2415,14 @@ def _score_query_vs_chunk_with_bonus_optimized(
             if taken > 0:
                 distinct_bonus /= np.sqrt(taken)
 
-        return rel + cov_weight * coverage + pair_weight * good_pairs_bonus + distinct_weight * distinct_bonus + path_bonus
+        return float(
+            rel
+            + cov_weight * coverage
+            + pair_weight * good_pairs_bonus
+            + distinct_weight * distinct_bonus
+            + path_bonus
+        )
+
 
     score = sum(score_from_S(S, a) for S, a in zip(S_list, A_list))
 
