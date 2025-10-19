@@ -78,16 +78,18 @@ def longest_path_including_edge(triples: List[Triple], selected: Triple, max_ste
     return [triples[i] for i in best_edge_indices]
 
 
-def get_all_following_triples_for_topt(all_triples_lst: List[Triple],selected_triples_lst: List[Triple]):
-  all_following_edges = []
-  for triple in selected_triples_lst:
-    following_edges = longest_path_including_edge(all_triples_lst, triple)
-    all_following_edges.extend(following_edges)
 
-    for edge in following_edges:
-      all_triples_lst.remove(edge)
-
-  return all_triples_lst
+def get_all_following_triples_for_topt(all_triples_lst, selected_triples_lst):
+    all_following_edges = []  
+    for triple in selected_triples_lst:
+        if triple in all_triples_lst:
+            following_edges = longest_path_including_edge(all_triples_lst, triple)
+            all_following_edges.append(following_edges)
+            for edge in following_edges:
+                all_triples_lst.remove(edge)
+        else:
+            all_following_edges.append([])
+    return all_following_edges 
 
 
 # following_edges.py

@@ -837,8 +837,7 @@ def get_code_book(
     factparser: bool = False,   
     *,
     batch_size: int = 1,
-    sent_emb = word_emb,
-    last_subchunk = None     
+    sent_emb = word_emb,  
 ):
     valid_types = {'questions', 'answers', 'thinkings', 'facts'}
 
@@ -2299,8 +2298,74 @@ def _score_query_vs_chunk_with_bonus_optimized(
         idx = np.argpartition(flat, -t_pairs)[-t_pairs:]
 
         # newly added the following triples lst
-        selected_c_triples = [c_triples[i] for i in idx]
-        following_triples_lst = get_all_following_triples_for_topt(c_triples,selected_c_triples)
+
+        # --- 1) Rank the top-t seeds by score and map to triples ---
+        rows = (idx // nc).astype(int)
+        cols = (idx % nc).astype(int)
+        order = np.argsort(-flat[idx])                 # sort top-t by descending score
+        rows, cols = rows[order], cols[order]
+        seed_scores = flat[idx][order]                 # optional want to use seed strength
+
+        selected_c_triples_sorted = [c_triples[c] for c in cols.tolist()]
+
+        # --- 2) Call updated helper ONCE (returns list-of-lists aligned to seeds) ---
+        # IMPORTANT: pass a local copy so we don't mutate the original chunk state elsewhere
+        per_seed_paths = get_all_following_triples_for_topt(list(c_triples.copy()), selected_c_triples_sorted.copy())
+
+        # --- 3) Build unique followings per seed (drop the seed itself) ---
+        per_seed_follow = []
+        for seed_tr, path in zip(selected_c_triples_sorted, per_seed_paths):
+            uniq_follow = [tr for tr in path if tr != seed_tr]
+            per_seed_follow.append(uniq_follow)
+
+        # --- 4) Rank-penalized, (optionally) similarity-weighted bonus ---
+        base_penalty = 10.0        # rank 1 -> 1/10, rank 2 -> 1/20, ...
+        use_sim_weight = True      # False = count-only
+        k_follow_cap = 64          # cap per seed to avoid long-path domination
+        gate_tau, gate_temp = 0.15, 0.10
+        path_bonus_weight = 0.5
+        contribs = []
+
+        # map triple -> col index once for similarity lookup
+        col_index = {tr: j for j, tr in enumerate(c_triples)}
+
+        assigned_total = 0
+        for rank, (follow_trs, seed_w) in enumerate(zip(per_seed_follow, seed_scores.tolist()), start=1):
+            if not follow_trs:
+                continue
+            if k_follow_cap:
+                follow_trs = follow_trs[:k_follow_cap]
+
+            F_idx = [col_index[tr] for tr in follow_trs if tr in col_index]
+            if not F_idx:
+                continue
+            F_idx = np.array(F_idx, dtype=int)
+            assigned_total += len(F_idx)
+
+            rank_pen = 1.0 / (base_penalty * rank)
+
+            if use_sim_weight:
+                # credit per followed edge: max over rows (avoid double counting across question rows)
+                sim_seed_to_F = float(S_attn[:, F_idx].max(axis=0).sum())
+                contrib = rank_pen * sim_seed_to_F
+                # Optional: tie even more to seed strength:
+                # contrib = rank_pen * seed_w * sim_seed_to_F
+            else:
+                contrib = rank_pen * float(len(F_idx))  # count-only
+
+            contribs.append(contrib)
+
+        # --- 5) Normalize + gate, then form final path bonus ---
+        if contribs:
+            raw_signal = float(sum(contribs))
+            signal = raw_signal / np.sqrt(max(1, nq * max(1, assigned_total)))  # √ normalization
+        else:
+            signal = 0.0
+
+        gate = 1.0 / (1.0 + np.exp(-(signal - gate_tau) / max(1e-6, gate_temp)))
+        path_bonus = path_bonus_weight * (gate * signal)
+
+        # Add `path_bonus` into the return expression for this voter:
         
         rel = float(flat[idx].mean())
 
@@ -2337,7 +2402,7 @@ def _score_query_vs_chunk_with_bonus_optimized(
             if taken > 0:
                 distinct_bonus /= np.sqrt(taken)
 
-        return rel + cov_weight * coverage + pair_weight * good_pairs_bonus + distinct_weight * distinct_bonus
+        return rel + cov_weight * coverage + pair_weight * good_pairs_bonus + distinct_weight * distinct_bonus + path_bonus
 
     score = sum(score_from_S(S, a) for S, a in zip(S_list, A_list))
 
