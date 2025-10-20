@@ -236,7 +236,7 @@ def merge_chunks_by_boundary(
     segment_by_centroid_sim: Callable[..., List[List[Triple]]] = segment_by_centroid_sim,
     codebook_main = None,
     *,
-    tau: float = 0.7, 
+    tau: float = tau_default, 
     min_chunk_len: int = 1,
     patience: int = 0,
     relu_floor: float = 0.0,
