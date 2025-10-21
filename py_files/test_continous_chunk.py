@@ -74,7 +74,7 @@ def ensure_list_of_triples(triples):
 
 # ---------- segmenter ----------
 
-tau_default = 0.6
+tau_default = 0.5
 # tau_default = 0.7
 
 # def segment_by_centroid_sim(

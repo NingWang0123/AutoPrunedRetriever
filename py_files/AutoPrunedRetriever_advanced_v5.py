@@ -897,7 +897,7 @@ def get_code_book(
         T_vecs = embed_triples_as_sentences(triples_merged, sent_emb)
         chunks = segment_by_centroid_sim(
             triples_merged, T_vecs,
-            tau=0.6,           
+            tau=0.5,           
             patience=0,
             bonus_tail_head=True,
             tail_head_bonus=0.05

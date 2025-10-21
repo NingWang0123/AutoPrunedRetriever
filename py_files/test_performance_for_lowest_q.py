@@ -3,9 +3,9 @@ from pathlib import Path
 from statistics import mean
 
 # -------- Paths --------
-GEN_PATH = Path("GraphRAG-Benchmark/results/generation_compressrag_novel_final.json")
+GEN_PATH = Path("results/generation_scores_novelv5.json")
 ORIG_QUEST_LOCAL = Path("GraphRAG-Benchmark/Datasets/Questions/novel_questions.json")
-OUT_PATH = Path("results/reval_novel_lowest500_by_answer_correctness.json")
+OUT_PATH = Path("results/reval_novel_lowest500_n_by_answer_correctness.json")
 
 # -------- Config --------
 SECTION_NAME = "Fact Retrieval"     # as shown in your JSON
