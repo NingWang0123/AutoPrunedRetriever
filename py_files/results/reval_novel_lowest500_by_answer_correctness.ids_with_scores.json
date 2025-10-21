@@ -1,0 +1,3002 @@
+[
+  {
+    "id": "Novel-5492a510",
+    "answer_correctness": 0.17391162892561393,
+    "rouge_score": 0.0,
+    "question": "In the incident where a man intrudes into Toto's cottage to steal, what specific food item did the man draw out of the cupboard as part of his meal?"
+  },
+  {
+    "id": "Novel-fc6d1c33",
+    "answer_correctness": 0.1759055793074302,
+    "rouge_score": 0.0,
+    "question": "In the story, where was Venus especially worshipped, reflecting her role as a principal deity in certain localities?"
+  },
+  {
+    "id": "Novel-a9564c89",
+    "answer_correctness": 0.17868148712006066,
+    "rouge_score": 0.0,
+    "question": "In the story, whom did Toto's grandmother specifically thank for his help and companionship in the cottage?"
+  },
+  {
+    "id": "Novel-965ad8a8",
+    "answer_correctness": 0.1793965082423627,
+    "rouge_score": 0.0,
+    "question": "Within the novel's discussions about the identity of Ovid's beloved, who was Corinna suspected to be?"
+  },
+  {
+    "id": "Novel-34ad11ec",
+    "answer_correctness": 0.18038378346706774,
+    "rouge_score": 0.25,
+    "question": "In the scene where the young man visits the bishop's study to discuss his relationship with Ellen, at whom does the bishop smile?"
+  },
+  {
+    "id": "Novel-cd572567",
+    "answer_correctness": 0.1806180503943287,
+    "rouge_score": 0.0,
+    "question": "For which institution or project did Dr. Inglis have a visionary plan, particularly in the context of maternity care and women's health?"
+  },
+  {
+    "id": "Novel-712b02a6",
+    "answer_correctness": 0.18084395483851667,
+    "rouge_score": 0.0,
+    "question": "Whom did my Lord issue orders to during the organizational matters described in Samuel Pepys's diary?"
+  },
+  {
+    "id": "Novel-0cac50ed",
+    "answer_correctness": 0.1815744160631974,
+    "rouge_score": 0.0,
+    "question": "In Samuel Pepys's diary, with whom did Pepys have a conversation during the course of his recorded events?"
+  },
+  {
+    "id": "Novel-adf818a2",
+    "answer_correctness": 0.18290985450803113,
+    "rouge_score": 0.0,
+    "question": "In which play did W. H. Denny perform as an actor, contributing to its comic success?"
+  },
+  {
+    "id": "Novel-624c452d",
+    "answer_correctness": 0.1830278346763951,
+    "rouge_score": 0.0,
+    "question": "According to the genealogical accounts within the narrative, who was the mother of Ascanius?"
+  },
+  {
+    "id": "Novel-74440a6a",
+    "answer_correctness": 0.1841965704632561,
+    "rouge_score": 0.0,
+    "question": "Within the account of the royal visit to St. Michael's Mount in Cornwall, who is identified as the person who married Princess Frederica of Hanover?"
+  },
+  {
+    "id": "Novel-b3c430ef",
+    "answer_correctness": 0.1843985975446778,
+    "rouge_score": 0.0,
+    "question": "In the historical account relating to St. Michael's Mount, which individual is said to have caused himself to be bled to death there?"
+  },
+  {
+    "id": "Novel-0ab293c2",
+    "answer_correctness": 0.18466740751001953,
+    "rouge_score": 0.0,
+    "question": "What feature is present in the furnace used for revivifying bone-black, as described in the text?"
+  },
+  {
+    "id": "Novel-7ed82690",
+    "answer_correctness": 0.18498205159813833,
+    "rouge_score": 0.0,
+    "question": "In the machinery described for processing bone-black, what components are mounted on the vertical shaft?"
+  },
+  {
+    "id": "Novel-54b3e97f",
+    "answer_correctness": 0.18587280876374002,
+    "rouge_score": 0.13333333333333336,
+    "question": "According to the diary, which individual drank with Mr. Pepys during one of his social encounters?"
+  },
+  {
+    "id": "Novel-78788ae0",
+    "answer_correctness": 0.1865390860788503,
+    "rouge_score": 0.0,
+    "question": "Who was the mother of John, as noted in the genealogical details of Elsie Inglis's family history?"
+  },
+  {
+    "id": "Novel-c8e42c69",
+    "answer_correctness": 0.187463901975446,
+    "rouge_score": 0.0,
+    "question": "What was the political affiliation of Dr. Inglis, as referenced in her participation in public and political life?"
+  },
+  {
+    "id": "Novel-4a90fe75",
+    "answer_correctness": 0.1878764493488636,
+    "rouge_score": 0.0,
+    "question": "In the novel, what is the name of the place that serves as the primary home for Toto and his grandmother throughout their adventures?"
+  },
+  {
+    "id": "Novel-26ce4d1c",
+    "answer_correctness": 0.19044688967241893,
+    "rouge_score": 0.0,
+    "question": "During water purification as discussed in the narrative, from what substance is air dissolved?"
+  },
+  {
+    "id": "Novel-e05d0922",
+    "answer_correctness": 0.19166753488098104,
+    "rouge_score": 0.125,
+    "question": "According to the description of Kynance Cove in Cornwall, which specific feature is included as a part of Kynance Cove?"
+  },
+  {
+    "id": "Novel-0b0c4cf9",
+    "answer_correctness": 0.19206470862178393,
+    "rouge_score": 0.125,
+    "question": "In the narrative of Samuel Pepys's diary, with whom was my Lord angry during the preparations for a voyage?"
+  },
+  {
+    "id": "Novel-6ded047c",
+    "answer_correctness": 0.1921364375439158,
+    "rouge_score": 0.125,
+    "question": "For which individuals did Mr. Pepys prepare a special collation, as noted in his diary record of hospitality?"
+  },
+  {
+    "id": "Novel-6b20ca96",
+    "answer_correctness": 0.19256493068927105,
+    "rouge_score": 0.0,
+    "question": "In the winter gathering at Toto's cottage, where was the woodchuck located while the other animals and Toto spent time together?"
+  },
+  {
+    "id": "Novel-a29916b0",
+    "answer_correctness": 0.19359478455100848,
+    "rouge_score": 0.0909090909090909,
+    "question": "According to the narrative, what items are mentioned as being included alongside burnouses?"
+  },
+  {
+    "id": "Novel-4061f8c4",
+    "answer_correctness": 0.19414447135387097,
+    "rouge_score": 0.0,
+    "question": "According to the mythological genealogies presented in the narrative, who was identified as the father of Hypseus?"
+  },
+  {
+    "id": "Novel-deee1f4b",
+    "answer_correctness": 0.1955046793669492,
+    "rouge_score": 0.36363636363636365,
+    "question": "In which city did Theophilus Stickney, the father of Angeline Hall, die after years of hardship and estrangement from his family?"
+  },
+  {
+    "id": "Novel-75c9949b",
+    "answer_correctness": 0.19661947202389235,
+    "rouge_score": 0.0,
+    "question": "Within the context of Ovid's references to imperial lineage, from which deity was Augustus said to be descended?"
+  },
+  {
+    "id": "Novel-4be4d916",
+    "answer_correctness": 0.19707940092984,
+    "rouge_score": 0.0,
+    "question": "In Schreiber's apparatus for revivifying bone-black, what component does the drier include as part of its construction?"
+  },
+  {
+    "id": "Novel-fea8a757",
+    "answer_correctness": 0.19850612418584218,
+    "rouge_score": 0.37037037037037035,
+    "question": "During the early morning hours after attending a boxing match and eating at the Owl's Nest, who walked alone on the cross-street?"
+  },
+  {
+    "id": "Novel-49d93af8",
+    "answer_correctness": 0.19879162835244985,
+    "rouge_score": 0.125,
+    "question": "In the context of Schreiber's apparatus for revivifying bone-black, what material are the retorts constructed from?"
+  },
+  {
+    "id": "Novel-8bf3a99b",
+    "answer_correctness": 0.19965337495831587,
+    "rouge_score": 0.16,
+    "question": "Who was the musician from Mekka, noted for playing the lute in the Persian style, as recorded in historical accounts?"
+  },
+  {
+    "id": "Novel-4eaa05dd",
+    "answer_correctness": 0.20004081196235673,
+    "rouge_score": 0.36363636363636365,
+    "question": "Within the story, who is described as a 'dead shot,' noted for his marksmanship and readiness to defend himself?"
+  },
+  {
+    "id": "Novel-1a736b11",
+    "answer_correctness": 0.20025078532177934,
+    "rouge_score": 0.34782608695652173,
+    "question": "Who contributed financially to the Restoration Fund for the Minster Spire, demonstrating civic responsibility in the play?"
+  },
+  {
+    "id": "Novel-3b1e4517",
+    "answer_correctness": 0.20048860134927343,
+    "rouge_score": 0.2727272727272727,
+    "question": "When Fleming first met the girl living near the redwood forest, what article of clothing was she wearing that added to her rustic appearance?"
+  },
+  {
+    "id": "Novel-db30377a",
+    "answer_correctness": 0.20059030110510773,
+    "rouge_score": 0.35294117647058826,
+    "question": "In which town was Chloe Angeline Stickney, later known as Angeline Hall, born, as noted in the opening chapters of the biography?"
+  },
+  {
+    "id": "Novel-90da4658",
+    "answer_correctness": 0.20070450302129683,
+    "rouge_score": 0.32000000000000006,
+    "question": "What distinctive item did the girl wear on her head when Fleming first encountered her near the redwood forest cabin?"
+  },
+  {
+    "id": "Novel-d184bb36",
+    "answer_correctness": 0.2013165835079685,
+    "rouge_score": 0.23076923076923078,
+    "question": "Who were the notable individuals interested in the Ivanhoe mine during the mining excitement described in the text?"
+  },
+  {
+    "id": "Novel-558d306b",
+    "answer_correctness": 0.20214519752283244,
+    "rouge_score": 0.5,
+    "question": "After attending the fight between 'Dutchy' Mack and the Black Diamond, who went to the Owl's Nest restaurant?"
+  },
+  {
+    "id": "Novel-51147943",
+    "answer_correctness": 0.20222921485313955,
+    "rouge_score": 0.25,
+    "question": "Who accompanied Mrs. Hall, also known as Angeline Hall, during her travels as she visited various notable locations later in her life?"
+  },
+  {
+    "id": "Novel-6fa265bc",
+    "answer_correctness": 0.20235624124421514,
+    "rouge_score": 0.1818181818181818,
+    "question": "After the intense events at the nunnery in 'Dragon's Blood', where did Rudolph choose to rest and recover, and what was the setting of this location?"
+  },
+  {
+    "id": "Novel-8f64cf43",
+    "answer_correctness": 0.20285486340896264,
+    "rouge_score": 0.2857142857142857,
+    "question": "While at the French restaurant near Washington Square, which character did Van Bibber recognize and see dining there?"
+  },
+  {
+    "id": "Novel-f3e4ed65",
+    "answer_correctness": 0.20319931091129842,
+    "rouge_score": 0.0,
+    "question": "In the described revivification furnace for bone-black, what material are the blocks, which encase the retorts, made of?"
+  },
+  {
+    "id": "Novel-2d86c774",
+    "answer_correctness": 0.2032988202734251,
+    "rouge_score": 0.1111111111111111,
+    "question": "Which works does Behmer analyze in his study of Wieland's relationship to Laurence Sterne, as referenced in the context of German literary scholarship?"
+  },
+  {
+    "id": "Novel-67daa568",
+    "answer_correctness": 0.20458219812314948,
+    "rouge_score": 0.30769230769230765,
+    "question": "During the events at El-Kesar, which notable historical figures are described as having died there?"
+  },
+  {
+    "id": "Novel-e68a1c3c",
+    "answer_correctness": 0.2049539817566683,
+    "rouge_score": 0.35294117647058826,
+    "question": "Who are listed as the producers of the book 'CHILD'S HEALTH PRIMER,' according to its publication information?"
+  },
+  {
+    "id": "Novel-22696bad",
+    "answer_correctness": 0.20499739090204727,
+    "rouge_score": 0.33333333333333337,
+    "question": "Within the setting of 'Dragon's Blood', in which country are the villages located where much of the story's action takes place?"
+  },
+  {
+    "id": "Novel-0a1eb649",
+    "answer_correctness": 0.2050611210261514,
+    "rouge_score": 0.12500000000000003,
+    "question": "During the events described in the diary, who was the individual that I met with during a particular social occasion?"
+  },
+  {
+    "id": "Novel-28f101b7",
+    "answer_correctness": 0.20571729370487685,
+    "rouge_score": 0.35714285714285715,
+    "question": "At the French restaurant with the terrace and the awning, who was accompanying the young man during his meal?"
+  },
+  {
+    "id": "Novel-fa73ec7c",
+    "answer_correctness": 0.2057672083816568,
+    "rouge_score": 0.14814814814814814,
+    "question": "Which individual is described as being associated with Cay in the narrative, particularly in relation to temple service or priestly duties among the Mayas?"
+  },
+  {
+    "id": "Novel-9b7aadb2",
+    "answer_correctness": 0.20591355141013173,
+    "rouge_score": 0.11111111111111112,
+    "question": "In the discussion of nutrition and body composition, which food item is identified as a contributor to the formation of fat in the body?"
+  },
+  {
+    "id": "Novel-11c6c323",
+    "answer_correctness": 0.20631947561246494,
+    "rouge_score": 0.25,
+    "question": "In the narrative, which region is noted as having similarities with Mayab in terms of customs or cultural traits?"
+  },
+  {
+    "id": "Novel-0386999c",
+    "answer_correctness": 0.20642953670581304,
+    "rouge_score": 0.14814814814814814,
+    "question": "From where were dates brought, according to the trade and agricultural accounts in the narrative?"
+  },
+  {
+    "id": "Novel-13fbbea3",
+    "answer_correctness": 0.20648570648446735,
+    "rouge_score": 0.37037037037037035,
+    "question": "Which individual, related to Angeline Hall, was wounded at the Battle of Bull Run during the Civil War?"
+  },
+  {
+    "id": "Novel-fd699d82",
+    "answer_correctness": 0.20674291932817795,
+    "rouge_score": 0.4375,
+    "question": "Who was recognized as a star performer at the People's theater in St. Paul, according to the city's early theatrical history?"
+  },
+  {
+    "id": "Novel-a39f95c7",
+    "answer_correctness": 0.20675225247234302,
+    "rouge_score": 0.2702702702702703,
+    "question": "Which company was included as part of the St. Paul organizations sent to bury the dead and rescue wounded after the Sioux attacks, according to the narrative?"
+  },
+  {
+    "id": "Novel-ccfae8e3",
+    "answer_correctness": 0.20678727116625756,
+    "rouge_score": 0.2727272727272727,
+    "question": "With which individual is the town of Rodman associated in the biography, particularly as the birthplace and childhood home of the subject?"
+  },
+  {
+    "id": "Novel-de5fab4c",
+    "answer_correctness": 0.20703091641689358,
+    "rouge_score": 0.34285714285714286,
+    "question": "Who are credited as producers of the CHILD'S HEALTH PRIMER?"
+  },
+  {
+    "id": "Novel-f8cdc58f",
+    "answer_correctness": 0.20716397816628043,
+    "rouge_score": 0.12,
+    "question": "Where can the regal instrument still be found in historical contexts?"
+  },
+  {
+    "id": "Novel-81e86b6a",
+    "answer_correctness": 0.20723387570065563,
+    "rouge_score": 0.23529411764705882,
+    "question": "During the course of the play, who joins SHEBA, particularly in scenes involving youthful excitement and social events?"
+  },
+  {
+    "id": "Novel-909f9360",
+    "answer_correctness": 0.2075066706357896,
+    "rouge_score": 0.20689655172413793,
+    "question": "Which character left Price's Confederate army without permission during the events following the battle, and for what personal reason?"
+  },
+  {
+    "id": "Novel-ecf0b2cb",
+    "answer_correctness": 0.20778651410461169,
+    "rouge_score": 0.2857142857142857,
+    "question": "Amidst a tense and heated exchange at the club, who was the character that ultimately broke the silence and shifted the mood of the expatriate gathering?"
+  },
+  {
+    "id": "Novel-19840e69",
+    "answer_correctness": 0.20796998619373952,
+    "rouge_score": 0.16666666666666666,
+    "question": "According to the narrative, in which region are epidemics stated to occur, as described in the context of disease and climate?"
+  },
+  {
+    "id": "Novel-bba0d522",
+    "answer_correctness": 0.2079848707035209,
+    "rouge_score": 0.5714285714285714,
+    "question": "Which group or people are described by Du Chaillu in the narrative, as referenced in his observations within the text?"
+  },
+  {
+    "id": "Novel-3c458c47",
+    "answer_correctness": 0.20826315617148872,
+    "rouge_score": 0.3,
+    "question": "In the description of the natural environment, which region is specifically characterized in the narrative as having luxuriant vegetation?"
+  },
+  {
+    "id": "Novel-67b8e0a9",
+    "answer_correctness": 0.2083770331598427,
+    "rouge_score": 0.3333333333333333,
+    "question": "Who takes THE DEAN into custody or possession, particularly during the misunderstanding at the police station?"
+  },
+  {
+    "id": "Novel-393eabb5",
+    "answer_correctness": 0.2084133914400574,
+    "rouge_score": 0.18181818181818182,
+    "question": "In the Deanery, who inquires about THE DEAN's well-being, demonstrating concern for his health during their visit?"
+  },
+  {
+    "id": "Novel-50852ffa",
+    "answer_correctness": 0.20859499629923559,
+    "rouge_score": 0.13953488372093023,
+    "question": "What did the city of Pekin know about Tong-Ki-Tcheng that allowed Chop-Chin to claim he brought wine as a plea for prayers at the temple?"
+  },
+  {
+    "id": "Novel-a0e852ec",
+    "answer_correctness": 0.20875201381416938,
+    "rouge_score": 0.27586206896551724,
+    "question": "Within the narrative set around the Mountain Clarion newspaper, who is described as a friend of Grey, providing insight into local legends?"
+  },
+  {
+    "id": "Novel-dffcdcf8",
+    "answer_correctness": 0.20879090528826783,
+    "rouge_score": 0.4000000000000001,
+    "question": "According to the instructions for surveying a true meridian, what equipment should a surveyor provide himself with to ensure accuracy?"
+  },
+  {
+    "id": "Novel-4b10d237",
+    "answer_correctness": 0.20885276656554952,
+    "rouge_score": 0.26666666666666666,
+    "question": "Which literary work is specifically mentioned as being associated with the 'Allgemeine deutsche Bibliothek' (Allg. deutsche Bibl.) in the context of German eighteenth-century literary criticism?"
+  },
+  {
+    "id": "Novel-dc60c354",
+    "answer_correctness": 0.20921948556873993,
+    "rouge_score": 0.08695652173913043,
+    "question": "What aliases did the character Carleton use in the story, particularly in relation to the Burrbank murder investigation?"
+  },
+  {
+    "id": "Novel-944d2bc5",
+    "answer_correctness": 0.2093279531594865,
+    "rouge_score": 0.4347826086956522,
+    "question": "During the siege at the nunnery, which character fired shots from the defensive position on the pony-shed, contributing to the defense against the attackers?"
+  },
+  {
+    "id": "Novel-294e8af8",
+    "answer_correctness": 0.20938153410711874,
+    "rouge_score": 0.2926829268292683,
+    "question": "What event caused a stir and surprised the community of Buckeye Hill in relation to the management of the Summit House hotel?"
+  },
+  {
+    "id": "Novel-539448fd",
+    "answer_correctness": 0.20955649498084328,
+    "rouge_score": 0.25,
+    "question": "Who succeeded J. J. Eschenburg as editor in the context of German literary periodicals?"
+  },
+  {
+    "id": "Novel-cdf0477d",
+    "answer_correctness": 0.20959611088115707,
+    "rouge_score": 0.15384615384615385,
+    "question": "When Eily encountered the Green Man in the forest or was distressed by her predicament, whom did she invoke for help or protection?"
+  },
+  {
+    "id": "Novel-e7fbe0e2",
+    "answer_correctness": 0.2096935869661117,
+    "rouge_score": 0.7272727272727272,
+    "question": "What is the title of Chapter IX in the book, as referenced in the table of contents or chapter headings?"
+  },
+  {
+    "id": "Novel-28728520",
+    "answer_correctness": 0.2097190802994347,
+    "rouge_score": 0.2857142857142857,
+    "question": "By what nickname, referencing a character from Laurence Sterne's works, is Johann Georg Jacobi known within his literary circle?"
+  },
+  {
+    "id": "Novel-3d8ab972",
+    "answer_correctness": 0.20999334936504288,
+    "rouge_score": 0.08,
+    "question": "Based on the discussion of nutrition and body composition in the CHILD'S HEALTH PRIMER, what type of food will contribute to the formation of fat in the body?"
+  },
+  {
+    "id": "Novel-4505fae9",
+    "answer_correctness": 0.21001343882102522,
+    "rouge_score": 0.20689655172413793,
+    "question": "During the aftermath of her father's financial scandal in Canada City, who discreetly followed Cissy Trixit to ensure her safety as she traveled?"
+  },
+  {
+    "id": "Novel-c402e349",
+    "answer_correctness": 0.21032467262849053,
+    "rouge_score": 0.11428571428571428,
+    "question": "In the scenes depicting daily life, what do the women examine, as described in the narrative?"
+  },
+  {
+    "id": "Novel-54f18ca7",
+    "answer_correctness": 0.21034148858813984,
+    "rouge_score": 0.23529411764705882,
+    "question": "During the Lower Canada Rebellion, in which village did the Patriotes gather to prepare for military resistance against British forces in the county of Two Mountains?"
+  },
+  {
+    "id": "Novel-57cbe929",
+    "answer_correctness": 0.2104563464201846,
+    "rouge_score": 0.3,
+    "question": "Who authored the discussion about Jersey fisheries, as described in the context of authorship in the narrative?"
+  },
+  {
+    "id": "Novel-3c31caed",
+    "answer_correctness": 0.2104911580870405,
+    "rouge_score": 0.36363636363636365,
+    "question": "During her service on the Eastern front in World War I, in which city did Elsie have a particularly busy and eventful time managing her hospital unit?"
+  },
+  {
+    "id": "Novel-dc537cd7",
+    "answer_correctness": 0.21058462366782574,
+    "rouge_score": 0.3703703703703703,
+    "question": "Within the apple jelly factory's operational roles, what dual functions does the jelly maker perform?"
+  },
+  {
+    "id": "Novel-6598f21c",
+    "answer_correctness": 0.21061050644217078,
+    "rouge_score": 0.42857142857142855,
+    "question": "During his arrival and initial journey into the Chinese interior, in which type of boat did Rudolph sit as he was transported upriver?"
+  },
+  {
+    "id": "Novel-38c4da07",
+    "answer_correctness": 0.21062008288287767,
+    "rouge_score": 0.1764705882352941,
+    "question": "Who was governor of Canada during the administration that followed Sir James Craig and was known for conciliatory policies toward the French Canadians?"
+  },
+  {
+    "id": "Novel-ba894e2c",
+    "answer_correctness": 0.21066637506653113,
+    "rouge_score": 0.19047619047619047,
+    "question": "In the retelling of the Arthurian legend within the novel, who is the character credited with producing King Arthur?"
+  },
+  {
+    "id": "Novel-278ed735",
+    "answer_correctness": 0.2106959509618753,
+    "rouge_score": 0.25,
+    "question": "During the Assembly's consideration of the Ninety-Two Resolutions in Lower Canada, which prominent reformer took a stand in opposition to these resolutions?"
+  },
+  {
+    "id": "Novel-ab708b74",
+    "answer_correctness": 0.21097957914722504,
+    "rouge_score": 0.2857142857142857,
+    "question": "While investigating the area near the nunnery during the siege, what important feature did Rudolph recognize that tipped him off to the enemy's tunneling activities?"
+  },
+  {
+    "id": "Novel-5787c02c",
+    "answer_correctness": 0.2112074808647466,
+    "rouge_score": 0.32,
+    "question": "In the political context of the Lower Canada Rebellion, which figure is identified as a follower of Louis Joseph Papineau and supported his leadership within the Patriote movement?"
+  },
+  {
+    "id": "Novel-83e047ca",
+    "answer_correctness": 0.21123322888682122,
+    "rouge_score": 0.2857142857142857,
+    "question": "In his conversation with the girl at the cabin, what book did Jack Fleming mention he had read, reflecting on its teachings in relation to gold hunting?"
+  },
+  {
+    "id": "Novel-41491cb3",
+    "answer_correctness": 0.2112514083137193,
+    "rouge_score": 0.15384615384615385,
+    "question": "What is the title of the play authored by Ernest Warren that is performed as a comedietta before 'Dandy Dick'?"
+  },
+  {
+    "id": "Novel-6ff7589c",
+    "answer_correctness": 0.21141444896898426,
+    "rouge_score": 0.3333333333333333,
+    "question": "Who, in addition to Asaph Hall, also taught at Shalersville Institute during their time in Ohio?"
+  },
+  {
+    "id": "Novel-869c8d57",
+    "answer_correctness": 0.2114771456175522,
+    "rouge_score": 0.22222222222222218,
+    "question": "While moving near the nunnery during the siege, what significant geographical feature did Rudolph recognize, which played a role in the defenders' awareness of the attackers' tunneling?"
+  },
+  {
+    "id": "Novel-9d5ac399",
+    "answer_correctness": 0.21178915226273398,
+    "rouge_score": 0.2727272727272727,
+    "question": "During Elsie Inglis's childhood years, which family member was described as spending significant time with her, fostering a close bond?"
+  },
+  {
+    "id": "Novel-ba19add3",
+    "answer_correctness": 0.21197392206250443,
+    "rouge_score": 0.23076923076923075,
+    "question": "During a moment at the nunnery, to which servant boy did Rudolph call out, illustrating the daily interactions between foreigners and their Chinese staff?"
+  },
+  {
+    "id": "Novel-f5fc9016",
+    "answer_correctness": 0.21231786373354886,
+    "rouge_score": 0.2727272727272727,
+    "question": "In the narrative's depiction of poetic inspiration, what figure or concept is described as coming to the Poet?"
+  },
+  {
+    "id": "Novel-0e35afe5",
+    "answer_correctness": 0.21250898250182193,
+    "rouge_score": 0.27272727272727276,
+    "question": "Amidst the pressures and uncertainties of their situation in China, to whom did Rudolph confess his thoughts and feelings, seeking understanding?"
+  },
+  {
+    "id": "Novel-1ad52a4e",
+    "answer_correctness": 0.21255787569983547,
+    "rouge_score": 0.3333333333333333,
+    "question": "During the episode at the fonda, who was seen riding the mustang, displaying remarkable horsemanship before the visitors?"
+  },
+  {
+    "id": "Novel-35f5fbd3",
+    "answer_correctness": 0.21260217029475964,
+    "rouge_score": 0.4242424242424242,
+    "question": "Who were reported to have bought the Solitaire mine following its discovery in the Perche district?"
+  },
+  {
+    "id": "Novel-f944ae15",
+    "answer_correctness": 0.21261662037905732,
+    "rouge_score": 0.2962962962962963,
+    "question": "In the apple jelly factory's pressing operation, from what material is the press constructed?"
+  },
+  {
+    "id": "Novel-cef34fff",
+    "answer_correctness": 0.2126930126170608,
+    "rouge_score": 0.4137931034482759,
+    "question": "Who is present with DARBEY during the narrative, especially in scenes involving the younger generation at the Deanery?"
+  },
+  {
+    "id": "Novel-5bae1c96",
+    "answer_correctness": 0.21271579901098037,
+    "rouge_score": 0.3076923076923077,
+    "question": "In the legends recounted in the narrative, who was condemned to the endless task of emptying Dozmare Pool?"
+  },
+  {
+    "id": "Novel-61cf41ee",
+    "answer_correctness": 0.21281395181179993,
+    "rouge_score": 0.37037037037037035,
+    "question": "During the journey through Cornwall, who is identified as the driver responsible for transporting the main party by carriage?"
+  },
+  {
+    "id": "Novel-bb2edb76",
+    "answer_correctness": 0.21281964435830458,
+    "rouge_score": 0.29629629629629634,
+    "question": "In the context of local governance described in the narrative, who holds the position of chief in the community of Figheegh?"
+  },
+  {
+    "id": "Novel-5179c591",
+    "answer_correctness": 0.21288515772472644,
+    "rouge_score": 0.4,
+    "question": "Which notable location did Mrs. Hall visit during her travels, as recounted in the biographical narrative?"
+  },
+  {
+    "id": "Novel-b59fdb33",
+    "answer_correctness": 0.21296609318321227,
+    "rouge_score": 0.17647058823529413,
+    "question": "At the woodmouse wedding supper described in the story, what types of nuts were included among the foods served to the guests?"
+  },
+  {
+    "id": "Novel-7718481e",
+    "answer_correctness": 0.2129889396341833,
+    "rouge_score": 0.5555555555555556,
+    "question": "Who were some of the members of the stock company at the People's theater?"
+  },
+  {
+    "id": "Novel-4196794d",
+    "answer_correctness": 0.21299055222385802,
+    "rouge_score": 0.2857142857142857,
+    "question": "During the boating excursion described in the narrative, where did the young members of the party go after leaving the shore?"
+  },
+  {
+    "id": "Novel-e471244c",
+    "answer_correctness": 0.21316973289238605,
+    "rouge_score": 0.1935483870967742,
+    "question": "According to the philosophical discussion presented in 'Impressions of Theophrastus Such', what is described as the ultimate goal that all organisms strive for?"
+  },
+  {
+    "id": "Novel-878b6eb6",
+    "answer_correctness": 0.2131827157802001,
+    "rouge_score": 0.36363636363636365,
+    "question": "Who led a direct charge against the Sioux during the defense of New Ulm, as described in the events of the Sioux outbreak?"
+  },
+  {
+    "id": "Novel-94e134ef",
+    "answer_correctness": 0.21331094277252402,
+    "rouge_score": 0.3529411764705882,
+    "question": "Which city is described as being near Mogador in the narrative's discussion of regional geography?"
+  },
+  {
+    "id": "Novel-2e2f10c6",
+    "answer_correctness": 0.21336042670209426,
+    "rouge_score": 0.26086956521739135,
+    "question": "What profession is associated with the Jewish character in the narrative, specifically in the context of his occupation?"
+  },
+  {
+    "id": "Novel-c939b0fc",
+    "answer_correctness": 0.21338629897690115,
+    "rouge_score": 0.5,
+    "question": "In the context of literary criticism within the narrative, in which publication does the character Volvox contribute his writings?"
+  },
+  {
+    "id": "Novel-25024e4e",
+    "answer_correctness": 0.213556361101072,
+    "rouge_score": 0.48,
+    "question": "During Chop-Chin's quest to save his father in Pekin, who specifically guarded the second gate of the Golden Dragon's temple?"
+  },
+  {
+    "id": "Novel-d0839ef2",
+    "answer_correctness": 0.21356001540721833,
+    "rouge_score": 0.2608695652173913,
+    "question": "During his time hiding in the tenement after the altercation, whom did Raegen see that impacted his actions and emotions?"
+  },
+  {
+    "id": "Novel-ff5afce7",
+    "answer_correctness": 0.21359635444300618,
+    "rouge_score": 0.1739130434782609,
+    "question": "During their journey on the river, with whom did Heywood share a seat, highlighting their camaraderie aboard the Kut Sing steamer?"
+  },
+  {
+    "id": "Novel-ba9612df",
+    "answer_correctness": 0.21364272049887117,
+    "rouge_score": 0.1739130434782609,
+    "question": "Who does THE DEAN see during their interaction, particularly in scenes involving social calls at the Deanery?"
+  },
+  {
+    "id": "Novel-17ae12cd",
+    "answer_correctness": 0.21366443781924696,
+    "rouge_score": 0.19047619047619047,
+    "question": "Which theatrical production did Samuel Pepys watch during his leisure time, as described in his diary?"
+  },
+  {
+    "id": "Novel-9491e7f0",
+    "answer_correctness": 0.21391455320303937,
+    "rouge_score": 0.3636363636363637,
+    "question": "Who held the position of secretary for the Ladies Aid Society, as mentioned in the narrative's account of volunteer organizations during the Civil War?"
+  },
+  {
+    "id": "Novel-c87c6baf",
+    "answer_correctness": 0.21393413853666926,
+    "rouge_score": 0.22222222222222224,
+    "question": "According to the account of familial relationships among the Maya royal family in the narrative, who was loved by Aac?"
+  },
+  {
+    "id": "Novel-277e2774",
+    "answer_correctness": 0.21394463280189874,
+    "rouge_score": 0.2,
+    "question": "During the period of turmoil surrounding her father's bank, whom did Cissy find when she returned home and discovered the unusual state of her house?"
+  },
+  {
+    "id": "Novel-44f86338",
+    "answer_correctness": 0.21400324164850099,
+    "rouge_score": 0.2608695652173913,
+    "question": "What is the religious affiliation of Kaed as indicated in the narrative's description of characters?"
+  },
+  {
+    "id": "Novel-9dfd9d7f",
+    "answer_correctness": 0.21405375074530564,
+    "rouge_score": 0.4,
+    "question": "In the climactic scene where Chop-Chin removes the idol, what did Chop-Chin use his sash to cover before escaping the temple?"
+  },
+  {
+    "id": "Novel-34b13bc9",
+    "answer_correctness": 0.21419365249494526,
+    "rouge_score": 0.26666666666666666,
+    "question": "Which place is located near Toser, as described in the regional geography of the text?"
+  },
+  {
+    "id": "Novel-c579da71",
+    "answer_correctness": 0.21420383375051136,
+    "rouge_score": 0.3703703703703704,
+    "question": "According to the account of St. Paul's early newspapers, who served as editor of the Pioneer during its influential years?"
+  },
+  {
+    "id": "Novel-611ac003",
+    "answer_correctness": 0.21421105094078524,
+    "rouge_score": 0.2857142857142857,
+    "question": "Who wrote a letter to Asaph, as indicated in the correspondence between family members featured in the biography?"
+  },
+  {
+    "id": "Novel-80328029",
+    "answer_correctness": 0.2142657619560301,
+    "rouge_score": 0.2608695652173913,
+    "question": "At which educational institution did Asaph Hall serve as a teacher, along with his wife Angeline, before pursuing his astronomical career?"
+  },
+  {
+    "id": "Novel-f7fdaea6",
+    "answer_correctness": 0.21430768663097816,
+    "rouge_score": 0.4,
+    "question": "Who is credited with producing the novel using images that were made available by the Bibliotheque nationale de France?"
+  },
+  {
+    "id": "Novel-8468ce49",
+    "answer_correctness": 0.21456243282941007,
+    "rouge_score": 0.10526315789473684,
+    "question": "In the course of the political struggle preceding the Lower Canada Rebellion, which key ally did Louis Joseph Papineau alienate due to differences in political views and strategy?"
+  },
+  {
+    "id": "Novel-41723902",
+    "answer_correctness": 0.21460440190674224,
+    "rouge_score": 0.5333333333333333,
+    "question": "Following the late-night boxing match, who invited Van Bibber to the Owl's Nest restaurant for steak and onions?"
+  },
+  {
+    "id": "Novel-cf87aed7",
+    "answer_correctness": 0.21475316748170842,
+    "rouge_score": 0.1212121212121212,
+    "question": "Whom is SALOME shown considering or reflecting upon, especially regarding family dynamics and guidance in the play?"
+  },
+  {
+    "id": "Novel-8f34d47a",
+    "answer_correctness": 0.21477016560746404,
+    "rouge_score": 0.380952380952381,
+    "question": "Who served as governor of Canada during the period known as the 'Reign of Terror,' which was marked by the suppression of Le Canadien and political tensions with French Canadians?"
+  },
+  {
+    "id": "Novel-46e394b5",
+    "answer_correctness": 0.21488434626711606,
+    "rouge_score": 0.4444444444444445,
+    "question": "In the narrative's description of animal habitats, in which location is the animal called loted found?"
+  },
+  {
+    "id": "Novel-07e567d4",
+    "answer_correctness": 0.21490299354377862,
+    "rouge_score": 0.3448275862068966,
+    "question": "During his attempt to evade the police after a violent encounter, where did Raegen wish to hide in order to avoid being caught?"
+  },
+  {
+    "id": "Novel-b5213026",
+    "answer_correctness": 0.21499597866818415,
+    "rouge_score": 0.2727272727272727,
+    "question": "Who is identified as describing the Systeme Atlantique in the narrative's discussion of geography?"
+  },
+  {
+    "id": "Novel-a296a86b",
+    "answer_correctness": 0.21514159516909487,
+    "rouge_score": 0.3478260869565218,
+    "question": "According to the diary, whom did Samuel Pepys meet with during his daily affairs?"
+  },
+  {
+    "id": "Novel-cfc34fd6",
+    "answer_correctness": 0.21520522360533156,
+    "rouge_score": 0.3529411764705882,
+    "question": "During her time in London for medical experience, which notable location did Elsie visit that is mentioned in her correspondence?"
+  },
+  {
+    "id": "Novel-f1d87691",
+    "answer_correctness": 0.21530165718671102,
+    "rouge_score": 0.23529411764705882,
+    "question": "Who was the editor responsible for the German literary periodical 'Deutsches Museum'?"
+  },
+  {
+    "id": "Novel-53fae064",
+    "answer_correctness": 0.21532269443661162,
+    "rouge_score": 0.3157894736842105,
+    "question": "When Jack Fleming offered a deposit for the pan, what object did the girl take and hold as surety for his return?"
+  },
+  {
+    "id": "Novel-fc8c1f25",
+    "answer_correctness": 0.21540883643878986,
+    "rouge_score": 0.1875,
+    "question": "During her captivity, what topic did Eily repeatedly talk about as a result of the fairy's gift, producing magical objects with every word?"
+  },
+  {
+    "id": "Novel-acec9fa2",
+    "answer_correctness": 0.21542105492394192,
+    "rouge_score": 0.625,
+    "question": "Who was the character that made a proposition to Conway, prompting an exchange of personal histories while they shared a straw shed?"
+  },
+  {
+    "id": "Novel-563587c2",
+    "answer_correctness": 0.2154518240279053,
+    "rouge_score": 0.3,
+    "question": "On the occasion of their outing described in the narrative, to which destination did the carriage ultimately travel?"
+  },
+  {
+    "id": "Novel-a2cb0b77",
+    "answer_correctness": 0.215467835464139,
+    "rouge_score": 0.1694915254237288,
+    "question": "Which publications are listed in the novel as having reviewed Vorticella's book 'The Channel Islands'?"
+  },
+  {
+    "id": "Novel-14c841bc",
+    "answer_correctness": 0.2155040190733278,
+    "rouge_score": 0.2608695652173913,
+    "question": "During the legal and inheritance discussions, to which character did Roxie speak regarding the arrangements and challenges she faced?"
+  },
+  {
+    "id": "Novel-5175a85e",
+    "answer_correctness": 0.21567751043848088,
+    "rouge_score": 0.2608695652173913,
+    "question": "During his excursions in the City, whom did Samuel Pepys meet according to his diary entry?"
+  },
+  {
+    "id": "Novel-8765f7a6",
+    "answer_correctness": 0.21576843936584417,
+    "rouge_score": 0.4,
+    "question": "Who was in command of the First division during the Union military operations described in the narrative's account of the Civil War?"
+  },
+  {
+    "id": "Novel-9e9f49ea",
+    "answer_correctness": 0.21581635166408847,
+    "rouge_score": 0.47058823529411764,
+    "question": "During the secret society initiation ceremony in 'Dragon's Blood', whom did the Master of Incense invoke as part of the ritual before the gathered recruits?"
+  },
+  {
+    "id": "Novel-a77dafa9",
+    "answer_correctness": 0.21582120884321204,
+    "rouge_score": 0.30303030303030304,
+    "question": "During which major historical event was Asaph Hall raised to prominence, as indicated by his increased recognition in the field of astronomy?"
+  },
+  {
+    "id": "Novel-5a7c7b88",
+    "answer_correctness": 0.21586849768548505,
+    "rouge_score": 0.15384615384615385,
+    "question": "To which destination did Samuel Pepys travel in the course of his professional responsibilities, as documented in his diary?"
+  },
+  {
+    "id": "Novel-f2c54ca8",
+    "answer_correctness": 0.21612076299023353,
+    "rouge_score": 0.43478260869565216,
+    "question": "When Chop-Chin reached the temple of the Golden Dragon, what object did he hold out to the guards or priests as part of his ruse?"
+  },
+  {
+    "id": "Novel-a55b2f6f",
+    "answer_correctness": 0.21622924029737492,
+    "rouge_score": 0.56,
+    "question": "Who served as president of the Ladies Aid Society, the organization devoted to supporting wounded soldiers and refugees during the Civil War as recounted in the narrative?"
+  },
+  {
+    "id": "Novel-32b97819",
+    "answer_correctness": 0.216348231150561,
+    "rouge_score": 0.3157894736842105,
+    "question": "In the Eureka Mining Company camp, to whom did Jerrold pose a question regarding their gold prospecting activities?"
+  },
+  {
+    "id": "Novel-84097016",
+    "answer_correctness": 0.2163635628365456,
+    "rouge_score": 0.13333333333333333,
+    "question": "Within the narrative's exploration of technology and the future, what kind of powers is a machine described as possessing?"
+  },
+  {
+    "id": "Novel-14497bbd",
+    "answer_correctness": 0.21640032522947422,
+    "rouge_score": 0.22222222222222224,
+    "question": "In Greek mythology and art, which muse or figure is specifically represented holding or playing a lyre?"
+  },
+  {
+    "id": "Novel-f059dea2",
+    "answer_correctness": 0.21642630598922896,
+    "rouge_score": 0.4615384615384615,
+    "question": "At which intersection in St. Paul was the International hotel, a significant site during the events described, located?"
+  },
+  {
+    "id": "Novel-c8d26f3e",
+    "answer_correctness": 0.21643787361373534,
+    "rouge_score": 0.2857142857142857,
+    "question": "Which mountain did Angeline Hall ascend during her travels, as recounted in her biography?"
+  },
+  {
+    "id": "Novel-1e78dd0f",
+    "answer_correctness": 0.21648691448873916,
+    "rouge_score": 0.3125,
+    "question": "Who accompanied Mrs. Hall, also known as Angeline Hall, on her travels as she visited various locations described in her later years?"
+  },
+  {
+    "id": "Novel-3668a63e",
+    "answer_correctness": 0.21651754187015382,
+    "rouge_score": 0.2105263157894737,
+    "question": "According to the narrative's example comparing animal senses, which animal is described as having eyes?"
+  },
+  {
+    "id": "Novel-1bae3e94",
+    "answer_correctness": 0.2165581440325929,
+    "rouge_score": 0.23529411764705885,
+    "question": "Who is recognized as the author of the satirical novel 'Der Empfindsame', which critiques the sentimental movement in eighteenth-century German literature?"
+  },
+  {
+    "id": "Novel-e2c6c59c",
+    "answer_correctness": 0.21660381251338529,
+    "rouge_score": 0.38095238095238093,
+    "question": "Who holds the position of Consul of France as described in the diplomatic and social interactions of the narrative?"
+  },
+  {
+    "id": "Novel-e18d2c7f",
+    "answer_correctness": 0.21666212247635555,
+    "rouge_score": 0.4,
+    "question": "During the confrontation about Eily's mysterious jewels, to whom did Dr. O'Shaughnessy speak in order to explain or demand information?"
+  },
+  {
+    "id": "Novel-81fe9edb",
+    "answer_correctness": 0.2167081807951286,
+    "rouge_score": 0.25806451612903225,
+    "question": "In the historical events described, which prominent political figure made the International hotel in St. Paul his headquarters during his visit?"
+  },
+  {
+    "id": "Novel-27280ca7",
+    "answer_correctness": 0.21677671001648244,
+    "rouge_score": 0.35294117647058826,
+    "question": "Who proposes to GEORGIANA in the play, initiating a romantic subplot amid the comedic events?"
+  },
+  {
+    "id": "Novel-ce9a2620",
+    "answer_correctness": 0.21677772317314298,
+    "rouge_score": 0.43478260869565216,
+    "question": "During the violent events in the go-down, with what symbolic item was the Christian captive crowned as a form of execution by the attackers?"
+  },
+  {
+    "id": "Novel-3919018c",
+    "answer_correctness": 0.21679696737303045,
+    "rouge_score": 0.42857142857142855,
+    "question": "During the banquet scenes depicted in the narrative, who were the individuals that drank the wine?"
+  },
+  {
+    "id": "Novel-ea3d4859",
+    "answer_correctness": 0.2168076592529402,
+    "rouge_score": 0.5882352941176471,
+    "question": "During the travelers' exploration of the Cornish coastline in the narrative, what notable geographical feature is located near Housel Cove?"
+  },
+  {
+    "id": "Novel-75f181e8",
+    "answer_correctness": 0.21691261586744154,
+    "rouge_score": 0.2222222222222222,
+    "question": "During the travelers' excursions from The Lizard, to which beach did Charles offer to drive the party for sightseeing and bathing?"
+  },
+  {
+    "id": "Novel-6a4086f1",
+    "answer_correctness": 0.21692689573494617,
+    "rouge_score": 0.4210526315789473,
+    "question": "During the apple jelly manufacturing process described, into what do the pomace residues drop after being processed?"
+  },
+  {
+    "id": "Novel-69adc0f1",
+    "answer_correctness": 0.216962112789309,
+    "rouge_score": 0.43478260869565216,
+    "question": "In the social context of the Summit House, who was considered a rival to Judge Fletcher in pursuing Miss Trotter's hand?"
+  },
+  {
+    "id": "Novel-7e564d1e",
+    "answer_correctness": 0.21698930944318728,
+    "rouge_score": 0.21052631578947364,
+    "question": "What feature does the telescope possess in the context of astronomical surveying as described in the narrative?"
+  },
+  {
+    "id": "Novel-c8928151",
+    "answer_correctness": 0.21700980949343018,
+    "rouge_score": 0.42857142857142855,
+    "question": "During the doctor's experiments described in the CHILD'S HEALTH PRIMER, what substance did he put into the stomach to observe its effects?"
+  },
+  {
+    "id": "Novel-e7913a00",
+    "answer_correctness": 0.21707294934793886,
+    "rouge_score": 0.4444444444444444,
+    "question": "Who wrote the work 'Bilder aus dem geistigen Leben unserer Zeit', a study on the intellectual life of the era?"
+  },
+  {
+    "id": "Novel-7e2ac41f",
+    "answer_correctness": 0.2171982178955943,
+    "rouge_score": 0.3157894736842105,
+    "question": "What is another name given to Nephthis in the account of Egyptian mythology within the narrative?"
+  },
+  {
+    "id": "Novel-f18cea43",
+    "answer_correctness": 0.2173076952653139,
+    "rouge_score": 0.21428571428571427,
+    "question": "During the commotion following the police raid at the Eagle Inn, to whom did Gallegher whisper as he attempted to secure the story?"
+  },
+  {
+    "id": "Novel-1068c5b7",
+    "answer_correctness": 0.2173113632484292,
+    "rouge_score": 0.25000000000000006,
+    "question": "According to the text's discussion of grape cultivation, what factor is identified as having a significant effect on grapes?"
+  },
+  {
+    "id": "Novel-b2f65835",
+    "answer_correctness": 0.2174000041811504,
+    "rouge_score": 0.5333333333333333,
+    "question": "According to the story, which object does the boy open while performing his daily actions?"
+  },
+  {
+    "id": "Novel-c6229ad7",
+    "answer_correctness": 0.21744103166868542,
+    "rouge_score": 0.3076923076923077,
+    "question": "In the novel 'Dragon's Blood', by what nickname was Fang recognized, denoting his role as a dangerous and influential figure among the townspeople?"
+  },
+  {
+    "id": "Novel-2ad3d9f2",
+    "answer_correctness": 0.21750118471629518,
+    "rouge_score": 0.3,
+    "question": "During his philosophical musings in the story, where does Lentulus take a walk that frames his conversation about society and ideas?"
+  },
+  {
+    "id": "Novel-e416a392",
+    "answer_correctness": 0.2175077840924921,
+    "rouge_score": 0.6153846153846154,
+    "question": "Within the description of regional resources in the narrative, where is slate identified as being found?"
+  },
+  {
+    "id": "Novel-7fc3edb9",
+    "answer_correctness": 0.21759859721167596,
+    "rouge_score": 0.1739130434782609,
+    "question": "How far does the mountain system called Systeme Atlantique extend, according to the geographical account in the text?"
+  },
+  {
+    "id": "Novel-1af03c49",
+    "answer_correctness": 0.21762850476176127,
+    "rouge_score": 0.1111111111111111,
+    "question": "According to the narrative, which coastal destination does Cornwall include among its notable features?"
+  },
+  {
+    "id": "Novel-a1c1d077",
+    "answer_correctness": 0.21764575878709294,
+    "rouge_score": 0.18867924528301885,
+    "question": "What has Europe long been accustomed to consider about the Jews, as discussed in the text's examination of cultural perceptions?"
+  },
+  {
+    "id": "Novel-7ae0429b",
+    "answer_correctness": 0.21785738712954172,
+    "rouge_score": 0.2608695652173913,
+    "question": "According to the narrative of the Patriote movement in Lower Canada, which political leader counted Louis Joseph Papineau among his followers or supporters?"
+  },
+  {
+    "id": "Novel-b2d6723b",
+    "answer_correctness": 0.21789158390418695,
+    "rouge_score": 0.35714285714285715,
+    "question": "Within the context of German literary discourse, what concept is considered to be the opposite of 'Empfindsamkeit', as discussed in eighteenth-century critiques?"
+  },
+  {
+    "id": "Novel-55755d12",
+    "answer_correctness": 0.21801112407838452,
+    "rouge_score": 0.35714285714285715,
+    "question": "Which publishing house released George Eliot's novel 'Impressions of Theophrastus Such' according to the information provided in the text?"
+  },
+  {
+    "id": "Novel-f9135c63",
+    "answer_correctness": 0.21803726385219535,
+    "rouge_score": 0.5333333333333333,
+    "question": "In the scenes involving the spirited animal at the Ramierez fonda, what kind of animal is the mustang that plays a central role?"
+  },
+  {
+    "id": "Novel-c42877c4",
+    "answer_correctness": 0.21804488114472176,
+    "rouge_score": 0.19999999999999998,
+    "question": "How does the composition of bones contribute to the structure of the chest in children?"
+  },
+  {
+    "id": "Novel-4c68753b",
+    "answer_correctness": 0.2180969878503115,
+    "rouge_score": 0.48,
+    "question": "In the scenes describing Granny's appearance at the cottage party, what distinctive piece of jewelry did she wear, and what was depicted on it?"
+  },
+  {
+    "id": "Novel-d94fa48e",
+    "answer_correctness": 0.2181135801950212,
+    "rouge_score": 0.24390243902439024,
+    "question": "Who defeated the rebels at St Charles, and what was the result of this confrontation?"
+  },
+  {
+    "id": "Novel-dc742cf1",
+    "answer_correctness": 0.21812030137271424,
+    "rouge_score": 0.625,
+    "question": "According to his own account at a public meeting after guiding refugees to safety, by whom was Other Day instructed during his formative years?"
+  },
+  {
+    "id": "Novel-74016ca7",
+    "answer_correctness": 0.2182483480855138,
+    "rouge_score": 0.35294117647058826,
+    "question": "According to the narrative's discussion on bodily strength, what substance is specifically stated as not providing strength to the body?"
+  },
+  {
+    "id": "Novel-b6bddd1e",
+    "answer_correctness": 0.21833699617575342,
+    "rouge_score": 0.2173913043478261,
+    "question": "In the context of the body's internal communication system described in the narrative, what does the brain have to take care of to ensure proper bodily function?"
+  },
+  {
+    "id": "Novel-99a81ca9",
+    "answer_correctness": 0.21834491346346735,
+    "rouge_score": 0.4,
+    "question": "Who is responsible for locking up the Deanery after the events of the evening, ensuring the security of the household?"
+  },
+  {
+    "id": "Novel-c5154650",
+    "answer_correctness": 0.2183573185813601,
+    "rouge_score": 0.2222222222222222,
+    "question": "During Lord Durham's administration in Canada following the suspension of the constitution, who was called to serve on his special council to help govern the province?"
+  },
+  {
+    "id": "Novel-227447b0",
+    "answer_correctness": 0.2183819535196429,
+    "rouge_score": 0.38095238095238093,
+    "question": "When Cissy Trixit returned to her home during the crisis following her father's bank collapse, with which household staff member did she speak to understand the situation?"
+  },
+  {
+    "id": "Novel-e9340ec8",
+    "answer_correctness": 0.21846869650863476,
+    "rouge_score": 0.23076923076923078,
+    "question": "In which location did Asaph Hall earn money by working as a carpenter to support his further education, prior to his studies at Harvard?"
+  },
+  {
+    "id": "Novel-d44eb527",
+    "answer_correctness": 0.21867595957942687,
+    "rouge_score": 0.26666666666666666,
+    "question": "In the context of a personal conversation described in the diary, with whom did I, the narrator, have a talk?"
+  },
+  {
+    "id": "Novel-adfde050",
+    "answer_correctness": 0.21875710179234858,
+    "rouge_score": 0.27586206896551724,
+    "question": "To whom did Sir George Beatson address his remarks regarding the establishment of Scottish Women's Hospitals for Foreign Service?"
+  },
+  {
+    "id": "Novel-06ecaea9",
+    "answer_correctness": 0.21880124502974385,
+    "rouge_score": 0.32,
+    "question": "During the green-goods operation described in Case's tenement, in which room was Alf Wolfe located as he orchestrated the scheme?"
+  },
+  {
+    "id": "Novel-0ce3e959",
+    "answer_correctness": 0.21887047889462585,
+    "rouge_score": 0.4,
+    "question": "In which play did John Clayton perform as an actor, taking on a leading role central to its success?"
+  },
+  {
+    "id": "Novel-9ba19145",
+    "answer_correctness": 0.2188791058570444,
+    "rouge_score": 0.28571428571428575,
+    "question": "What was the primary material used in the construction of the ancient Egyptian Sistrum instrument?"
+  },
+  {
+    "id": "Novel-5025010a",
+    "answer_correctness": 0.2189629194124285,
+    "rouge_score": 0.5882352941176471,
+    "question": "With whom was Cole Conway traveling or keeping company, according to the events described in the story?"
+  },
+  {
+    "id": "Novel-5dd8e62d",
+    "answer_correctness": 0.2189953800883643,
+    "rouge_score": 0.3076923076923077,
+    "question": "By which English author was Wegener influenced in his literary works, particularly in the context of adopting a satirical and whimsical style?"
+  },
+  {
+    "id": "Novel-ecf1e8d7",
+    "answer_correctness": 0.21900803008663616,
+    "rouge_score": 0.25,
+    "question": "In which city was Asaph Hall located while pursuing his academic studies under the mentorship of Professor Brünnow, before beginning his career as an astronomer?"
+  },
+  {
+    "id": "Novel-637bb2bd",
+    "answer_correctness": 0.21915306123987044,
+    "rouge_score": 0.5,
+    "question": "To whom did Asaph Hall sub-let a room during his early years living in Cambridge, as he and Angeline struggled to make ends meet?"
+  },
+  {
+    "id": "Novel-3fddf21b",
+    "answer_correctness": 0.21923394871853713,
+    "rouge_score": 0.46153846153846156,
+    "question": "According to the narrative's explanation of bodily needs, from the lack of what essential element must the body suffer?"
+  },
+  {
+    "id": "Novel-20e55b68",
+    "answer_correctness": 0.21925146580028956,
+    "rouge_score": 0.2857142857142857,
+    "question": "With which other literary figure is Lichtenberg mentioned alongside in discussions of critics and commentators on German sentimentalism?"
+  },
+  {
+    "id": "Novel-21c7cd3c",
+    "answer_correctness": 0.21928323272611955,
+    "rouge_score": 0.25,
+    "question": "Which literary work did Goethe read aloud to his contemporaries, as recorded in accounts of his engagement with English literature?"
+  },
+  {
+    "id": "Novel-b607d092",
+    "answer_correctness": 0.21934099335931145,
+    "rouge_score": 0.4242424242424242,
+    "question": "According to the family and migration history detailed in the narrative, from where and to where was Ali called by his uncle?"
+  },
+  {
+    "id": "Novel-fad73295",
+    "answer_correctness": 0.21942105881870116,
+    "rouge_score": 0.5384615384615384,
+    "question": "Whose works had Mrs. Le Plongeon read, as mentioned in the narrative's discussion of sources consulted before exploring Maya ruins?"
+  },
+  {
+    "id": "Novel-075e66bd",
+    "answer_correctness": 0.21949083147876966,
+    "rouge_score": 0.4444444444444444,
+    "question": "Who influenced the sale of a strip of land involving the Sioux, leading to internal division among the tribe as described in the novel?"
+  },
+  {
+    "id": "Novel-ef451592",
+    "answer_correctness": 0.21949264343991,
+    "rouge_score": 0.4444444444444444,
+    "question": "Aside from Penolver, what other prominent feature is described as being near Housel Cove in the narrative?"
+  },
+  {
+    "id": "Novel-2c702150",
+    "answer_correctness": 0.21959203423408177,
+    "rouge_score": 0.5263157894736842,
+    "question": "Within the depiction of religious communities in the narrative, in which English county is the Methodist sect noted as being present?"
+  },
+  {
+    "id": "Novel-cdd407be",
+    "answer_correctness": 0.21962147267110554,
+    "rouge_score": 0.17777777777777776,
+    "question": "According to the description of mill construction, what key components does the mill have for its operation?"
+  },
+  {
+    "id": "Novel-e22e810e",
+    "answer_correctness": 0.21962881054367026,
+    "rouge_score": 0.34782608695652173,
+    "question": "After Colonel Starbottle's mysterious accident near the Ramierez fonda, who found him in the ditch and helped him recover?"
+  },
+  {
+    "id": "Novel-a43ea44f",
+    "answer_correctness": 0.21971310004991737,
+    "rouge_score": 0.3157894736842105,
+    "question": "In the aftermath of a dramatic rescue by the river, with whom did Rudolph stand, sharing in the tension and uncertainty of their escape?"
+  },
+  {
+    "id": "Novel-f1c88331",
+    "answer_correctness": 0.21971484089620652,
+    "rouge_score": 0.3,
+    "question": "Which biblical book did Angeline Stickney quote in her writings, especially in the context of her advocacy against slavery?"
+  },
+  {
+    "id": "Novel-1c2bd910",
+    "answer_correctness": 0.21972722103277414,
+    "rouge_score": 0.1111111111111111,
+    "question": "Who is mentioned as being located near Toser in the narrative's discussion of local villages and notable figures?"
+  },
+  {
+    "id": "Novel-05910147",
+    "answer_correctness": 0.2197501877462612,
+    "rouge_score": 0.2727272727272727,
+    "question": "Within the climatic discussion in the narrative, in which region is the variation of the thermometer, as described in the text, observed?"
+  },
+  {
+    "id": "Novel-c4c487bc",
+    "answer_correctness": 0.2198620419259357,
+    "rouge_score": 0.2,
+    "question": "In which ancient Assyrian archaeological site were a number of bells discovered?"
+  },
+  {
+    "id": "Novel-bff01916",
+    "answer_correctness": 0.21987629988711888,
+    "rouge_score": 0.39999999999999997,
+    "question": "During the time chronicled in the diary, what item did Mr. Holden send, as mentioned in his interaction with Samuel Pepys?"
+  },
+  {
+    "id": "Novel-b58d9012",
+    "answer_correctness": 0.21988953559225682,
+    "rouge_score": 0.25,
+    "question": "Which prominent English novelist was the subject of ridicule by Musäus in his satirical literary writings?"
+  },
+  {
+    "id": "Novel-287e2097",
+    "answer_correctness": 0.22002208314125576,
+    "rouge_score": 0.13793103448275865,
+    "question": "During the height of political agitation in Lower Canada, whom did Papineau publicly attack in his speeches and resolutions as being responsible for government abuses?"
+  },
+  {
+    "id": "Novel-667a422d",
+    "answer_correctness": 0.22002620253138505,
+    "rouge_score": 0.24,
+    "question": "Who constructed the Rice house, recognized as one of the first brick buildings and principal hotels in early St. Paul?"
+  },
+  {
+    "id": "Novel-8fe8663f",
+    "answer_correctness": 0.22007120074612113,
+    "rouge_score": 0.28571428571428575,
+    "question": "After the police raid disrupted the illegal boxing match, to whom did Captain Scott address his remarks regarding the arrest of the newspaper men?"
+  },
+  {
+    "id": "Novel-5ad931db",
+    "answer_correctness": 0.22014412947109702,
+    "rouge_score": 0.1935483870967742,
+    "question": "To which place did Samuel Pepys travel during the course of his official duties, as documented in his diary?"
+  },
+  {
+    "id": "Novel-f3697acd",
+    "answer_correctness": 0.22014606725607358,
+    "rouge_score": 0.25806451612903225,
+    "question": "On what topic does the periodical 'Allgemeine Litteratur-Zeitung' provide commentary within the context of literary trends in eighteenth-century Germany?"
+  },
+  {
+    "id": "Novel-35f3815e",
+    "answer_correctness": 0.22017561303894465,
+    "rouge_score": 0.2727272727272727,
+    "question": "At which educational institution did Asaph Hall work as a teacher, together with his wife Angeline, prior to his career in astronomy?"
+  },
+  {
+    "id": "Novel-5610453b",
+    "answer_correctness": 0.2201760953408164,
+    "rouge_score": 0.2857142857142857,
+    "question": "Where did Mr. Inglis reside during the years following his return from India, as recounted in the family's history?"
+  },
+  {
+    "id": "Novel-0d21d2d6",
+    "answer_correctness": 0.2206203391977963,
+    "rouge_score": 0.19047619047619044,
+    "question": "Which character did Brindle Bill express disbelief toward during the discussion about the inheritance and family matters?"
+  },
+  {
+    "id": "Novel-e9c535e5",
+    "answer_correctness": 0.2206239943537057,
+    "rouge_score": 0.2608695652173913,
+    "question": "While Elsie was pursuing her medical studies, which instructor or doctor was noted as agreeing with her viewpoints or approaches during class discussions?"
+  },
+  {
+    "id": "Novel-185686b9",
+    "answer_correctness": 0.22064385390616298,
+    "rouge_score": 0.6,
+    "question": "According to the diary's account of diplomatic affairs, which ambassador took leave of the King?"
+  },
+  {
+    "id": "Novel-4b530497",
+    "answer_correctness": 0.22067793839370103,
+    "rouge_score": 0.0909090909090909,
+    "question": "According to the environmental and economic description in the narrative, what natural product is said to abound in Yucatan?"
+  },
+  {
+    "id": "Novel-c1baeaa2",
+    "answer_correctness": 0.22073139501977046,
+    "rouge_score": 0.29629629629629634,
+    "question": "To which notable figures is Vorticella compared in the narrative, highlighting her sense of self-importance as an author?"
+  },
+  {
+    "id": "Novel-77287c53",
+    "answer_correctness": 0.22075601320229082,
+    "rouge_score": 0.13793103448275865,
+    "question": "During their conversation, what did Walters say to Cecil, and how does this reflect their relationship in the narrative?"
+  },
+  {
+    "id": "Novel-81f351e0",
+    "answer_correctness": 0.22079675774974106,
+    "rouge_score": 0.47058823529411764,
+    "question": "Which river is identified as supplying water to Morocco in the descriptions of natural resources within the narrative?"
+  },
+  {
+    "id": "Novel-4e8cfeb0",
+    "answer_correctness": 0.22079714455093083,
+    "rouge_score": 0.2857142857142857,
+    "question": "Which musical instrument is specifically mentioned in the narrative as having been used by the Egyptians during religious rites?"
+  },
+  {
+    "id": "Novel-7e5c21ca",
+    "answer_correctness": 0.22081840660440943,
+    "rouge_score": 0.2857142857142857,
+    "question": "According to the philosophical reflections in the text, to what is consciousness related?"
+  },
+  {
+    "id": "Novel-2b0a2dfb",
+    "answer_correctness": 0.2208999399966317,
+    "rouge_score": 0.10526315789473684,
+    "question": "What notable feature is described as belonging to the town of Toser, according to the text's depiction of its environment?"
+  },
+  {
+    "id": "Novel-cd5e7cb5",
+    "answer_correctness": 0.22094443794444318,
+    "rouge_score": 0.2857142857142857,
+    "question": "In the narrative's description of the natural world, of what larger structure are minerals considered to be a part?"
+  },
+  {
+    "id": "Novel-1edadd2a",
+    "answer_correctness": 0.22098625228129046,
+    "rouge_score": 0.23529411764705885,
+    "question": "In the context of the Maya language as discussed in the narrative, to what does the word 'MOO' refer?"
+  },
+  {
+    "id": "Novel-4cfb5a3a",
+    "answer_correctness": 0.22104550763053243,
+    "rouge_score": 0.7368421052631577,
+    "question": "Who served as the editor of the periodical 'Neue Bibliothek der schönen Wissenschaften und der freyen Künste', which was influential in the German Enlightenment?"
+  },
+  {
+    "id": "Novel-ec7ca0e0",
+    "answer_correctness": 0.22105219538790222,
+    "rouge_score": 0.4,
+    "question": "According to the description of the city's downfall, who was responsible for plundering the city?"
+  },
+  {
+    "id": "Novel-6aaabde4",
+    "answer_correctness": 0.22108830000705737,
+    "rouge_score": 0.4761904761904762,
+    "question": "Within the story's depiction of the Old Inn at Mullion, who is credited with writing a poem about Mary Mundy?"
+  },
+  {
+    "id": "Novel-7d90c178",
+    "answer_correctness": 0.22119418050033174,
+    "rouge_score": 0.09523809523809523,
+    "question": "Who was the husband of Huldah, establishing a family connection in the ancestry of Angeline Hall?"
+  },
+  {
+    "id": "Novel-3f059f86",
+    "answer_correctness": 0.22128231632871903,
+    "rouge_score": 0.5333333333333333,
+    "question": "According to the narrative, what city is designated as the capital of the region of Haiaina?"
+  },
+  {
+    "id": "Novel-152bec6a",
+    "answer_correctness": 0.22131522301006679,
+    "rouge_score": 0.3870967741935483,
+    "question": "Who offered to arrange the legal testimony for Roxie Daymon in her attempt to secure her inheritance during the estate dispute?"
+  },
+  {
+    "id": "Novel-f6793331",
+    "answer_correctness": 0.22137090901492296,
+    "rouge_score": 0.3333333333333333,
+    "question": "After borrowing a pan from the girl at the cabin in the redwoods, what personal item did Fleming wish to recover from her when he returned?"
+  },
+  {
+    "id": "Novel-f05a2e9b",
+    "answer_correctness": 0.22142695173691546,
+    "rouge_score": 0.2,
+    "question": "After his experiences in Monte Carlo, where did Louis intend to return with his wife, as discussed in their conversation?"
+  },
+  {
+    "id": "Novel-76a07999",
+    "answer_correctness": 0.22146268556531737,
+    "rouge_score": 0.30769230769230765,
+    "question": "While planning her outing with Piney in Canada City, where did Cissy express a desire to stop, reflecting her social status and interests?"
+  },
+  {
+    "id": "Novel-1d1d9414",
+    "answer_correctness": 0.2215023386490162,
+    "rouge_score": 0.4,
+    "question": "Who was responsible for constructing the Winslow House, one of the significant hotels mentioned during St. Paul's early history in the novel?"
+  },
+  {
+    "id": "Novel-9fbd09c4",
+    "answer_correctness": 0.221562024869141,
+    "rouge_score": 0.24999999999999997,
+    "question": "During his gold prospecting efforts at the spring, what tool did Fleming unearth while clearing away debris from the watercourse?"
+  },
+  {
+    "id": "Novel-da451391",
+    "answer_correctness": 0.2215987193202777,
+    "rouge_score": 0.48275862068965514,
+    "question": "When making her wish to the Green Man, whom did Eily declare she wanted to be richer than, expressing her ambitions?"
+  },
+  {
+    "id": "Novel-7caf80a1",
+    "answer_correctness": 0.2216234598332602,
+    "rouge_score": 0.23529411764705885,
+    "question": "Who wrote the play 'Dandy Dick', which features the comedic and farcical events at the Deanery?"
+  },
+  {
+    "id": "Novel-362dbef2",
+    "answer_correctness": 0.22162696939542062,
+    "rouge_score": 0.6486486486486486,
+    "question": "Which actress was a member of the stock company at the People's theater, as outlined in the narrative detailing St. Paul's theatrical scene?"
+  },
+  {
+    "id": "Novel-a8a15d1c",
+    "answer_correctness": 0.2216715022617212,
+    "rouge_score": 0.48,
+    "question": "Who held the command of the Department of the Cumberland during the Civil War campaigns as detailed in the narrative?"
+  },
+  {
+    "id": "Novel-e506aa4e",
+    "answer_correctness": 0.22167349512454218,
+    "rouge_score": 0.30303030303030304,
+    "question": "In the narrative surrounding Ellen, what is the relationship between her father and the bishop, as indicated by their roles in the story?"
+  },
+  {
+    "id": "Novel-032659ba",
+    "answer_correctness": 0.2216974547798436,
+    "rouge_score": 0.1,
+    "question": "Who is credited with building the city of Rabat in the historical accounts included in the narrative?"
+  },
+  {
+    "id": "Novel-752ca0c2",
+    "answer_correctness": 0.22183041084199173,
+    "rouge_score": 0.4615384615384615,
+    "question": "In the context of the story's visit to Mullion, which individual did Mary Mundy express her admiration for?"
+  },
+  {
+    "id": "Novel-5b005bba",
+    "answer_correctness": 0.22197865161845226,
+    "rouge_score": 0.28571428571428575,
+    "question": "In the concluding journey aboard the Hakka boat, what geographical feature did the narrative describe as lying beyond, symbolizing the vast and mysterious empire?"
+  },
+  {
+    "id": "Novel-dff662c1",
+    "answer_correctness": 0.22201685290331674,
+    "rouge_score": 0.21428571428571427,
+    "question": "When the stagecoach was stopped by a fallen tree on the mountain road, what specific tool did Yuba Bill request from the settlers in order to clear the obstruction?"
+  },
+  {
+    "id": "Novel-262024cc",
+    "answer_correctness": 0.22205803932231305,
+    "rouge_score": 0.5,
+    "question": "During the scholarly controversy involving Grampus and Merman, which two figures wrote to Grampus regarding the dispute?"
+  },
+  {
+    "id": "Novel-661b7c2a",
+    "answer_correctness": 0.22207380981774905,
+    "rouge_score": 0.2222222222222222,
+    "question": "Who translated Laurence Sterne's 'Tristram Shandy' into German, as credited in bibliographical records?"
+  },
+  {
+    "id": "Novel-8ee2e2c7",
+    "answer_correctness": 0.2221713870086907,
+    "rouge_score": 0.47619047619047616,
+    "question": "During the events at the Deanery, what specific item does THE DEAN put on, as part of his preparation to visit the stable?"
+  },
+  {
+    "id": "Novel-c007b84b",
+    "answer_correctness": 0.22220169425764125,
+    "rouge_score": 0.18604651162790697,
+    "question": "According to the historical account in the text, what is said to have disappeared from America, particularly in reference to the 'Lands of the West'?"
+  },
+  {
+    "id": "Novel-d2746bf8",
+    "answer_correctness": 0.2222424586989806,
+    "rouge_score": 0.5217391304347826,
+    "question": "During the visit to Mullion, who was mentioned as being considered the best ghost-layer in England?"
+  },
+  {
+    "id": "Novel-8dc2b8ae",
+    "answer_correctness": 0.22225565967627484,
+    "rouge_score": 0.16666666666666666,
+    "question": "What was the name of one of the hotels located in St. Paul during its early history, as referenced in the novel?"
+  },
+  {
+    "id": "Novel-8d39da2e",
+    "answer_correctness": 0.2224481230029826,
+    "rouge_score": 0.5714285714285714,
+    "question": "At which venue did Samuel Pepys observe the Duke of York during his attendance at a performance?"
+  },
+  {
+    "id": "Novel-473eae59",
+    "answer_correctness": 0.22245811259398143,
+    "rouge_score": 0.2608695652173913,
+    "question": "Within the context of Ovid's life and Roman society as described in the narrative, what official position did Ovid hold?"
+  },
+  {
+    "id": "Novel-be31fc13",
+    "answer_correctness": 0.2224938565976006,
+    "rouge_score": 0.39999999999999997,
+    "question": "What subject did the character Spike hold a strong opinion about, according to his political discussions in the novel?"
+  },
+  {
+    "id": "Novel-4cb346cb",
+    "answer_correctness": 0.2225672839248944,
+    "rouge_score": 0.25,
+    "question": "According to the diary, who shared a drinking occasion with Samuel Pepys?"
+  },
+  {
+    "id": "Novel-aa179e3f",
+    "answer_correctness": 0.2225820977884203,
+    "rouge_score": 0.2127659574468085,
+    "question": "What was the outcome of the Patriotes' actions at St Denis during the rebellion?"
+  },
+  {
+    "id": "Novel-3cf0e356",
+    "answer_correctness": 0.22262234243894333,
+    "rouge_score": 0.3448275862068965,
+    "question": "Where did the character Mixtus demonstrate his ability in business, according to the narrative's depiction of his commercial success?"
+  },
+  {
+    "id": "Novel-f3c17ac0",
+    "answer_correctness": 0.22267463906575155,
+    "rouge_score": 0.3846153846153846,
+    "question": "During his daring attempt to rescue Wutzler, along what structure did Heywood run swiftly as he charged toward the site of the martyrdom in the siege's aftermath?"
+  },
+  {
+    "id": "Novel-1f7241a3",
+    "answer_correctness": 0.22280002937807708,
+    "rouge_score": 0.4210526315789474,
+    "question": "Who was the author of the play 'Dandy Dick'?"
+  },
+  {
+    "id": "Novel-bc484b0f",
+    "answer_correctness": 0.22289181320757617,
+    "rouge_score": 0.35714285714285715,
+    "question": "During the Civil War movements of the Second Minnesota regiment, at what city did they arrive before being redirected as part of their military campaign?"
+  },
+  {
+    "id": "Novel-06ecb1df",
+    "answer_correctness": 0.22292185260561076,
+    "rouge_score": 0.36363636363636365,
+    "question": "Who authored the German novel 'Tobias Knaut', which is discussed as an example of Sterne's influence on German narrative fiction?"
+  },
+  {
+    "id": "Novel-1b824083",
+    "answer_correctness": 0.22294843262131223,
+    "rouge_score": 0.4,
+    "question": "According to the narrative's depiction of ancestry, from whom was Ilia descended?"
+  },
+  {
+    "id": "Novel-5d6707ec",
+    "answer_correctness": 0.22300546344384115,
+    "rouge_score": 0.4,
+    "question": "In the sequence of events described in the diary, with whom was my Lord angry during the preparations for the fleet's voyage?"
+  },
+  {
+    "id": "Novel-4390cffb",
+    "answer_correctness": 0.22315303386623175,
+    "rouge_score": 0.2926829268292683,
+    "question": "Who published literary criticism in the periodical 'Braunschweiger Intelligenzblätter', as documented in the context of German Enlightenment print culture?"
+  },
+  {
+    "id": "Novel-de0b30b1",
+    "answer_correctness": 0.22316494912010582,
+    "rouge_score": 0.24,
+    "question": "During a social gathering described in the diary, who was present with Lady Batten?"
+  },
+  {
+    "id": "Novel-880faffb",
+    "answer_correctness": 0.2232559014388874,
+    "rouge_score": 0.2,
+    "question": "Within the context of optimizing steam power in a factory or mill, what arrangement does the engineer plan?"
+  },
+  {
+    "id": "Novel-f6b5155a",
+    "answer_correctness": 0.2232656690182213,
+    "rouge_score": 0.4,
+    "question": "With whom was Don Carlo a business partner in the wood yard enterprise at Shirt-Tail Bend?"
+  },
+  {
+    "id": "Novel-8217a825",
+    "answer_correctness": 0.22329077278700282,
+    "rouge_score": 0.4615384615384615,
+    "question": "According to the narrative's description of coastal towns, near which location is the town of Falmouth situated?"
+  },
+  {
+    "id": "Novel-cd123e30",
+    "answer_correctness": 0.22330577629223086,
+    "rouge_score": 0.33333333333333326,
+    "question": "In the geographical description provided, the Great Atlas mountains are included in which larger mountain system?"
+  },
+  {
+    "id": "Novel-62a9b979",
+    "answer_correctness": 0.22330881223453874,
+    "rouge_score": 0.5,
+    "question": "After arresting Hade, where was Detective Hefflefinger supposed to take him according to Gallegher's plan?"
+  },
+  {
+    "id": "Novel-33eeb504",
+    "answer_correctness": 0.2233542520076611,
+    "rouge_score": 0.25,
+    "question": "In the gas engine system described, by what mechanism is gas regulated to ensure proper operation?"
+  },
+  {
+    "id": "Novel-076be3e2",
+    "answer_correctness": 0.2234343684612994,
+    "rouge_score": 0.3529411764705882,
+    "question": "What alternate name is used for Figheegh, according to the naming conventions presented in the text?"
+  },
+  {
+    "id": "Novel-4cf524cb",
+    "answer_correctness": 0.22346487935278564,
+    "rouge_score": 0.2608695652173913,
+    "question": "During a social event described in Samuel Pepys's diary, with whom did he share a drink?"
+  },
+  {
+    "id": "Novel-6b0b36c7",
+    "answer_correctness": 0.223502467587053,
+    "rouge_score": 0.22857142857142856,
+    "question": "What particular honor did Miss Catherwaight attempt to acquire for her collection of secondhand medals and decorations?"
+  },
+  {
+    "id": "Novel-17991540",
+    "answer_correctness": 0.22352897778067096,
+    "rouge_score": 0.5833333333333334,
+    "question": "Who is credited in the narrative with writing the playful review or notice in the publication 'Medley Pie'?"
+  },
+  {
+    "id": "Novel-85c57bc9",
+    "answer_correctness": 0.22353515352693726,
+    "rouge_score": 0.6,
+    "question": "In which Cornish village did Thomas Flavel serve as a reverend gentleman, as mentioned during the visit to the old church?"
+  },
+  {
+    "id": "Novel-6faea159",
+    "answer_correctness": 0.22357916590852014,
+    "rouge_score": 0.2962962962962963,
+    "question": "To which destination does Fez send a caravan, as described in the narrative's account of trade routes and commerce?"
+  },
+  {
+    "id": "Novel-bc1d5800",
+    "answer_correctness": 0.2235852799325066,
+    "rouge_score": 0.31578947368421056,
+    "question": "Which individual does Albrecht Wittenberg mention in his literary correspondence or writings regarding the German literary scene?"
+  },
+  {
+    "id": "Novel-8a166224",
+    "answer_correctness": 0.22359428871865522,
+    "rouge_score": 0.3125,
+    "question": "Who taught Roxie the art of penmanship during her youth, a skill that later played a role in her correspondence?"
+  },
+  {
+    "id": "Novel-fdfcf977",
+    "answer_correctness": 0.22363397896286502,
+    "rouge_score": 0.24242424242424246,
+    "question": "Who was the father of Electa, the mother of Angeline Hall, as established in the genealogical background of the novel?"
+  },
+  {
+    "id": "Novel-7044a5ef",
+    "answer_correctness": 0.22379947583740195,
+    "rouge_score": 0.2727272727272727,
+    "question": "As Gallegher raced back to the city in a stolen cab to deliver news to the Press office, what did he drive beside during his journey?"
+  },
+  {
+    "id": "Novel-d8149b81",
+    "answer_correctness": 0.22387839783485275,
+    "rouge_score": 0.21428571428571427,
+    "question": "Which character is depicted as being so devoted to SHEBA that he claims he would die for her during the unfolding events?"
+  },
+  {
+    "id": "Novel-9536f8e7",
+    "answer_correctness": 0.22397932475861182,
+    "rouge_score": 0.48275862068965514,
+    "question": "During the impromptu wedding he helped arrange, whom did Van Bibber press into service as witnesses to give the ceremony an air of legitimacy?"
+  },
+  {
+    "id": "Novel-e31f34b7",
+    "answer_correctness": 0.2239871732829185,
+    "rouge_score": 0.4,
+    "question": "According to Samuel Pepys's diary, who was the person with whom Pepys had a significant conversation during his daily events?"
+  },
+  {
+    "id": "Novel-a3a406d6",
+    "answer_correctness": 0.22413085775415142,
+    "rouge_score": 0.4090909090909091,
+    "question": "On what committee was Dr. Inglis first appointed, reflecting her involvement in political and social organizations for women?"
+  },
+  {
+    "id": "Novel-038fe57c",
+    "answer_correctness": 0.2241648069469327,
+    "rouge_score": 0.196078431372549,
+    "question": "In the context of the scholarly debate between Grampus and his critics, how did Megalosaurus interpret the words of Grampus?"
+  },
+  {
+    "id": "Novel-bbe14ef1",
+    "answer_correctness": 0.2242486102874635,
+    "rouge_score": 0.4166666666666667,
+    "question": "During the brutal interrogation in the go-down, what did the men-at-arms do to the Christian prisoner while demanding that he renounce his faith?"
+  },
+  {
+    "id": "Novel-50f95cb6",
+    "answer_correctness": 0.22434273303593863,
+    "rouge_score": 0.7142857142857142,
+    "question": "According to the narrative's commentary on social and political attitudes, towards which group are the English felt in high quarters to have been too lenient?"
+  },
+  {
+    "id": "Novel-e78b5a2b",
+    "answer_correctness": 0.22439143789987598,
+    "rouge_score": 0.3333333333333333,
+    "question": "Who is described as vanquishing the Khati, according to the narrative's recounting of historical events in the ancient Near East?"
+  },
+  {
+    "id": "Novel-08098847",
+    "answer_correctness": 0.2244186435522278,
+    "rouge_score": 0.6,
+    "question": "In the described setup for gas analysis, to what is the burette connected during the measurement process?"
+  },
+  {
+    "id": "Novel-fd3bf89d",
+    "answer_correctness": 0.2245380345833918,
+    "rouge_score": 0.375,
+    "question": "In which periodical did Julian Schmidt publish his writings, as part of his contributions to nineteenth-century German literary criticism?"
+  },
+  {
+    "id": "Novel-a316de2b",
+    "answer_correctness": 0.22455035203810977,
+    "rouge_score": 0.4,
+    "question": "During the turbulent period described in the narrative, which European country was preparing to launch an invasion of Mexico?"
+  },
+  {
+    "id": "Novel-c5bc82ff",
+    "answer_correctness": 0.22457103974023657,
+    "rouge_score": 0.23529411764705882,
+    "question": "According to the narrative's reflections on national development, what type of individuals are nations expected to produce?"
+  },
+  {
+    "id": "Novel-ce8ad4ae",
+    "answer_correctness": 0.22462015925944384,
+    "rouge_score": 0.3333333333333333,
+    "question": "According to the text's discussion of building stone supply, in which region is granite particularly abundant?"
+  },
+  {
+    "id": "Novel-c5412c78",
+    "answer_correctness": 0.22466511386075405,
+    "rouge_score": 0.24,
+    "question": "Upon Dr. Inglis's return journey to Britain after World War I, in which city did Evelyn Simson arrive to greet her?"
+  },
+  {
+    "id": "Novel-57375967",
+    "answer_correctness": 0.22474039960230197,
+    "rouge_score": 0.4761904761904762,
+    "question": "From whom did Samuel Pepys borrow money to cover his expenses, as noted in his diary entry?"
+  },
+  {
+    "id": "Novel-57794d1f",
+    "answer_correctness": 0.22478853787333186,
+    "rouge_score": 0.7000000000000001,
+    "question": "On which street in St. Paul was the Concert Hall building, a significant venue for public gatherings and performances, located?"
+  },
+  {
+    "id": "Novel-cf92674c",
+    "answer_correctness": 0.22484877543278436,
+    "rouge_score": 0.2222222222222222,
+    "question": "What is the name of the avenue in St. Paul that is mentioned among the city's notable streets in the historical narrative?"
+  },
+  {
+    "id": "Novel-574362f8",
+    "answer_correctness": 0.2249007836794366,
+    "rouge_score": 0.5,
+    "question": "Where in St. Paul was the Windsor hotel situated, according to the narrative's account of city landmarks?"
+  },
+  {
+    "id": "Novel-72938445",
+    "answer_correctness": 0.2249232625069062,
+    "rouge_score": 0.6153846153846153,
+    "question": "In the apple jelly factory described in the report, what do the storage bins hold before processing begins?"
+  },
+  {
+    "id": "Novel-3c025533",
+    "answer_correctness": 0.22496538600960797,
+    "rouge_score": 0.15789473684210528,
+    "question": "In the context of surveying as discussed in the text, for what purpose is the determination of latitude needed?"
+  },
+  {
+    "id": "Novel-3c195424",
+    "answer_correctness": 0.22502415620644933,
+    "rouge_score": 0.5128205128205129,
+    "question": "Who is credited with writing the fourth part of the multi-part novel 'Die Gleichheit der menschlichen Herzen' in the context of German literature?"
+  },
+  {
+    "id": "Novel-48a7d213",
+    "answer_correctness": 0.22510616381897286,
+    "rouge_score": 0.2,
+    "question": "Who is credited with building the town of Aghmat, as described in the historical account in the narrative?"
+  },
+  {
+    "id": "Novel-465ca672",
+    "answer_correctness": 0.22515079193418958,
+    "rouge_score": 0.3448275862068965,
+    "question": "What is the Egyptian term for the Sistrum, the musical instrument used in ancient Egyptian religious ceremonies?"
+  },
+  {
+    "id": "Novel-8f604aeb",
+    "answer_correctness": 0.22530321525070726,
+    "rouge_score": 0.4736842105263158,
+    "question": "During the engagement at St Denis in the Lower Canada Rebellion, which side was notably without ambulance or transport, impacting their ability to care for the wounded?"
+  },
+  {
+    "id": "Novel-077d32f8",
+    "answer_correctness": 0.2254104145804277,
+    "rouge_score": 0.7777777777777777,
+    "question": "Of which newspaper was E.S. Lightbourn the foreman, as described in the narrative's discussion of prominent printers?"
+  },
+  {
+    "id": "Novel-6b1a0d52",
+    "answer_correctness": 0.2254641164547681,
+    "rouge_score": 0.375,
+    "question": "Who organized Brackett's battalion, a military unit referenced in the Civil War section of the narrative?"
+  },
+  {
+    "id": "Novel-8866282b",
+    "answer_correctness": 0.2254956619803778,
+    "rouge_score": 0.4166666666666667,
+    "question": "In his efforts to help the poor, on which part of the city was Latimer conducting a mission, as referenced in his activities?"
+  },
+  {
+    "id": "Novel-973bc3d0",
+    "answer_correctness": 0.22555775508247242,
+    "rouge_score": 0.32,
+    "question": "Whom did Asaph Hall help protect during a public event in Boston, demonstrating his commitment to the abolitionist cause?"
+  },
+  {
+    "id": "Novel-d65bea45",
+    "answer_correctness": 0.22556905785453069,
+    "rouge_score": 0.5454545454545454,
+    "question": "Who is identified as the first editor of the Minnesotian, one of St. Paul's earliest newspapers, in the historical account provided?"
+  },
+  {
+    "id": "Novel-2114ae1d",
+    "answer_correctness": 0.2256031624450622,
+    "rouge_score": 0.1,
+    "question": "Which professionals examined the Chinese stone 'yu' that was used in constructing ancient musical instruments?"
+  },
+  {
+    "id": "Novel-e2957691",
+    "answer_correctness": 0.2256626184001248,
+    "rouge_score": 0.42857142857142855,
+    "question": "In the story's recounting of the legendary footrace, who was the individual that outstripped Atalanta and thus won the race?"
+  },
+  {
+    "id": "Novel-874ccc88",
+    "answer_correctness": 0.22569078890096028,
+    "rouge_score": 0.12121212121212123,
+    "question": "With which regions does the city of Fez engage in trade, as outlined in the economic activities described in the narrative?"
+  },
+  {
+    "id": "Novel-16920d74",
+    "answer_correctness": 0.22577481467325816,
+    "rouge_score": 0.56,
+    "question": "In the context of the mysteries discussed in relation to Maya sites, in which location did mysteries exist specifically in connection with the Dwarf's House?"
+  },
+  {
+    "id": "Novel-d47858dd",
+    "answer_correctness": 0.22589878776113936,
+    "rouge_score": 0.3333333333333333,
+    "question": "According to the narrative's recounting of mythological correspondence, who wrote a letter to Hypsipyle?"
+  },
+  {
+    "id": "Novel-de0767ce",
+    "answer_correctness": 0.2260502584489742,
+    "rouge_score": 0.2857142857142857,
+    "question": "In the narrative's account of tea at the Old Inn, what specialty did Mary Mundy prepare for her guests?"
+  },
+  {
+    "id": "Novel-a920039e",
+    "answer_correctness": 0.2260725631829988,
+    "rouge_score": 0.5185185185185185,
+    "question": "From which strategic location did Gen. Albert Sidney Johnston withdraw Confederate troops during the Civil War campaigns recounted in the narrative?"
+  },
+  {
+    "id": "Novel-01c7f97c",
+    "answer_correctness": 0.22616433582245277,
+    "rouge_score": 0.26666666666666666,
+    "question": "During the events recorded in Samuel Pepys's diary, who was the person that dined with him, specifically identified as Tom Pepys?"
+  },
+  {
+    "id": "Novel-1e353d15",
+    "answer_correctness": 0.22616928671137648,
+    "rouge_score": 0.5217391304347825,
+    "question": "In Dr. Buente's apparatus for gas analysis, the funnel is part of which specific apparatus component?"
+  },
+  {
+    "id": "Novel-a116a662",
+    "answer_correctness": 0.22618765098979934,
+    "rouge_score": 0.25,
+    "question": "When discussing her personal history aboard the ship to China, what did Mrs. Forrester claim about her national background during her conversation with Rudolph?"
+  },
+  {
+    "id": "Novel-ec3afdb4",
+    "answer_correctness": 0.2262432278394724,
+    "rouge_score": 0.2,
+    "question": "In the context of physiological effects discussed in the narrative, what does alcohol contribute fat to within the body?"
+  },
+  {
+    "id": "Novel-fb164cc9",
+    "answer_correctness": 0.22628610096690413,
+    "rouge_score": 0.32,
+    "question": "According to the narrative's discussion of ancestry and heritage, to whom do Englishmen have a common relationship as described in the text?"
+  },
+  {
+    "id": "Novel-8622e4cc",
+    "answer_correctness": 0.2263086955596914,
+    "rouge_score": 0.4444444444444444,
+    "question": "In which state was Conway, later known as Cole Conway, born according to the story's account of his early life?"
+  },
+  {
+    "id": "Novel-d6b88dbd",
+    "answer_correctness": 0.22638114253807878,
+    "rouge_score": 0.5185185185185185,
+    "question": "During the vote on the Ninety-Two Resolutions in the Assembly of Lower Canada, which member, known for his moderate stance, voted against these resolutions?"
+  },
+  {
+    "id": "Novel-bb9550cb",
+    "answer_correctness": 0.22638404332404355,
+    "rouge_score": 0.12499999999999999,
+    "question": "How did Lentulus, in his evaluations within the narrative, regard poets in terms of quality?"
+  },
+  {
+    "id": "Novel-bb870733",
+    "answer_correctness": 0.22641988752482012,
+    "rouge_score": 0.5185185185185185,
+    "question": "What institution for university women did Dr. Inglis found to support female students in higher education?"
+  },
+  {
+    "id": "Novel-db48e1e1",
+    "answer_correctness": 0.22645208005491557,
+    "rouge_score": 0.6250000000000001,
+    "question": "The Black Range mentioned in the narrative is part of which larger mountain range in the context of the mining rush?"
+  },
+  {
+    "id": "Novel-e7cb20aa",
+    "answer_correctness": 0.22646534270833313,
+    "rouge_score": 0.3076923076923077,
+    "question": "Within the context of animal nutrition discussed in the CHILD'S HEALTH PRIMER, from what food source are eggs made?"
+  },
+  {
+    "id": "Novel-56084fb4",
+    "answer_correctness": 0.22649267323254685,
+    "rouge_score": 0.4166666666666667,
+    "question": "In which institution is the Anglo-Saxon manuscript, referenced for its musical content, currently kept?"
+  },
+  {
+    "id": "Novel-640ee9ee",
+    "answer_correctness": 0.22654750307680122,
+    "rouge_score": 0.5,
+    "question": "On which street was Case's tenement, the central location for the green-goods operation, located?"
+  },
+  {
+    "id": "Novel-3e2b82f5",
+    "answer_correctness": 0.22666806001406714,
+    "rouge_score": 0.31249999999999994,
+    "question": "What military position did Steve Brindle hold in General Pearce's army during the Civil War events depicted in the novel?"
+  },
+  {
+    "id": "Novel-f70df1bc",
+    "answer_correctness": 0.22690799310876147,
+    "rouge_score": 0.24,
+    "question": "Where did Elsie Inglis go to school during her early education before establishing her medical career in Scotland?"
+  },
+  {
+    "id": "Novel-b6d5f2ae",
+    "answer_correctness": 0.22700783455241344,
+    "rouge_score": 0.588235294117647,
+    "question": "On which street was the Maternity Hospice, established and overseen by Dr. Inglis, located in Edinburgh?"
+  },
+  {
+    "id": "Novel-c0ac21ce",
+    "answer_correctness": 0.22721747263851716,
+    "rouge_score": 0.30769230769230765,
+    "question": "To whom did Heinse address his correspondence, as documented among exchanges between German literary figures?"
+  },
+  {
+    "id": "Novel-9f039e8c",
+    "answer_correctness": 0.22727151991531003,
+    "rouge_score": 0.6666666666666666,
+    "question": "On what river is the town of Kesar located, according to the geographical descriptions in the narrative?"
+  },
+  {
+    "id": "Novel-0f0d4401",
+    "answer_correctness": 0.22744518667817554,
+    "rouge_score": 0.5217391304347825,
+    "question": "According to the narrative's discussion of symbolism, what number was regarded as a mystic number among the Egyptians?"
+  },
+  {
+    "id": "Novel-ac73c113",
+    "answer_correctness": 0.22745882890911803,
+    "rouge_score": 0.823529411764706,
+    "question": "Where is the ROYAL COURT THEATRE located?"
+  },
+  {
+    "id": "Novel-b45419a9",
+    "answer_correctness": 0.22752529922939702,
+    "rouge_score": 0.36363636363636365,
+    "question": "To whom did Muley Ismail direct his request during the historical interactions described in the text?"
+  },
+  {
+    "id": "Novel-5847f72a",
+    "answer_correctness": 0.22756406434711793,
+    "rouge_score": 0.2608695652173913,
+    "question": "When the town of Corinth was being pursued by the rebel forces during the Civil War as described in the narrative, what action did it take in response to the threat?"
+  },
+  {
+    "id": "Novel-476e6cd0",
+    "answer_correctness": 0.22764989842470018,
+    "rouge_score": 0.631578947368421,
+    "question": "What city is identified as the capital of the Chaldeans in the narrative's discussion of ancient Mesopotamia?"
+  },
+  {
+    "id": "Novel-2085b009",
+    "answer_correctness": 0.22766557647974678,
+    "rouge_score": 0.6153846153846154,
+    "question": "To which correspondent did G. Hartmann write, as recorded in the exchanges among German intellectuals?"
+  },
+  {
+    "id": "Novel-f4b744e6",
+    "answer_correctness": 0.2278197300683455,
+    "rouge_score": 0.6363636363636364,
+    "question": "Within the apple jelly factory setup described, to what is the boiler furnace connected for the manufacturing process?"
+  },
+  {
+    "id": "Novel-061d8a5d",
+    "answer_correctness": 0.2280403646731942,
+    "rouge_score": 0.5263157894736842,
+    "question": "Who was the individual responsible for building the Carpenter house, one of the notable hotels mentioned in the novel's history of St. Paul?"
+  },
+  {
+    "id": "Novel-12882aa8",
+    "answer_correctness": 0.22804892679798178,
+    "rouge_score": 0.5714285714285714,
+    "question": "According to the references to imperial descent in the narrative, from whom was Augustus said to be descended?"
+  },
+  {
+    "id": "Novel-76052a9a",
+    "answer_correctness": 0.22805984148789074,
+    "rouge_score": 0.5714285714285714,
+    "question": "Within the territorial divisions described in the text, in which region is the city of El-Kesar located?"
+  },
+  {
+    "id": "Novel-aa283616",
+    "answer_correctness": 0.2280822341140108,
+    "rouge_score": 0.36363636363636365,
+    "question": "During her formative educational years, in which European city did Dr. Elsie attend school before returning to Scotland?"
+  },
+  {
+    "id": "Novel-ef187e12",
+    "answer_correctness": 0.22809462804590303,
+    "rouge_score": 0.6206896551724137,
+    "question": "Which region is noted in the text as paying a regular impost to the Emperor of Morocco?"
+  },
+  {
+    "id": "Novel-419cadfe",
+    "answer_correctness": 0.22810943617848667,
+    "rouge_score": 0.37499999999999994,
+    "question": "Within the summary of Arthurian legend provided in the narrative, with whom did King Arthur engage in battle?"
+  },
+  {
+    "id": "Novel-23dbbe8f",
+    "answer_correctness": 0.22825313023645893,
+    "rouge_score": 0.5517241379310345,
+    "question": "After bringing his family home from India during the time of crisis, to whom did Mr. Inglis return to take his place beside while serving in India?"
+  },
+  {
+    "id": "Novel-84c4f293",
+    "answer_correctness": 0.2286225147399715,
+    "rouge_score": 0.5714285714285714,
+    "question": "For which guests did Mr. Pepys arrange a special collation during the events described in his diary?"
+  },
+  {
+    "id": "Novel-ef65fa4f",
+    "answer_correctness": 0.22864718185956262,
+    "rouge_score": 0.6896551724137931,
+    "question": "In the narrative, which group is described as having customs similar to those of the inhabitants of Yucatan, based on the comparison of cultural practices?"
+  },
+  {
+    "id": "Novel-f41a6eed",
+    "answer_correctness": 0.22872919832266594,
+    "rouge_score": 0.6666666666666665,
+    "question": "After Ly-Chee is condemned by the Emperor for soaking the royal garments, where did His Celestial Majesty withdraw into, ending the audience?"
+  },
+  {
+    "id": "Novel-872af6b3",
+    "answer_correctness": 0.2287876827119225,
+    "rouge_score": 0.3225806451612903,
+    "question": "According to the narrative, whose effigy is held by the National Museum of Mexico, as discussed in connection with Maya discoveries?"
+  },
+  {
+    "id": "Novel-11a4f086",
+    "answer_correctness": 0.22879255302307983,
+    "rouge_score": 0.4444444444444444,
+    "question": "At which location in St. Paul was the St. Paul Press newspaper situated during its publication as described in the narrative?"
+  },
+  {
+    "id": "Novel-f0ffe14a",
+    "answer_correctness": 0.22882233051687328,
+    "rouge_score": 0.46153846153846156,
+    "question": "According to the historical recounting of military leadership conflicts, who gave the order for the arrest of Gen. Grant during the Civil War?"
+  },
+  {
+    "id": "Novel-7409b4bb",
+    "answer_correctness": 0.2289087035195374,
+    "rouge_score": 0.4137931034482759,
+    "question": "While building her collection of medals and decorations, what item did Miss Catherwaight find on Bowery, and why was it noteworthy?"
+  },
+  {
+    "id": "Novel-cbf3a899",
+    "answer_correctness": 0.22892214989968346,
+    "rouge_score": 0.5714285714285713,
+    "question": "Within the historical account of the St. Paul fire department, which fire company, originally an active participant, was eventually replaced by St. Paul Hose Company No. 1?"
+  },
+  {
+    "id": "Novel-09d21113",
+    "answer_correctness": 0.22892623375586404,
+    "rouge_score": 0.5714285714285715,
+    "question": "In the account of the road journey after passing through Penzance, to which location did Charles travel with the carriage?"
+  },
+  {
+    "id": "Novel-b182ee0f",
+    "answer_correctness": 0.228949990816281,
+    "rouge_score": 0.5925925925925926,
+    "question": "During the succession events in the city, whom did the people lead to the market-place, resulting in an encounter with the new king?"
+  },
+  {
+    "id": "Novel-6afbeb29",
+    "answer_correctness": 0.22917775266625812,
+    "rouge_score": 0.6153846153846154,
+    "question": "In which cities was the work 'Versuch über den Roman' published, according to its publication history in the eighteenth century?"
+  },
+  {
+    "id": "Novel-5b1265c0",
+    "answer_correctness": 0.22937879769899036,
+    "rouge_score": 0.3478260869565218,
+    "question": "While tracking a suspect in the Burrbank murder case, whom did Gallegher follow to the station at Torresdale?"
+  },
+  {
+    "id": "Novel-5cff0991",
+    "answer_correctness": 0.2293822376724975,
+    "rouge_score": 0.5217391304347827,
+    "question": "With whom did Dr. Elsie correspond while studying in Glasgow, maintaining a close connection through letters?"
+  },
+  {
+    "id": "Novel-d2bac092",
+    "answer_correctness": 0.22975513082301674,
+    "rouge_score": 0.19999999999999998,
+    "question": "In the geographical descriptions in the story, where is Whitesand Bay stated to be located?"
+  },
+  {
+    "id": "Novel-bfecbf96",
+    "answer_correctness": 0.22977505969532372,
+    "rouge_score": 0.588235294117647,
+    "question": "In which city was the Minnehaha Engine Company, one of the key volunteer fire organizations, based according to the historical account?"
+  },
+  {
+    "id": "Novel-d33f62e1",
+    "answer_correctness": 0.22982218715303987,
+    "rouge_score": 0.6666666666666665,
+    "question": "According to the steelworks layout described, to where do ingot cranes transfer the ingots after casting?"
+  },
+  {
+    "id": "Novel-722180f4",
+    "answer_correctness": 0.22987340958082145,
+    "rouge_score": 0.5714285714285714,
+    "question": "During the historical events involving treaties with Native Americans, from which group did the United States acquire land as described in the narrative?"
+  },
+  {
+    "id": "Novel-bfa9a27b",
+    "answer_correctness": 0.2299533276676266,
+    "rouge_score": 0.4,
+    "question": "In which city did Roxie Daymon, previously known as Roxie Fairfield and Daymon's wife, reside before moving to Chicago?"
+  },
+  {
+    "id": "Novel-2a4fcbab",
+    "answer_correctness": 0.22998204609577905,
+    "rouge_score": 0.19047619047619047,
+    "question": "In the narrative, how does the character Hinze express his opinion about the poet Chaucer?"
+  },
+  {
+    "id": "Novel-7d087b64",
+    "answer_correctness": 0.2299983888671179,
+    "rouge_score": 0.3333333333333333,
+    "question": "From which prominent location was Roughtor visible, as experienced by the travelers during their visit to Cornwall?"
+  },
+  {
+    "id": "Novel-4482bd32",
+    "answer_correctness": 0.23001497651068722,
+    "rouge_score": 0.368421052631579,
+    "question": "Who cared for Angeline Hall during her time of need, particularly when she was ill and required assistance in her later years?"
+  },
+  {
+    "id": "Novel-90d5cf72",
+    "answer_correctness": 0.23002362833488227,
+    "rouge_score": 0.3529411764705882,
+    "question": "According to historical accounts in the text, which oases did the Garamantes colonize?"
+  },
+  {
+    "id": "Novel-a4c519cd",
+    "answer_correctness": 0.23005372456136242,
+    "rouge_score": 0.4,
+    "question": "Psalterium is classified as a kind of which ancient stringed instrument?"
+  },
+  {
+    "id": "Novel-fb8d613d",
+    "answer_correctness": 0.2301609459429712,
+    "rouge_score": 0.5,
+    "question": "Within the apparatus for baking refractory products, the smoking furnace is part of what larger system?"
+  },
+  {
+    "id": "Novel-127aad82",
+    "answer_correctness": 0.23025307772709663,
+    "rouge_score": 0.48648648648648657,
+    "question": "Who is identified as the principal banker of Canada City, playing a central role in the town's economy and in Cissy's family life?"
+  },
+  {
+    "id": "Novel-fd687925",
+    "answer_correctness": 0.23025709517240028,
+    "rouge_score": 0.35294117647058826,
+    "question": "Which publisher released the German edition 'Briefe von Yorick', a collection of letters by Laurence Sterne?"
+  },
+  {
+    "id": "Novel-36b41c81",
+    "answer_correctness": 0.23026660267244498,
+    "rouge_score": 0.5555555555555556,
+    "question": "In the manufacture of agglomerated artificial fuel, what substance is coal dust mixed with to create the final product?"
+  },
+  {
+    "id": "Novel-4262873a",
+    "answer_correctness": 0.2302946268336911,
+    "rouge_score": 0.4,
+    "question": "Which group of people adopted the harp as part of their musical tradition according to historical sources?"
+  },
+  {
+    "id": "Novel-ee43e743",
+    "answer_correctness": 0.23032433805731312,
+    "rouge_score": 0.23529411764705882,
+    "question": "In the context of the narrative's discussion of natural processes, what do inorganic combinations include according to the text?"
+  },
+  {
+    "id": "Novel-4bb300c3",
+    "answer_correctness": 0.23057802242491054,
+    "rouge_score": 0.45,
+    "question": "Who gave Cousin Cæsar his first lesson in the rewards of imagination, shaping his outlook and ambitions during childhood?"
+  },
+  {
+    "id": "Novel-e49be454",
+    "answer_correctness": 0.23062872199528028,
+    "rouge_score": 0.8421052631578948,
+    "question": "In which state was Aunt Patsy Perkins's dear brother buried, as mentioned during discussions of family in the narrative?"
+  },
+  {
+    "id": "Novel-4dbf67b1",
+    "answer_correctness": 0.23066646046660944,
+    "rouge_score": 0.18181818181818182,
+    "question": "Which population group is found residing in El Araish, as noted in the demographic descriptions in the narrative?"
+  },
+  {
+    "id": "Novel-bf1c3282",
+    "answer_correctness": 0.23080957622849668,
+    "rouge_score": 0.3529411764705882,
+    "question": "According to the narrative recounting ancient conflicts, who is described as having vanquished the Khati?"
+  },
+  {
+    "id": "Novel-b0b6408f",
+    "answer_correctness": 0.23083840455714097,
+    "rouge_score": 0.5,
+    "question": "Of which larger book series is the 'CHILD'S HEALTH PRIMER' a part, according to the series information provided in the narrative?"
+  },
+  {
+    "id": "Novel-6f2d6386",
+    "answer_correctness": 0.23110524818917602,
+    "rouge_score": 0.7142857142857143,
+    "question": "From which ancestor was Asaph Hall descended, as noted in the biographical account of his family background?"
+  },
+  {
+    "id": "Novel-9fb94929",
+    "answer_correctness": 0.23158788347415116,
+    "rouge_score": 0.38095238095238093,
+    "question": "To which country did Susan Lasco, the sister of John A. Lasco, emigrate with her father after losing hope of recovering the family fortune?"
+  },
+  {
+    "id": "Novel-0cbbd549",
+    "answer_correctness": 0.23160299516473204,
+    "rouge_score": 0.7741935483870969,
+    "question": "Which work did the 'Neue Bibliothek der schönen Wissenschaften' delay a full review of, as noted in the context of eighteenth-century literary periodicals?"
+  },
+  {
+    "id": "Novel-fbef0cd8",
+    "answer_correctness": 0.23162231725643756,
+    "rouge_score": 0.5263157894736842,
+    "question": "At which theatre was the original production of 'Dandy Dick' staged, marking its debut performance?"
+  },
+  {
+    "id": "Novel-37909b08",
+    "answer_correctness": 0.23182995405792062,
+    "rouge_score": 0.7142857142857143,
+    "question": "Within the familial relationships described in the text, who is identified as the brother of Typho?"
+  },
+  {
+    "id": "Novel-c79a2c52",
+    "answer_correctness": 0.23185632754639474,
+    "rouge_score": 0.631578947368421,
+    "question": "Baking chambers, as described in the context of refractory product manufacturing, are part of what type of furnaces?"
+  },
+  {
+    "id": "Novel-13d8667b",
+    "answer_correctness": 0.23197720413095074,
+    "rouge_score": 0.7741935483870968,
+    "question": "In the course of diplomatic negotiations depicted in the narrative, was the Moorish envoy able to conclude a treaty of peace with France?"
+  },
+  {
+    "id": "Novel-2000a7a9",
+    "answer_correctness": 0.23199935102535238,
+    "rouge_score": 0.35294117647058826,
+    "question": "According to the description of gas composition in the soaking pit process, what is one of the components that gas is composed of?"
+  },
+  {
+    "id": "Novel-01876f03",
+    "answer_correctness": 0.232067691848964,
+    "rouge_score": 0.631578947368421,
+    "question": "In his critical judgments throughout the novel, which group did Lentulus tend to rate low in his evaluations?"
+  },
+  {
+    "id": "Novel-3d95a5f2",
+    "answer_correctness": 0.23216212936614639,
+    "rouge_score": 0.7272727272727274,
+    "question": "In which state did Tom Fairfield learn to read and write before migrating to Kentucky, as recounted in his family's early history?"
+  },
+  {
+    "id": "Novel-edb040bb",
+    "answer_correctness": 0.2321621516150339,
+    "rouge_score": 0.5,
+    "question": "According to the narrative about rare bird species, what is another name for the Ocellated Pheasant?"
+  },
+  {
+    "id": "Novel-682c2e93",
+    "answer_correctness": 0.23216529625227142,
+    "rouge_score": 0.6,
+    "question": "In their steel production process, in what specific structures is the Darlington Steel and Iron Company treating ingots?"
+  },
+  {
+    "id": "Novel-5e031204",
+    "answer_correctness": 0.23234549132786722,
+    "rouge_score": 0.6363636363636364,
+    "question": "With whom did Samuel Pepys walk into the City during his daily activities, according to his diary entry?"
+  },
+  {
+    "id": "Novel-58a3acce",
+    "answer_correctness": 0.23251330271624407,
+    "rouge_score": 0.5454545454545454,
+    "question": "Whom did Theophilus Stickney, the father of Angeline Hall, marry, according to the genealogical background provided in the biography?"
+  },
+  {
+    "id": "Novel-5f9dfcb6",
+    "answer_correctness": 0.23252011654468568,
+    "rouge_score": 0.5263157894736842,
+    "question": "With whom was Asaph Hall charmed during his visit to Rodman, as described in the context of his early courtship and family interactions?"
+  },
+  {
+    "id": "Novel-8d545fa4",
+    "answer_correctness": 0.23266163784791988,
+    "rouge_score": 0.380952380952381,
+    "question": "What is another name for the musical instrument known as the rotta?"
+  },
+  {
+    "id": "Novel-d7f0ce35",
+    "answer_correctness": 0.23319657039876135,
+    "rouge_score": 0.4727272727272727,
+    "question": "What sentiments did the Hutchinson family express in their songs to the Army of the Potomac, leading to their expulsion as described in the narrative?"
+  },
+  {
+    "id": "Novel-8df61619",
+    "answer_correctness": 0.2332996075576797,
+    "rouge_score": 0.5333333333333333,
+    "question": "The citole, mentioned among medieval musical instruments, is classified as what kind of instrument?"
+  },
+  {
+    "id": "Novel-745cb06e",
+    "answer_correctness": 0.2333513101863052,
+    "rouge_score": 0.5333333333333333,
+    "question": "In which region is the city of Ceuta located, based on the geographical context provided in the narrative?"
+  },
+  {
+    "id": "Novel-72a77731",
+    "answer_correctness": 0.23345777295376663,
+    "rouge_score": 0.5263157894736842,
+    "question": "While investigating the whereabouts of Hade, whom did Gallegher follow on the way to Torresdale in his pursuit?"
+  },
+  {
+    "id": "Novel-43f2a7a9",
+    "answer_correctness": 0.23350724690742317,
+    "rouge_score": 0.3428571428571429,
+    "question": "What was the role of Maj. Joseph R. Brown in relation to the St. Paul military organizations during the campaign to relieve settlers after the Sioux uprising?"
+  },
+  {
+    "id": "Novel-164736c9",
+    "answer_correctness": 0.2335261978882054,
+    "rouge_score": 0.4444444444444444,
+    "question": "According to the description of seasonal climate in the narrative, during which month is it noted to be hot in Yucatan?"
+  },
+  {
+    "id": "Novel-b815334f",
+    "answer_correctness": 0.2335719909521829,
+    "rouge_score": 0.43478260869565216,
+    "question": "According to the narrative, in which regions are Mussulmen found as mentioned in the discussion of religious distribution?"
+  },
+  {
+    "id": "Novel-d6b9a73e",
+    "answer_correctness": 0.23358969324103004,
+    "rouge_score": 0.5,
+    "question": "The metzilloth, mentioned in ancient Hebrew music, is a type of which percussion instrument?"
+  },
+  {
+    "id": "Novel-af1b400b",
+    "answer_correctness": 0.23359448183186574,
+    "rouge_score": 0.4444444444444444,
+    "question": "Which major body of water did Rudolph Hackh cross during his voyage from Europe to begin his new life in China?"
+  },
+  {
+    "id": "Novel-5e0ccd4f",
+    "answer_correctness": 0.23407212928046772,
+    "rouge_score": 0.46153846153846156,
+    "question": "Where was Robert Bouchette, a prominent participant in the Patriote movement, held as a prisoner following the events of the Lower Canada Rebellion?"
+  },
+  {
+    "id": "Novel-f10f3bc4",
+    "answer_correctness": 0.2342541987749011,
+    "rouge_score": 0.36363636363636365,
+    "question": "During their encounter after the battle, did Cousin Cæsar recognize his old acquaintance Steve Brindle, and what was the outcome of their meeting?"
+  },
+  {
+    "id": "Novel-e39fe71c",
+    "answer_correctness": 0.23436331787357245,
+    "rouge_score": 0.6428571428571429,
+    "question": "At which institution did Elsie Inglis receive her first formal medical teaching during her early studies to become a doctor?"
+  },
+  {
+    "id": "Novel-612b302a",
+    "answer_correctness": 0.23439136677106198,
+    "rouge_score": 0.5217391304347825,
+    "question": "During the journey described in the novel, what did the vehicle begin to do when it reached the mountain, marking a significant change in the trip's progress?"
+  },
+  {
+    "id": "Novel-ff8f3b0c",
+    "answer_correctness": 0.23442585377302508,
+    "rouge_score": 0.33333333333333326,
+    "question": "Where are the apple jelly factories mentioned in the report located within New York State?"
+  },
+  {
+    "id": "Novel-cd57cf13",
+    "answer_correctness": 0.23465435336126375,
+    "rouge_score": 0.8181818181818182,
+    "question": "In the steelworks process described, what is the output of the Bessemer pit used for?"
+  },
+  {
+    "id": "Novel-bf776c5c",
+    "answer_correctness": 0.2346745024950621,
+    "rouge_score": 0.37037037037037035,
+    "question": "Within the descriptions of Corinna's beauty in the narrative, what feature of Corinna might have been desired by Apollo?"
+  },
+  {
+    "id": "Novel-3590e722",
+    "answer_correctness": 0.2347425234586053,
+    "rouge_score": 0.7058823529411764,
+    "question": "To which city does the Pass of Teniah lead, as described in the text's account of regional routes?"
+  },
+  {
+    "id": "Novel-15cb0c88",
+    "answer_correctness": 0.23529366032732232,
+    "rouge_score": 0.8125,
+    "question": "During the American Civil War, in which regiment did Capt. Coates serve as an officer according to the military histories recounted in the novel?"
+  },
+  {
+    "id": "Novel-d76e4df9",
+    "answer_correctness": 0.2353095470414876,
+    "rouge_score": 0.48275862068965514,
+    "question": "How are the moulding wheels set in motion?"
+  },
+  {
+    "id": "Novel-6d738949",
+    "answer_correctness": 0.2354808524145434,
+    "rouge_score": 0.45454545454545453,
+    "question": "During the plan to capture the Burrbank murderer, what did Gallegher want Detective Hefflefinger to do regarding Hade?"
+  },
+  {
+    "id": "Novel-ed54bccb",
+    "answer_correctness": 0.23570251496341393,
+    "rouge_score": 0.6666666666666667,
+    "question": "Which character owns the horse Dandy Dick, whose fate is central to the events surrounding the St. Marvells races?"
+  },
+  {
+    "id": "Novel-5db82bf8",
+    "answer_correctness": 0.23602410847426492,
+    "rouge_score": 0.3846153846153846,
+    "question": "Does the membership list of the Minnehaha Engine Company, as detailed in the early history of St. Paul's fire department, include Harry M. Shaw?"
+  },
+  {
+    "id": "Novel-8dca36f9",
+    "answer_correctness": 0.23622397849017873,
+    "rouge_score": 0.42857142857142855,
+    "question": "Which subjects are taught in the CHILD'S HEALTH PRIMER?"
+  },
+  {
+    "id": "Novel-6c42674a",
+    "answer_correctness": 0.23635903400625408,
+    "rouge_score": 0.4827586206896552,
+    "question": "Where was the Greek lyre artifact discovered, and in which museum is it currently housed?"
+  },
+  {
+    "id": "Novel-f83e84a2",
+    "answer_correctness": 0.23657335835453974,
+    "rouge_score": 0.4705882352941176,
+    "question": "To which professional association did Elsie Maud Inglis write, seeking support or collaboration during the organization of medical units?"
+  },
+  {
+    "id": "Novel-8c555476",
+    "answer_correctness": 0.2373492250373565,
+    "rouge_score": 0.31999999999999995,
+    "question": "What type of quarries are found in Washington County, New York, as described in the narrative about building materials?"
+  },
+  {
+    "id": "Novel-a4b7873b",
+    "answer_correctness": 0.23741013316777987,
+    "rouge_score": 0.8181818181818182,
+    "question": "In which German city was the work 'Reisen unter Sonne, Mond und Sternen' published, according to bibliographical records?"
+  },
+  {
+    "id": "Novel-daac4d33",
+    "answer_correctness": 0.23743724855948095,
+    "rouge_score": 0.4615384615384615,
+    "question": "On the occasion described in Samuel Pepys's diary, with whom did Samuel Pepys share a meal?"
+  },
+  {
+    "id": "Novel-89de49a4",
+    "answer_correctness": 0.2374658740925411,
+    "rouge_score": 0.4000000000000001,
+    "question": "In the context of early Roman history depicted in the novel, what was the relationship between Tatius and Romulus?"
+  },
+  {
+    "id": "Novel-afb11f97",
+    "answer_correctness": 0.23756336052708346,
+    "rouge_score": 0.8421052631578948,
+    "question": "In which German city was the periodical 'Neue Zeitungen von Gelehrten Sachen' published, contributing to Enlightenment literary culture?"
+  },
+  {
+    "id": "Novel-4e0348b9",
+    "answer_correctness": 0.23758386990037061,
+    "rouge_score": 0.7999999999999999,
+    "question": "In which state is the Perche district, the site of the described mining rush, located?"
+  },
+  {
+    "id": "Novel-47995a35",
+    "answer_correctness": 0.23785790484157437,
+    "rouge_score": 0.5333333333333333,
+    "question": "Within the classification of wind instruments, what type of instrument is the shehna considered to be?"
+  },
+  {
+    "id": "Novel-7c516e03",
+    "answer_correctness": 0.23879954218013286,
+    "rouge_score": 0.5,
+    "question": "In which publication was the work 'Coriat' reviewed, as documented in the context of German literary periodicals?"
+  },
+  {
+    "id": "Novel-ac9a05e7",
+    "answer_correctness": 0.23904468899300324,
+    "rouge_score": 0.4999999999999999,
+    "question": "According to the narrative in 'Vestiges of the Mayas,' between which regions is the territory known as Tierra de Guerra situated, specifically as described in its geographical context?"
+  },
+  {
+    "id": "Novel-1b7a0e02",
+    "answer_correctness": 0.24050926670846795,
+    "rouge_score": 0.39999999999999997,
+    "question": "During the first evening at The Lizard, what did Charles call out excitedly upon seeing the lights, as described in the narrative?"
+  },
+  {
+    "id": "Novel-c4349293",
+    "answer_correctness": 0.24082165635715086,
+    "rouge_score": 0.5882352941176471,
+    "question": "What is the familial relationship between Muley Abd Errahman and Muley Suleiman as presented in the genealogical accounts of the narrative?"
+  },
+  {
+    "id": "Novel-941c0004",
+    "answer_correctness": 0.24093974252597072,
+    "rouge_score": 0.5714285714285715,
+    "question": "To which city did cousin Cæsar travel after his early years, as he sought new opportunities and adventures?"
+  },
+  {
+    "id": "Novel-dc52ffce",
+    "answer_correctness": 0.24106546928521777,
+    "rouge_score": 0.6666666666666666,
+    "question": "With whom did Mr. Lockwood attend school, as revealed in the story of the silver medal Miss Catherwaight found for her collection?"
+  },
+  {
+    "id": "Novel-98ea72d7",
+    "answer_correctness": 0.24270666560331078,
+    "rouge_score": 0.5333333333333333,
+    "question": "Within the academic discussion about ancient cultures in 'Impressions of Theophrastus Such', what is another name by which the Zuzumotzis are referred to?"
+  },
+  {
+    "id": "Novel-8089ca4d",
+    "answer_correctness": 0.24515975840813867,
+    "rouge_score": 0.8571428571428571,
+    "question": "To which Native American tribe did Other Day, the guide who led refugees to safety during the Sioux outbreak, belong?"
+  },
+  {
+    "id": "Novel-1ef8833c",
+    "answer_correctness": 0.2487686618116452,
+    "rouge_score": 0.923076923076923,
+    "question": "According to the narrative, in which city is Regent's Park located?"
+  },
+  {
+    "id": "Novel-7ee9b77f",
+    "answer_correctness": 0.24937307334866976,
+    "rouge_score": 0.9333333333333333,
+    "question": "Where are the Pueblo Indians located, as specified in the context of the narrative's discussion of indigenous North American groups?"
+  },
+  {
+    "id": "Novel-c227f2f2",
+    "answer_correctness": 0.311504977415738,
+    "rouge_score": 0.15999999999999998,
+    "question": "Who are identified as members of the Minnehaha Engine Company, a key volunteer fire organization in St. Paul's early history?"
+  },
+  {
+    "id": "Novel-8b99b755",
+    "answer_correctness": 0.3659993108199115,
+    "rouge_score": 0.33333333333333326,
+    "question": "Which musical instruments are used by the Greeks according to the provided information?"
+  },
+  {
+    "id": "Novel-26033837",
+    "answer_correctness": 0.38690151621363256,
+    "rouge_score": 0.1818181818181818,
+    "question": "In the correspondence featured within the narrative, which individuals wrote letters to Sabinus, as indicated by the exchange of letters among mythological figures?"
+  },
+  {
+    "id": "Novel-b1ab4938",
+    "answer_correctness": 0.44465436024944544,
+    "rouge_score": 0.3333333333333333,
+    "question": "Within the mythological accounts provided in the narrative, who are named as the brothers of Briareus?"
+  },
+  {
+    "id": "Novel-350fb80a",
+    "answer_correctness": 0.44706224350082396,
+    "rouge_score": 0.2222222222222222,
+    "question": "What notable archaeological discovery did the author make at Chichen-Itza, as described in the narrative?"
+  },
+  {
+    "id": "Novel-0c89dcba",
+    "answer_correctness": 0.44926293075081875,
+    "rouge_score": 0.43333333333333335,
+    "question": "According to the discussion of individuality and social enrichment in the novel, what has a modern book on Liberty maintained regarding the freedom of individual men?"
+  },
+  {
+    "id": "Novel-87d7f30f",
+    "answer_correctness": 0.4529074917695521,
+    "rouge_score": 0.372093023255814,
+    "question": "Which musical instruments, including the pipe and syrinx, were used by the Peruvians according to historical accounts?"
+  },
+  {
+    "id": "Novel-83d2a1a9",
+    "answer_correctness": 0.4622478947190376,
+    "rouge_score": 0.19999999999999998,
+    "question": "During the girls' walk through Canada City, which character performed a dramatic horseback maneuver, charging up to Cissy Trixit as a display of bravado?"
+  },
+  {
+    "id": "Novel-3077d6bc",
+    "answer_correctness": 0.4648721328812017,
+    "rouge_score": 0.21428571428571427,
+    "question": "During the sea voyage to China, with which character did Miss Forrester engage in conversation, sparking a connection that would develop throughout the novel?"
+  },
+  {
+    "id": "Novel-ebb0af4d",
+    "answer_correctness": 0.465303652956893,
+    "rouge_score": 0.38095238095238093,
+    "question": "In the journey along the Cornish coastline, what notable location is described as being near Housel Cove?"
+  },
+  {
+    "id": "Novel-2cd3be1d",
+    "answer_correctness": 0.46564427060424485,
+    "rouge_score": 0.48275862068965514,
+    "question": "In the aftermath of the court-yard mishap, to whom did His Celestial Majesty, the Emperor, express his agony about his damp and ruined attire?"
+  },
+  {
+    "id": "Novel-0dc11963",
+    "answer_correctness": 0.46884973996599744,
+    "rouge_score": 0.16326530612244897,
+    "question": "What information did Mrs. Inglis provide in her reports concerning her daughter Elsie, particularly during Elsie's early years?"
+  },
+  {
+    "id": "Novel-7f529715",
+    "answer_correctness": 0.46961973124709994,
+    "rouge_score": 0.45161290322580644,
+    "question": "In the story Chop-Chin tells, from whom did the guards at the temple gates receive both a greeting and wine meant as a plea for prayers?"
+  },
+  {
+    "id": "Novel-af243069",
+    "answer_correctness": 0.48270866567379356,
+    "rouge_score": 0.375,
+    "question": "According to the discussion of engines in industrial settings, into what types are engines subdivided?"
+  },
+  {
+    "id": "Novel-1b8745a9",
+    "answer_correctness": 0.4828395434146678,
+    "rouge_score": 0.3478260869565218,
+    "question": "To whom did Angeline Hall plead during a difficult financial and personal period in her marriage, as she and her husband faced hardship?"
+  },
+  {
+    "id": "Novel-38953b85",
+    "answer_correctness": 0.4873086763434843,
+    "rouge_score": 0.0,
+    "question": "To which location did Samuel Pepys travel during the events recorded in his diary, specifically as part of his official duties?"
+  },
+  {
+    "id": "Novel-b6dc1118",
+    "answer_correctness": 0.4965934999592514,
+    "rouge_score": 0.2,
+    "question": "On which steamboat did the Englishman lose his life in a fire, leading to the revelation about Susan Lasco's inheritance?"
+  },
+  {
+    "id": "Novel-6580dc7a",
+    "answer_correctness": 0.5034659702753712,
+    "rouge_score": 0.23529411764705882,
+    "question": "During the events described in Samuel Pepys's diary, who was the lady that dined with him, as recorded in his daily account?"
+  },
+  {
+    "id": "Novel-0b2a33fc",
+    "answer_correctness": 0.5053548997220147,
+    "rouge_score": 0.1,
+    "question": "In the storyline involving Ellen, whom did Ellen love, and how does this affect the development of her character?"
+  },
+  {
+    "id": "Novel-451efc66",
+    "answer_correctness": 0.5105883243402339,
+    "rouge_score": 0.19047619047619047,
+    "question": "Who mentions John Cox, the author of 'The Horse and its Ailments', in relation to veterinary remedies in the play?"
+  },
+  {
+    "id": "Novel-0c731c0a",
+    "answer_correctness": 0.5115900003207033,
+    "rouge_score": 0.1951219512195122,
+    "question": "Within the narrative’s examination of national sentiment, on what fundamental point are Englishmen portrayed as being in agreement?"
+  },
+  {
+    "id": "Novel-3e80d395",
+    "answer_correctness": 0.5119724325266879,
+    "rouge_score": 0.29629629629629634,
+    "question": "Who owes a debt to Lewis Isaacs, the costumier, as part of the subplot involving extravagant expenses for the ball?"
+  },
+  {
+    "id": "Novel-793b51bf",
+    "answer_correctness": 0.5123231033498116,
+    "rouge_score": 0.30769230769230765,
+    "question": "Which influential social group in Lower Canada remained loyal to the British crown during the years following the conquest and throughout the early colonial period?"
+  },
+  {
+    "id": "Novel-5c651ccc",
+    "answer_correctness": 0.51256587300895,
+    "rouge_score": 0.1904761904761905,
+    "question": "Who is credited with civilizing Egypt in the historical and mythological narrative of the text?"
+  },
+  {
+    "id": "Novel-9e29cae8",
+    "answer_correctness": 0.5128570037264295,
+    "rouge_score": 0.3333333333333333,
+    "question": "In the chaotic scene during the robbery at Toto's cottage, what did the man do involving the kettle as he tried to escape?"
+  },
+  {
+    "id": "Novel-6b0f8bc4",
+    "answer_correctness": 0.5131242309857436,
+    "rouge_score": 0.09756097560975609,
+    "question": "According to the narrative, by what means is the Poet encouraged to gain celebrity, specifically as described through the introduction of Roman Tragedy as an urging force?"
+  },
+  {
+    "id": "Novel-135a7719",
+    "answer_correctness": 0.5134580887548799,
+    "rouge_score": 0.21621621621621623,
+    "question": "In the steelmaking process described, what causes the loss of steel that the soaking pit method seeks to avoid?"
+  },
+  {
+    "id": "Novel-459e0a03",
+    "answer_correctness": 0.5143418479111264,
+    "rouge_score": 0.5833333333333334,
+    "question": "Throughout the play 'Dandy Dick', by what other names is THE DEAN, who is also referred to as Augustin and Gus, known by the characters?"
+  },
+  {
+    "id": "Novel-a6bc409b",
+    "answer_correctness": 0.5166784183781721,
+    "rouge_score": 0.24615384615384617,
+    "question": "What are some of the named sections or components included within the 'CHILD'S HEALTH PRIMER,' as listed in its contents and structural outline?"
+  },
+  {
+    "id": "Novel-640aa386",
+    "answer_correctness": 0.517864141352097,
+    "rouge_score": 0.23076923076923075,
+    "question": "During the torture of the Christian prisoner in the go-down, who were the ones that struck at him with their torches in an attempt to force a confession?"
+  },
+  {
+    "id": "Novel-7f0e321e",
+    "answer_correctness": 0.5179678367675155,
+    "rouge_score": 0.30769230769230765,
+    "question": "Who is identified as the ancestor of the Berbers in the genealogical or historical discussions of the narrative?"
+  },
+  {
+    "id": "Novel-c06a99a5",
+    "answer_correctness": 0.5183806726447123,
+    "rouge_score": 0.2857142857142857,
+    "question": "During his westward journey in the early 1800s, to which locations did Elisha Cook travel as he moved his family from Connecticut?"
+  },
+  {
+    "id": "Novel-2fc64004",
+    "answer_correctness": 0.5191581615998035,
+    "rouge_score": 0.24,
+    "question": "With which regions did the Mayas have relations, as discussed in the narrative's account of their contact with foreign lands?"
+  },
+  {
+    "id": "Novel-948e27af",
+    "answer_correctness": 0.5200147510766949,
+    "rouge_score": 0.15384615384615383,
+    "question": "What statement did Louis Joseph Papineau make about Reform ministries during his speeches criticizing British government responses to the grievances of Lower Canada?"
+  },
+  {
+    "id": "Novel-5953d9c0",
+    "answer_correctness": 0.5219293274154739,
+    "rouge_score": 0.39999999999999997,
+    "question": "In the context of ancient Chinese music, who was the performer associated with playing the instrument called the 'king'?"
+  },
+  {
+    "id": "Novel-c1efee91",
+    "answer_correctness": 0.5221339653064659,
+    "rouge_score": 0.42857142857142855,
+    "question": "To which location was Capt. Shelly ordered to provide relief during the Civil War events recounted in the novel?"
+  },
+  {
+    "id": "Novel-5c0cc4b2",
+    "answer_correctness": 0.5231526362889057,
+    "rouge_score": 0.37500000000000006,
+    "question": "On which front was the Serbian army engaged in combat during the period of Dr. Elsie Inglis's service with the Scottish Women's Hospitals?"
+  },
+  {
+    "id": "Novel-c6f1ea93",
+    "answer_correctness": 0.5234721939085654,
+    "rouge_score": 0.11764705882352941,
+    "question": "Who were the people that historically inhabited the ancient land of Egypt?"
+  },
+  {
+    "id": "Novel-44249ede",
+    "answer_correctness": 0.5239504625379574,
+    "rouge_score": 0.45,
+    "question": "Who took over the administration of Lower Canada as governor during the period of Lord Durham's mission following the suspension of the constitution?"
+  },
+  {
+    "id": "Novel-1d9d11e6",
+    "answer_correctness": 0.524073282170656,
+    "rouge_score": 0.23999999999999996,
+    "question": "In the context of the ancient Maya civilization as discussed in the text, which archaeological site is specifically noted for containing inscriptions created by the Mayas?"
+  },
+  {
+    "id": "Novel-11483e85",
+    "answer_correctness": 0.5252962693097786,
+    "rouge_score": 0.5,
+    "question": "At which location did General Van Dorn make a rash military attack during the Civil War, as described in the narrative?"
+  },
+  {
+    "id": "Novel-e9a8741e",
+    "answer_correctness": 0.5257075973735802,
+    "rouge_score": 0.4242424242424242,
+    "question": "With which organization did the Foreign Office make stipulations regarding the conditions and arrangements for overseas medical work during World War I?"
+  }
+]
