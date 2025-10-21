@@ -176,7 +176,7 @@ def segment_by_prototype_sim(
     relu_floor: float | None = 0.0,
     bonus_tail_head: bool = True,
     tail_head_bonus: float = 0.05,
-    prototype: str = "centroid",     # "centroid" | "medoid" | "medoid_approx"
+    prototype: str = "medoid",     # "centroid" | "medoid" | "medoid_approx"
 ) -> List[List[Triple]]:
     """
     Segment an ordered triple list into chunks using cosine similarity of the
@@ -339,7 +339,7 @@ def should_merge_boundary(
 # ---- main routine: pass over chunk list and merge neighbors when boundary is weak ----
 def merge_chunks_by_boundary(
     chunks: List[List[List[int]]],  # [[[int,...], ...], ...]
-    segment_by_centroid_sim: Callable[..., List[List[Triple]]] = segment_by_centroid_sim,
+    segment_by_centroid_sim: Callable[..., List[List[Triple]]] = segment_by_prototype_sim,
     codebook_main = None,
     *,
     tau: float = tau_default, 
@@ -397,10 +397,6 @@ def merge_chunks_by_boundary(
         )
 
         if merge:
-            # print('merging success')
-            # # Merge entire chunks: concatenate subchunk lists
-            # print('left',last_left_encoded)
-            # print('right',first_right_encoded)
             left[-1] = last_left_encoded+first_right_encoded
             cur = right[1:]
             # if merging make the right empty, we still use the cur as the next cur
