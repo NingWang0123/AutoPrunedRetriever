@@ -77,65 +77,171 @@ def ensure_list_of_triples(triples):
 tau_default = 0.6
 # tau_default = 0.7
 
-def segment_by_centroid_sim(
+# def segment_by_centroid_sim(
+#     triples: List[Triple],
+#     triple_vecs: np.ndarray,
+#     tau: float = tau_default,            # similarity threshold to stay in chunk
+#     min_chunk_len: int = 1,
+#     patience: int = 0,            # consecutive below-threshold sims before cutting
+#     relu_floor: float = 0.0,      # clamp negative sims up to 0 if desired
+#     bonus_tail_head: bool = True, # small structural continuity bonus
+#     tail_head_bonus: float = 0.05,
+# ) -> List[List[Triple]]:
+#     """
+#     Segment an ordered triple list into chunks using cosine similarity of
+#     triple-level sentence embeddings against the *current chunk centroid*.
+#     """
+#     if not triples:
+#         return []
+    
+#     triples = ensure_list_of_triples(triples)
+    
+#     assert len(triples) == triple_vecs.shape[0], "vecs and triples length mismatch"
+
+#     # L2-normalize once (BGE expects cosine)
+#     V = triple_vecs.astype(np.float32)
+#     V = np.apply_along_axis(_norm, 1, V)
+
+#     chunks: List[List[Triple]] = []
+#     cur: List[Triple] = [triples[0]]
+#     cur_vecs = [V[0]]
+#     bad_streak = 0
+
+#     for i in range(1, len(triples)):
+#         centroid = _norm(np.mean(np.stack(cur_vecs, axis=0), axis=0))
+#         sim = _cos(centroid, V[i])
+#         if relu_floor is not None:
+#             sim = max(relu_floor, sim)
+
+#         if bonus_tail_head:
+#             # tiny nudge if path continuity: tail(prev) == head(curr) (casefolded)
+#             prev_h, prev_r, prev_t = cur[-1]
+#             h, r, u = triples[i]
+#             if prev_t.casefold() == h.casefold():
+#                 sim += tail_head_bonus
+
+#         if sim < tau:
+#             bad_streak += 1
+#         else:
+#             bad_streak = 0
+
+#         if bad_streak > patience and len(cur) >= min_chunk_len:
+#             chunks.append(cur)
+#             cur = [triples[i]]
+#             cur_vecs = [V[i]]
+#             bad_streak = 0
+#         else:
+#             cur.append(triples[i])
+#             cur_vecs.append(V[i])
+
+#     if cur:
+#         chunks.append(cur)
+#     return chunks
+
+def _norm_rows(V: np.ndarray, eps: float = 1e-12) -> np.ndarray:
+    norms = np.linalg.norm(V, axis=1, keepdims=True)
+    return V / (norms + eps)
+
+def _choose_medoid_exact(cur_vecs: List[np.ndarray]) -> int:
+    """
+    Exact medoid index: argmax over average cosine similarity to all others.
+    cur_vecs are assumed L2-normalized.
+    """
+    if len(cur_vecs) == 1:
+        return 0
+    M = np.stack(cur_vecs, axis=0)               # (k, d)
+    G = M @ M.T                                   # (k, k) cosine Gram
+    # Average similarity to others (include self; adding a constant doesn't change argmax)
+    avg = G.mean(axis=1)
+    return int(np.argmax(avg))
+
+def _choose_medoid_approx(cur_vecs: List[np.ndarray]) -> int:
+    """
+    Approx medoid: closest to centroid direction (fast).
+    """
+    if len(cur_vecs) == 1:
+        return 0
+    M = np.stack(cur_vecs, axis=0)               # (k, d)
+    c = M.mean(axis=0)
+    c /= (np.linalg.norm(c) + 1e-12)
+    sims = M @ c
+    return int(np.argmax(sims))
+
+def segment_by_prototype_sim(
     triples: List[Triple],
     triple_vecs: np.ndarray,
-    tau: float = tau_default,            # similarity threshold to stay in chunk
+    tau: float = 0.6,
     min_chunk_len: int = 1,
-    patience: int = 0,            # consecutive below-threshold sims before cutting
-    relu_floor: float = 0.0,      # clamp negative sims up to 0 if desired
-    bonus_tail_head: bool = True, # small structural continuity bonus
+    patience: int = 0,
+    relu_floor: float | None = 0.0,
+    bonus_tail_head: bool = True,
     tail_head_bonus: float = 0.05,
+    prototype: str = "centroid",     # "centroid" | "medoid" | "medoid_approx"
 ) -> List[List[Triple]]:
     """
-    Segment an ordered triple list into chunks using cosine similarity of
-    triple-level sentence embeddings against the *current chunk centroid*.
+    Segment an ordered triple list into chunks using cosine similarity of the
+    next triple against a chunk prototype: centroid, medoid, or medoid_approx.
     """
     if not triples:
         return []
-    
-    triples = ensure_list_of_triples(triples)
-    
-    assert len(triples) == triple_vecs.shape[0], "vecs and triples length mismatch"
+    if len(triples) != triple_vecs.shape[0]:
+        raise ValueError("vecs and triples length mismatch")
 
-    # L2-normalize once (BGE expects cosine)
-    V = triple_vecs.astype(np.float32)
-    V = np.apply_along_axis(_norm, 1, V)
+    # Normalize all embeddings once
+    V = triple_vecs.astype(np.float32, copy=False)
+    V = _norm_rows(V)
 
     chunks: List[List[Triple]] = []
-    cur: List[Triple] = [triples[0]]
-    cur_vecs = [V[0]]
+    cur_triples: List[Triple] = [triples[0]]
+    cur_vecs: List[np.ndarray] = [V[0].copy()]
+    sum_vec = V[0].copy()  # for centroid/approx fast path
     bad_streak = 0
 
+    def _prototype_vec() -> np.ndarray:
+        nonlocal sum_vec, cur_vecs, prototype
+        if prototype == "centroid":
+            c = sum_vec / (np.linalg.norm(sum_vec) + 1e-12)
+            return c
+        elif prototype == "medoid":
+            mi = _choose_medoid_exact(cur_vecs)
+            return cur_vecs[mi]
+        elif prototype == "medoid_approx":
+            mi = _choose_medoid_approx(cur_vecs)
+            return cur_vecs[mi]
+        else:
+            raise ValueError(f"Unknown prototype: {prototype}")
+
     for i in range(1, len(triples)):
-        centroid = _norm(np.mean(np.stack(cur_vecs, axis=0), axis=0))
-        sim = _cos(centroid, V[i])
+        p = _prototype_vec()
+        sim = float(p @ V[i])
+
         if relu_floor is not None:
             sim = max(relu_floor, sim)
 
         if bonus_tail_head:
-            # tiny nudge if path continuity: tail(prev) == head(curr) (casefolded)
-            prev_h, prev_r, prev_t = cur[-1]
+            prev_h, prev_r, prev_t = cur_triples[-1]
             h, r, u = triples[i]
-            if prev_t.casefold() == h.casefold():
-                sim += tail_head_bonus
+            if isinstance(prev_t, str) and isinstance(h, str) and prev_t.casefold() == h.casefold():
+                sim = min(1.0, sim + tail_head_bonus)
 
         if sim < tau:
             bad_streak += 1
         else:
             bad_streak = 0
 
-        if bad_streak > patience and len(cur) >= min_chunk_len:
-            chunks.append(cur)
-            cur = [triples[i]]
-            cur_vecs = [V[i]]
+        if bad_streak > patience and len(cur_triples) >= min_chunk_len:
+            chunks.append(cur_triples)
+            cur_triples = [triples[i]]
+            cur_vecs = [V[i].copy()]
+            sum_vec = V[i].copy()
             bad_streak = 0
         else:
-            cur.append(triples[i])
-            cur_vecs.append(V[i])
+            cur_triples.append(triples[i])
+            cur_vecs.append(V[i].copy())
+            sum_vec += V[i]
 
-    if cur:
-        chunks.append(cur)
+    if cur_triples:
+        chunks.append(cur_triples)
     return chunks
 
 
