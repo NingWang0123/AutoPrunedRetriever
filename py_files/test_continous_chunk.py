@@ -74,69 +74,69 @@ def ensure_list_of_triples(triples):
 
 # ---------- segmenter ----------
 
-tau_default = 0.5
-# tau_default = 0.7
+# tau_default = 0.5
+tau_default = 0.7
 
-# def segment_by_centroid_sim(
-#     triples: List[Triple],
-#     triple_vecs: np.ndarray,
-#     tau: float = tau_default,            # similarity threshold to stay in chunk
-#     min_chunk_len: int = 1,
-#     patience: int = 0,            # consecutive below-threshold sims before cutting
-#     relu_floor: float = 0.0,      # clamp negative sims up to 0 if desired
-#     bonus_tail_head: bool = True, # small structural continuity bonus
-#     tail_head_bonus: float = 0.05,
-# ) -> List[List[Triple]]:
-#     """
-#     Segment an ordered triple list into chunks using cosine similarity of
-#     triple-level sentence embeddings against the *current chunk centroid*.
-#     """
-#     if not triples:
-#         return []
+def segment_by_centroid_sim(
+    triples: List[Triple],
+    triple_vecs: np.ndarray,
+    tau: float = tau_default,            # similarity threshold to stay in chunk
+    min_chunk_len: int = 1,
+    patience: int = 0,            # consecutive below-threshold sims before cutting
+    relu_floor: float = 0.0,      # clamp negative sims up to 0 if desired
+    bonus_tail_head: bool = True, # small structural continuity bonus
+    tail_head_bonus: float = 0.05,
+) -> List[List[Triple]]:
+    """
+    Segment an ordered triple list into chunks using cosine similarity of
+    triple-level sentence embeddings against the *current chunk centroid*.
+    """
+    if not triples:
+        return []
     
-#     triples = ensure_list_of_triples(triples)
+    triples = ensure_list_of_triples(triples)
     
-#     assert len(triples) == triple_vecs.shape[0], "vecs and triples length mismatch"
+    assert len(triples) == triple_vecs.shape[0], "vecs and triples length mismatch"
 
-#     # L2-normalize once (BGE expects cosine)
-#     V = triple_vecs.astype(np.float32)
-#     V = np.apply_along_axis(_norm, 1, V)
+    # L2-normalize once (BGE expects cosine)
+    V = triple_vecs.astype(np.float32)
+    V = np.apply_along_axis(_norm, 1, V)
 
-#     chunks: List[List[Triple]] = []
-#     cur: List[Triple] = [triples[0]]
-#     cur_vecs = [V[0]]
-#     bad_streak = 0
+    chunks: List[List[Triple]] = []
+    cur: List[Triple] = [triples[0]]
+    cur_vecs = [V[0]]
+    bad_streak = 0
 
-#     for i in range(1, len(triples)):
-#         centroid = _norm(np.mean(np.stack(cur_vecs, axis=0), axis=0))
-#         sim = _cos(centroid, V[i])
-#         if relu_floor is not None:
-#             sim = max(relu_floor, sim)
+    for i in range(1, len(triples)):
+        centroid = _norm(np.mean(np.stack(cur_vecs, axis=0), axis=0))
+        sim = _cos(centroid, V[i])
+        if relu_floor is not None:
+            sim = max(relu_floor, sim)
 
-#         if bonus_tail_head:
-#             # tiny nudge if path continuity: tail(prev) == head(curr) (casefolded)
-#             prev_h, prev_r, prev_t = cur[-1]
-#             h, r, u = triples[i]
-#             if prev_t.casefold() == h.casefold():
-#                 sim += tail_head_bonus
+        if bonus_tail_head:
+            # tiny nudge if path continuity: tail(prev) == head(curr) (casefolded)
+            prev_h, prev_r, prev_t = cur[-1]
+            h, r, u = triples[i]
+            if prev_t.casefold() == h.casefold():
+                sim += tail_head_bonus
 
-#         if sim < tau:
-#             bad_streak += 1
-#         else:
-#             bad_streak = 0
+        if sim < tau:
+            bad_streak += 1
+        else:
+            bad_streak = 0
 
-#         if bad_streak > patience and len(cur) >= min_chunk_len:
-#             chunks.append(cur)
-#             cur = [triples[i]]
-#             cur_vecs = [V[i]]
-#             bad_streak = 0
-#         else:
-#             cur.append(triples[i])
-#             cur_vecs.append(V[i])
+        if bad_streak > patience and len(cur) >= min_chunk_len:
+            chunks.append(cur)
+            cur = [triples[i]]
+            cur_vecs = [V[i]]
+            bad_streak = 0
+        else:
+            cur.append(triples[i])
+            cur_vecs.append(V[i])
 
-#     if cur:
-#         chunks.append(cur)
-#     return chunks
+    if cur:
+        chunks.append(cur)
+    return chunks
 
 def _norm_rows(V: np.ndarray, eps: float = 1e-12) -> np.ndarray:
     norms = np.linalg.norm(V, axis=1, keepdims=True)
@@ -339,7 +339,7 @@ def should_merge_boundary(
 # ---- main routine: pass over chunk list and merge neighbors when boundary is weak ----
 def merge_chunks_by_boundary(
     chunks: List[List[List[int]]],  # [[[int,...], ...], ...]
-    segment_by_centroid_sim: Callable[..., List[List[Triple]]] = segment_by_prototype_sim,
+    segment_by_centroid_sim: Callable[..., List[List[Triple]]] = segment_by_centroid_sim,
     codebook_main = None,
     *,
     tau: float = tau_default, 

@@ -1,5 +1,5 @@
 from langchain_community.embeddings import HuggingFaceEmbeddings
-from typing import List, Tuple, Callable, Optional, Sequence, Iterable, Union
+from typing import List, Tuple, Callable, Optional, Sequence, Iterable, Union ,Dict
 import numpy as np
 
 Triple = Tuple[str, str, str]  # (head, relation, tail)
@@ -199,6 +199,177 @@ def segment_by_prototype_sim(
     if cur_triples:
         chunks.append(cur_triples)
     return chunks
+
+
+def segment_by_prototype_sim_multi(
+    triples: List[Triple],
+    triple_vecs: np.ndarray,
+    *,
+    # similarity / thresholds
+    tau_leave: float,
+    tau_enter: Optional[float] = None,
+    min_chunk_len: int = 1,
+    patience: int = 0,
+    relu_floor: Optional[float] = 0.0,
+    # structural bonus
+    bonus_tail_head: bool = True,
+    tail_head_bonus: float = 0.05,
+    # prototypes to evaluate
+    prototypes: Sequence[str] = ("medoid",),     # e.g. ("centroid","medoid","ema","hybrid","medoid_approx")
+    ema_beta: float = 0.85,                      # used by "ema" / "hybrid"
+    # entity overlap hook: returns value in [0,1] for (cur_triples, next_triple)
+    entity_overlap: Optional[Callable[[List[Triple], Triple], float]] = None,
+    entity_bonus_lambda: float = 0.08,
+) -> Dict[str, List[List[Triple]]]:
+    """
+    Segment an ordered triple list using cosine similarity against a chunk prototype
+    for multiple prototype strategies in one call. Shared work:
+      - normalize embeddings once
+      - precompute tail→head bonus flags and entity-overlap values per step
+    Returns:
+      { prototype_name: List[List[Triple]] }
+    Notes:
+      - Decisions (cuts) differ per prototype; we therefore run independent passes,
+        but reuse shared precomputations.
+      - Requires helper funcs: ensure_list_of_triples, _norm_rows, _choose_medoid_exact,
+        _choose_medoid_approx (same as your single-prototype version).
+    """
+    if not triples:
+        return {p: [] for p in prototypes}
+    if len(triples) != triple_vecs.shape[0]:
+        raise ValueError("vecs and triples length mismatch")
+
+    triples = ensure_list_of_triples(triples)
+
+    # Normalize once and reuse
+    V = triple_vecs.astype(np.float32, copy=False)
+    V = _norm_rows(V)  # existing row-wise L2 normalize
+
+    n = len(triples)
+
+    # ------------------------------
+    # Precompute per-step additive bonuses once (reused by all prototypes):
+    #   tail_head_add[i]    in {0, tail_head_bonus}
+    #   overlap_scaled[i]   in [0, entity_bonus_lambda]
+    # They apply to comparing V[i] against the current prototype when stepping from i-1 -> i
+    # Index 0 is unused because the loop starts at i=1.
+    # ------------------------------
+    tail_head_add = np.zeros(n, dtype=np.float32)
+    if bonus_tail_head:
+        for i in range(1, n):
+            prev_h, prev_r, prev_t = triples[i-1]
+            h, r, t = triples[i]
+            if isinstance(prev_t, str) and isinstance(h, str) and prev_t.casefold() == h.casefold():
+                tail_head_add[i] = float(tail_head_bonus)
+
+    overlap_scaled = np.zeros(n, dtype=np.float32)
+    if entity_overlap is not None:
+        # We can't precompute purely from triples because entity_overlap depends on cur_triples.
+        # But we can bound the call-count by calling it exactly once per (prototype, i) in the
+        # inner pass. To still share work, we collect the raw values here in a structure per proto.
+        # However, because the callback depends on *cur_triples*, which differ per prototype,
+        # we cannot precompute true overlap values globally. So we leave this array as zeros and
+        # compute per-prototype on the fly (still cheap).
+        pass
+
+    # ------------------------------
+    # Prototype runner (single pass, same as original function, but parameterized)
+    # ------------------------------
+    def _run_one(prototype: str) -> List[List[Triple]]:
+        chunks: List[List[Triple]] = []
+        cur_triples: List[Triple] = [triples[0]]
+        cur_vecs: List[np.ndarray] = [V[0].copy()]
+        sum_vec = V[0].copy()     # for centroid & hybrid
+        ema_vec = V[0].copy()     # for EMA / hybrid
+        bad_streak = 0
+        started = True            # hysteresis: we start inside the first chunk
+
+        def _proto_vec() -> np.ndarray:
+            nonlocal sum_vec, cur_vecs, ema_vec
+            if prototype == "centroid":
+                c = sum_vec / (np.linalg.norm(sum_vec) + 1e-12)
+                return c
+            elif prototype == "medoid":
+                mi = _choose_medoid_exact(cur_vecs)
+                return cur_vecs[mi]
+            elif prototype == "medoid_approx":
+                mi = _choose_medoid_approx(cur_vecs)
+                return cur_vecs[mi]
+            elif prototype == "ema":
+                v = ema_vec / (np.linalg.norm(ema_vec) + 1e-12)
+                return v
+            elif prototype == "hybrid":
+                c = sum_vec / (np.linalg.norm(sum_vec) + 1e-12)
+                e = ema_vec / (np.linalg.norm(ema_vec) + 1e-12)
+                h = 0.7 * e + 0.3 * c
+                return h / (np.linalg.norm(h) + 1e-12)
+            else:
+                raise ValueError(f"Unknown prototype: {prototype}")
+
+        for i in range(1, n):
+            # update EMA with *previous* item to avoid peeking at V[i]
+            ema_vec = ema_beta * ema_vec + (1.0 - ema_beta) * V[i-1]
+
+            p = _proto_vec()
+            sim = float(p @ V[i])
+
+            # relu before bonuses (matching your semantics)
+            if relu_floor is not None:
+                sim = max(relu_floor, sim)
+
+            # add shared tail→head bonus
+            if tail_head_add[i] != 0.0:
+                sim += float(tail_head_add[i])
+
+            # add entity-overlap bonus (must be computed per-prototype due to cur_triples dependency)
+            if entity_overlap is not None:
+                try:
+                    ov = float(entity_overlap(cur_triples, triples[i]))
+                    if ov > 0.0:
+                        sim += float(entity_bonus_lambda) * float(min(1.0, max(0.0, ov)))
+                except Exception:
+                    pass
+
+            sim = min(1.0, sim)
+
+            # hysteresis enter guard (optional)
+            if tau_enter is not None and not started:
+                if sim >= tau_enter:
+                    started = True
+                # Still accumulate to stabilize prototype
+                # (no special action needed; we fall through)
+
+            # patience logic
+            if sim < tau_leave:
+                bad_streak += 1
+            else:
+                bad_streak = 0
+
+            if started and bad_streak > patience and len(cur_triples) >= min_chunk_len:
+                # cut
+                chunks.append(cur_triples)
+                cur_triples = [triples[i]]
+                cur_vecs = [V[i].copy()]
+                sum_vec = V[i].copy()
+                ema_vec = V[i].copy()
+                bad_streak = 0
+                started = (tau_enter is None)  # if we require enter, next chunk must "enter" again
+            else:
+                # accumulate
+                cur_triples.append(triples[i])
+                cur_vecs.append(V[i].copy())
+                sum_vec += V[i]
+
+        if cur_triples:
+            chunks.append(cur_triples)
+        return chunks
+
+    # Run for all requested prototypes
+    out: Dict[str, List[List[Triple]]] = {}
+    for proto in prototypes:
+        out[proto] = _run_one(proto)
+    return out
+
 
 # ---- decoding helpers (your original) ----
 def decode_subchunk(question, codebook_main, fmt='words'):
