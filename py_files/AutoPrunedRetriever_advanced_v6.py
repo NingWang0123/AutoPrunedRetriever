@@ -5000,15 +5000,13 @@ class ExactGraphRag_rl:
         batch_num = 0
         facts_codebook_lst = []
         for i in range(0, total_chunks, batch_size):
-
-
-
             batch_chunks = all_chunks[i:i+batch_size]
-            fact_cb = get_code_book(
+            fact_cb = get_code_book_for_multi_facts(
                 batch_chunks,
                 type='facts',
                 rule="Store factual statements.",
                 batch_size=1,
+                all_facts_types = ("centroid","medoid_approx","ema")
             )
 
             print(f'batch {batch_num} codebook is generated')
@@ -5545,7 +5543,7 @@ class ExactGraphRag_rl:
             )
             for cb in facts_codebook_lst:
                 if cb:
-                    self.meta_codebook = merging_codebook(
+                    self.meta_codebook = merging_codebook_multi(
                         self.meta_codebook, cb, 'facts', self.word_emb, False
                     )
 
