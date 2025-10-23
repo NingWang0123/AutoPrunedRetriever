@@ -18,11 +18,9 @@ from sentence_transformers import SentenceTransformer
 # ===============================
 # 0) GLOBAL CHOICES / MAPPINGS
 # ===============================
-# THINKINGS_CHOICES = ['overlap','unique','not_include']
 # ANSWERS_CHOICES   = ['overlap','unique','not_include']
 
-
-THINKINGS_CHOICES = ['not_include']
+CHUNKING_CHOICES = ["centroid","medoid_approx","ema"]
 ANSWERS_CHOICES   = ['unique','not_include']
 FACTS_CHOICES = ['unique','include_all'] 
 
@@ -207,7 +205,7 @@ def make_preference_dataset_2head(
     seed: int = 0,
     isolate_state: bool = True,
     ANSWERS_CHOICES = ANSWERS_CHOICES,
-    THINKINGS_CHOICES = THINKINGS_CHOICES,
+    CHUNKING_CHOICES = CHUNKING_CHOICES,
     FACTS_CHOICES = FACTS_CHOICES,
 ) -> List[PrefExample2]:
     """
@@ -219,7 +217,7 @@ def make_preference_dataset_2head(
     rng = random.Random(seed)
     all_pairs = [(ai, ti,fi)
                  for ai in range(len(ANSWERS_CHOICES))
-                 for ti in range(len(THINKINGS_CHOICES))
+                 for ti in range(len(CHUNKING_CHOICES))
                  for fi in range(len(FACTS_CHOICES))]
 
     examples: List[PrefExample2] = []
@@ -231,7 +229,7 @@ def make_preference_dataset_2head(
         scored: List[Tuple[Tuple[int,int], float]] = []
         for (ai, ti, fi) in tried:
             ans = ANSWERS_CHOICES[ai]
-            th  = THINKINGS_CHOICES[ti]
+            th  = CHUNKING_CHOICES[ti]
             facts = FACTS_CHOICES[fi]
 
             with temp_ans_th(cr, ans, th, facts, isolate_state=isolate_state):
@@ -277,7 +275,7 @@ async def make_preference_dataset_2head_using_llm(
     seed: int = 0,
     isolate_state: bool = True,
     ANSWERS_CHOICES = ANSWERS_CHOICES,
-    THINKINGS_CHOICES = THINKINGS_CHOICES,
+    CHUNKING_CHOICES = CHUNKING_CHOICES,
     FACTS_CHOICES = FACTS_CHOICES,
     llm=None,
     embeddings=None,
@@ -294,7 +292,7 @@ async def make_preference_dataset_2head_using_llm(
     rng = random.Random(seed)
     all_pairs = [(ai, ti,fi)
                  for ai in range(len(ANSWERS_CHOICES))
-                 for ti in range(len(THINKINGS_CHOICES))
+                 for ti in range(len(CHUNKING_CHOICES))
                  for fi in range(len(FACTS_CHOICES))]
 
     examples: List["PrefExample2"] = []
@@ -308,7 +306,7 @@ async def make_preference_dataset_2head_using_llm(
         meta = []  # keep (ai, ti) aligned with tasks
         for (ai, ti, fi) in tried:
             ans = ANSWERS_CHOICES[ai]
-            th  = THINKINGS_CHOICES[ti]
+            th  = CHUNKING_CHOICES[ti]
             facts = FACTS_CHOICES[fi]
 
             with temp_ans_th(cr, ans, th, facts, isolate_state=isolate_state):
@@ -386,14 +384,14 @@ def load_pref_examples(path: str) -> List["PrefExample2"]:
 # ===============================
 class StrategyPolicy2Head(nn.Module):
     """MLP with two categorical heads: answers, thinkings."""
-    def __init__(self, input_dim: int, hidden: int = 512, drop: float = 0.1,ANSWERS_CHOICES = ANSWERS_CHOICES, THINKINGS_CHOICES = THINKINGS_CHOICES,FACTS_CHOICES= FACTS_CHOICES):
+    def __init__(self, input_dim: int, hidden: int = 512, drop: float = 0.1,ANSWERS_CHOICES = ANSWERS_CHOICES, CHUNKING_CHOICES = CHUNKING_CHOICES,FACTS_CHOICES= FACTS_CHOICES):
         super().__init__()
         self.ff = nn.Sequential(
             nn.Linear(input_dim, hidden), nn.ReLU(), nn.Dropout(drop),
             nn.Linear(hidden, hidden),   nn.ReLU(), nn.Dropout(drop),
         )
         self.ans = nn.Linear(hidden, len(ANSWERS_CHOICES))
-        self.th  = nn.Linear(hidden, len(THINKINGS_CHOICES))
+        self.th  = nn.Linear(hidden, len(CHUNKING_CHOICES))
         self.facts  = nn.Linear(hidden, len(FACTS_CHOICES))
 
     def forward(self, x):  # x: [B,D]
@@ -560,11 +558,11 @@ def _json_len_safe(x):
 # 6) INFERENCE PIPELINE
 # ===============================
 @torch.no_grad()
-def select_ans_th(policy: StrategyPolicy2Head, cr, q: str, feature_dim: int = 384, greedy: bool = True,  ANSWERS_CHOICES = ANSWERS_CHOICES,THINKINGS_CHOICES = THINKINGS_CHOICES,FACTS_CHOICES = FACTS_CHOICES):
+def select_ans_th(policy: StrategyPolicy2Head, cr, q: str, feature_dim: int = 384, greedy: bool = True,  ANSWERS_CHOICES = ANSWERS_CHOICES,CHUNKING_CHOICES = CHUNKING_CHOICES,FACTS_CHOICES = FACTS_CHOICES):
     x = torch.tensor(featurize_query(q, dims=feature_dim),dtype=torch.float32).unsqueeze(0).to(next(policy.parameters()).device)
     y = policy.sample(x, greedy=greedy)[0].cpu().numpy().tolist()
     ai, ti, fi = int(y[0]), int(y[1]), int(y[2])
-    return (ANSWERS_CHOICES[ai], THINKINGS_CHOICES[ti], FACTS_CHOICES[fi])
+    return (ANSWERS_CHOICES[ai], CHUNKING_CHOICES[ti], FACTS_CHOICES[fi])
 
 def answer_with_auto_strategy(
     cr: CompressRag_rl,
@@ -574,7 +572,7 @@ def answer_with_auto_strategy(
     gold_answer: Optional[str] = None,
     greedy: bool = True,
     ANSWERS_CHOICES = ANSWERS_CHOICES,
-    THINKINGS_CHOICES = THINKINGS_CHOICES,
+    CHUNKING_CHOICES = CHUNKING_CHOICES,
     FACTS_CHOICES = FACTS_CHOICES
 ) -> Tuple[str, Dict[str, object]]:
     """
@@ -583,7 +581,7 @@ def answer_with_auto_strategy(
     3) If reward_fn & gold provided, update scheduler online
     """
     # 1) per-question knobs
-    ans_choice, th_choice, facts_choice = select_ans_th(policy, cr, q, greedy=greedy,ANSWERS_CHOICES = ANSWERS_CHOICES,THINKINGS_CHOICES = THINKINGS_CHOICES, FACTS_CHOICES = FACTS_CHOICES)
+    ans_choice, th_choice, facts_choice = select_ans_th(policy, cr, q, greedy=greedy,ANSWERS_CHOICES = ANSWERS_CHOICES,CHUNKING_CHOICES = CHUNKING_CHOICES, FACTS_CHOICES = FACTS_CHOICES)
 
     # 2) run
     with temp_ans_th(cr, ans_choice, th_choice,facts_choice, isolate_state=False):
