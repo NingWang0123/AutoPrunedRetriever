@@ -4703,10 +4703,11 @@ def remove_duplicate_inner_lists(lst, seen=None):
 # thinkings extraction choice: keep the overlap(default), not include the thinking, keep the unique thinking
 # answers extraction choice: keep the unique (default), not include the answers, keep the overlap
 # combine ents choice: not combine, combine per round, combine per 3 round
+
+# changing thinkings_choice to chunkings_choice
 thinkings_choice = ['overlap','unique','not_include']
 answers_choice = ['overlap','unique','not_include']
 facts_choice = ['unique','include_all']
-combine_ents_choice = [0,1,2]
 
 
 def skip_func(a,b):
@@ -4768,6 +4769,7 @@ class AutoPrunedRetriver:
         word_emb: Optional[Embeddings] = None,
         llm = None,
         thinkings_choice = 'not_include',
+        chunkings_choice = 'medoid_approx',
         answers_choice = 'overlap',
         facts_choice = 'include_all',
         use_word = False,
@@ -4824,18 +4826,12 @@ class AutoPrunedRetriver:
         ###### Extraction params
         self.semantic_overlap_sim = semantic_overlap_sim
 
-        ### thinkings param
-        self.thinkings_choice = thinkings_choice
-        if thinkings_choice == "not_include":
-            self.include_thinkings = False
-        else:
-            self.include_thinkings = True
-            if self.thinkings_choice == "overlap":
-                self.thinking_extract_function = partial(get_unique_or_overlap_by_sentence_embedded,sim_threshold=self.semantic_overlap_sim)
-            elif self.thinkings_choice == "unique":
-                self.thinking_extract_function = partial(get_unique_or_overlap_by_sentence_embedded,unique=True,sim_threshold=self.semantic_overlap_sim)
 
-        self.llm.include_thinkings = self.include_thinkings
+        ### chunkings param
+        self.chunkings_choice = chunkings_choice
+
+        ### thinkings param
+        self.llm.include_thinkings = False
         ### answers param
         self.answers_choice   = answers_choice
         if answers_choice == "not_include":
