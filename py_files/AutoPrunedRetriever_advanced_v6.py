@@ -5047,7 +5047,7 @@ class AutoPrunedRetriver:
         facts_codebook_lst = []
         for i in range(0, total_chunks, batch_size):
 
-            if i <3:
+            if batch_num <3:
                 batch_chunks = all_chunks[i:i+batch_size]
                 fact_cb = get_code_book_for_multi_facts(
                     batch_chunks,
