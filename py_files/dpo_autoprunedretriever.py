@@ -10,7 +10,7 @@ import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import re, os
 from test_for_compressrag import Phi4MiniReasoningLLM
-import json
+import sys, json, pickle
 import asyncio,inspect
 from sentence_transformers import SentenceTransformer
 
@@ -18,18 +18,13 @@ from sentence_transformers import SentenceTransformer
 # ===============================
 # 0) GLOBAL CHOICES / MAPPINGS
 # ===============================
-# CHUNKING_CHOICES = ['overlap','unique','not_include']
+# THINKINGS_CHOICES = ['overlap','unique','not_include']
 # ANSWERS_CHOICES   = ['overlap','unique','not_include']
 
-# CHUNKING_CHOICES = ['overlap','not_include']
-# CHUNKING_CHOICES = ['not_include']
-# ANSWERS_CHOICES   = ['overlap','not_include']
+
+THINKINGS_CHOICES = ['not_include']
 ANSWERS_CHOICES   = ['unique','not_include']
-
-CHUNKING_CHOICES = ["centroid","medoid_approx","ema"]
-
-def get_facts_name(chunking_choice):
-    return f'facts:{chunking_choice}(edges[i])'
+FACTS_CHOICES = ['unique','include_all'] 
 
 
 # ===============================
@@ -46,7 +41,10 @@ def _hashed_char_ngrams(s: str, dims: int = 384, n: int = 3) -> np.ndarray:
     return v / norm if norm else v
 
 
-_ENCODER = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+# _ENCODER = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+# _ENCODER = SentenceTransformer("BAAI/bge-base-en")
+_ENCODER = SentenceTransformer("BAAI/bge-large-en-v1.5")
+
 
 def featurize_query(q: str, dims: int = 384) -> np.ndarray:
     """
@@ -105,6 +103,7 @@ def featurize_state(cr) -> np.ndarray:
 def temp_ans_th(cr,
                 answers_choice: str,
                 thinkings_choice: str,
+                facts_choice: str,
                 isolate_state: bool = True):
     """
     Temporarily set CR's per-question knobs (answers, thinkings).
@@ -112,8 +111,9 @@ def temp_ans_th(cr,
     """
     prev_ans  = getattr(cr, "answers_choice", None)
     prev_th   = getattr(cr, "thinkings_choice", None)
+    prev_facts = getattr(cr, "facts_choice", None)
+
     prev_meta = None
-    prev_round = None
 
     if isolate_state:
         if hasattr(cr, "meta_codebook"):
@@ -122,12 +122,15 @@ def temp_ans_th(cr,
 
     cr.answers_choice   = answers_choice
     cr.thinkings_choice = thinkings_choice
+    cr.facts_choice = facts_choice
 
     try:
         yield
     finally:
         if prev_ans is not None:  cr.answers_choice = prev_ans
         if prev_th is not None:   cr.thinkings_choice = prev_th
+        if prev_facts is not None:  cr.facts_choice = prev_facts
+
         if isolate_state:
             if prev_meta is not None: cr.meta_codebook = prev_meta
 
@@ -151,24 +154,48 @@ def default_reward(pred_answer: str, gold_answer: Optional[str]) -> float:
     return base - 0.0005*max(0, toks-256)
 
 # ===============================
-# 4) DPO DATA (2-HEAD: ans/th)
+# 4) DPO DATA (3-HEAD: ans/th/facts)
 # ===============================
 @dataclass
 class PrefExample2:
     x: np.ndarray                 # question features
-    y_pos: Tuple[int,int]         # (ans_idx, th_idx)
-    y_neg: Tuple[int,int]
+    y_pos: Tuple[int,int,int]         # (ans_idx, th_idx, facts_idx)
+    y_neg: Tuple[int,int,int]
 
+# class PrefDataset2(torch.utils.data.Dataset):
+#     def __init__(self, examples: List[PrefExample2]):
+#         assert len(examples) > 0, "Empty preference dataset."
+#         self.examples = examples
+#     def __len__(self): return len(self.examples)
+#     def __getitem__(self, i):
+#         ex = self.examples[i]
+#         return (torch.tensor(ex.x, dtype=torch.float32),
+#                 torch.tensor(ex.y_pos, dtype=torch.long),
+#                 torch.tensor(ex.y_neg, dtype=torch.long))
+    
 class PrefDataset2(torch.utils.data.Dataset):
     def __init__(self, examples: List[PrefExample2]):
         assert len(examples) > 0, "Empty preference dataset."
         self.examples = examples
+
     def __len__(self): return len(self.examples)
+
     def __getitem__(self, i):
         ex = self.examples[i]
-        return (torch.tensor(ex.x, dtype=torch.float32),
-                torch.tensor(ex.y_pos, dtype=torch.long),
-                torch.tensor(ex.y_neg, dtype=torch.long))
+
+        def _ensure_triple(t):
+            t = list(t)
+            if len(t) == 2: t.append(0)   # pad facts index
+            return tuple(t[:3])
+
+        y_pos = _ensure_triple(ex.y_pos)
+        y_neg = _ensure_triple(ex.y_neg)
+
+        return (
+            torch.tensor(ex.x, dtype=torch.float32),
+            torch.tensor(y_pos, dtype=torch.long),  # [3]
+            torch.tensor(y_neg, dtype=torch.long),  # [3]
+        )
     
 def make_preference_dataset_2head(
     cr,
@@ -180,8 +207,8 @@ def make_preference_dataset_2head(
     seed: int = 0,
     isolate_state: bool = True,
     ANSWERS_CHOICES = ANSWERS_CHOICES,
-    CHUNKING_CHOICES = CHUNKING_CHOICES,
-
+    THINKINGS_CHOICES = THINKINGS_CHOICES,
+    FACTS_CHOICES = FACTS_CHOICES,
 ) -> List[PrefExample2]:
     """
     Build DPO pairs for (answers_choice, thinkings_choice) ONLY.
@@ -190,9 +217,10 @@ def make_preference_dataset_2head(
         reward_fn = default_reward
 
     rng = random.Random(seed)
-    all_pairs = [(ai, ti)
+    all_pairs = [(ai, ti,fi)
                  for ai in range(len(ANSWERS_CHOICES))
-                 for ti in range(len(CHUNKING_CHOICES))]
+                 for ti in range(len(THINKINGS_CHOICES))
+                 for fi in range(len(FACTS_CHOICES))]
 
     examples: List[PrefExample2] = []
 
@@ -201,13 +229,14 @@ def make_preference_dataset_2head(
         tried = rng.sample(all_pairs, k=min(per_q_samples, len(all_pairs)))
 
         scored: List[Tuple[Tuple[int,int], float]] = []
-        for (ai, ti) in tried:
+        for (ai, ti, fi) in tried:
             ans = ANSWERS_CHOICES[ai]
-            th  = CHUNKING_CHOICES[ti]
+            th  = THINKINGS_CHOICES[ti]
+            facts = FACTS_CHOICES[fi]
 
-            with temp_ans_th(cr, ans, th, isolate_state=isolate_state):
+            with temp_ans_th(cr, ans, th, facts, isolate_state=isolate_state):
                 pred = cr.run_work_flow(q)
-                print(f'pred{pred}')
+
             score = reward_fn(pred, gold_answers.get(q) if gold_answers else None)
             scored.append(((ai, ti), score))
 
@@ -248,7 +277,8 @@ async def make_preference_dataset_2head_using_llm(
     seed: int = 0,
     isolate_state: bool = True,
     ANSWERS_CHOICES = ANSWERS_CHOICES,
-    CHUNKING_CHOICES = CHUNKING_CHOICES,
+    THINKINGS_CHOICES = THINKINGS_CHOICES,
+    FACTS_CHOICES = FACTS_CHOICES,
     llm=None,
     embeddings=None,
 ) -> List["PrefExample2"]:
@@ -262,9 +292,10 @@ async def make_preference_dataset_2head_using_llm(
 
     gold_answers = gold_answers or {}
     rng = random.Random(seed)
-    all_pairs = [(ai, ti)
+    all_pairs = [(ai, ti,fi)
                  for ai in range(len(ANSWERS_CHOICES))
-                 for ti in range(len(CHUNKING_CHOICES))]
+                 for ti in range(len(THINKINGS_CHOICES))
+                 for fi in range(len(FACTS_CHOICES))]
 
     examples: List["PrefExample2"] = []
 
@@ -275,27 +306,29 @@ async def make_preference_dataset_2head_using_llm(
         # (optional) parallelize scoring for this question
         tasks = []
         meta = []  # keep (ai, ti) aligned with tasks
-        for (ai, ti) in tried:
+        for (ai, ti, fi) in tried:
             ans = ANSWERS_CHOICES[ai]
-            th  = CHUNKING_CHOICES[ti]
-            with temp_ans_th(cr, ans, th, isolate_state=isolate_state):
+            th  = THINKINGS_CHOICES[ti]
+            facts = FACTS_CHOICES[fi]
+
+            with temp_ans_th(cr, ans, th, facts, isolate_state=isolate_state):
                 pred, metrics_from_llm, ft_txt = cr.run_work_flow_for_dpo(q)
 
             tasks.append(_call_reward_fn(
                 reward_fn, q, pred, gold_answers.get(q), llm, embeddings
             ))
-            meta.append((ai, ti))
+            meta.append((ai, ti, fi))
 
         # await all scores
         scores = await asyncio.gather(*tasks, return_exceptions=True)
 
         scored: List[Tuple[Tuple[int,int], float]] = []
-        for (ai_ti, s) in zip(meta, scores):
+        for (ai_ti_fi, s) in zip(meta, scores):
             if isinstance(s, Exception) or s is None:
                 # skip failures or None
                 continue
             try:
-                scored.append((ai_ti, float(s)))
+                scored.append((ai_ti_fi, float(s)))
             except (TypeError, ValueError):
                 # skip non-numeric results
                 continue
@@ -316,12 +349,23 @@ def _pref2_to_dict(e) -> Dict[str, Any]:
         "y_neg": list(e.y_neg),
     }
 
+# def _pref2_from_dict(d):
+#     # Replace with your real PrefExample2(..) if the signature differs
+#     return PrefExample2(
+#         x=np.array(d["x"], dtype=np.float32),
+#         y_pos=tuple(d["y_pos"]),
+#         y_neg=tuple(d["y_neg"]),
+#     )
+
 def _pref2_from_dict(d):
-    # Replace with your real PrefExample2(..) if the signature differs
+    def _ensure_triple(t):
+        t = list(t)
+        if len(t) == 2: t.append(0)
+        return tuple(t[:3])
     return PrefExample2(
         x=np.array(d["x"], dtype=np.float32),
-        y_pos=tuple(d["y_pos"]),
-        y_neg=tuple(d["y_neg"]),
+        y_pos=_ensure_triple(d["y_pos"]),
+        y_neg=_ensure_triple(d["y_neg"]),
     )
 
 def save_pref_examples(path: str, examples: List["PrefExample2"]) -> None:
@@ -338,39 +382,42 @@ def load_pref_examples(path: str) -> List["PrefExample2"]:
 
 
 # ===============================
-# 5) DPO POLICY (2-HEAD)
+# 5) DPO POLICY 
 # ===============================
 class StrategyPolicy2Head(nn.Module):
     """MLP with two categorical heads: answers, thinkings."""
-    def __init__(self, input_dim: int, hidden: int = 512, drop: float = 0.1,ANSWERS_CHOICES = ANSWERS_CHOICES, CHUNKING_CHOICES = CHUNKING_CHOICES,):
+    def __init__(self, input_dim: int, hidden: int = 512, drop: float = 0.1,ANSWERS_CHOICES = ANSWERS_CHOICES, THINKINGS_CHOICES = THINKINGS_CHOICES,FACTS_CHOICES= FACTS_CHOICES):
         super().__init__()
         self.ff = nn.Sequential(
             nn.Linear(input_dim, hidden), nn.ReLU(), nn.Dropout(drop),
             nn.Linear(hidden, hidden),   nn.ReLU(), nn.Dropout(drop),
         )
         self.ans = nn.Linear(hidden, len(ANSWERS_CHOICES))
-        self.th  = nn.Linear(hidden, len(CHUNKING_CHOICES))
+        self.th  = nn.Linear(hidden, len(THINKINGS_CHOICES))
+        self.facts  = nn.Linear(hidden, len(FACTS_CHOICES))
 
     def forward(self, x):  # x: [B,D]
         h = self.ff(x)
-        return self.ans(h), self.th(h)
+        return self.ans(h), self.th(h), self.facts(h)
 
 
-    def log_prob(self, x, y):  # y: [B,2] longs
-        la, lt = self.forward(x)
+    def log_prob(self, x, y):  # y: [B,3] longs
+        la, lt, lf = self.forward(x)
         logpa = F.log_softmax(la, dim=-1).gather(-1, y[:,0:1]).squeeze(-1)
         logpt = F.log_softmax(lt, dim=-1).gather(-1, y[:,1:2]).squeeze(-1)
-        return logpa + logpt
+        logpf = F.log_softmax(lf, dim=-1).gather(-1, y[:,2:3]).squeeze(-1)
+        return logpa + logpt + logpf
 
     @torch.no_grad()
     def sample(self, x, greedy: bool = True):
-        la, lt = self.forward(x)
+        la, lt, lf = self.forward(x)
         if greedy:
-            ya, yt = la.argmax(-1), lt.argmax(-1)
+            ya, yt, yf = la.argmax(-1), lt.argmax(-1), lf.argmax(-1)
         else:
             ya = torch.distributions.Categorical(logits=la).sample()
             yt = torch.distributions.Categorical(logits=lt).sample()
-        return torch.stack([ya, yt], dim=-1)
+            yf = torch.distributions.Categorical(logits=lf).sample()
+        return torch.stack([ya, yt, yf], dim=-1)
 
 def dpo_loss_2head(policy: StrategyPolicy2Head,
                    ref: StrategyPolicy2Head,
@@ -426,43 +473,98 @@ def train_dpo_2head(examples: List[PrefExample2], input_dim: int, cfg: TrainCfg 
     return policy, ref
 
 
+
+#### measuring metacodebook
+
+def _sizeof_deep(obj, _seen=None) -> int:
+    """Best-effort deep size in bytes; handles dict/list/tuple/set, numpy, torch."""
+    try:
+        import numpy as np
+    except Exception:
+        np = None
+    try:
+        import torch
+    except Exception:
+        torch = None
+
+    if _seen is None:
+        _seen = set()
+    oid = id(obj)
+    if oid in _seen:
+        return 0
+    _seen.add(oid)
+
+    # Fast paths for arrays/tensors (data payload dominates)
+    if np is not None and isinstance(obj, np.ndarray):
+        return int(obj.nbytes) + sys.getsizeof(obj)
+    if torch is not None and isinstance(obj, torch.Tensor):
+        try:
+            return int(obj.element_size() * obj.nelement()) + sys.getsizeof(obj)
+        except Exception:
+            return sys.getsizeof(obj)
+
+    size = sys.getsizeof(obj)
+    if isinstance(obj, dict):
+        for k, v in obj.items():
+            size += _sizeof_deep(k, _seen)
+            size += _sizeof_deep(v, _seen)
+    elif isinstance(obj, (list, tuple, set, frozenset)):
+        for it in obj:
+            size += _sizeof_deep(it, _seen)
+    # else: treat as atomic (str, int, float, custom objs, etc.)
+    return int(size)
+
+def _mb(n_bytes: int) -> float:
+    return round(n_bytes / (1024 * 1024), 6)
+
+def _json_len_safe(x):
+    """Return (byte_len, error_str_or_None). Converts common non-JSON types."""
+    def _default(o):
+        # Minimal converter so dumps won’t fail on common types
+        try:
+            import numpy as np
+            import torch
+        except Exception:
+            np = torch = None
+        # numpy
+        if 'numpy' in str(type(o)):
+            try:
+                return o.tolist()
+            except Exception:
+                return str(o)
+        # torch
+        if 'torch' in str(type(o)):
+            try:
+                return o.detach().cpu().tolist()
+            except Exception:
+                return str(o)
+        # sets, defaultdicts, etc.
+        try:
+            from collections import defaultdict
+        except Exception:
+            defaultdict = None
+        if isinstance(o, set):
+            return list(o)
+        if defaultdict is not None and isinstance(o, defaultdict):
+            return dict(o)
+        # generic fallback
+        return str(o)
+
+    try:
+        b = json.dumps(x, ensure_ascii=False, default=_default).encode("utf-8")
+        return len(b), None
+    except Exception as e:
+        return 0, f"{type(e).__name__}: {e}"
+    
 # ===============================
-# 6) LINUCB SCHEDULER (COMBINE)
-# ===============================
-class LinUCBArm:
-    def __init__(self, d: int, alpha: float = 1.0):
-        self.d = d
-        self.alpha = alpha
-        self.A = np.eye(d, dtype=np.float32)   # d x d
-        self.b = np.zeros((d,1), dtype=np.float32)  # d x 1
-
-    def theta(self) -> np.ndarray:
-        A_inv = np.linalg.inv(self.A)
-        return (A_inv @ self.b).reshape(-1)  # d,
-
-    def ucb(self, x: np.ndarray) -> float:
-        x = x.reshape(-1,1)  # d x 1
-        A_inv = np.linalg.inv(self.A)
-        mu = float((x.T @ A_inv @ self.b).squeeze())   # mean
-        ci = self.alpha * float(np.sqrt((x.T @ A_inv @ x).squeeze()))  # bonus
-        return mu + ci
-
-    def update(self, x: np.ndarray, reward: float):
-        x = x.reshape(-1,1)
-        self.A += (x @ x.T)
-        self.b += reward * x
-
-
-
-# ===============================
-# 7) INFERENCE PIPELINE
+# 6) INFERENCE PIPELINE
 # ===============================
 @torch.no_grad()
-def select_ans_th(policy: StrategyPolicy2Head, cr, q: str, feature_dim: int = 384, greedy: bool = True,  ANSWERS_CHOICES = ANSWERS_CHOICES,CHUNKING_CHOICES = CHUNKING_CHOICES,):
+def select_ans_th(policy: StrategyPolicy2Head, cr, q: str, feature_dim: int = 384, greedy: bool = True,  ANSWERS_CHOICES = ANSWERS_CHOICES,THINKINGS_CHOICES = THINKINGS_CHOICES,FACTS_CHOICES = FACTS_CHOICES):
     x = torch.tensor(featurize_query(q, dims=feature_dim),dtype=torch.float32).unsqueeze(0).to(next(policy.parameters()).device)
     y = policy.sample(x, greedy=greedy)[0].cpu().numpy().tolist()
-    ai, ti = int(y[0]), int(y[1])
-    return (ANSWERS_CHOICES[ai], CHUNKING_CHOICES[ti])
+    ai, ti, fi = int(y[0]), int(y[1]), int(y[2])
+    return (ANSWERS_CHOICES[ai], THINKINGS_CHOICES[ti], FACTS_CHOICES[fi])
 
 def answer_with_auto_strategy(
     cr: CompressRag_rl,
@@ -472,7 +574,8 @@ def answer_with_auto_strategy(
     gold_answer: Optional[str] = None,
     greedy: bool = True,
     ANSWERS_CHOICES = ANSWERS_CHOICES,
-    CHUNKING_CHOICES = CHUNKING_CHOICES,
+    THINKINGS_CHOICES = THINKINGS_CHOICES,
+    FACTS_CHOICES = FACTS_CHOICES
 ) -> Tuple[str, Dict[str, object]]:
     """
     1) Choose answers/th via DPO policy (question features)
@@ -480,10 +583,10 @@ def answer_with_auto_strategy(
     3) If reward_fn & gold provided, update scheduler online
     """
     # 1) per-question knobs
-    ans_choice, th_choice = select_ans_th(policy, cr, q, greedy=greedy,ANSWERS_CHOICES = ANSWERS_CHOICES,CHUNKING_CHOICES = CHUNKING_CHOICES)
+    ans_choice, th_choice, facts_choice = select_ans_th(policy, cr, q, greedy=greedy,ANSWERS_CHOICES = ANSWERS_CHOICES,THINKINGS_CHOICES = THINKINGS_CHOICES, FACTS_CHOICES = FACTS_CHOICES)
 
     # 2) run
-    with temp_ans_th(cr, ans_choice, th_choice, isolate_state=False):
+    with temp_ans_th(cr, ans_choice, th_choice,facts_choice, isolate_state=False):
         pred = cr.run_work_flow(q)
         fact_context =  cr.cur_fact_context
 
@@ -502,137 +605,25 @@ def answer_with_auto_strategy(
         except Exception:
             pass
 
+    # === Robust memory measurements for meta_codebook ===
+    meta_cb = getattr(cr, "meta_codebook", None)
+
+    if meta_cb is None:
+        json_bytes, json_err = 0, "No meta_codebook on cr"
+    else:
+        # JSON size (only meaningful if serializable or convertible)
+        json_bytes, json_err = _json_len_safe(meta_cb)
+
     meta = {
         "answers_choice": ans_choice,
         "thinkings_choice": th_choice,
+        "facts_choice": facts_choice,
         "reward": reward,
         "fact_context": fact_context,
+        "meta_codebook_json_bytes": int(json_bytes),
+        "meta_codebook_json_MB": _mb(int(json_bytes)),
     }
     return pred, meta
 
 
-
-
-# ===============================
-# 8) SMALL EXAMPLE (USAGE)
-# ===============================
-# if __name__ == "__main__":
-
-#     # --- 1) create CR 
-
-#     # intialization
-
-#     include_thinking = True
-#     word_emb = WordAvgEmbeddings(model_path="gensim-data/glove-wiki-gigaword-100/glove-wiki-gigaword-100.model")
-#     sentence_emb = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-#     phi_llm = Phi4MiniReasoningLLM(
-#         include_thinkings=include_thinking,                 
-#         model_name="microsoft/Phi-4-mini-reasoning",
-#         max_new_tokens=512,
-#         temperature=0.2,
-#         top_p=0.9
-#     )
-#     cr = CompressRag_rl(
-#         ini_meta_codebook = {},
-#         sentence_emb=sentence_emb,
-#         word_emb=word_emb,
-#         llm=phi_llm,
-#         thinkings_choice='not_include',
-#         answers_choice='overlap'
-#     )
-
-#     facts_json_paths = 'medical_sub.json'
-
-#     facts_cb = cr.load_and_merge_facts(facts_json_paths, chunk_chars=100, overlap=30)
-#     cr._facts_preloaded = True
-#     cr.top_m = 2          # sentence-embedding rerank top-m
-
-#     cr.meta_codebook = merging_codebook(
-#         cr.meta_codebook, facts_cb,
-#         type='facts', word_emb=cr.word_emb, use_thinkings=True
-#     )
-#     print('ini merging')
-#     for k, v in cr.meta_codebook.items():
-#         if "fact" in k.lower():
-#             print(k, ":", v)
-#     # ensure round exists
-#     if not hasattr(cr, "round"):
-#         cr.round = 0
-
-#     # --- 2) build preference data for DPO (answers/th)
-#     train_questions = [
-#         "Who discovered penicillin?",
-#         # "What is the capital of France?",
-#         # "Define mitochondria.",
-#         # "When was the UN founded?",
-#     ]
-
-#     # for q in train_questions:
-#     #     cr.run_work_flow(q)
-
-#     # print('after answer questions merging')
-
-#     # for k, v in cr.meta_codebook.items():
-#     #     if "fact" in k.lower():
-#     #         print(k, ":", v)
-
-#     gold = {
-#         "Who discovered penicillin?": "Alexander Fleming",
-#         # "What is the capital of France?": "Paris",
-#         # "Define mitochondria.": "Organelle responsible for ATP production",
-#         # "When was the UN founded?": "1945",
-#     }
-
-#     examples = make_preference_dataset_2head(
-#         cr=cr,
-#         questions=train_questions,
-#         gold_answers=gold,
-#         per_q_samples=6,
-#         feature_dim=384,
-#         reward_fn=default_reward,
-#         seed=0,
-#         isolate_state=True,
-#     )
-
-#     print('after answer questions merging')
-
-#     for k, v in cr.meta_codebook.items():
-#         if "fact" in k.lower():
-#             print(k, ":", v)
-
-#     print(examples)
-
-#     save_pref_examples("pref_examples.json", examples)
-
-#     # 2) Later, just load (no retraining / re-scoring)
-#     examples = load_pref_examples("pref_examples.json")
-
-#     # --- 3) train DPO policy
-#     policy, ref = train_dpo_2head(examples, input_dim=384)
-
-#     # --- 4) init LinUCB scheduler with state feature dim
-#     d_state = featurize_state(cr).shape[0]  # typically 4
-
-#     # --- 5) inference on new questions (+ optional online bandit updates)
-#     test_questions = [
-#         "What is the tallest mountain in Africa?",
-#         # "Explain CRISPR in one sentence.",
-#         # "Who wrote Pride and Prejudice?",
-#     ]
-#     for q in test_questions:
-#         pred, meta = answer_with_auto_strategy(
-#             cr=cr,
-#             policy=policy,
-#             scheduler=scheduler,
-#             q=q,
-#             reward_fn=default_reward,  # if you have gold; else set to None
-#             gold_answer=None,          # supply if you have target
-#             greedy=True
-#         )
-#         print(f"\nQ: {q}\nA: {pred}\nmeta: {meta}")
-#         # print(cr.cur_fact_context)
-
-
-
-#python py_files/dpo_compressrag.py
-#python dpo_compressrag_v6.py
+# dpo_autoprunedretriever.py
