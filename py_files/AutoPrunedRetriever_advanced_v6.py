@@ -2033,7 +2033,8 @@ def get_topk_word_embedding_batched_cross_sim(
     questions_db_batch_size: int = 1,
     w_ent: float = 1.0,
     w_rel: float = 0.3,
-    target = 'questions'
+    target = 'questions',
+    fact_list_type = None
 ) -> Dict[int, List[Dict[str, Any]]]:
     """
     Uses (entities pooled: heads+tails) and relations from each edge_run, scored by:
@@ -2059,7 +2060,7 @@ def get_topk_word_embedding_batched_cross_sim(
             db_source = "questions"
 
     elif target == 'facts':
-        groups_for_db = codebook_main.get("facts_lst", [])
+        groups_for_db = codebook_main.get("facts_feat", {}).get(fact_list_type, [])
         db_source = "facts"
 
     # Flatten DB runs
@@ -2236,364 +2237,6 @@ def _score_query_vs_chunk_with_bonus(
 
 
 
-# # edit this 
-# # instead of getting embeddings one by one, this could get the overall score for the selected chunk edges
-# def _score_query_vs_chunk_with_bonus_optimized(
-#     questions: List[List[int]],
-#     coarse_topk: Dict[int, List[Dict[str, Any]]],
-#     chunk_selected: tuple(int,int,str),
-#     q_edges_embeddings_lst_dict, 
-#     questions_embeddings, # the embeddings for the questions
-#     codebook_main: Dict[str, Any],
-#     emb,
-#     top_t: int = 3,
-#     cov_tau: float = 0.45, cov_weight: float = 0.10,
-#     pair_tau: float = 0.55, pair_temp: float = 0.10, pair_weight: float = 0.20, pair_norm: str = "sqrt",
-#     distinct_weight: float = 0.10, distinct_tau: float = 0.50,
-#     whole_weight: float = 0.10,            # small; tune 0.05–0.15
-#     whole_gate_tau: float = 0.55,          # gate threshold
-#     whole_gate_temp: float = 0.15,         # gate sharpness
-#     whole_len_norm: str = "sqrt_nc"        # {"none","sqrt_nc","log_nc"}
-# ) -> float:
-    
-
-#     # get all the selected q_edges that pick chunk_selected in their top k
-#     q_edges_lst = []
-    
-#     for i, q_edges in enumerate(questions):
-#         cand = coarse_topk.get(i, [])
-#         for item in cand:
-#             qi = int(item["questions_index"])
-#             qj = int(item["question_index"])
-#             src = item.get("db_source", "questions")
-#             key = (qi, qj,src)
-
-#             if key == chunk_selected:
-#                 q_edges_lst.append(i)
-
-
-#     if src == "questions":
-#         groups = codebook_main["questions_lst"]
-
-#     elif src == 'answers':
-#         groups = codebook_main["answers_lst"]
-
-#     else:
-#         groups = codebook_main["facts_lst"]
-
-
-#     # get the selected chunk_edges
-#     chunk_edges = groups[chunk_selected[0]][chunk_selected[1]]
-
-#     c_triples = _triples_words(chunk_edges, codebook_main)
-
-#     # fall back for no generation
-#     if not c_triples:
-#         return 0.0
-
-#     # per-triple lines for embeddings
-#     c_lines = [f"{h} {r} {t}" for h, r, t in c_triples]
-
-#     Q_lst = [q_edges_embeddings_lst_dict[i] for i in q_edges_lst]
-
-#     C = _embed_lines(c_lines, emb)   # (nc,d)
-
-#     S_lst = [_cosine_sim_matrix(Q, C) for Q in Q_lst]
-
-#     score = 0
-
-#     def get_score(S):
-#         nq, nc = S.shape
-
-#         # base: adaptive top-t mean over ALL pairs
-#         t_pairs = max(1, min(top_t, nq * nc))
-#         flat = S.ravel()
-#         idx = np.argpartition(flat, -t_pairs)[-t_pairs:]
-#         rel = float(flat[idx].mean())
-
-#         # coverage: fraction of query triples with a good match
-#         best_per_q = S.max(axis=1)
-#         coverage = float((best_per_q >= cov_tau).mean())
-
-#         # many-to-many good-pairs bonus (soft count + diminishing returns)
-#         soft_hits = 1.0 / (1.0 + np.exp(-(S - pair_tau) / max(1e-6, pair_temp)))
-#         good_pairs_soft = float(soft_hits.sum())
-#         if pair_norm == "sqrt":
-#             norm = np.sqrt(nq * nc) + 1e-12
-#         elif pair_norm == "log":
-#             norm = np.log1p(nq * nc) + 1e-12
-#         else:
-#             norm = 1.0
-#         good_pairs_bonus = np.log1p(good_pairs_soft / norm)
-
-#         # distinct (one-to-one) greedy bonus
-#         distinct_bonus = 0.0
-#         if distinct_weight > 0.0:
-#             S_work = S.copy()
-#             taken = 0
-#             for _ in range(min(nq, nc)):
-#                 r, c = divmod(int(S_work.argmax()), S_work.shape[1])
-#                 val = S_work[r, c]
-#                 if val < distinct_tau:
-#                     break
-#                 distinct_bonus += float(val)
-#                 S_work[r, :] = -np.inf
-#                 S_work[:, c] = -np.inf
-#                 taken += 1
-#             if taken > 0:
-#                 distinct_bonus /= np.sqrt(taken)
-
-#         score = (
-#             rel
-#             + cov_weight * coverage
-#             + pair_weight * good_pairs_bonus
-#             + distinct_weight * distinct_bonus
-#         )
-
-#         return score
-    
-#     for S in S_lst:
-#         score+=get_score(S)
-
-
-#     if questions_embeddings:
-#         nq, nc = S[0].shape
-#         c_text = ",".join([f"[H]{h} [R]{r} [T]{t}" for h, r, t in c_triples])
-#         C_full = _embed_lines(c_text, emb) 
-#         vq = _l2norm_rows(questions_embeddings)
-#         vc = _l2norm_rows(C_full)
-#         s_whole = float(vq @ vc.T)  # cosine in [-1,1] (typically [0,1])
-#         # Length normalization to avoid "long text wins"
-#         if whole_len_norm == "sqrt_nc":
-#             len_factor = np.sqrt(nc) + 1e-12
-#         elif whole_len_norm == "log_nc":
-#             len_factor = np.log1p(nc) + 1e-12
-#         else:
-#             len_factor = 1.0
-#         s_whole_adj = s_whole / len_factor
-
-#         # Soft gate so the term contributes only when the whole-text match is decent
-#         whole_gate = 1.0 / (1.0 + np.exp(-(s_whole - whole_gate_tau) / max(1e-6, whole_gate_temp)))
-#         whole_bonus = whole_weight * (whole_gate * s_whole_adj)
-#         score+whole_bonus
-
-#     # optional: damp very long chunks
-#     # score /= (np.sqrt(nc) + 1e-12)
-#     return float(score)
-
-
-# def rerank_with_sentence_embeddings_score_with_coverage_optimized(
-#     questions: List[List[int]],
-#     codebook_main: Dict[str, Any],
-#     coarse_topk: Dict[int, List[Dict[str, Any]]],
-#     emb,                             # HuggingFaceEmbeddings (or compatible)
-#     top_m: int = 1,
-#     custom_linearizer: Optional[Callable[[List[List[str]]], str]] = None,
-#     use_attention:bool=True) -> Dict[int, List[Dict[str, Any]]]:
-
-
-#     questions_embeddings = None
-
-#     flattened_q = [x for sublist in questions for x in sublist]
-#     if len(flattened_q)>1:
-#         all_q_triples = _triples_words(flattened_q, codebook_main)
-#         full_q_text = " || ".join([f"[H]{h} [R]{r} [T]{t}" for h, r, t in all_q_triples])
-#         questions_embeddings = _embed_lines(full_q_text, emb)   # shape (2, d)
-
-#     results: Dict[int, List[Dict[str, Any]]] = {}
-
-
-#     all_scored = {
-#                 "score": [],                 # higher = better
-#                 "questions_index": [],
-#                 "question_index": [],              
-#                 "db_source": [],
-#                 'index_combo':[],
-#                 # 'text':[]
-#                 }
-    
-
-#     q_edges_embeddings_lst_dict = {}
-#     q_edge_attention = {}
-#     q_edge_attention_raw = {}         # per-question flat sims (1 per triple)
-#     q_edge_attention_weights = {}     # per-question nested per-edge weights (list of dicts)
-#     q_edge_attention_index = {}       # optional: flat-to-edge mapping metadata
-
-#     # store all the q_edges embeddings
-#     if questions_embeddings and use_attention:
-#         vq = _l2norm_rows(questions_embeddings)
-
-#     for i, q_edges in enumerate(questions):
-#         q_triples = _triples_words(q_edges, codebook_main)
-#         q_lines = [f"{h} {r} {t}" for h, r, t in q_triples]
-#         Q = _embed_lines(q_lines, emb)   
-#         q_edges_embeddings_lst_dict[i] = Q
-
-#         if questions_embeddings and use_attention:
-#             for q_sub in Q:
-#                 vq_sub = _l2norm_rows(q_sub)
-#                 s_sub = float(vq @ vq_sub.T)
-
-#                 if i in q_edge_attention.keys():
-#                     q_edge_attention[i].append(s_sub)
-#                 else:
-#                     q_edge_attention[i] = [s_sub]
-
-#         # --- Attention (triple-level) vs whole-question embedding ---
-#         if vq is not None and use_attention:
-#             vqi = vq[i:i+1, :]                # (1, d)
-#             VQ_sub = _l2norm_rows(Q)          # (total_triples_i, d)
-#             sims = (VQ_sub @ vqi.T).ravel().astype(np.float32)   # (total_triples_i,)
-#             q_edge_attention_raw[i] = sims.tolist()
-
-#             # Global softmax over all triples for this question
-#             s = sims - sims.max()
-#             exp_s = np.exp(s, dtype=np.float64)
-#             w_global = (exp_s / (exp_s.sum() + 1e-12)).astype(np.float32)  # (total_triples_i,)
-#         else:
-#             # No attention → uniform per triple
-#             sims = np.zeros((Q.shape[0],), dtype=np.float32)
-#             q_edge_attention_raw[i] = sims.tolist()
-#             w_global = np.full(Q.shape[0], 1.0 / Q.shape[0], dtype=np.float32)
-
-#         # # --- Package weights back per edge and per triple ---
-#         # nested = []
-#         # for (edge_idx, s0, s1, triples_e) in edge_slices:
-#         #     if s1 > s0:
-#         #         weights_e = w_global[s0:s1]
-#         #         # Optional: also provide per-edge-normalized weights if you prefer local softmax
-#         #         # ws = weights_e - weights_e.max()
-#         #         # w_edge = np.exp(ws) / (np.exp(ws).sum() + 1e-12)
-#         #         nested.append({
-#         #             "edge_index": edge_idx,
-#         #             "triples": triples_e,                     # [(h,r,t), ...]
-#         #             "weights_global": weights_e.tolist(),     # aligns 1-1 with triples_e
-#         #             # "weights_edge": w_edge.tolist(),        # uncomment if you want per-edge normalization
-#         #             "slice": [int(s0), int(s1)]               # back-reference into the flat arrays
-#         #         })
-#         #     else:
-#         #         nested.append({
-#         #             "edge_index": edge_idx,
-#         #             "triples": [],
-#         #             "weights_global": [],
-#         #             "slice": [int(s0), int(s1)]
-#         #         })
-
-#         # q_edge_attention_weights[i] = nested
-#         # q_edge_attention_index[i] = {
-#         #     "weights_global": w_global.tolist(),
-#         #     "edge_slices": [
-#         #         {"edge_index": idx, "start": int(s0), "end": int(s1)}
-#         #         for (idx, s0, s1, _) in edge_slices
-#         #     ]
-#         # }
-
-
-#         cand = coarse_topk.get(i, [])
-#         if not cand:
-#             results[i] = []
-#             continue
-
-#         seen = set()
-#         scored = []
-
-#         for item in cand:
-#             qi = int(item["questions_index"])
-#             qj = int(item["question_index"])
-#             src = item.get("db_source", "questions")
-#             key = (qi, qj, src)
-#             if key in seen:
-#                 continue
-#             seen.add(key)
-
-
-#         # getting the attention factor 
-#         q_attention_factor = []
-#         if q_edge_attention:
-#             print(1)
-
-
-
-
-#         for chunk_selected in seen:
-#             # need add attention in this func
-#             score = _score_query_vs_chunk_with_bonus_optimized(
-#                     questions,
-#                     coarse_topk,
-#                     chunk_selected,
-#                     q_edges_embeddings_lst_dict, 
-#                     questions_embeddings, # the embeddings for the questions
-#                     codebook_main,
-#                     emb)
-            
-#             qi, qj, src = chunk_selected
-            
-#             all_scored['score'].append(score)
-#             all_scored['questions_index'].append(qi)
-#             all_scored['question_index'].append(qj)
-#             all_scored['db_source'].append(src)
-#             all_scored['index_combo'].append([qi, qj])
-
-#     m = min(top_m, len(all_scored["score"]))
-
-#     # print('all_scored',all_scored)
-
-#     combined = list(zip(
-#         all_scored["score"],
-#         all_scored["questions_index"],
-#         all_scored["question_index"],
-#         all_scored["db_source"],
-#         all_scored["index_combo"]
-#     ))
-
-#     # Sort by score (descending)
-#     combined.sort(key=lambda x: x[0], reverse=True)
-
-#     # Take top-m
-#     top_m_scored = combined[:m]
-
-#     # Unzip back
-#     (
-#         all_scored["score"],
-#         all_scored["questions_index"],
-#         all_scored["question_index"],
-#         all_scored["db_source"],
-#         all_scored["index_combo"],
-#     ) = map(list, zip(*top_m_scored))
-
-
-
-#     return all_scored
-
-def _build_whole_question_embeddings(
-    questions: List[List[List[int]]],  # each question is a list of q_edges; each q_edge is edge_run list[int]
-    codebook_main: Dict[str, Any],
-    emb,
-    sep: str = " <SEP> "
-) -> np.ndarray:
-    """One (normalized) embedding per question: (num_questions, d)."""
-    rows = []
-    d = None
-    for q_edges in questions:
-        q_triples = _triples_words(q_edges, codebook_main)  # [(h,r,t),...]
-        if not q_triples:
-            # placeholder; patched to correct dim after we see first real vec
-            rows.append(np.zeros((1, 1), dtype=np.float32))
-            continue
-        full_q_text = sep.join([f"[H]{h} [R]{r} [T]{t}" for h, r, t in q_triples])
-        v = _embed_lines([full_q_text], emb)  # (1,d)
-        d = v.shape[1] if d is None else d
-        rows.append(v)
-
-    if d is None:
-        # no questions at all; return (0, 0)
-        return np.zeros((0, 0), dtype=np.float32)
-
-    # fix placeholders to correct width
-    rows = [r if r.shape[1] == d else np.zeros((1, d), dtype=np.float32) for r in rows]
-    V = np.vstack(rows).astype(np.float32)  # (N,d)
-    return _l2norm_rows(V)
-
 
 # --- scorer with attention row-weights---
 def _score_query_vs_chunk_with_bonus_optimized(
@@ -2612,7 +2255,8 @@ def _score_query_vs_chunk_with_bonus_optimized(
     whole_weight: float = 0.10,
     whole_gate_tau: float = 0.55,
     whole_gate_temp: float = 0.15,
-    whole_len_norm: str = "sqrt_nc"
+    whole_len_norm: str = "sqrt_nc",
+    fact_list_type = None
 ) -> float:
     import numpy as np
 
@@ -2647,7 +2291,7 @@ def _score_query_vs_chunk_with_bonus_optimized(
     elif sel_src == "answers":
         groups = codebook_main["answers_lst"]
     else:
-        groups = codebook_main["facts_lst"]
+        groups = codebook_main["facts_feat"][fact_list_type]
 
     chunk_edges = groups[sel_qi][sel_qj]
     c_triples = _triples_words(chunk_edges, codebook_main)
@@ -2765,7 +2409,8 @@ def rerank_with_sentence_embeddings_score_with_coverage_optimized(
     coarse_topk,
     emb,
     top_m: int = 1,
-    use_attention: bool = True
+    use_attention: bool = True,
+    fact_list_type = None
 ):
     import numpy as np
 
@@ -2842,7 +2487,8 @@ def rerank_with_sentence_embeddings_score_with_coverage_optimized(
             questions_embeddings=questions_embeddings if questions_embeddings.size else None,
             codebook_main=codebook_main,
             emb=emb,
-            q_triple_attention=q_triple_attention
+            q_triple_attention=q_triple_attention,
+            fact_list_type = fact_list_type
         )
         qi, qj, src = chunk_selected
         all_scored["score"].append(float(sc))
@@ -2870,7 +2516,8 @@ def coarse_filter_optimized(
     custom_linearizer: Optional[Callable[[List[List[str]]], str]] = None,
     target = 'questions',
     w_ent: float = 1.0,
-    w_rel: float = 0.3,):
+    w_rel: float = 0.3,
+    fact_list_type = None):
 
     # doing the word embedding pre-filter 
 
@@ -2882,7 +2529,8 @@ def coarse_filter_optimized(
     questions_db_batch_size,     # number of db questions processed per time
     w_ent,
     w_rel,
-    target
+    target,
+    fact_list_type = fact_list_type
     )
 
     # doing the sentence embedding filter 
@@ -2893,7 +2541,8 @@ def coarse_filter_optimized(
     coarse_top_k,
     sentence_emb,
     top_m,
-    custom_linearizer)
+    custom_linearizer,
+    fact_list_type = fact_list_type)
 
     print('top_m_results',top_m_results)
 
@@ -4768,7 +4417,6 @@ class AutoPrunedRetriver:
         sentence_emb: Optional[Embeddings] = None,
         word_emb: Optional[Embeddings] = None,
         llm = None,
-        thinkings_choice = 'not_include',
         chunkings_choice = 'medoid_approx',
         answers_choice = 'overlap',
         facts_choice = 'include_all',
@@ -4831,6 +4479,7 @@ class AutoPrunedRetriver:
         self.chunkings_choice = chunkings_choice
 
         ### thinkings param
+        self.include_thinkings = False
         self.llm.include_thinkings = False
         ### answers param
         self.answers_choice   = answers_choice
@@ -4859,19 +4508,23 @@ class AutoPrunedRetriver:
         self.context_json_path = None  
         self._facts_preloaded = False 
 
-    def set_include_thinkings(self):
-        if self.thinkings_choice == "not_include":
-            self.include_thinkings = False
-            self.llm.include_thinkings = False
+    # def set_include_thinkings(self):
+    #     if self.thinkings_choice == "not_include":
+    #         self.include_thinkings = False
+    #         self.llm.include_thinkings = False
 
-        else:
-            self.include_thinkings = True
-            self.llm.include_thinkings = True
+    #     else:
+    #         self.include_thinkings = True
+    #         self.llm.include_thinkings = True
 
-            if self.thinkings_choice == "overlap":
-                self.thinking_extract_function =  partial(get_unique_or_overlap_by_sentence_embedded,sim_threshold=self.semantic_overlap_sim)
-            elif self.thinkings_choice == "unique":
-                self.thinking_extract_function = partial(get_unique_or_overlap_by_sentence_embedded,unique=True,sim_threshold=self.semantic_overlap_sim)
+    #         if self.thinkings_choice == "overlap":
+    #             self.thinking_extract_function =  partial(get_unique_or_overlap_by_sentence_embedded,sim_threshold=self.semantic_overlap_sim)
+    #         elif self.thinkings_choice == "unique":
+    #             self.thinking_extract_function = partial(get_unique_or_overlap_by_sentence_embedded,unique=True,sim_threshold=self.semantic_overlap_sim)
+
+
+    def set_chunkings_choice(self):
+        self.fact_list_type = f'facts:{self.chunkings_choice}(edges[i])'
 
     def set_include_answers(self):
         if self.answers_choice == "not_include":
@@ -4898,7 +4551,7 @@ class AutoPrunedRetriver:
 
 
     def set_includings(self):
-        self.set_include_thinkings()
+        self.set_chunkings_choice
         self.set_include_answers()
         self.set_include_facts()
 
@@ -5308,7 +4961,8 @@ class AutoPrunedRetriver:
                                     self.questions_db_batch_size,           # DB batch size
                                     self.top_m,                             # sentence-embedding rerank
                                     self.custom_linearizer,
-                                    'facts')
+                                    'facts',
+                                    fact_list_type = self.fact_list_type)
         
         all_facts,_ = get_all_results(top_m_results_for_facts,self.meta_codebook) 
         print('all_facts',all_facts)
@@ -5761,35 +5415,6 @@ class AutoPrunedRetriver:
             if len(self.meta_codebook['facts_lst'])>=2:
                 self.meta_codebook['facts_lst'] = remove_duplicate_inner_lists(self.meta_codebook['facts_lst'])
 
-        # after combine ents combine others
-        # combine qas if avaliable
-        # if 'questions_lst' in self.meta_codebook and 'answers_lst' in self.meta_codebook:
-        #     if len(self.meta_codebook['questions_lst'])>=2:
-        #         new_q, new_a, q_old_to_new, q_clusters, kept = ann_merge_questions_answer_gated(self.meta_codebook,
-        #                                                                                         self.meta_codebook['questions_lst'],
-        #                                                                                         self.meta_codebook['answers_lst'],
-        #                                                                                         q_sim_threshold = self.q_combine_sim,
-        #                                                                                         a_sim_threshold = self.aft_combine_sim)
-                
-        #         self.meta_codebook['questions_lst'] = new_q
-        #         self.meta_codebook['answers_lst'] = new_a
-
-        # if 'facts_lst' in self.meta_codebook:
-        #     if len(self.meta_codebook['facts_lst'])>=2:
-        #         new_facts, f_old2new, f_clusters, kept = ann_feat_combine(self.meta_codebook,
-        #                                                                                         self.meta_codebook['facts_lst'],
-        #                                                                                         sim_threshold = self.aft_combine_sim)
-                
-        #         self.meta_codebook['facts_lst'] = new_facts
-
-
-        # if 'thinkings_lst' in self.meta_codebook:
-        #     if len(self.meta_codebook['thinkings_lst'])>=2:
-        #         new_thinkings, f_old2new, f_clusters, kept = ann_feat_combine(self.meta_codebook,
-        #                                                                                         self.meta_codebook['thinkings_lst'],
-        #                                                                                         sim_threshold = self.aft_combine_sim)
-                
-        #         self.meta_codebook['thinkings_lst'] = new_thinkings
 
         return (new_result, metrics_map, self.cur_fact_context) if return_metrics else new_result
     
@@ -5842,37 +5467,6 @@ class AutoPrunedRetriver:
         if 'facts_lst' in self.meta_codebook:
             if len(self.meta_codebook['facts_lst'])>=2:
                 self.meta_codebook['facts_lst'] = remove_duplicate_inner_lists(self.meta_codebook['facts_lst'])
-
-        # after combine ents combine others
-        # after combine ents combine others
-        # combine qas if avaliable
-        # if 'questions_lst' in self.meta_codebook and 'answers_lst' in self.meta_codebook:
-        #     if len(self.meta_codebook['questions_lst'])>=2:
-        #         new_q, new_a, q_old_to_new, q_clusters, kept = ann_merge_questions_answer_gated(self.meta_codebook,
-        #                                                                                         self.meta_codebook['questions_lst'],
-        #                                                                                         self.meta_codebook['answers_lst'],
-        #                                                                                         q_sim_threshold = self.q_combine_sim,
-        #                                                                                         a_sim_threshold = self.aft_combine_sim)
-                
-        #         self.meta_codebook['questions_lst'] = new_q
-        #         self.meta_codebook['answers_lst'] = new_a
-
-        # if 'facts_lst' in self.meta_codebook:
-        #     if len(self.meta_codebook['facts_lst'])>=2:
-        #         new_facts, f_old2new, f_clusters, kept = ann_feat_combine(self.meta_codebook,
-        #                                                                                         self.meta_codebook['facts_lst'],
-        #                                                                                         sim_threshold = self.aft_combine_sim)
-                
-        #         self.meta_codebook['facts_lst'] = new_facts
-
-
-        # if 'thinkings_lst' in self.meta_codebook:
-        #     if len(self.meta_codebook['thinkings_lst'])>=2:
-        #         new_thinkings, f_old2new, f_clusters, kept = ann_feat_combine(self.meta_codebook,
-        #                                                                                         self.meta_codebook['thinkings_lst'],
-        #                                                                                         sim_threshold = self.aft_combine_sim)
-                
-        #         self.meta_codebook['thinkings_lst'] = new_thinkings
 
 
         return new_result,metrics_from_llm,ft_txt
