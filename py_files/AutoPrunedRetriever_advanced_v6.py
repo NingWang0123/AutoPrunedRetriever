@@ -24,8 +24,8 @@ import copy
 from optimize_combine_storage import ann_feat_combine,ann_merge_questions_answer_gated
 from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 from rouge_score import rouge_scorer
-from test_continous_chunk import embed_triples_as_sentences,segment_by_centroid_sim,merge_chunks_by_boundary 
-from continous_chunk_v2 import segment_by_prototype_sim_multi
+from test_continous_chunk import embed_triples_as_sentences,segment_by_centroid_sim 
+from continous_chunk_v2 import segment_by_prototype_sim_multi,merge_chunks_by_boundary
 
 Triplet = Tuple[str, str, str]
 
@@ -922,33 +922,74 @@ def _build_triple_positions(triples: List[Triple]) -> Dict[Triple, deque]:
     Map each triple value -> deque of positions where it occurs in `triples`.
     Supports duplicates: we pop from the left each time we consume one.
     """
+    print(f'triples are {triples}')
     pos: Dict[Triple, deque] = defaultdict(deque)
     for i, t in enumerate(triples):
         pos[t].append(i)
+    print(f'pos is {pos}')
     return pos
 
 
-def _chunks_to_global_indices_via_triples(
-    triples_global: List[Triple],
-    chunks: List[List[Triple]],
-) -> List[List[int]]:
+from collections import defaultdict, deque
+from typing import Iterable, List, Tuple, Sequence
+import numpy as np
+
+Triple = Tuple[str, str, str]
+
+def _as_tuple_triple(x) -> Triple:
     """
-    Given a *global ordered* triple list and a chunking (list of lists of triples),
-    return [[global_edge_idx,...] per chunk], reusing the order/indices of `triples_global`.
-    Works even if triples repeat (indexes are consumed FIFO).
+    Accepts (h,r,t) as tuple/list/np.array; returns a hashable (h,r,t) tuple.
+    Raises TypeError if not a length-3 sequence.
     """
+    if isinstance(x, np.ndarray):
+        x = x.tolist()
+    if isinstance(x, tuple):
+        if len(x) == 3: return x
+    elif isinstance(x, list):
+        if len(x) == 3: return (x[0], x[1], x[2])
+    else:
+        # also allow any Sequence of len 3
+        if isinstance(x, Sequence) and not isinstance(x, (str, bytes)) and len(x) == 3:
+            return (x[0], x[1], x[2])
+    raise TypeError(f"Not a valid (h,r,t) triple: {x!r}")
+
+def _coerce_triple_list(seq: Iterable) -> List[Triple]:
+    return [_as_tuple_triple(t) for t in seq]
+
+def _coerce_chunks(chunks: Iterable[Iterable]) -> List[List[Triple]]:
+    return [_coerce_triple_list(ch) for ch in chunks]
+
+def _build_triple_positions(triples_global: Iterable) -> defaultdict:
+    pos = defaultdict(deque)
+    for i, t in enumerate(triples_global):
+        pos[_as_tuple_triple(t)].append(i)
+    return pos
+
+def _chunks_to_global_indices_via_triples(triples_global: Iterable,
+                                          chunks: Iterable[Iterable]) -> List[List[int]]:
+    """
+    Given a global ordered triple list and a chunking (list of lists of triples),
+    return [[global_edge_idx,...] per chunk], consuming positions FIFO for duplicates.
+    """
+    triples_global = _coerce_triple_list(triples_global)
+    chunks = _coerce_chunks(chunks)
+
     pos = _build_triple_positions(triples_global)
-    chunk_to_global: List[List[int]] = []
+
+    out: List[List[int]] = []
     for ch in chunks:
         row: List[int] = []
         for t in ch:
-            if not pos[t]:
-                # Fall back: if the triple wasn't found (rare if inputs are consistent),
-                # skip or handle as needed; here we skip.
+            tt = _as_tuple_triple(t)
+            dq = pos.get(tt)
+            if not dq:
+                # If you prefer strictness, replace with: raise KeyError(...)
+                # This can happen if chunking reorders/drops/duplicates beyond global supply.
                 continue
-            row.append(pos[t].popleft())
-        chunk_to_global.append(row)
-    return chunk_to_global
+            row.append(dq.popleft())
+        out.append(row)
+    return out
+
 
 
 def get_code_book_for_multi_facts(
@@ -1052,6 +1093,9 @@ def get_code_book_for_multi_facts(
             bonus_tail_head=bonus_tail_head,
             tail_head_bonus=tail_head_bonus
         )
+
+        triples_global = _coerce_triple_list(triples_global) 
+
         chunk_to_global = _chunks_to_global_indices_via_triples(triples_global, chunks)
         codebook.update({
             "edges([e,r,e])": edges_global,
@@ -1078,6 +1122,8 @@ def get_code_book_for_multi_facts(
 
     # For each prototype, convert its chunking to indices over the ONE global edges list
     features: Dict[str, List[List[int]]] = {}
+
+    triples_global = _coerce_triple_list(triples_global) 
     for proto, chunks in chunks_dict.items():
         features[f"{type}:{proto}(edges[i])"] = _chunks_to_global_indices_via_triples(triples_global, chunks)
 
@@ -4714,7 +4760,7 @@ def entrel_maxpair_similarity(Eq, Rq,Ef, Rf,w_ent: float = 1.0, w_rel: float = 0
     return w_ent * ent_score + w_rel * rel_score
 
 
-class ExactGraphRag_rl:
+class AutoPrunedRetriver:
     def __init__(
         self,
         ini_meta_codebook = {},
@@ -4860,7 +4906,7 @@ class ExactGraphRag_rl:
         self.set_include_answers()
         self.set_include_facts()
 
-    def preload_context_json(self, json_path: str, chunk_tokens: int = 1200, overlap_tokens: int = 100, sub_chunk_chars: int = 300, sub_chunk_overlap: int = 50, tokenizer_name: str = "gpt-4o-mini", subchunk_batch: int = 500):
+    def preload_context_json(self, json_path: str, chunk_tokens: int = 1200, overlap_tokens: int = 100, sub_chunk_chars: int = 300, sub_chunk_overlap: int = 50, tokenizer_name: str = "gpt-4o-mini", subchunk_batch: int = 500,all_facts_types = ("centroid","medoid_approx","ema")):
         import json
         import tiktoken
 
@@ -5000,18 +5046,26 @@ class ExactGraphRag_rl:
         batch_num = 0
         facts_codebook_lst = []
         for i in range(0, total_chunks, batch_size):
-            batch_chunks = all_chunks[i:i+batch_size]
-            fact_cb = get_code_book_for_multi_facts(
-                batch_chunks,
-                type='facts',
-                rule="Store factual statements.",
-                batch_size=1,
-                all_facts_types = ("centroid","medoid_approx","ema")
-            )
 
-            print(f'batch {batch_num} codebook is generated')
+            if i <3:
+                batch_chunks = all_chunks[i:i+batch_size]
+                fact_cb = get_code_book_for_multi_facts(
+                    batch_chunks,
+                    type='facts',
+                    rule="Store factual statements.",
+                    batch_size=1,
+                    all_facts_types = all_facts_types,
+                    sent_emb = self.sentence_emb
+                )
 
-            facts_codebook_lst.append(fact_cb)
+                print(f'batch {batch_num} codebook is generated')
+
+                print(fact_cb)
+
+                facts_codebook_lst.append(fact_cb)
+
+            else:
+                break
 
 
             # facts_codebook_lst.append(fact_cb)
@@ -5551,19 +5605,72 @@ class ExactGraphRag_rl:
                     print('===============================================================')
                     print('===============================================================')
 
-                    print("len(self.meta_codebook[facts_lst])",len(self.meta_codebook["facts_lst"]))
+                    # print("len(self.meta_codebook[facts_lst])",len(self.meta_codebook["facts_lst"]))
 
                     print('===============================================================')
                     print('===============================================================')
                     print('===============================================================')
+
+                    print(self.meta_codebook.keys())
 
             # newly adding trying to merge boundaries
         print('starting to check whether to merge boundaries')
-        self.meta_codebook['facts_lst'] = merge_chunks_by_boundary(chunks = self.meta_codebook['facts_lst'],
-                                                                   codebook_main = self.meta_codebook,
-                                                                   sent_emb = self.sentence_emb)
+
+        _FACT_TYPE_ONLY_RE = re.compile(r"^facts:([A-Za-z0-9_\-]+)\(edges\[i\]\)$")
+
+        def extract_fact_type(key: str, *, to_lower: bool = True) -> Optional[str]:
+            """
+            Return the facts type from a key like 'facts:medoid(edges[i])'.
+            Returns None if it isn't a typed facts key (e.g., 'facts(edges[i])').
+            """
+            m = _FACT_TYPE_ONLY_RE.match(key.strip())
+            if not m:
+                return None
+            t = m.group(1)
+            return t.lower() if to_lower else t
         
-        self.meta_codebook['facts_lst'] = remove_duplicate_inner_lists(self.meta_codebook['facts_lst'])
+        # 2) Find all *typed* facts features in a codebook (exclude plain 'facts(edges[i])')
+        def list_fact_type_keys(codebook_main: Dict) -> List[str]:
+            """
+            Return keys in codebook_main['facts_feat'] that are typed facts,
+            e.g., ['facts:centroid(edges[i])', 'facts:medoid(edges[i])', ...].
+            """
+            facts_feat = codebook_main.get("facts_feat", {})
+            return [k for k in facts_feat.keys() if _FACT_TYPE_ONLY_RE.match(k)]
+
+        def get_fact_types(codebook_main: Dict, *, to_lower: bool = True) -> List[str]:
+            """
+            """
+            types_dict = {}
+            facts_type_keys = list_fact_type_keys(codebook_main)
+            for k in facts_type_keys:
+                t = extract_fact_type(k, to_lower=to_lower)
+                if t is not None:
+                    types_dict[k] = t
+            return types_dict
+        
+
+
+        print(f'self.meta_codebook{self.meta_codebook}')
+        
+
+        types_dict = get_fact_types(self.meta_codebook)
+
+        for feat_name, prototype in types_dict.items():
+
+            print(f'start merging boundaries for {feat_name}')
+
+            self.meta_codebook['facts_feat'][feat_name] = merge_chunks_by_boundary(chunks = self.meta_codebook['facts_feat'][feat_name],
+                                                                    codebook_main = self.meta_codebook,
+                                                                    sent_emb = self.sentence_emb,
+                                                                    prototype = prototype)
+            
+            self.meta_codebook['facts_feat'][feat_name] = remove_duplicate_inner_lists(self.meta_codebook['facts_feat'][feat_name])
+
+        if 'facts(edges[i])' in self.meta_codebook:
+            self.meta_codebook.pop('facts(edges[i])')
+
+    
 
     def run_work_flow(self, q_prompt, rule="Answer questions", 
                       facts_json_path: list = None, chunk_chars: int = 800, 
