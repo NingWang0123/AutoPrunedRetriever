@@ -21,6 +21,8 @@ from sentence_transformers import SentenceTransformer
 # ANSWERS_CHOICES   = ['overlap','unique','not_include']
 
 CHUNKINGS_CHOICES = ["centroid","medoid_approx","ema"]
+
+CHUNKINGS_CHOICES = ["centroid","ema","hybrid"]
 ANSWERS_CHOICES   = ['unique','not_include']
 FACTS_CHOICES = ['unique','include_all'] 
 
