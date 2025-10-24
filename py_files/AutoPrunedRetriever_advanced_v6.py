@@ -5047,11 +5047,12 @@ class AutoPrunedRetriver:
 
 
         print('remove the duplicates ...')
-        if 'facts_lst' in self.meta_codebook:
-            if len(self.meta_codebook['facts_lst'])>=2:
-                self.meta_codebook['facts_lst'] = remove_duplicate_inner_lists(self.meta_codebook['facts_lst'])
-
-
+        if 'facts_feat' in self.meta_codebook:
+            fact_list_types = self.meta_codebook['facts_feat'].keys()
+            print(f'start removing the duplicates for {fact_list_types}')
+            for fact_list_type in fact_list_types:
+                self.meta_codebook['facts_feat'][fact_list_type] = remove_duplicate_inner_lists(self.meta_codebook['facts_feat'][fact_list_type])
+        
         return (new_result, metrics_map, self.cur_fact_context) if return_metrics else new_result
     
     # dpo version for run work_flow, same process but return the collected metrics from the llm
@@ -5106,10 +5107,13 @@ class AutoPrunedRetriver:
         # replace the learning periodical combine ents with trapped by ram
         self.combine_ents_func(mode=warm_start) 
 
-        if 'facts_lst' in self.meta_codebook:
-            if len(self.meta_codebook['facts_lst'])>=2:
-                self.meta_codebook['facts_lst'] = remove_duplicate_inner_lists(self.meta_codebook['facts_lst'])
-
+        print('remove the duplicates ...')
+        if 'facts_feat' in self.meta_codebook:
+            fact_list_types = self.meta_codebook['facts_feat'].keys()
+            print(f'start removing the duplicates for {fact_list_types}')
+            for fact_list_type in fact_list_types:
+                self.meta_codebook['facts_feat'][fact_list_type] = remove_duplicate_inner_lists(self.meta_codebook['facts_feat'][fact_list_type])
+        
 
         return new_result,metrics_from_llm,ft_txt
     
