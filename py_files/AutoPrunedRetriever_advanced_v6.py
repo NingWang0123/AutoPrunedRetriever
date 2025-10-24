@@ -13,7 +13,7 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
-from optimize_combine_ent import combine_ents_auto, combine_ents_ann_knn, coarse_combine
+from optimize_combine_ent_for_apr import combine_ents_auto, combine_ents_ann_knn, coarse_combine
 from copy import deepcopy
 from textwrap import dedent
 from graph_generator.rebel_large import triplet_parser
@@ -1987,6 +1987,7 @@ def _extract_entities_relations_from_run(edge_run: List[int],
       E: (n_e, de) or None    # heads+tails
       R: (n_r, dr) or None    # relations
     """
+    print(f'current edge_run is {edge_run}')
     decoded = decode_question(edge_run, codebook_main, fmt='embeddings')
 
     Es, Rs = [], []
@@ -4996,9 +4997,16 @@ class AutoPrunedRetriver:
 
         print(f'final_merged_json sliced{final_merged_json}')
 
-        self.cur_fact_context = ft_txt
+        if gk_txt:
+            self.cur_fact_context = ft_txt+gk_txt
 
-        print(f'{ft_txt} ft_txt')
+            print(f'{ft_txt+gk_txt} ft_txt+gk_txt')
+
+        else:
+            self.cur_fact_context = ft_txt
+
+            print(f'{ft_txt} ft_txt+gk_txt')
+
 
         new_result, new_json_lst = self.collect_results(final_merged_json, questions=q_prompt, retrieval_time=retrieval_time)
         metrics_map = self.llm.last_metrics or {}           # {question: gen_info}
@@ -5079,9 +5087,15 @@ class AutoPrunedRetriver:
         
         final_merged_json = slice_for_final_merged_json(final_merged_json,self.use_word)
 
-        self.cur_fact_context = ft_txt
+        if gk_txt:
+            self.cur_fact_context = ft_txt+gk_txt
 
-        print(f'{ft_txt} ft_txt')
+            print(f'{ft_txt+gk_txt} ft_txt+gk_txt')
+
+        else:
+            self.cur_fact_context = ft_txt
+
+            print(f'{ft_txt} ft_txt+gk_txt')
 
         print(f'final_merged_json sliced{final_merged_json}')
         new_result, new_json_lst,metrics_from_llm = self.collect_results_dpo(final_merged_json, questions=q_prompt, retrieval_time=retrieval_time)

@@ -144,7 +144,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
         cr._facts_preloaded = True
         # cr.top_m = 5          # sentence-embedding rerank top-m
 
-        print(cr.meta_codebook)
+        # print(cr.meta_codebook)
 
         print('===============================================================')
         print('===============================================================')
@@ -188,7 +188,6 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
     # ---------------------------------------------------------------------
     # 4) Build DPO preference dataset on seed Q-A pairs
     # ---------------------------------------------------------------------
-    print(cr.meta_codebook)
     # use cr_training to train
 
     print("» Building preference pairs for DPO …")
@@ -394,7 +393,7 @@ if __name__ == "__main__":
 
     compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N, 
                             top_m,top_m*10,aft_combine_sim,aft_combine_sim,aft_combine_sim,0.93,
-                            Path("meta_codebook_new6.json") ,f"pref_examples_medical_exact_openai_v3.json",reward_func,
+                            Path("meta_codebook_medicalv6.json") ,f"pref_examples_medical_exact_openai_v3.json",reward_func,
                             reward_func_mode = 'non_llm',final_json_path = f"results/compressrag_medical_v6_method_results.json")
 
     # df.to_csv('results/result_sbertinclusive_new_embed_for_exactgraphrag.csv')
