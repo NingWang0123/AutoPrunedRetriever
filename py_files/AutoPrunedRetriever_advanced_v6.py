@@ -2726,11 +2726,11 @@ def coarse_filter_advanced(
 
 
 
-def get_all_results(top_m_results,codebook_main,target = 'facts'):
+def get_all_results(top_m_results,codebook_main,target = 'facts',fact_list_type = None):
     all_results = []
     chunk_dict = {}
     all_indexes = []
-    feat_name = target+'_lst'
+
     for i in range(len(top_m_results["score"])):
         row = {key: top_m_results[key][i] for key in top_m_results}
         cur_qid,cur_qjd = row['index_combo']
@@ -2739,13 +2739,24 @@ def get_all_results(top_m_results,codebook_main,target = 'facts'):
         else:
             chunk_dict[cur_qid] = [cur_qjd]
 
-    for q_idx, q_jdx_lst in chunk_dict.items():
-        chunks = []
-        for q_jdx in q_jdx_lst:
-            chunks.append(codebook_main[feat_name][q_idx][q_jdx])
+    if target == 'facts':
+        feat_name = 'facts_feat'
+        for q_idx, q_jdx_lst in chunk_dict.items():
+            chunks = []
+            for q_jdx in q_jdx_lst:
+                chunks.append(codebook_main[feat_name][fact_list_type][q_idx][q_jdx])
 
-        all_results.append(chunks)
-        all_indexes.append(q_idx)
+            all_results.append(chunks)
+            all_indexes.append(q_idx)
+    else:
+        feat_name = target+'_lst'
+        for q_idx, q_jdx_lst in chunk_dict.items():
+            chunks = []
+            for q_jdx in q_jdx_lst:
+                chunks.append(codebook_main[feat_name][q_idx][q_jdx])
+
+            all_results.append(chunks)
+            all_indexes.append(q_idx)
 
     return all_results,all_indexes
 
@@ -4357,9 +4368,11 @@ class AutoPrunedRetriver:
 
 
     def set_includings(self):
-        self.set_chunkings_choice
+        self.set_chunkings_choice()
         self.set_include_answers()
         self.set_include_facts()
+
+        print(self.fact_list_type)
 
     def preload_context_json(self, json_path: str, chunk_tokens: int = 1200, overlap_tokens: int = 100, sub_chunk_chars: int = 300, sub_chunk_overlap: int = 50, tokenizer_name: str = "gpt-4o-mini", subchunk_batch: int = 500,all_facts_types = ("centroid","medoid_approx","ema")):
         import json
@@ -4579,7 +4592,7 @@ class AutoPrunedRetriver:
                                     'facts',
                                     fact_list_type = self.fact_list_type)
         
-        all_facts,_ = get_all_results(top_m_results_for_facts,self.meta_codebook) 
+        all_facts,_ = get_all_results(top_m_results_for_facts,self.meta_codebook,fact_list_type=self.fact_list_type) 
         print('all_facts',all_facts)
 
         return all_answers, all_q_indices, all_facts
@@ -4959,7 +4972,7 @@ class AutoPrunedRetriver:
             print("all_facts", all_facts)
 
             print(f'answers choice is {self.answers_choice}')
-            print(f'thinkings_choice choice is {self.thinkings_choice}')
+            print(f'chunkings_choice choice is {self.chunkings_choice}')
             print(f'facts choice is {self.facts_choice}')
 
             domain_knowledge_lst = self.find_related_knowledge(all_answers, all_q_indices, all_facts)
