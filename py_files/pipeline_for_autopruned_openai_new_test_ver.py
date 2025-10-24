@@ -278,8 +278,16 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
         answers_choices = []
         chunkings_choices = []
         facts_choices = []
+        total_q_left = len(questions)
+        finished_q = 0
 
-        with tqdm(questions, desc="Processing questions") as pbar:
+        with tqdm(questions,
+          desc="Processing questions",
+          total=len(questions),
+          dynamic_ncols=True,
+          mininterval=0.2,
+          smoothing=0.0,
+          delay=0) as pbar:
             for q in pbar:
                 start_idx = len(cr.llm.metrics_runs)
                 pred, _meta = answer_with_auto_strategy(
@@ -315,41 +323,10 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
                         "ret": f"{gen_metrics.get('retrieval_latency_sec', 0):.2f}s"
                     })
 
-                # --- helpers ---
-                def _normalize_space(s: str) -> str:
-                    if isinstance(s, list):
-                        s = " ".join(str(x) for x in s if x is not None)
-                    return re.sub(r"\s+", " ", (s or "").strip())
-
-                _SbertModel = None
-                def get_sbert_model():
-                    nonlocal _SbertModel
-                    if _SbertModel is None:
-                        _SbertModel = SentenceTransformer("BAAI/bge-large-en-v1.5", device="cuda")
-                    return _SbertModel
-
-                def reward_sbert_cached(pred: str, gold: str) -> float:
-                    model = get_sbert_model()
-                    emb_pred, emb_gold = model.encode([pred, gold])
-                    emb_pred /= (np.linalg.norm(emb_pred) + 1e-9)
-                    emb_gold /= (np.linalg.norm(emb_gold) + 1e-9)
-                    return float((emb_pred * emb_gold).sum())
-
-                # --- measure meta_codebook memory # mergee from meta
                 import json
 
                 # --- build row ---
                 row = row_lookup[q]
-                predicted_answer_norm = _normalize_space(pred)
-                gold_answer_norm      = _normalize_space(row["answer"])
-                context_ret_norm      = _normalize_space(_meta['fact_context'])
-                ground_truth_context  = _normalize_space(row["evidence"])
-
-                if "no answer" in predicted_answer_norm.lower():
-                    eval_result_correctness = 0.0
-                else:
-                    eval_result_correctness = reward_sbert_cached(predicted_answer_norm, gold_answer_norm)
-                eval_result_context = reward_sbert_cached(context_ret_norm, ground_truth_context)
 
                 rows.append({
                     "id":               row["id"],
@@ -363,8 +340,8 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
                     "answers_choice":   _meta['answers_choice'],
                     "chunkings_choice": _meta['chunkings_choice'],
                     "facts_choice":     _meta['facts_choice'],
-                    "correctness": eval_result_correctness,
-                    "context_similarity": eval_result_context,
+                    # "correctness": eval_result_correctness,
+                    # "context_similarity": eval_result_context,
                     "meta_codebook_json_bytes": _meta['meta_codebook_json_bytes'],
                     "meta_codebook_json_MB": _meta['meta_codebook_json_MB'],
                 })
@@ -372,6 +349,13 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
                 answers_choices.append(_meta['answers_choice'])
                 chunkings_choices.append(_meta['chunkings_choice'])
                 facts_choices.append(_meta['facts_choice'])
+
+
+                finished_q+=1
+                total_q_left-=1
+
+                print(f'{finished_q} finished')
+                print(f'{total_q_left} q left')
 
         # --- merge metrics + rows ---
         Path(out_path).parent.mkdir(parents=True, exist_ok=True)
@@ -389,11 +373,9 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
 
         return merged_results, answers_choices, chunkings_choices, facts_choices
 
-
     print("» Answering evaluation questions …")
     # still giving the all questions
     generated_rows,answers_choices,chunkings_choices,facts_choices = dump_results(all_questions, out_path= final_json_path)
-
 
 
 if __name__ == "__main__":
@@ -413,7 +395,7 @@ if __name__ == "__main__":
     compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N, 
                             top_m,top_m*10,aft_combine_sim,aft_combine_sim,aft_combine_sim,0.93,
                             Path("meta_codebook_new6.json") ,f"pref_examples_medical_exact_openai_v3.json",reward_func,
-                            reward_func_mode = 'non_llm',final_json_path = f"results/compressrag_medical_data_openai_test_new_v3.json")
+                            reward_func_mode = 'non_llm',final_json_path = f"results/compressrag_medical_v6_method_results.json")
 
     # df.to_csv('results/result_sbertinclusive_new_embed_for_exactgraphrag.csv')
 # python pipeline_for_autopruned_openai_new_test_ver.py

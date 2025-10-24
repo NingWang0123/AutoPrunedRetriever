@@ -4515,25 +4515,25 @@ class AutoPrunedRetriver:
         facts_codebook_lst = []
         for i in range(0, total_chunks, batch_size):
 
-            if batch_num <3:
-                batch_chunks = all_chunks[i:i+batch_size]
-                fact_cb = get_code_book_for_multi_facts(
-                    batch_chunks,
-                    type='facts',
-                    rule="Store factual statements.",
-                    batch_size=1,
-                    all_facts_types = all_facts_types,
-                    sent_emb = self.sentence_emb
-                )
+            # if batch_num <3:
+            batch_chunks = all_chunks[i:i+batch_size]
+            fact_cb = get_code_book_for_multi_facts(
+                batch_chunks,
+                type='facts',
+                rule="Store factual statements.",
+                batch_size=1,
+                all_facts_types = all_facts_types,
+                sent_emb = self.sentence_emb
+            )
 
-                print(f'batch {batch_num} codebook is generated')
+            print(f'batch {batch_num} codebook is generated')
 
-                print(fact_cb)
+            print(fact_cb)
 
-                facts_codebook_lst.append(fact_cb)
+            facts_codebook_lst.append(fact_cb)
 
-            else:
-                break
+            # else:
+            #     break
 
 
             # facts_codebook_lst.append(fact_cb)
