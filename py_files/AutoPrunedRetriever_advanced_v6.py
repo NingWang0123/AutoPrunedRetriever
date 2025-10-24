@@ -4258,7 +4258,8 @@ class AutoPrunedRetriver:
         combine_ent_sim = 0.9,
         q_combine_sim = 0.9,
         aft_combine_sim = 0.9,
-        semantic_overlap_sim = 0.9
+        semantic_overlap_sim = 0.9,
+        all_facts_types = ("centroid","medoid_approx","ema")
     ):
         """
         thinkings_choice and answers_choice must be one of 'overlap','unique','not_include'
@@ -4273,6 +4274,7 @@ class AutoPrunedRetriver:
         self.llm = llm
         self.cur_fact_context = None
         self.use_word = use_word
+        self.all_facts_types = all_facts_types
 
         # Embeddings
         self.sentence_emb = sentence_emb 
@@ -4375,7 +4377,7 @@ class AutoPrunedRetriver:
 
         print(self.fact_list_type)
 
-    def preload_context_json(self, json_path: str, chunk_tokens: int = 1200, overlap_tokens: int = 100, sub_chunk_chars: int = 300, sub_chunk_overlap: int = 50, tokenizer_name: str = "gpt-4o-mini", subchunk_batch: int = 500,all_facts_types = ("centroid","medoid_approx","ema")):
+    def preload_context_json(self, json_path: str, chunk_tokens: int = 1200, overlap_tokens: int = 100, sub_chunk_chars: int = 300, sub_chunk_overlap: int = 50, tokenizer_name: str = "gpt-4o-mini", subchunk_batch: int = 500):
         import json
         import tiktoken
 
@@ -4523,7 +4525,7 @@ class AutoPrunedRetriver:
                 type='facts',
                 rule="Store factual statements.",
                 batch_size=1,
-                all_facts_types = all_facts_types,
+                all_facts_types = self.all_facts_types,
                 sent_emb = self.sentence_emb
             )
 
