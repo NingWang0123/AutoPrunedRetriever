@@ -7,6 +7,7 @@ import argparse
 import json
 from typing import Dict, List, Optional
 import time
+from pathlib import Path
 
 import torch
 from transformers import (
@@ -138,22 +139,12 @@ def group_questions_by_source(question_list):
     return grouped_questions
 
 
-SYSTEM_PROMPT = """
----Role---
-You are a helpful assistant responding to user queries.
+SYSTEM_PROMPT = """You are a helpful assistant responding to user queries.
 
----Goal---
 Generate direct and concise answers based strictly on the provided Knowledge Base.
 Respond in plain text without explanations or formatting.
 Maintain conversation continuity and use the same language as the query.
-If the answer is unknown, respond with "I don't know".
-
----Conversation History---
-{history}
-
----Knowledge Base---
-{context_data}
-"""
+If the answer is unknown, respond with "I don't know"."""
 
 async def llm_model_func(
     prompt: str,
@@ -166,6 +157,11 @@ async def llm_model_func(
     model_name = kwargs.get("model_name", "qwen2.5-14b-instruct")
     base_url = kwargs.get("base_url", "")
     api_key = kwargs.get("api_key", "")
+    
+    # Remove the extracted parameters from kwargs to avoid duplication
+    filtered_kwargs = {k: v for k, v in kwargs.items() 
+                      if k not in ["model_name", "base_url", "api_key"]}
+    
     return await openai_complete_if_cache(
         model_name,
         prompt,
@@ -173,7 +169,7 @@ async def llm_model_func(
         history_messages=history_messages,
         base_url=base_url,
         api_key=api_key,
-        **kwargs
+        **filtered_kwargs
     )
 
 
@@ -421,13 +417,15 @@ async def process_corpus(
     embed_model_name: str,
     llm_base_url: str,
     llm_api_key: str,
-    questions: List[dict],
+    questions: dict,
     sample: int,
     retrieve_topk: int,
     q_start,
-    q_end
+    q_end,
+    retrieval_only: bool = False
 ):
-    logging.info(f"📚 Processing corpus: {corpus_name}")
+    mode_str = "🔍 RETRIEVAL ONLY" if retrieval_only else "💬 RETRIEVAL + GENERATION"
+    logging.info(f"📚 Processing corpus: {corpus_name} ({mode_str})")
 
     rag, timing_state = await initialize_rag(
         base_dir=base_dir,
@@ -471,24 +469,47 @@ async def process_corpus(
 
     logging.info(f"✅ Indexed corpus: {corpus_name} ({len(context.split())} words)")
 
+    # Debug logging for questions structure
+    logging.info(f"🔍 Debug: Questions keys: {list(questions.keys())}")
+    logging.info(f"🔍 Debug: Looking for corpus_name: {corpus_name}")
+    
     corpus_questions = questions.get(corpus_name, [])
     if not corpus_questions:
         logging.warning(f"No questions found for corpus: {corpus_name}")
+        logging.warning(f"Available question groups: {list(questions.keys())}")
         return
+    
+    logging.info(f"🔍 Debug: Original questions count: {len(corpus_questions)}")
 
     if sample and sample < len(corpus_questions):
+        logging.info(f"🔍 Debug: Applying sample limit: {sample}")
         corpus_questions = corpus_questions[:sample]
+        logging.info(f"🔍 Debug: After sample: {len(corpus_questions)} questions")
 
     if q_start is not None or q_end is not None:
         start_idx = (q_start - 1) if q_start else 0
         end_idx = q_end if q_end else len(corpus_questions)
+        
+        # Validate and adjust indices
+        if start_idx >= len(corpus_questions):
+            logging.warning(f"⚠️  q_start ({q_start}) exceeds available questions ({len(corpus_questions)}). Using questions 1-2 instead.")
+            start_idx = 0
+            end_idx = min(2, len(corpus_questions))
+        elif end_idx > len(corpus_questions):
+            logging.warning(f"⚠️  q_end ({q_end}) exceeds available questions ({len(corpus_questions)}). Adjusting to available range.")
+            end_idx = len(corpus_questions)
+        
+        logging.info(f"🔍 Debug: Applying slice [{start_idx}:{end_idx}] to {len(corpus_questions)} questions")
         corpus_questions = corpus_questions[start_idx:end_idx]
+        logging.info(f"🔍 Debug: After slice: {len(corpus_questions)} questions")
 
     logging.info(f"🔍 Found {len(corpus_questions)} questions for {corpus_name}")
 
     output_dir = f"./results/lightrag/{corpus_name}"
     os.makedirs(output_dir, exist_ok=True)
-    output_path = os.path.join(output_dir, f"predictions_{corpus_name}.json")
+    
+    mode_suffix = "_retrieval_only" if retrieval_only else ""
+    output_path = os.path.join(output_dir, f"predictions_{corpus_name}{mode_suffix}.json")
 
     results = []
     query_type = 'hybrid'
@@ -506,32 +527,69 @@ async def process_corpus(
             pass
 
         t_total_start = perf_counter()
-        result = rag.query(
-            q["question"],
-            param=query_param,
-            system_prompt=SYSTEM_PROMPT
-        )
-        if asyncio.iscoroutine(result):
-            result = await result
-        t_total_end = perf_counter()
-
-        context_ret = ""
-        if isinstance(result, tuple):
-            response = result[0]
-            if len(result) >= 2:
-                context_ret = result[1] if result[1] is not None else ""
+        
+        if retrieval_only:
+            # Only perform retrieval without LLM generation
+            query_param_retrieval = QueryParam(mode='local', top_k=retrieve_topk)
+            try:
+                # Try to get context only if supported
+                result = rag.query(
+                    q["question"],
+                    param=query_param_retrieval,
+                    system_prompt=None
+                )
+                if asyncio.iscoroutine(result):
+                    result = await result
+                
+                # Extract context from result
+                if isinstance(result, tuple) and len(result) >= 2:
+                    context_ret = result[1] if result[1] is not None else ""
+                elif isinstance(result, str):
+                    context_ret = ""  # No context returned in retrieval mode
+                else:
+                    context_ret = str(result) if result else ""
+                    
+            except Exception as e:
+                logging.warning(f"Retrieval error for question {q['id']}: {e}")
+                context_ret = ""
+                
+            predicted_answer = "[RETRIEVAL_ONLY_MODE]"
+            response = predicted_answer
         else:
-            response = result
-        predicted_answer = str(response)
+            # Full query with LLM generation
+            result = rag.query(
+                q["question"],
+                param=query_param,
+                system_prompt=SYSTEM_PROMPT
+            )
+            if asyncio.iscoroutine(result):
+                result = await result
+            
+            context_ret = ""
+            if isinstance(result, tuple):
+                response = result[0]
+                if len(result) >= 2:
+                    context_ret = result[1] if result[1] is not None else ""
+            else:
+                response = result
+            predicted_answer = str(response)
+            
+        t_total_end = perf_counter()
 
         total_latency = t_total_end - t_total_start
 
-        gen_latency_sec = float(timing_state.get("sum_gen_sec", 0.0))
-        retrieval_latency_sec = total_latency - gen_latency_sec
-
-        approx_prompt_chars = len(SYSTEM_PROMPT) + len(context_ret) + len(q["question"])
+        if retrieval_only:
+            gen_latency_sec = 0.0
+            retrieval_latency_sec = total_latency
+            approx_prompt_chars = len(q["question"])
+            output_tokens = 0.0
+        else:
+            gen_latency_sec = float(timing_state.get("sum_gen_sec", 0.0))
+            retrieval_latency_sec = total_latency - gen_latency_sec
+            approx_prompt_chars = len(SYSTEM_PROMPT) + len(context_ret) + len(q["question"])
+            output_tokens = len(predicted_answer) / 4.0
+            
         input_tokens  = approx_prompt_chars / 4.0
-        output_tokens = len(predicted_answer) / 4.0
 
         device = "ollama" if mode.lower() == "ollama" else ("hf" if mode.lower() == "hf" else "api")
         try:
@@ -559,7 +617,8 @@ async def process_corpus(
             "timestamp_end": t_total_end,
         }
 
-        predicted_answer = strip_think(predicted_answer)[0]
+        if not retrieval_only:
+            predicted_answer = strip_think(predicted_answer)[0]
 
         gold_answer = q.get("answer", "") or ""
         gt_ctx_raw = q.get("evidence", "")
@@ -570,10 +629,15 @@ async def process_corpus(
         context_ret_norm      = _normalize_space(context_ret)
         ground_truth_context  = _normalize_space(ground_truth_context)
 
-        if "i don't know" in predicted_answer_norm.lower() or "no-context" in predicted_answer_norm.lower():
+        # Evaluate answer correctness (skip in retrieval-only mode)
+        if retrieval_only:
+            eval_result_correctness = -1.0  # Indicate not evaluated
+        elif "i don't know" in predicted_answer_norm.lower() or "no-context" in predicted_answer_norm.lower():
             eval_result_correctness = 0.0
         else:
             eval_result_correctness = reward_sbert_cached(predicted_answer_norm, gold_answer_norm)
+        
+        # Evaluate context similarity (always performed)
         if context_ret == "":
             eval_result_context = 0.0
         else:
@@ -588,6 +652,7 @@ async def process_corpus(
             "question_type": q["question_type"],
             "generated_answer": predicted_answer,
             "ground_truth": q.get("answer"),
+            "retrieval_only": retrieval_only,
 
             **gen_info,
 
@@ -611,22 +676,34 @@ def main():
         "novel": {
             "corpus": "./Datasets/Corpus/novel.json",
             "questions": "./Datasets/Questions/novel_questions.json"
+        },
+        "2wikimultihop": {
+            "corpus": "./Datasets/Corpus/2wikimultihop.json",
+            "questions": "./Datasets/Questions/2wikimultihop_questions.json"
+        },
+        "hotpotqa": {
+            "corpus": "./Datasets/Corpus/hotpotqa.json",
+            "questions": "./Datasets/Questions/hotpotqa_questions.json"
+        },
+        "history": {
+            "corpus": "./Datasets/Corpus/history_corpus.json",
+            "questions": "./Datasets/Questions/history_QnA.json"
         }
     }
 
     parser = argparse.ArgumentParser(description="LightRAG: Process Corpora and Answer Questions")
-    parser.add_argument("--subset", required=True, choices=["medical", "novel"], help="Subset to process (medical or novel)")
+    parser.add_argument("--subset", required=True, choices=["medical", "novel", "2wikimultihop", "hotpotqa", "history"], help="Subset to process (medical, novel, 2wikimultihop, hotpotqa, or history)")
     parser.add_argument("--q_start", type=int, default=None, help="Start index of questions (1-based, inclusive)")
     parser.add_argument("--q_end", type=int, default=None, help="End index of questions (1-based, inclusive)")
 
     parser.add_argument("--base_dir", default="./lightrag_workspace", help="Base working directory")
 
-    # 现在支持 hf
     parser.add_argument("--mode", required=True, choices=["API", "ollama", "hf"], help="Use API, ollama, or hf (local transformers)")
     parser.add_argument("--model_name", default="qwen2.5-14b-instruct", help="LLM model identifier (HF 模式下是 HF repo id)")
     parser.add_argument("--embed_model", default="bge-base-en", help="Embedding model name (HF/ollama 的名称)")
     parser.add_argument("--retrieve_topk", type=int, default=5, help="Number of top documents to retrieve")
     parser.add_argument("--sample", type=int, default=None, help="Number of questions to sample per corpus")
+    parser.add_argument("--retrieval_only", action="store_true", help="Only perform retrieval without LLM generation")
 
     parser.add_argument("--llm_base_url", default="https://api.openai.com/v1", help="Base URL for LLM API / ollama host")
     parser.add_argument("--llm_api_key", default="", help="API key for LLM service (can also use LLM_API_KEY env var)")
@@ -642,6 +719,136 @@ def main():
 
     corpus_path = SUBSET_PATHS[args.subset]["corpus"]
     questions_path = SUBSET_PATHS[args.subset]["questions"]
+
+    # Auto-convert 2WikiMultihop data if needed
+    if args.subset == "2wikimultihop":
+        if not os.path.exists(corpus_path) or not os.path.exists(questions_path):
+            logging.info("🔄 2WikiMultihop data files not found, attempting auto-conversion...")
+            
+            # Try to find 2WikiMultihop source files
+            wiki2_root = Path("../../2wikimultihop-main")  # Relative to Examples folder
+            if not wiki2_root.exists():
+                wiki2_root = Path("../2wikimultihop-main")  # Alternative path
+            if not wiki2_root.exists():
+                wiki2_root = Path("./2wikimultihop-main")  # Current directory
+            
+            if wiki2_root.exists():
+                # Use small corpus if available, otherwise use full corpus
+                small_corpus = wiki2_root / "para_with_hyperlink_small.jsonl"
+                full_corpus = wiki2_root / "para_with_hyperlink.jsonl"
+                corpus_input = str(small_corpus) if small_corpus.exists() else str(full_corpus)
+                
+                # Use dev.json if available, otherwise use train.json
+                dev_questions = wiki2_root / "data" / "dev.json"
+                train_questions = wiki2_root / "data" / "train.json"
+                questions_input = str(dev_questions) if dev_questions.exists() else str(train_questions)
+                
+                if Path(corpus_input).exists() and Path(questions_input).exists():
+                    logging.info(f"📁 Found 2WikiMultihop source files:")
+                    logging.info(f"   Corpus: {corpus_input}")
+                    logging.info(f"   Questions: {questions_input}")
+                    
+                    # Import and run conversion
+                    try:
+                        import sys
+                        sys.path.append("..")  # Add parent directory to path
+                        from convert_2wiki_to_graphrag import (
+                            convert_2wiki_corpus_to_graphrag_format,
+                            convert_2wiki_questions_to_graphrag_format
+                        )
+                        
+                        # Create output directories
+                        Path(corpus_path).parent.mkdir(parents=True, exist_ok=True)
+                        Path(questions_path).parent.mkdir(parents=True, exist_ok=True)
+                        
+                        # Convert with limits for faster processing
+                        max_docs = 1000 if "small" in corpus_input else 10000
+                        max_questions = 100 if args.sample else 1000
+                        
+                        convert_2wiki_corpus_to_graphrag_format(
+                            corpus_input, corpus_path, max_docs
+                        )
+                        convert_2wiki_questions_to_graphrag_format(
+                            questions_input, questions_path, max_questions
+                        )
+                        
+                        logging.info("✅ 2WikiMultihop data conversion completed!")
+                        
+                    except Exception as e:
+                        logging.error(f"❌ Failed to convert 2WikiMultihop data: {e}")
+                        logging.error("Please run the conversion script manually:")
+                        logging.error(f"python convert_2wiki_to_graphrag.py --corpus_input {corpus_input} --questions_input {questions_input}")
+                        return
+                else:
+                    logging.error("❌ 2WikiMultihop source files not found!")
+                    logging.error(f"Expected corpus: {corpus_input}")
+                    logging.error(f"Expected questions: {questions_input}")
+                    logging.error("Please download and extract 2WikiMultihop dataset first.")
+                    return
+            else:
+                logging.error("❌ 2WikiMultihop directory not found!")
+                logging.error("Please ensure 2wikimultihop-main directory exists and contains the dataset.")
+                return
+
+    # Auto-convert HotpotQA data if needed
+    if args.subset == "hotpotqa":
+        if not os.path.exists(corpus_path) or not os.path.exists(questions_path):
+            logging.info("🔄 HotpotQA data files not found, attempting auto-conversion...")
+            
+            # Try to find HotpotQA source files
+            hotpot_root = Path("../hotpot-master")  # Relative to Examples folder
+            if not hotpot_root.exists():
+                hotpot_root = Path("./hotpot-master")  # Current directory
+            
+            if hotpot_root.exists():
+                # Look for HotpotQA files
+                questions_input = hotpot_root / "hotpot_test_fullwiki_v1.json"
+                corpus_tar = hotpot_root / "enwiki-20171001-pages-meta-current-withlinks-processed.tar.bz2"
+                
+                if questions_input.exists():
+                    logging.info(f"📁 Found HotpotQA questions: {questions_input}")
+                    
+                    # Import and run conversion
+                    try:
+                        import sys
+                        sys.path.append("..")  # Add parent directory to path
+                        from convert_hotpot_to_graphrag import (
+                            convert_hotpot_questions_to_graphrag_format,
+                            process_corpus_from_questions
+                        )
+                        
+                        # Create output directories
+                        Path(corpus_path).parent.mkdir(parents=True, exist_ok=True)
+                        Path(questions_path).parent.mkdir(parents=True, exist_ok=True)
+                        
+                        # Convert with limits for faster processing
+                        max_docs = 1000 if args.sample else 10000
+                        max_questions = 100 if args.sample else 1000
+                        
+                        # Use questions context to extract corpus (faster method)
+                        process_corpus_from_questions(
+                            str(questions_input), corpus_path, max_docs
+                        )
+                        convert_hotpot_questions_to_graphrag_format(
+                            str(questions_input), questions_path, max_questions
+                        )
+                        
+                        logging.info("✅ HotpotQA data conversion completed!")
+                        
+                    except Exception as e:
+                        logging.error(f"❌ Failed to convert HotpotQA data: {e}")
+                        logging.error("Please run the conversion script manually:")
+                        logging.error(f"python convert_hotpot_to_graphrag.py --questions_input {questions_input} --use_questions_context")
+                        return
+                else:
+                    logging.error("❌ HotpotQA question file not found!")
+                    logging.error(f"Expected questions: {questions_input}")
+                    logging.error("Please download HotpotQA dataset first.")
+                    return
+            else:
+                logging.error("❌ HotpotQA directory not found!")
+                logging.error("Please ensure hotpot-master directory exists and contains the dataset.")
+                return
 
     api_key = args.llm_api_key or os.getenv("LLM_API_KEY", "")
     if args.mode == "API" and not api_key:
@@ -686,7 +893,8 @@ def main():
                 sample=args.sample,
                 retrieve_topk=args.retrieve_topk,
                 q_start=args.q_start,
-                q_end=args.q_end
+                q_end=args.q_end,
+                retrieval_only=args.retrieval_only
             )
         )
 
