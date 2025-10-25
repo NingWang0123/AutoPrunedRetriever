@@ -333,8 +333,8 @@ def group_questions_by_source(question_list: List[dict]) -> Dict[str, List[dict]
 def split_text(
     text: str,
     tokenizer: AutoTokenizer,
-    chunk_token_size: int = 256,
-    chunk_overlap_token_size: int = 32
+    chunk_token_size: int = 1200,
+    chunk_overlap_token_size: int = 100
 ) -> List[str]:
     tokens = tokenizer.encode(text, add_special_tokens=False)
     chunks = []
@@ -461,16 +461,15 @@ def process_corpus(
                 super().__init__(*args, **kwargs)
 
         _em.ContrieverModel = _ContrieverAsHF
-        em_name_for_config = "contriever"   # 让工厂选择我们替换后的类
+        em_name_for_config = "contriever"  
     else:
         em_name_for_config = embed_model_path
     
     
-    # HippoRAG 配置（仍用其检索/图构建）
     config = BaseConfig(
         save_dir=os.path.join(base_dir, corpus_name),
         llm_base_url=llm_base_url,
-        llm_name=model_name,                       # API 模式下生效
+        llm_name=model_name,                     
         embedding_model_name=em_name_for_config,
         force_index_from_scratch=True,
         force_openie_from_scratch=True,
