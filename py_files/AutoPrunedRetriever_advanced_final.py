@@ -3502,188 +3502,6 @@ def combine_ents(codebook_main: Dict[str, Any],
 
     return codebook_main
 
-class CompressRag:
-    def __init__(
-        self,
-        ini_meta_codebook = {},
-        sentence_emb: Optional[Embeddings] = None,
-        word_emb: Optional[Embeddings] = None,
-        include_thinkings = True,
-        llm = None,
-    ):
-
-        # meta
-        # start with empty codebook
-        self.meta_codebook = ini_meta_codebook
-        self.include_thinkings = include_thinkings
-        self.llm = llm
-
-        # Embeddings
-        self.sentence_emb = sentence_emb 
-        self.word_emb = word_emb 
-
-        #coarse filter params
-        self.top_k = 10
-        self.top_m = 2
-        self.question_batch_size = 1
-        self.questions_db_batch_size = 1
-        self.custom_linearizer = None
-
-
-        # combine ents
-        self.min_exp_num =2
-        self.max_exp_num = 10
-
-
-    def encode_question(self,q_prompt,rule):
-
-        return get_code_book(q_prompt,'questions',rule)
-    
-    def retrieve(self,q_json):
-        # needs to be fixed
-
-        # questions queries: list of edge indices
-
-        # change question edges index to the edges in codebook main first
-
-        # now the problem is that q_json's 'edges([e,r,e])' is the from q_json's (e, r, e) index
-
-        # merge with meta code book first
-
-        self.meta_codebook = merging_codebook(self.meta_codebook,q_json,'questions',self.word_emb,True)
-
-        # take the last one 
-
-        questions_edges_index = self.meta_codebook['questions_lst'][-1]
-
-        top_m_results = coarse_filter(
-                        questions_edges_index,
-                        self.meta_codebook,
-                        self.sentence_emb,                 # ← move before defaults
-                        self.top_k,                             # word-embedding candidates
-                        self.question_batch_size,               # query batch size
-                        self.questions_db_batch_size,           # DB batch size
-                        self.top_m,                             # sentence-embedding rerank
-                        self.custom_linearizer)
-        
-        result = add_answers_to_filtered_lst(top_m_results,self.meta_codebook)
-
-        all_answers,all_q_indices = get_answers_lst_from_results(result)
-
-        return all_answers,all_q_indices
-    
-
-    def find_related_knowledge(self,all_answers,all_q_indices):
-
-        domain_knowledge_lst = []
-
-        # this will automatically flatten answers
-        overlapped_answers = find_overlapped_answers(all_answers)
-
-        flat_answers = get_flat_answers_lsts(all_answers)
-
-        overlapped_answers_dict = {'overlaps': overlapped_answers}
-
-        unique_knowledge_dict = get_unique_knowledge(overlapped_answers_dict,flat_answers, mode="advanced")
-
-        unique_knowledge = unique_knowledge_dict['out_answers']
-
-        domain_knowledge_lst.append(unique_knowledge)
-
-        if self.include_thinkings:
-            final_flat_thinkings_lsts =find_overlapped_thinkings(all_q_indices,self.meta_codebook)
-            domain_knowledge_lst.append(final_flat_thinkings_lsts)
-
-
-
-        return domain_knowledge_lst
-    
-
-    def compact_indicies_for_prompt(self,codebook_sub_q,domain_knowledge_lst):
-
-        if self.include_thinkings:
-            flat_answers_lsts,flat_thinkings_lsts = domain_knowledge_lst
-            final_merged_json= get_json_with_given_knowledge_and_thinkings(flat_answers_lsts,flat_thinkings_lsts,
-                                                                           self.meta_codebook,codebook_sub_q)
-
-        else:
-            flat_answers_lsts = domain_knowledge_lst[0]
-            final_merged_json = get_json_with_given_knowledge(flat_answers_lsts,self.meta_codebook,codebook_sub_q)
-
-
-        return final_merged_json
-    
-    
-    def collect_results(self, final_merged_json, question):
-
-        llm = self.llm
-
-        new_json_lst = []
-        new_result = None
-
-        if self.include_thinkings:
-            a_new, t_new = llm.take_questions(final_merged_json, question)
-            new_result = a_new
-            a_new_json = get_code_book(a_new, type='answers')
-            t_new_json = get_code_book(t_new, type='thinkings')
-            new_json_lst.extend([a_new_json, t_new_json])
-        else:
-            a_new = llm.take_questions(final_merged_json, question)
-            new_result = a_new
-            a_new_json = get_code_book(a_new, type='answers')
-            new_json_lst.append(a_new_json)
-        return new_result,new_json_lst
-    
-    def update_meta(self,codebook_sub_q,new_json_lst):
-
-        if self.include_thinkings:
-            codebook_sub_a,codebook_sub_t = new_json_lst
-
-            self.meta_codebook = merging_codebook(self.meta_codebook,codebook_sub_q,'questions',self.word_emb,True)
-            self.meta_codebook = merging_codebook(self.meta_codebook,codebook_sub_a,'answers',self.word_emb,True)
-            self.meta_codebook = merging_codebook(self.meta_codebook,codebook_sub_t,'thinkings',self.word_emb,True)
-
-        else:
-            codebook_sub_a = new_json_lst[0]
-            self.meta_codebook = merging_codebook(self.meta_codebook,codebook_sub_q,'questions',self.word_emb,True)
-            self.meta_codebook = merging_codebook(self.meta_codebook,codebook_sub_a,'answers',self.word_emb,True)
-
-
-    def combine_ents_func(self):
-
-        self.meta_codebook = combine_ents(self.meta_codebook,
-                 self.min_exp_num,  
-                 self.max_exp_num,  
-                 self.include_thinkings) 
-        
-
-    def run_work_flow(self,q_prompt,rule = "Answer questions"):
-        q_json = self.encode_question(q_prompt,rule)
-
-        # check the meta code book is not empty
-
-        if self.meta_codebook:
-            all_answers,all_q_indices = self.retrieve(q_json)
-            domain_knowledge_lst= self.find_related_knowledge(all_answers,all_q_indices)
-            final_merged_json = self.compact_indicies_for_prompt(q_json,domain_knowledge_lst)
-
-        else:
-            final_merged_json = q_json.copy()
-
-        print(f'final_merged_json: {final_merged_json}')
-        
-        new_result,new_json_lst = self.collect_results(final_merged_json, question=q_prompt)
-
-        self.update_meta(q_json,new_json_lst)
-
-        self.combine_ents_func()
-
-        # return answer
-
-        return new_result
-    
-
-### CompressRag RL version
 
 ###### adding slicing func
 
@@ -3696,7 +3514,6 @@ rule_ere_exact = dedent("""\
         * NOTE: edges[i] is just shorthand for edge_matrix[i]
     - questions(edges[i]): questions linked by edge i
     - given knowledge(edges[i]): prior answers linked by edge i
-    - start thinking with(edges[i]): reasoning steps linked by edge i
     - facts(edges[i]): factss linked by edge i
 """)
 
@@ -3708,7 +3525,6 @@ rule_edge_exact = dedent("""\
     - [e,r,e]: triple [head_e_idx, r_idx, tail_e_idx]
     - questions([[e,r,e], ...]): question triples 
     - given knowledge([[e,r,e], ...]): prior answer triples
-    - start thinking with([[e,r,e], ...]): reasoning steps
     - facts([[e,r,e], ...]): fact triples
 """)
                          
@@ -3717,7 +3533,6 @@ rule_words = dedent("""\
     [JSON format]
     - questions(words): question triples 
     - given knowledge(words): prior answer triples
-    - start thinking with(words): reasoning triples
     - facts(words): fact triples
 """)
 
@@ -4029,7 +3844,9 @@ class AutoPrunedRetriver:
         combine_ent_sim = 0.9,
         q_combine_sim = 0.9,
         aft_combine_sim = 0.9,
-        semantic_overlap_sim = 0.9
+        semantic_overlap_sim = 0.9,
+        chunking_use = 'rebel',
+        chunking_api = None,
     ):
         """
         thinkings_choice and answers_choice must be one of 'overlap','unique','not_include'
@@ -4044,6 +3861,8 @@ class AutoPrunedRetriver:
         self.llm = llm
         self.cur_fact_context = None
         self.use_word = use_word
+        self.chunking_use = chunking_use
+        self.chunking_api = chunking_api
 
         # Embeddings
         self.sentence_emb = sentence_emb 
@@ -4308,6 +4127,8 @@ class AutoPrunedRetriver:
                 type='facts',
                 rule="Store factual statements.",
                 batch_size=1,
+                parser_choice=self.chunking_use,
+                api=self.chunking_api,
             )
 
             print(f'batch {batch_num} codebook is generated')
