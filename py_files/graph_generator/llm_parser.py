@@ -121,6 +121,31 @@ def _coerce_to_text(x: Any) -> str:
     return str(x)
 
 
+
+def _client_from_api(api: Optional[Union[str, Mapping]] = None):
+    """
+    Build an OpenAI client from:
+      - str: treated as API key
+      - Mapping: may include {"api_key": "...", "base_url": "..."} (base_url optional)
+      - None: fall back to env-based client
+    """
+    if api is None:
+        return get_triplet_extractor(None)  # existing cached env-based client
+
+    if isinstance(api, str):
+        return openai.OpenAI(api_key=api)
+
+    if isinstance(api, Mapping):
+        api_key = api.get("api_key") or api.get("key") or os.getenv("OPENAI_API_KEY") or os.getenv("LLM_API_KEY")
+        base_url = api.get("base_url") or api.get("endpoint")
+        if base_url:
+            return openai.OpenAI(api_key=api_key, base_url=base_url)
+        return openai.OpenAI(api_key=api_key)
+
+    # Fallback
+    return get_triplet_extractor(None)
+
+
 def triplet_parser(
     text_or_list: Union[str, List[str]],
     *,
@@ -148,6 +173,49 @@ def triplet_parser(
         batch_results = _extract_triplets_batch(client, batch, max_new_tokens)
         results.extend(batch_results)
     
+    return results
+
+
+def triplet_parser_llm(
+    text_or_list: Union[str, List[str]],
+    *,
+    device: Optional[Union[str, int]] = None,
+    batch_size: int = 8,
+    max_new_tokens: int = 256,
+    do_sample: bool = False,
+    num_beams: int = 1,
+    api: Optional[Union[str, Mapping]] = None,   
+    client: Optional[Any] = None,                
+    model: str = "gpt-4o-mini",                  
+) -> Union[Set[Triplet], List[Set[Triplet]]]:
+    """
+    Extract triplets using GPT-4o mini API - compatible with REBEL interface.
+
+    Parameters new:
+      - api: str (API key) or Mapping (e.g., {"api_key": "...", "base_url": "..."})
+      - client: pre-initialized OpenAI client; takes precedence over `api`
+      - model: model name (default "gpt-4o-mini")
+    """
+    # Resolve client preference: client > api > env
+    _client = client or _client_from_api(api)
+
+    # Bind model name into the single-call helper via a small wrapper
+    def _single(text: str) -> Set[Triplet]:
+        return _extract_triplets_single(_client, text, max_new_tokens, model=model)
+
+    # Handle single string input
+    if isinstance(text_or_list, str):
+        text = _coerce_to_text(text_or_list)
+        truncated = _truncate_to_max_tokens(text, max_tokens=8000)
+        return _single(truncated)
+
+    # Handle list input with batching
+    texts: List[str] = [_coerce_to_text(t) for t in text_or_list]
+    results: List[Set[Triplet]] = []
+    for i in range(0, len(texts), batch_size):
+        batch = texts[i:i+batch_size]
+        batch_results = _extract_triplets_batch(_client, batch, max_new_tokens, model=model)
+        results.extend(batch_results)
     return results
 
 def _extract_triplets_single(client, text: str, max_new_tokens: int) -> Set[Triplet]:
@@ -203,34 +271,34 @@ def _extract_triplets_batch(client, texts: List[str], max_new_tokens: int) -> Li
 # pip install openai
 
 # Usage example matching REBEL interface:
-if __name__ == "__main__":
-    # Set your OpenAI API key first:
-    # export OPENAI_API_KEY="your-api-key-here"
+# if __name__ == "__main__":
+#     # Set your OpenAI API key first:
+#     # export OPENAI_API_KEY="your-api-key-here"
     
-    # Single string input (like REBEL)
-    s = "About basal cell skin cancer What is basal cell skin cancer? How is basal cell skin cancer treated? What can you do to get the best care? Basal cell skin cancer, also known as basal cell carcinoma (BCC), is the most common type of skin cancer. About 3 million cases of basal cell skin cancer are diagnosed every year in the United States. The good news is it can be cured in most cases. Treatment usually involves surgery to remove the cancer. Keep reading to find out more. What is basal cell skin cancer? Basal cell skin cancer is the most common of all skin cancer types. If caught early, it is easily treatable and curable. This is because it rarely metastasizes (spreads). Skin cancers often occur in the top layer of the skin (epidermis) and less commonly in the middle layer of the skin (dermis). The epidermis is made up of basal cells and other cells."
-    print("Single text result:")
-    print(triplet_parser(s, device="mps"))            
+#     # Single string input (like REBEL)
+#     s = "About basal cell skin cancer What is basal cell skin cancer? How is basal cell skin cancer treated? What can you do to get the best care? Basal cell skin cancer, also known as basal cell carcinoma (BCC), is the most common type of skin cancer. About 3 million cases of basal cell skin cancer are diagnosed every year in the United States. The good news is it can be cured in most cases. Treatment usually involves surgery to remove the cancer. Keep reading to find out more. What is basal cell skin cancer? Basal cell skin cancer is the most common of all skin cancer types. If caught early, it is easily treatable and curable. This is because it rarely metastasizes (spreads). Skin cancers often occur in the top layer of the skin (epidermis) and less commonly in the middle layer of the skin (dermis). The epidermis is made up of basal cells and other cells."
+#     print("Single text result:")
+#     print(triplet_parser(s, device="mps"))            
 
-    # List input with batch processing (like REBEL)
-    lst = [
-        "About basal cell skin cancer What is basal cell skin cancer?",
-        "How is basal cell skin cancer treated? What can you do to get the best care?",
-        "Basal cell skin cancer, also known as basal cell carcinoma (BCC), is the most common type of skin cancer.",
-        "About 3 million cases of basal cell skin cancer are diagnosed every year in the United States.",
-        "The good news is it can be cured in most cases.",
-        "Treatment usually involves surgery to remove the cancer.",
-        "Keep reading to find out more.",
-        "What is basal cell skin cancer?",
-        "Basal cell skin cancer is the most common of all skin cancer types.",
-        "If caught early, it is easily treatable and curable.",
-        "This is because it rarely metastasizes (spreads).",
-    ]
-    print("\nBatch processing result:")
-    batch_results = triplet_parser(lst, device="mps", batch_size=4)
-    for i, result in enumerate(batch_results):
-        print(f"Text {i+1}: {len(result)} triplets")
-        for triplet in list(result)[:3]:  # Show first 3 triplets
-            print(f"  {triplet}")
+#     # List input with batch processing (like REBEL)
+#     lst = [
+#         "About basal cell skin cancer What is basal cell skin cancer?",
+#         "How is basal cell skin cancer treated? What can you do to get the best care?",
+#         "Basal cell skin cancer, also known as basal cell carcinoma (BCC), is the most common type of skin cancer.",
+#         "About 3 million cases of basal cell skin cancer are diagnosed every year in the United States.",
+#         "The good news is it can be cured in most cases.",
+#         "Treatment usually involves surgery to remove the cancer.",
+#         "Keep reading to find out more.",
+#         "What is basal cell skin cancer?",
+#         "Basal cell skin cancer is the most common of all skin cancer types.",
+#         "If caught early, it is easily treatable and curable.",
+#         "This is because it rarely metastasizes (spreads).",
+#     ]
+#     print("\nBatch processing result:")
+#     batch_results = triplet_parser(lst, device="mps", batch_size=4)
+#     for i, result in enumerate(batch_results):
+#         print(f"Text {i+1}: {len(result)} triplets")
+#         for triplet in list(result)[:3]:  # Show first 3 triplets
+#             print(f"  {triplet}")
 
 # python graph_generator/4omini.py
