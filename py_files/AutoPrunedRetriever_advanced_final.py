@@ -2,7 +2,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import re
 import json, hashlib
-from typing import List, Tuple, Dict, Optional,Iterable,Any,Callable, Set, Union
+from typing import List, Tuple, Dict, Optional,Iterable,Any,Callable, Set, Union, Mapping
 import itertools
 from collections import defaultdict
 import numpy as np
@@ -837,8 +837,19 @@ def get_code_book(
     factparser: bool = False,   
     *,
     batch_size: int = 1,
-    sent_emb = word_emb, 
+    sent_emb = word_emb,
+    parser_choice = 'rebel',
+    api: Optional[Union[str, Mapping]] = None,
+    model: str = "gpt-4o-mini"
 ):
+    
+    if parser_choice == 'rebel':
+        parser = triplet_parser
+    elif parser_choice == 'llm':
+        parser = partial(triplet_parser_llm,api = api, model = model)
+    else:
+        raise ValueError("parser must be one of 'rebel' and 'llm' " )
+
     valid_types = {'questions', 'answers', 'thinkings', 'facts'}
 
     processing_texts_lst = False
@@ -847,14 +858,14 @@ def get_code_book(
         raise ValueError(f"type must be one of {valid_types}, got: {type}")
 
     if isinstance(prompt, str):
-        triples_merged: Set[Triplet] = triplet_parser(prompt)  # Set[Triplet]
+        triples_merged: Set[Triplet] = parser(prompt)  # Set[Triplet]
     else:
         processing_texts_lst = True
         texts: List[str] = [t for t in prompt if isinstance(t, str) and t.strip()]
         if not texts:
             triples_merged = set()
         elif len(texts) <= batch_size:
-            parsed = triplet_parser(texts)
+            parsed = parser(texts)
             if isinstance(parsed, set):
                 triples_merged = parsed
             elif isinstance(parsed, list):
@@ -864,7 +875,7 @@ def get_code_book(
         else:
             acc: List[Iterable[Triplet]] = []
             for i in range(0, len(texts), batch_size):
-                parsed = triplet_parser(texts[i:i+batch_size])
+                parsed = parser(texts[i:i+batch_size])
                 if isinstance(parsed, set):
                     acc.append(parsed)  
                 elif isinstance(parsed, list):
