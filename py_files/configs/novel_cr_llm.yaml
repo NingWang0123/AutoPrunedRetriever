@@ -10,7 +10,7 @@ corpus_file: GraphRAG-Benchmark/Datasets/Corpus/{dataset}.json
 quest_file: data/novel_complex_reasoning.json
 
 # runner/processing knobs
-chunking_use: rebel
+chunking_use: llm
 
 # outputs (template by dataset; optionally include chunking_use)
 ini_meta_json: outputs/{dataset}/meta_codebook_{chunking_use}.json
@@ -33,5 +33,5 @@ semantic_overlap_sim: 0.93
 reward_func: reward_sbert_inclusive
 reward_func_mode: non_llm
 
-# optional; prefer env OPENAI_API_KEY if omitted
+# enter api for this
 llm_api: null
