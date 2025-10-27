@@ -286,6 +286,10 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
 
             )
         
+        # saving the pref examples
+        
+        save_pref_examples(saved_examples_name,pref_ds)
+        
 
     # throw away the store info from qa
     cr.meta_codebook['questions_lst'] = []
