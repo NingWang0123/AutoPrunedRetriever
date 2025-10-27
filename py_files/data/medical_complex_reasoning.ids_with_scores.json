@@ -1,0 +1,3056 @@
+[
+  {
+    "id": "Medical-6e39cbe0",
+    "answer_correctness": 0.21488355672497392,
+    "rouge_score": 0.0,
+    "question": "Which anatomical layer acts as a barrier before cancer reaches the outer membrane (serosa) of the gallbladder?"
+  },
+  {
+    "id": "Medical-6ac9b753",
+    "answer_correctness": 0.22175588654229578,
+    "rouge_score": 0.03225806451612903,
+    "question": "What diagnostic methods are required for confirming MGZL and why?"
+  },
+  {
+    "id": "Medical-f6a94128",
+    "answer_correctness": 0.22295816619317907,
+    "rouge_score": 0.2222222222222222,
+    "question": "Which tests are essential to perform before starting systemic therapy in a young AML patient concerned about fertility?"
+  },
+  {
+    "id": "Medical-328006b7",
+    "answer_correctness": 0.2250621948935511,
+    "rouge_score": 0.09523809523809523,
+    "question": "What combination of exposure and symptom would most strongly suggest the need for diagnostic evaluation for lung cancer?"
+  },
+  {
+    "id": "Medical-23080670",
+    "answer_correctness": 0.2261955797090266,
+    "rouge_score": 0.375,
+    "question": "If a patient presents with a large mediastinal mass and is assigned male at birth aged 25, what additional diagnostic step is necessary?"
+  },
+  {
+    "id": "Medical-c7bf38df",
+    "answer_correctness": 0.22627094791358593,
+    "rouge_score": 0.22727272727272724,
+    "question": "If a tumor is located at the esophagogastric junction, which classification system and factors are used for staging and treatment planning?"
+  },
+  {
+    "id": "Medical-aaefb0f2",
+    "answer_correctness": 0.22769160153993034,
+    "rouge_score": 0.14285714285714282,
+    "question": "What surveillance strategies are recommended after local excision or ESD for T1 rectal cancer?"
+  },
+  {
+    "id": "Medical-f9bc1472",
+    "answer_correctness": 0.22787153741671107,
+    "rouge_score": 0.22857142857142854,
+    "question": "If a patient presents with a single enlarged lymph node in the head and neck and minimal symptoms, which FL subtype is most likely, and what is its typical genetic status?"
+  },
+  {
+    "id": "Medical-e7d1cd1c",
+    "answer_correctness": 0.22866464777492507,
+    "rouge_score": 0.08695652173913045,
+    "question": "How does the subtype of NSCLC influence the origin of the cancer cells?"
+  },
+  {
+    "id": "Medical-2cc4ff58",
+    "answer_correctness": 0.22902771648564288,
+    "rouge_score": 0.2608695652173913,
+    "question": "For a patient with a tumor in the retromolar trigone, which cancer subtype and anatomic site categories are relevant for diagnosis and staging?"
+  },
+  {
+    "id": "Medical-333a4a3b",
+    "answer_correctness": 0.22919436131230514,
+    "rouge_score": 0.13333333333333333,
+    "question": "Which bone sarcoma subtype is most likely to arise in the diaphysis or flat bones, and what genetic alteration is characteristic of this subtype?"
+  },
+  {
+    "id": "Medical-35fee661",
+    "answer_correctness": 0.22919527694661154,
+    "rouge_score": 0.4571428571428572,
+    "question": "Which diagnostic procedures would be prioritized for a patient with primary CNS lymphoma presenting with blurry vision and suspected eye involvement?"
+  },
+  {
+    "id": "Medical-ed26b623",
+    "answer_correctness": 0.2295260557253198,
+    "rouge_score": 0.3225806451612903,
+    "question": "Which laboratory tests are essential for initial workup of primary CNS lymphoma, particularly in patients with suspected immunodeficiency?"
+  },
+  {
+    "id": "Medical-2782702e",
+    "answer_correctness": 0.23047458672750706,
+    "rouge_score": 0.15873015873015872,
+    "question": "What symptoms would prompt a clinician to perform a skin biopsy for suspected CSCC?"
+  },
+  {
+    "id": "Medical-c09d2bcb",
+    "answer_correctness": 0.23132862189218417,
+    "rouge_score": 0.17857142857142858,
+    "question": "Which populations are at increased risk for nasopharyngeal carcinoma and what risk factors contribute to this increased incidence?"
+  },
+  {
+    "id": "Medical-68e55e0e",
+    "answer_correctness": 0.2313612579038799,
+    "rouge_score": 0.29411764705882354,
+    "question": "If a patient has papules under the skin and is diagnosed with a lymphoma subtype originating from B lymphocytes, which subtypes should be considered?"
+  },
+  {
+    "id": "Medical-1e7500e4",
+    "answer_correctness": 0.23183545864581723,
+    "rouge_score": 0.35,
+    "question": "What combination of tests would be used to assess both disease burden and prognosis in CLL?"
+  },
+  {
+    "id": "Medical-37f18801",
+    "answer_correctness": 0.23221168747299015,
+    "rouge_score": 0.36666666666666664,
+    "question": "What features distinguish grade 3A from grade 3B follicular lymphoma in terms of treatment?"
+  },
+  {
+    "id": "Medical-f57e3ab2",
+    "answer_correctness": 0.23237519530060285,
+    "rouge_score": 0.1967213114754098,
+    "question": "What combination of clinical and pathological features would support a diagnosis of mediastinal gray zone lymphoma (MGZL) in a young male patient?"
+  },
+  {
+    "id": "Medical-6d56985a",
+    "answer_correctness": 0.23259387120719605,
+    "rouge_score": 0.18604651162790697,
+    "question": "How does the diagnosis of gray zone lymphoma change if there is extra-mediastinal disease?"
+  },
+  {
+    "id": "Medical-831bb1e6",
+    "answer_correctness": 0.23339877279352547,
+    "rouge_score": 0.372093023255814,
+    "question": "Which combination of risk factors should prompt earlier and more frequent skin exams for BCC?"
+  },
+  {
+    "id": "Medical-781a9787",
+    "answer_correctness": 0.23349638176049625,
+    "rouge_score": 0.20689655172413793,
+    "question": "What diagnostic tests are used for both initial evaluation and staging of colon cancer, and what unique information does each provide?"
+  },
+  {
+    "id": "Medical-27edd702",
+    "answer_correctness": 0.23354953455051763,
+    "rouge_score": 0.13333333333333333,
+    "question": "What systemic therapies are available for bladder cancer patients with advanced or metastatic disease?"
+  },
+  {
+    "id": "Medical-884a8392",
+    "answer_correctness": 0.2335618943944283,
+    "rouge_score": 0.3448275862068966,
+    "question": "Which cancers are managed similarly to ovarian cancer and why might their management overlap?"
+  },
+  {
+    "id": "Medical-e0c754c6",
+    "answer_correctness": 0.23377956290733398,
+    "rouge_score": 0.1395348837209302,
+    "question": "How does the histopathology of MGZL relate to its clinical presentation?"
+  },
+  {
+    "id": "Medical-98bb0bbc",
+    "answer_correctness": 0.2343068418510848,
+    "rouge_score": 0.14285714285714282,
+    "question": "How does the classification of uncommon FL (uFL) differ from classic FL (cFL), and how does this affect treatment?"
+  },
+  {
+    "id": "Medical-95bdfdba",
+    "answer_correctness": 0.2346354885641424,
+    "rouge_score": 0.24242424242424246,
+    "question": "Which symptoms should prompt consideration of throat cancer and subsequent diagnostic evaluation?"
+  },
+  {
+    "id": "Medical-8ac49b5b",
+    "answer_correctness": 0.23470914972425674,
+    "rouge_score": 0.23999999999999996,
+    "question": "Which biomarker must be tested in all patients diagnosed with oropharyngeal cancer, and what is its clinical significance?"
+  },
+  {
+    "id": "Medical-5f54bb84",
+    "answer_correctness": 0.2348232586506387,
+    "rouge_score": 0.3235294117647059,
+    "question": "What symptoms and diagnostic findings would prompt a clinician to test for biomarkers and genetic changes in a suspected case of CBCL?"
+  },
+  {
+    "id": "Medical-890965f6",
+    "answer_correctness": 0.23497520218033036,
+    "rouge_score": 0.21276595744680854,
+    "question": "What laboratory findings and symptoms together would strongly suggest a diagnosis of AML?"
+  },
+  {
+    "id": "Medical-836e7db0",
+    "answer_correctness": 0.23513199121827974,
+    "rouge_score": 0.17391304347826086,
+    "question": "Which symptoms, when present together, would most strongly suggest CLL as a diagnosis requiring further blood and immunophenotyping tests?"
+  },
+  {
+    "id": "Medical-c58fae3b",
+    "answer_correctness": 0.23590854701160352,
+    "rouge_score": 0.3673469387755102,
+    "question": "Which targeted therapies are approved for progressive, unresectable, or metastatic thyroid cancer, and what is their main indication?"
+  },
+  {
+    "id": "Medical-2045d4e4",
+    "answer_correctness": 0.23593957463528664,
+    "rouge_score": 0.3673469387755102,
+    "question": "Which diagnostic approach is shared among all adrenal tumor types and why is it important?"
+  },
+  {
+    "id": "Medical-fdd40f83",
+    "answer_correctness": 0.2361030871568114,
+    "rouge_score": 0.20833333333333334,
+    "question": "What symptoms would most likely prompt a physician to perform a digital rectal exam and anoscopy for suspected anal cancer?"
+  },
+  {
+    "id": "Medical-6fb8996b",
+    "answer_correctness": 0.236483600564367,
+    "rouge_score": 0.1095890410958904,
+    "question": "What factors would lead to recommending a clinical trial for a lung cancer patient?"
+  },
+  {
+    "id": "Medical-a7e62dce",
+    "answer_correctness": 0.23685063434893114,
+    "rouge_score": 0.4444444444444445,
+    "question": "What combination of diagnostic methods is necessary to both confirm nasopharyngeal carcinoma and determine its subtype?"
+  },
+  {
+    "id": "Medical-7b682af7",
+    "answer_correctness": 0.23732911720997302,
+    "rouge_score": 0.27777777777777773,
+    "question": "Which additional therapy may be used alongside chemotherapy for localized MGZL, and under what circumstance?"
+  },
+  {
+    "id": "Medical-8407a0ab",
+    "answer_correctness": 0.23766937851245867,
+    "rouge_score": 0.08571428571428572,
+    "question": "Which patient characteristics would prompt the use of imaging during the diagnostic workup of CSCC?"
+  },
+  {
+    "id": "Medical-1f7241a3",
+    "answer_correctness": 0.23796609709587851,
+    "rouge_score": 0.20289855072463767,
+    "question": "How does the presence of BCR::ABL1-positive status in B-ALL affect treatment choice in children?"
+  },
+  {
+    "id": "Medical-f27c64c0",
+    "answer_correctness": 0.2381981309670545,
+    "rouge_score": 0.15151515151515152,
+    "question": "What steps are involved in the diagnostic workup for a patient suspected of colon cancer based on symptoms?"
+  },
+  {
+    "id": "Medical-9d34bcac",
+    "answer_correctness": 0.23822718464312473,
+    "rouge_score": 0.2857142857142857,
+    "question": "Which subtype of Hodgkin lymphoma is less common, and what unique risk does it carry compared to the common subtype?"
+  },
+  {
+    "id": "Medical-395b9708",
+    "answer_correctness": 0.2384916036253446,
+    "rouge_score": 0.3103448275862069,
+    "question": "Which symptoms and hormone findings would suggest a cortisol-producing adenoma causing Cushing syndrome?"
+  },
+  {
+    "id": "Medical-5504201a",
+    "answer_correctness": 0.24012186406045816,
+    "rouge_score": 0.42857142857142855,
+    "question": "If a kidney tumor is found in the renal pelvis, which cancer subtype is most likely and why?"
+  },
+  {
+    "id": "Medical-a5f2e7a9",
+    "answer_correctness": 0.24026033076172665,
+    "rouge_score": 0.18604651162790697,
+    "question": "What are the key factors that determine the treatment approach for RCC according to the classification system?"
+  },
+  {
+    "id": "Medical-9bc8aaa1",
+    "answer_correctness": 0.24058630220777938,
+    "rouge_score": 0.5789473684210527,
+    "question": "What findings from both the patient's age and the location of lymph node involvement would increase suspicion for Hodgkin lymphoma?"
+  },
+  {
+    "id": "Medical-59890a0c",
+    "answer_correctness": 0.24082009048776215,
+    "rouge_score": 0.4705882352941176,
+    "question": "What is the preferred radiation technique for treating non-metastatic anal cancer and which stages does this include?"
+  },
+  {
+    "id": "Medical-baed6d13",
+    "answer_correctness": 0.2409925378178871,
+    "rouge_score": 0.20689655172413796,
+    "question": "For a patient with CSCC arising in a chronic wound, what two risk factors are present and how does this affect staging and management?"
+  },
+  {
+    "id": "Medical-3964e4de",
+    "answer_correctness": 0.24184458156215916,
+    "rouge_score": 0.2,
+    "question": "What factors would indicate that a patient with anal cancer should undergo HIV testing as part of their diagnostic workup?"
+  },
+  {
+    "id": "Medical-33e5776d",
+    "answer_correctness": 0.24206378740207657,
+    "rouge_score": 0.5294117647058824,
+    "question": "Which patients with prostate cancer should receive molecular biomarker testing as part of their follow-up?"
+  },
+  {
+    "id": "Medical-eab49131",
+    "answer_correctness": 0.24248201635501782,
+    "rouge_score": 0.20895522388059704,
+    "question": "Which diagnostic tests are necessary to confirm CLL and detect prognostic biomarkers, and why are multiple methods needed?"
+  },
+  {
+    "id": "Medical-9db4f113",
+    "answer_correctness": 0.24286156169622813,
+    "rouge_score": 0.16666666666666666,
+    "question": "What evidence would indicate that an adrenal tumor is benign and unlikely to metastasize?"
+  },
+  {
+    "id": "Medical-9386f24f",
+    "answer_correctness": 0.2433345232238459,
+    "rouge_score": 0.2909090909090909,
+    "question": "How do grade and biomarker status together affect the classification of astrocytoma and oligodendroglioma?"
+  },
+  {
+    "id": "Medical-5456c556",
+    "answer_correctness": 0.34197198738171697,
+    "rouge_score": 0.32,
+    "question": "Which hereditary syndromes should be considered risk factors if a patient is diagnosed with adrenocortical carcinoma (ACC)?"
+  },
+  {
+    "id": "Medical-eb042e58",
+    "answer_correctness": 0.35601730150063093,
+    "rouge_score": 0.24,
+    "question": "Which biomarkers are tested to determine eligibility for targeted therapies in ovarian cancer?"
+  },
+  {
+    "id": "Medical-b914d234",
+    "answer_correctness": 0.364976862100889,
+    "rouge_score": 0.19230769230769232,
+    "question": "Which diagnostic procedures and biomarkers are required to confirm and assess the aggressiveness of localized prostate cancer?"
+  },
+  {
+    "id": "Medical-833eac1d",
+    "answer_correctness": 0.3684210929146951,
+    "rouge_score": 0.3380281690140845,
+    "question": "Which risk factors and genetic syndromes should prompt genetic testing in a patient with pancreatic cancer?"
+  },
+  {
+    "id": "Medical-e3da3cd7",
+    "answer_correctness": 0.37330209247212,
+    "rouge_score": 0.18461538461538463,
+    "question": "Which diagnostic methods are common to both adrenocortical carcinoma (ACC) and pheochromocytoma, and which are unique to ACC?"
+  },
+  {
+    "id": "Medical-1ab31cd8",
+    "answer_correctness": 0.38286429625396123,
+    "rouge_score": 0.1923076923076923,
+    "question": "What combination of findings would support a diagnosis of blastic plasmacytoid dendritic cell neoplasm (BPDCN)?"
+  },
+  {
+    "id": "Medical-99713759",
+    "answer_correctness": 0.3941335293125281,
+    "rouge_score": 0.20689655172413793,
+    "question": "Which diagnostic methods are recommended for confirming a diagnosis of kidney cancer, and what is their basis in the classification system?"
+  },
+  {
+    "id": "Medical-64f219fe",
+    "answer_correctness": 0.40359654862470884,
+    "rouge_score": 0.4,
+    "question": "Why is fertility preservation considered before ALL treatment, and which treatment modalities make this necessary?"
+  },
+  {
+    "id": "Medical-fad3190e",
+    "answer_correctness": 0.41448598778631407,
+    "rouge_score": 0.22222222222222224,
+    "question": "For a patient with a history of FAP, what combination of surveillance and diagnostic methods is most critical?"
+  },
+  {
+    "id": "Medical-8233f77f",
+    "answer_correctness": 0.4182096954222828,
+    "rouge_score": 0.2727272727272727,
+    "question": "What laboratory and tissue-based tests are required to assess both biomarkers and genetic alterations in cutaneous B-cell lymphoma?"
+  },
+  {
+    "id": "Medical-bb794987",
+    "answer_correctness": 0.42106337319473963,
+    "rouge_score": 0.41666666666666663,
+    "question": "What are the primary symptoms and diagnostic methods associated with pancreatic ductal adenocarcinoma?"
+  },
+  {
+    "id": "Medical-e0a5fcc5",
+    "answer_correctness": 0.42414084354078646,
+    "rouge_score": 0.24242424242424243,
+    "question": "How is high-grade squamous intraepithelial lesion (HSIL) related to cervical cancer progression and diagnosis?"
+  },
+  {
+    "id": "Medical-3776fc3d",
+    "answer_correctness": 0.4244251312890096,
+    "rouge_score": 0.3018867924528302,
+    "question": "How does achieving minimal residual disease status affect the prognosis and management of CLL?"
+  },
+  {
+    "id": "Medical-f5688b0c",
+    "answer_correctness": 0.42562392766026985,
+    "rouge_score": 0.23529411764705882,
+    "question": "What are the necessary follow-up procedures after completing primary treatment for breast cancer to monitor for recurrence?"
+  },
+  {
+    "id": "Medical-bc622c63",
+    "answer_correctness": 0.4268084176433371,
+    "rouge_score": 0.27586206896551724,
+    "question": "How does the unregulated growth of lymphocytes relate to the development of cutaneous B-cell lymphoma?"
+  },
+  {
+    "id": "Medical-ed5085d7",
+    "answer_correctness": 0.4426130346560144,
+    "rouge_score": 0.18867924528301885,
+    "question": "Which anatomical structures are at risk for local spread of kidney cancer, and how are they categorized?"
+  },
+  {
+    "id": "Medical-ef429fbb",
+    "answer_correctness": 0.4440024737648732,
+    "rouge_score": 0.1290322580645161,
+    "question": "Which risk factors should be investigated in a patient with a suspected stomach mass and a positive genetic risk test?"
+  },
+  {
+    "id": "Medical-4744dfa7",
+    "answer_correctness": 0.44412906398643875,
+    "rouge_score": 0.3076923076923077,
+    "question": "Which performance evaluation is necessary before determining eligibility for clinical trials in primary CNS lymphoma patients and why?"
+  },
+  {
+    "id": "Medical-efd1af00",
+    "answer_correctness": 0.448635272913296,
+    "rouge_score": 0.23076923076923075,
+    "question": "What evidence supports the use of chemoimmunotherapy instead of chemotherapy alone in MGZL?"
+  },
+  {
+    "id": "Medical-e7ebb96c",
+    "answer_correctness": 0.4525818783406241,
+    "rouge_score": 0.4210526315789474,
+    "question": "Which diagnostic methods are necessary for confirming both the subtype and stage of esophageal cancer?"
+  },
+  {
+    "id": "Medical-4aed3e10",
+    "answer_correctness": 0.45457127230121946,
+    "rouge_score": 0.1923076923076923,
+    "question": "Which blood tests are included in the evaluation of bone cancer, and what is their collective purpose?"
+  },
+  {
+    "id": "Medical-c2ead218",
+    "answer_correctness": 0.45491483355584417,
+    "rouge_score": 0.27906976744186046,
+    "question": "Which abnormal blood counts and genetic findings together support a diagnosis of CML?"
+  },
+  {
+    "id": "Medical-0093e2ec",
+    "answer_correctness": 0.4555759097609329,
+    "rouge_score": 0.4444444444444444,
+    "question": "What combination of symptoms and imaging findings would indicate metastatic prostate cancer?"
+  },
+  {
+    "id": "Medical-a6968a78",
+    "answer_correctness": 0.4565870781438774,
+    "rouge_score": 0.23529411764705882,
+    "question": "Which diagnostic methods are recommended for a patient presenting with hematuria and frequent urination suspected of having bladder cancer?"
+  },
+  {
+    "id": "Medical-7f3beb74",
+    "answer_correctness": 0.45831530232582995,
+    "rouge_score": 0.41379310344827586,
+    "question": "If a tumor spreads through all histological layers of the bile duct, which anatomical structures could it potentially invade next?"
+  },
+  {
+    "id": "Medical-42d7ac7c",
+    "answer_correctness": 0.46375820875916995,
+    "rouge_score": 0.2903225806451613,
+    "question": "If a patient presents with jaundice and has a family history of breast cancer, which diagnostic tests and risk factors should be considered?"
+  },
+  {
+    "id": "Medical-83eb6b6b",
+    "answer_correctness": 0.4668687340768579,
+    "rouge_score": 0.1,
+    "question": "What follow-up methods are recommended after cervical cancer treatment, and how do they help in surveillance?"
+  },
+  {
+    "id": "Medical-6e8f1b95",
+    "answer_correctness": 0.4728543341093322,
+    "rouge_score": 0.32,
+    "question": "Which tumor markers should be monitored during surveillance after ovarian cancer treatment?"
+  },
+  {
+    "id": "Medical-dc695a12",
+    "answer_correctness": 0.47456659384976585,
+    "rouge_score": 0.15,
+    "question": "What histopathological finding is essential for diagnosing MGZL, and how is it confirmed?"
+  },
+  {
+    "id": "Medical-cd4d3dd1",
+    "answer_correctness": 0.48042256510036346,
+    "rouge_score": 0.24242424242424246,
+    "question": "What factors are considered prognostic in treatment planning for throat cancer?"
+  },
+  {
+    "id": "Medical-e8163237",
+    "answer_correctness": 0.48088370266226443,
+    "rouge_score": 0.13333333333333333,
+    "question": "Which surgical procedures are specifically used for tumors in different parts of the rectum?"
+  },
+  {
+    "id": "Medical-cfdb85ba",
+    "answer_correctness": 0.48199294469412546,
+    "rouge_score": 0.2608695652173913,
+    "question": "Which risk factors and genetic alterations should be evaluated in a patient with a family history of prostate cancer?"
+  },
+  {
+    "id": "Medical-659d7c0a",
+    "answer_correctness": 0.4863117295072057,
+    "rouge_score": 0.43137254901960786,
+    "question": "How do the purposes of lung cancer screening and follow-up care differ?"
+  },
+  {
+    "id": "Medical-c6b862bd",
+    "answer_correctness": 0.4865747501880082,
+    "rouge_score": 0.25925925925925924,
+    "question": "What are the key risk factors for developing glioma, and how are these determined from the ontology?"
+  },
+  {
+    "id": "Medical-92ed141f",
+    "answer_correctness": 0.4865820321714336,
+    "rouge_score": 0.33333333333333337,
+    "question": "How does the approach to fertility preservation differ between early-stage cervical cancer patients and those with advanced disease?"
+  },
+  {
+    "id": "Medical-da2b7d6f",
+    "answer_correctness": 0.4876941613060508,
+    "rouge_score": 0.34285714285714286,
+    "question": "Which treatments are used for non–muscle-invasive bladder cancer and what surgical procedure is typically involved?"
+  },
+  {
+    "id": "Medical-a9db9ed9",
+    "answer_correctness": 0.4897814780157071,
+    "rouge_score": 0.17647058823529413,
+    "question": "If a child under 5 presents with an adrenal mass and bone metastases, what is the most likely diagnosis and which diagnostic methods should be prioritized?"
+  },
+  {
+    "id": "Medical-9499de40",
+    "answer_correctness": 0.4899356386119276,
+    "rouge_score": 0.47619047619047616,
+    "question": "Which biomarkers are most closely associated with the development of anal squamous cell carcinoma, and what is the most common risk factor?"
+  },
+  {
+    "id": "Medical-34a9155d",
+    "answer_correctness": 0.4908372353561238,
+    "rouge_score": 0.25000000000000006,
+    "question": "Why is a lung nodule detected by imaging not sufficient for a lung cancer diagnosis?"
+  },
+  {
+    "id": "Medical-e2bcebf4",
+    "answer_correctness": 0.4941218649077751,
+    "rouge_score": 0.45161290322580644,
+    "question": "When is enrollment in a clinical trial particularly recommended for ovarian cancer patients?"
+  },
+  {
+    "id": "Medical-950b879f",
+    "answer_correctness": 0.49629022385649674,
+    "rouge_score": 0.5333333333333333,
+    "question": "How does the typical site of involvement differ between mediastinal and non-mediastinal gray zone lymphomas?"
+  },
+  {
+    "id": "Medical-14d39f0c",
+    "answer_correctness": 0.5026957544504616,
+    "rouge_score": 0.13953488372093023,
+    "question": "What are the common symptoms and metabolic complications associated with bone cancer, and what causes the metabolic complication?"
+  },
+  {
+    "id": "Medical-3e87c7a1",
+    "answer_correctness": 0.5080008810290755,
+    "rouge_score": 0.25,
+    "question": "What anatomical locations are at risk for distant metastasis from stomach cancer and what is the typical spread pattern?"
+  },
+  {
+    "id": "Medical-6b3f89bd",
+    "answer_correctness": 0.5097516970101402,
+    "rouge_score": 0.35483870967741943,
+    "question": "Which RCC subtypes are considered non-clear cell RCC, and how are they grouped in the classification?"
+  },
+  {
+    "id": "Medical-f63520dd",
+    "answer_correctness": 0.5171274232804253,
+    "rouge_score": 0.48387096774193544,
+    "question": "What is the role of supportive and palliative care in advanced or metastatic cervical cancer management?"
+  },
+  {
+    "id": "Medical-f2800f11",
+    "answer_correctness": 0.5171451690174815,
+    "rouge_score": 0.19999999999999998,
+    "question": "Which care team roles are necessary for comprehensive diagnosis and treatment planning in pancreatic cancer?"
+  },
+  {
+    "id": "Medical-78897235",
+    "answer_correctness": 0.5294854863780409,
+    "rouge_score": 0.1818181818181818,
+    "question": "Which two diagnostic methods are used to confirm CML by detecting its key biomarkers?"
+  },
+  {
+    "id": "Medical-df366063",
+    "answer_correctness": 0.5297669615107898,
+    "rouge_score": 0.20588235294117646,
+    "question": "If a patient presents with a shiny bump on the face and has a history of tanning bed use, what diagnostic steps should be taken to evaluate for basal cell carcinoma?"
+  },
+  {
+    "id": "Medical-441c763b",
+    "answer_correctness": 0.5306259378477299,
+    "rouge_score": 0.14285714285714285,
+    "question": "Which treatment is indicated for a patient with persistent or recurrent anal cancer after initial chemoradiation, and what is a major consequence of this intervention?"
+  },
+  {
+    "id": "Medical-de3d6946",
+    "answer_correctness": 0.5314854588027513,
+    "rouge_score": 0.3870967741935483,
+    "question": "Which diagnostic methods would be most informative for differentiating between cutaneous B-cell and T-cell lymphomas?"
+  },
+  {
+    "id": "Medical-6e99ce81",
+    "answer_correctness": 0.5324722626154359,
+    "rouge_score": 0.35294117647058826,
+    "question": "For a patient with anaplastic thyroid cancer and distant metastasis, which combination of therapies is most likely to be recommended?"
+  },
+  {
+    "id": "Medical-b6fbf092",
+    "answer_correctness": 0.5345229378317029,
+    "rouge_score": 0.3773584905660377,
+    "question": "Why is clinical trial participation recommended for all primary CNS lymphoma patients regardless of treatment phase?"
+  },
+  {
+    "id": "Medical-ff2105ab",
+    "answer_correctness": 0.5353509180811005,
+    "rouge_score": 0.15873015873015875,
+    "question": "Why is dental health assessment important in the management of nasopharyngeal carcinoma?"
+  },
+  {
+    "id": "Medical-2157ec85",
+    "answer_correctness": 0.5360149429911387,
+    "rouge_score": 0.24615384615384617,
+    "question": "What features distinguish diffuse type adenocarcinoma from intestinal type in stomach cancer pathology?"
+  },
+  {
+    "id": "Medical-025c325c",
+    "answer_correctness": 0.5368987337123357,
+    "rouge_score": 0.4705882352941177,
+    "question": "Which symptoms and risk factors would prompt early diagnostic evaluation for bladder cancer?"
+  },
+  {
+    "id": "Medical-535c413f",
+    "answer_correctness": 0.5370286106138162,
+    "rouge_score": 0.34615384615384615,
+    "question": "Which diagnostic steps should be taken if a screening ultrasound and AFP test suggest liver cancer in a patient with hepatitis B?"
+  },
+  {
+    "id": "Medical-aa9a54c8",
+    "answer_correctness": 0.537231539619954,
+    "rouge_score": 0.5116279069767442,
+    "question": "Which diagnostic methods would be used to assess both lymph node involvement and distant metastasis in mouth cancer?"
+  },
+  {
+    "id": "Medical-f8e45373",
+    "answer_correctness": 0.5374954114603763,
+    "rouge_score": 0.5454545454545454,
+    "question": "Which subtype of Hodgkin lymphoma is most likely to transform into diffuse large B-cell lymphoma, and how is this subtype identified?"
+  },
+  {
+    "id": "Medical-f9e22272",
+    "answer_correctness": 0.5382221483365242,
+    "rouge_score": 0.6428571428571428,
+    "question": "Which two related lymphomas share overlapping features with gray zone lymphomas, complicating diagnosis?"
+  },
+  {
+    "id": "Medical-2148e062",
+    "answer_correctness": 0.5384617731917449,
+    "rouge_score": 0.2456140350877193,
+    "question": "What is the purpose of surveillance for relapse in ALL patients and which follow-up methods are used?"
+  },
+  {
+    "id": "Medical-b7e4be0e",
+    "answer_correctness": 0.5385806032635294,
+    "rouge_score": 0.19512195121951217,
+    "question": "What combination of risk factors and diagnostic methods would justify recommending lung cancer screening?"
+  },
+  {
+    "id": "Medical-e8957bed",
+    "answer_correctness": 0.5386180573599246,
+    "rouge_score": 0.25925925925925924,
+    "question": "Why is ctDNA testing not routinely used in colon cancer management outside clinical trials?"
+  },
+  {
+    "id": "Medical-81c95a46",
+    "answer_correctness": 0.5394415451274794,
+    "rouge_score": 0.3728813559322034,
+    "question": "Which anatomic locations are most commonly associated with osteosarcoma and giant cell tumor of bone, and what do these locations have in common?"
+  },
+  {
+    "id": "Medical-3a5671fc",
+    "answer_correctness": 0.5399032865603672,
+    "rouge_score": 0.3703703703703704,
+    "question": "What diagnostic methods are used to detect hereditary pancreatic cancer risk, and which genetic syndromes are relevant?"
+  },
+  {
+    "id": "Medical-54cc91bf",
+    "answer_correctness": 0.5404807764965476,
+    "rouge_score": 0.34782608695652173,
+    "question": "Which diagnostic methods are needed to both confirm squamous cell carcinoma (SCC) in the mouth and assess its anatomical extent?"
+  },
+  {
+    "id": "Medical-def9b488",
+    "answer_correctness": 0.5412994347932933,
+    "rouge_score": 0.17391304347826086,
+    "question": "Why is expert hematopathologist review crucial in diagnosing MGZL?"
+  },
+  {
+    "id": "Medical-8ff4d088",
+    "answer_correctness": 0.5419767784490666,
+    "rouge_score": 0.7317073170731706,
+    "question": "What treatment options are specifically recommended for hormone receptor-positive, HER2-negative, PIK3CA-mutated metastatic breast cancer?"
+  },
+  {
+    "id": "Medical-3bea99a2",
+    "answer_correctness": 0.54260409082653,
+    "rouge_score": 0.4864864864864865,
+    "question": "Which imaging modalities are necessary to fully stage a patient with suspected regional prostate cancer spread?"
+  },
+  {
+    "id": "Medical-9231a873",
+    "answer_correctness": 0.5430193321775598,
+    "rouge_score": 0.31818181818181823,
+    "question": "Which cancer subtype is most commonly found in the nasopharynx and how is it classified within the cancer ontology?"
+  },
+  {
+    "id": "Medical-efd5b238",
+    "answer_correctness": 0.5561859210590014,
+    "rouge_score": 0.1875,
+    "question": "What is the significance of identifying the disease stage in esophageal cancer for determining metastatic sites?"
+  },
+  {
+    "id": "Medical-5e530443",
+    "answer_correctness": 0.5603306313746999,
+    "rouge_score": 0.25806451612903225,
+    "question": "Which symptoms and risk factors together would most strongly indicate the need for biopsy to rule out BCC?"
+  },
+  {
+    "id": "Medical-52ca0ffb",
+    "answer_correctness": 0.5648609667821274,
+    "rouge_score": 0.2,
+    "question": "Why are both biomarker testing and genetic risk testing included in the diagnostic process for esophageal cancer?"
+  },
+  {
+    "id": "Medical-a7a91e43",
+    "answer_correctness": 0.5707184200040892,
+    "rouge_score": 0.26086956521739135,
+    "question": "For a patient with high-grade, muscle-invasive urothelial carcinoma, what are the standard treatment options?"
+  },
+  {
+    "id": "Medical-47504b64",
+    "answer_correctness": 0.5741679077934988,
+    "rouge_score": 0.28571428571428575,
+    "question": "Why is supportive care considered a treatment option for all stages of lung cancer?"
+  },
+  {
+    "id": "Medical-462ecc23",
+    "answer_correctness": 0.5745890418640169,
+    "rouge_score": 0.3384615384615385,
+    "question": "How are PD-1 inhibitors used in the treatment of CSCC and at which stage are they preferred?"
+  },
+  {
+    "id": "Medical-6cb18929",
+    "answer_correctness": 0.5765940953213847,
+    "rouge_score": 0.30769230769230765,
+    "question": "Which glioma subtype is always considered high-grade and what diagnostic and treatment steps are typically involved?"
+  },
+  {
+    "id": "Medical-b9f39886",
+    "answer_correctness": 0.5875145209768955,
+    "rouge_score": 0.22535211267605634,
+    "question": "What factors distinguish non-mediastinal gray zone lymphomas from mediastinal gray zone lymphomas?"
+  },
+  {
+    "id": "Medical-69bd1f37",
+    "answer_correctness": 0.6030516641934096,
+    "rouge_score": 0.30769230769230776,
+    "question": "Which biomarkers should be tested in a patient with SCC of the tongue to inform treatment options?"
+  },
+  {
+    "id": "Medical-2a24f6a2",
+    "answer_correctness": 0.6049352330001263,
+    "rouge_score": 0.6153846153846153,
+    "question": "Which methods are used to confirm both the presence and subtype of cutaneous B-cell lymphoma in a patient with skin lesions?"
+  },
+  {
+    "id": "Medical-0a6379ff",
+    "answer_correctness": 0.6050644824504592,
+    "rouge_score": 0.2641509433962264,
+    "question": "Which genetic syndromes are associated with increased CSCC risk and what is their implication for surveillance?"
+  },
+  {
+    "id": "Medical-ef073c61",
+    "answer_correctness": 0.6052909084826995,
+    "rouge_score": 0.31999999999999995,
+    "question": "What age group is most commonly affected by ALL and how does this influence diagnostic and treatment strategies?"
+  },
+  {
+    "id": "Medical-6a5c89f3",
+    "answer_correctness": 0.605478515582492,
+    "rouge_score": 0.2222222222222222,
+    "question": "Why do not all patients with follicular lymphoma require immediate treatment upon diagnosis?"
+  },
+  {
+    "id": "Medical-9675683c",
+    "answer_correctness": 0.6057779946368521,
+    "rouge_score": 0.1951219512195122,
+    "question": "What methods are used to monitor rectal cancer after initial treatment and what biomarker is involved?"
+  },
+  {
+    "id": "Medical-f473bcb0",
+    "answer_correctness": 0.6079125870086571,
+    "rouge_score": 0.09523809523809523,
+    "question": "What is the main chemotherapy agent used during the induction phase of primary CNS lymphoma treatment and which diagnostic procedure confirms the diagnosis?"
+  },
+  {
+    "id": "Medical-b2da7aee",
+    "answer_correctness": 0.6086158818362281,
+    "rouge_score": 0.22222222222222224,
+    "question": "What are the recommended surveillance strategies after treatment for colon cancer and which biomarkers are involved?"
+  },
+  {
+    "id": "Medical-5adcec8a",
+    "answer_correctness": 0.6091832838933164,
+    "rouge_score": 0.2727272727272727,
+    "question": "How do symptoms guide the use of imaging and biopsy in the diagnostic process for mouth cancer?"
+  },
+  {
+    "id": "Medical-72cfd9c6",
+    "answer_correctness": 0.6094176349035871,
+    "rouge_score": 0.39024390243902435,
+    "question": "What symptoms and risk factors would prompt early screening for prostate cancer?"
+  },
+  {
+    "id": "Medical-d7e8bc97",
+    "answer_correctness": 0.6095114562640188,
+    "rouge_score": 0.1276595744680851,
+    "question": "Which symptoms would raise suspicion for advanced follicular lymphoma involving multiple disease sites?"
+  },
+  {
+    "id": "Medical-c650bba8",
+    "answer_correctness": 0.6109069107663623,
+    "rouge_score": 0.10909090909090907,
+    "question": "How does the treatment of infant ALL differ from that of older children or adolescents?"
+  },
+  {
+    "id": "Medical-38fc968c",
+    "answer_correctness": 0.6122860086174917,
+    "rouge_score": 0.22641509433962265,
+    "question": "Which surgical procedures may be required for colon cancer patients and under what circumstances is a colostomy necessary?"
+  },
+  {
+    "id": "Medical-99964376",
+    "answer_correctness": 0.6126019205357414,
+    "rouge_score": 0.2580645161290322,
+    "question": "Why would a lumbar puncture be performed in the diagnostic workup of a child with ALL?"
+  },
+  {
+    "id": "Medical-a88065af",
+    "answer_correctness": 0.6128667892722122,
+    "rouge_score": 0.2580645161290323,
+    "question": "If a patient with esophageal cancer presents with liver and bone metastases, what is their disease stage and which diagnostic methods are necessary?"
+  },
+  {
+    "id": "Medical-7b422282",
+    "answer_correctness": 0.6131413642662707,
+    "rouge_score": 0.2641509433962264,
+    "question": "How does the presence of Lynch syndrome affect colon cancer risk and management?"
+  },
+  {
+    "id": "Medical-35afeb4b",
+    "answer_correctness": 0.6132054869079147,
+    "rouge_score": 0.23076923076923075,
+    "question": "What treatment modification is made for MGZL patients to enhance chemoimmunotherapy?"
+  },
+  {
+    "id": "Medical-88e1fb4a",
+    "answer_correctness": 0.6141238520687039,
+    "rouge_score": 0.28571428571428575,
+    "question": "How does the treatment approach differ for mature B-cell ALL (Burkitt leukemia) compared to other B-cell ALL subtypes in children?"
+  },
+  {
+    "id": "Medical-fb234ffb",
+    "answer_correctness": 0.6144125270787211,
+    "rouge_score": 0.29090909090909084,
+    "question": "What is the significance of BCL2 protein in the diagnosis or classification of follicular lymphoma?"
+  },
+  {
+    "id": "Medical-c58dca0f",
+    "answer_correctness": 0.6146053709831969,
+    "rouge_score": 0.4,
+    "question": "Which chemotherapy agents may be included in rectal cancer treatment regimens and for what stage are they typically used?"
+  },
+  {
+    "id": "Medical-1930c305",
+    "answer_correctness": 0.6146123840726632,
+    "rouge_score": 0.3389830508474576,
+    "question": "What features distinguish Hodgkin lymphoma from other lymphomas based on the ontology and relations provided?"
+  },
+  {
+    "id": "Medical-5e3016f9",
+    "answer_correctness": 0.6151679027709605,
+    "rouge_score": 0.2608695652173913,
+    "question": "What combination of features would indicate a diagnosis of non-mediastinal gray zone lymphoma rather than MGZL?"
+  },
+  {
+    "id": "Medical-68694b91",
+    "answer_correctness": 0.6152149129111624,
+    "rouge_score": 0.3859649122807018,
+    "question": "Why might a core needle biopsy be chosen over an excisional lymph node biopsy in Hodgkin lymphoma diagnosis?"
+  },
+  {
+    "id": "Medical-3f8a738d",
+    "answer_correctness": 0.6154564310046653,
+    "rouge_score": 0.26666666666666666,
+    "question": "If a patient with a history of head and neck radiation presents with a neck lump and trouble swallowing, what diagnostic steps should be taken to evaluate for thyroid cancer?"
+  },
+  {
+    "id": "Medical-f00f6356",
+    "answer_correctness": 0.6155485410552193,
+    "rouge_score": 0.2105263157894737,
+    "question": "What combination of factors must be considered in treatment planning for a locoregional esophageal adenocarcinoma at the lower esophagus?"
+  },
+  {
+    "id": "Medical-4b359d87",
+    "answer_correctness": 0.6161882049542285,
+    "rouge_score": 0.5161290322580646,
+    "question": "If a patient's lymph node biopsy reveals popcorn-shaped cells, what is the diagnosis and what is a potential complication?"
+  },
+  {
+    "id": "Medical-c7c59020",
+    "answer_correctness": 0.616631821155986,
+    "rouge_score": 0.22641509433962267,
+    "question": "What is the rationale for using both imaging and biopsy in the assessment of a lung nodule?"
+  },
+  {
+    "id": "Medical-311d66d6",
+    "answer_correctness": 0.616957900740188,
+    "rouge_score": 0.23809523809523808,
+    "question": "Which risk factors should be evaluated in a patient with a new breast lump to assess their likelihood of breast cancer?"
+  },
+  {
+    "id": "Medical-b6f1658b",
+    "answer_correctness": 0.6170785602755193,
+    "rouge_score": 0.3684210526315789,
+    "question": "What is the relationship between HPV status and the recommended biomarker testing in oropharyngeal cancer?"
+  },
+  {
+    "id": "Medical-417cbcfd",
+    "answer_correctness": 0.6187934314077826,
+    "rouge_score": 0.339622641509434,
+    "question": "What is the connection between the assessment of biomarkers/genetic changes and the selection of diagnostic methods in CBCL?"
+  },
+  {
+    "id": "Medical-ac781c3a",
+    "answer_correctness": 0.621372742991053,
+    "rouge_score": 0.36065573770491804,
+    "question": "If a patient with stage 4 primary biliary cholangitis develops liver cancer, what is the likely sequence of risk events?"
+  },
+  {
+    "id": "Medical-6d12f4ff",
+    "answer_correctness": 0.6380119017002448,
+    "rouge_score": 0.18461538461538457,
+    "question": "How does immunosuppression influence both the risk and clinical management of CSCC?"
+  },
+  {
+    "id": "Medical-f7300f3c",
+    "answer_correctness": 0.6402669182121093,
+    "rouge_score": 0.22950819672131145,
+    "question": "Which diagnostic methods are shared between classic Hodgkin lymphoma and NLPHL, and what does this suggest about their diagnostic process?"
+  },
+  {
+    "id": "Medical-2a5688d0",
+    "answer_correctness": 0.6443678355658841,
+    "rouge_score": 0.45454545454545453,
+    "question": "What are the main imaging modalities used in the diagnosis and surveillance of bladder cancer?"
+  },
+  {
+    "id": "Medical-18be1c24",
+    "answer_correctness": 0.6458647145932981,
+    "rouge_score": 0.28571428571428575,
+    "question": "Which diagnostic and biomarker tests are indicated for a patient with a visible neck lump suspected to be papillary thyroid carcinoma?"
+  },
+  {
+    "id": "Medical-2f70ddcb",
+    "answer_correctness": 0.6473975873563469,
+    "rouge_score": 0.3137254901960784,
+    "question": "What follow-up tests are recommended after total thyroidectomy for thyroid cancer, and how can recurrence be detected?"
+  },
+  {
+    "id": "Medical-6e464eb2",
+    "answer_correctness": 0.6479852862823893,
+    "rouge_score": 0.3,
+    "question": "In a patient with symptoms of hormone excess and an adrenal mass found incidentally on CT, what further tests are indicated to determine tumor type?"
+  },
+  {
+    "id": "Medical-3a5fb7b0",
+    "answer_correctness": 0.6532952983621335,
+    "rouge_score": 0.33333333333333337,
+    "question": "Why are high-grade gliomas treated differently than low-grade gliomas following surgery?"
+  },
+  {
+    "id": "Medical-e851fe04",
+    "answer_correctness": 0.6554158050608989,
+    "rouge_score": 0.17142857142857143,
+    "question": "What factors determine the use of fertility-sparing surgery in ovarian cancer patients?"
+  },
+  {
+    "id": "Medical-4a4eaab8",
+    "answer_correctness": 0.6592723711692884,
+    "rouge_score": 0.12500000000000003,
+    "question": "How does the presence or absence of the t(14;18) translocation affect the classification of follicular lymphoma?"
+  },
+  {
+    "id": "Medical-6e3e48fa",
+    "answer_correctness": 0.6601444068431516,
+    "rouge_score": 0.5,
+    "question": "Which diagnostic procedures are essential for confirming a case of cutaneous B-cell lymphoma presenting with skin nodules?"
+  },
+  {
+    "id": "Medical-59ea36ca",
+    "answer_correctness": 0.6609884249641098,
+    "rouge_score": 0.2222222222222222,
+    "question": "What follow-up procedures are recommended after achieving remission in primary CNS lymphoma?"
+  },
+  {
+    "id": "Medical-640a315c",
+    "answer_correctness": 0.661403369751095,
+    "rouge_score": 0.21276595744680854,
+    "question": "Which supportive care interventions are necessary for an AML patient presenting with severe anemia and infection risk?"
+  },
+  {
+    "id": "Medical-5fdb115b",
+    "answer_correctness": 0.6622692600367692,
+    "rouge_score": 0.38095238095238093,
+    "question": "What imaging modalities are used for both staging and surveillance of nasopharyngeal carcinoma?"
+  },
+  {
+    "id": "Medical-5422875d",
+    "answer_correctness": 0.6624880128461007,
+    "rouge_score": 0.24137931034482757,
+    "question": "What risk factors should be evaluated in a patient suspected of having ALL and why are these important?"
+  },
+  {
+    "id": "Medical-e1deaedc",
+    "answer_correctness": 0.6632027108407339,
+    "rouge_score": 0.3396226415094339,
+    "question": "Which molecular biomarkers should be tested in recurrent or advanced thyroid cancers not treatable with RAI therapy, and why?"
+  },
+  {
+    "id": "Medical-413d4c7e",
+    "answer_correctness": 0.6633390460635261,
+    "rouge_score": 0.29166666666666663,
+    "question": "What are the main symptoms prompting diagnostic evaluation for cervical cancer, and which diagnostic methods confirm the diagnosis?"
+  },
+  {
+    "id": "Medical-41b1601a",
+    "answer_correctness": 0.6641779369420748,
+    "rouge_score": 0.21739130434782608,
+    "question": "Which two main biomarkers are tested to confirm a diagnosis of CML, and how are they related?"
+  },
+  {
+    "id": "Medical-904e0a11",
+    "answer_correctness": 0.6668965741398646,
+    "rouge_score": 0.3793103448275862,
+    "question": "How does the anatomical structure of the bile duct relate to the spread of cancer to the liver?"
+  },
+  {
+    "id": "Medical-6a90b47e",
+    "answer_correctness": 0.6676893304926508,
+    "rouge_score": 0.3529411764705882,
+    "question": "What methods are used to assess both nutritional status and speech/swallowing function in nasopharyngeal carcinoma patients?"
+  },
+  {
+    "id": "Medical-83ff7511",
+    "answer_correctness": 0.6683687070228046,
+    "rouge_score": 0.39999999999999997,
+    "question": "If liver cancer is found to have both hepatocellular and cholangiocarcinoma components, what is the tumor called and what does this imply about its classification?"
+  },
+  {
+    "id": "Medical-9a34e14c",
+    "answer_correctness": 0.6696755666762724,
+    "rouge_score": 0.20833333333333334,
+    "question": "In a patient with primary CNS lymphoma and concurrent HIV infection, why is additional laboratory testing necessary?"
+  },
+  {
+    "id": "Medical-ab708cf8",
+    "answer_correctness": 0.669972713583256,
+    "rouge_score": 0.3333333333333333,
+    "question": "What anatomical sites are included under oropharyngeal cancer, and how does this relate to the diagnosis of throat cancer?"
+  },
+  {
+    "id": "Medical-17015c75",
+    "answer_correctness": 0.670097829812845,
+    "rouge_score": 0.4117647058823529,
+    "question": "Which subtypes of pancreatic cancer are described, and which is most common?"
+  },
+  {
+    "id": "Medical-8779d729",
+    "answer_correctness": 0.670368821567096,
+    "rouge_score": 0.3157894736842105,
+    "question": "What are the main differences in cell type and disease progression risk between classic Hodgkin lymphoma and NLPHL?"
+  },
+  {
+    "id": "Medical-3c536762",
+    "answer_correctness": 0.6706730602911382,
+    "rouge_score": 0.25000000000000006,
+    "question": "Why is tumor size and extent of spread important in staging bile duct cancer?"
+  },
+  {
+    "id": "Medical-bb361e83",
+    "answer_correctness": 0.6709893249988723,
+    "rouge_score": 0.20408163265306123,
+    "question": "How does the presence of sarcomatoid features influence treatment considerations for RCC?"
+  },
+  {
+    "id": "Medical-55898188",
+    "answer_correctness": 0.6719684510536875,
+    "rouge_score": 0.2857142857142857,
+    "question": "Which diagnostic procedures are necessary for a patient with suspected regional CSCC presenting with lymph node involvement?"
+  },
+  {
+    "id": "Medical-57f0c93d",
+    "answer_correctness": 0.6720257478253607,
+    "rouge_score": 0.25,
+    "question": "Which combination of therapies may be considered for an AML patient with CD33-positive blasts and why?"
+  },
+  {
+    "id": "Medical-e6db1c4b",
+    "answer_correctness": 0.6721180518898414,
+    "rouge_score": 0.3829787234042553,
+    "question": "Which imaging modalities and biopsy types are recommended for the diagnosis of osteosarcoma?"
+  },
+  {
+    "id": "Medical-1024ca84",
+    "answer_correctness": 0.6729848346682484,
+    "rouge_score": 0.3055555555555555,
+    "question": "How does the treatment strategy for T-ALL differ from BCR::ABL1-positive B-ALL, and what evidence supports this distinction?"
+  },
+  {
+    "id": "Medical-cf2fbd21",
+    "answer_correctness": 0.6751664640317281,
+    "rouge_score": 0.40625,
+    "question": "How do risk factors for oropharyngeal squamous cell carcinoma differ from those for head and neck cancers in general?"
+  },
+  {
+    "id": "Medical-b77d8e3d",
+    "answer_correctness": 0.6830017436354312,
+    "rouge_score": 0.23728813559322035,
+    "question": "How do follow-up strategies change after initial treatment for NSCLC?"
+  },
+  {
+    "id": "Medical-33494794",
+    "answer_correctness": 0.6836089116087425,
+    "rouge_score": 0.23809523809523808,
+    "question": "What cellular changes would you expect to find in a patient with CML, and which test would confirm these findings?"
+  },
+  {
+    "id": "Medical-8307a348",
+    "answer_correctness": 0.6836289489519574,
+    "rouge_score": 0.2545454545454545,
+    "question": "Which surgical procedures are available for early-stage cervical cancer, and how do they relate to fertility preservation?"
+  },
+  {
+    "id": "Medical-32b9ef93",
+    "answer_correctness": 0.6858349899540641,
+    "rouge_score": 0.17543859649122806,
+    "question": "If a patient presents with seizures and cognitive changes, what diagnostic methods should be prioritized and why?"
+  },
+  {
+    "id": "Medical-889e2c6a",
+    "answer_correctness": 0.6861156575676638,
+    "rouge_score": 0.21428571428571425,
+    "question": "What factors contribute to a poorer prognosis in glioma patients, and how are these factors determined?"
+  },
+  {
+    "id": "Medical-40446029",
+    "answer_correctness": 0.687712350308411,
+    "rouge_score": 0.15151515151515152,
+    "question": "Why are clinical trials particularly preferred for BCR::ABL1-negative or BCR::ABL1-like B-ALL subtypes?"
+  },
+  {
+    "id": "Medical-ce635798",
+    "answer_correctness": 0.6885259402724808,
+    "rouge_score": 0.3555555555555555,
+    "question": "Which genetic alterations are characteristic of Ewing sarcoma, and by which diagnostic methods can these be detected?"
+  },
+  {
+    "id": "Medical-9b9b7f4a",
+    "answer_correctness": 0.6903357880233812,
+    "rouge_score": 0.4285714285714286,
+    "question": "Which diagnostic and molecular tests are used to guide treatment decisions in high-risk localized prostate cancer?"
+  },
+  {
+    "id": "Medical-bea3adf4",
+    "answer_correctness": 0.6906357528275429,
+    "rouge_score": 0.29090909090909095,
+    "question": "How does the presence of Barrett esophagus influence both risk and diagnostic approach for esophageal adenocarcinoma?"
+  },
+  {
+    "id": "Medical-e54f3250",
+    "answer_correctness": 0.6919394099346425,
+    "rouge_score": 0.25806451612903225,
+    "question": "What are the roles of immunotherapy agents in systemic therapy for advanced bladder cancer?"
+  },
+  {
+    "id": "Medical-fa092b30",
+    "answer_correctness": 0.6939512750349095,
+    "rouge_score": 0.2325581395348837,
+    "question": "What is the significance of imaging in the management of pancreatic cancer, and for which purposes is it used?"
+  },
+  {
+    "id": "Medical-aacc98ed",
+    "answer_correctness": 0.6962116823138376,
+    "rouge_score": 0.6486486486486486,
+    "question": "What histological layers must a tumor penetrate to reach the serosa from the epithelium in the bile duct?"
+  },
+  {
+    "id": "Medical-45847608",
+    "answer_correctness": 0.6990667365972889,
+    "rouge_score": 0.33962264150943394,
+    "question": "Which hereditary syndromes increase the risk for ovarian cancer and how does this affect patient management?"
+  },
+  {
+    "id": "Medical-d2458aa7",
+    "answer_correctness": 0.7265170950104781,
+    "rouge_score": 0.14285714285714285,
+    "question": "If a patient has multiple tumors in both kidneys, how should these be classified and why?"
+  },
+  {
+    "id": "Medical-a660735d",
+    "answer_correctness": 0.7283669562805444,
+    "rouge_score": 0.16129032258064516,
+    "question": "Why might a patient with pediatric-type follicular lymphoma present differently from an adult with classic FL?"
+  },
+  {
+    "id": "Medical-a0cd1d28",
+    "answer_correctness": 0.7296838183161141,
+    "rouge_score": 0.18518518518518517,
+    "question": "Which genetic alteration is most associated with inherited medullary thyroid cancer and what implication does this have for family members?"
+  },
+  {
+    "id": "Medical-bfe2b31f",
+    "answer_correctness": 0.7304534869940145,
+    "rouge_score": 0.32432432432432434,
+    "question": "Which imaging and biopsy methods are used together to confirm a diagnosis of primary CNS lymphoma localized to the brain?"
+  },
+  {
+    "id": "Medical-2d14639d",
+    "answer_correctness": 0.7307560657379151,
+    "rouge_score": 0.13559322033898305,
+    "question": "How does the grade of follicular lymphoma influence its classification and treatment approach?"
+  },
+  {
+    "id": "Medical-18fc35e5",
+    "answer_correctness": 0.7310615812140668,
+    "rouge_score": 0.06451612903225808,
+    "question": "What are the recommended initial treatments for most stages of epithelial ovarian cancer?"
+  },
+  {
+    "id": "Medical-402f416c",
+    "answer_correctness": 0.7325724870265063,
+    "rouge_score": 0.2222222222222222,
+    "question": "Which chemotherapy regimens are recommended as part of chemoradiation for a patient with Stage II anal squamous cell carcinoma?"
+  },
+  {
+    "id": "Medical-b200a90c",
+    "answer_correctness": 0.7335312261827047,
+    "rouge_score": 0.13333333333333333,
+    "question": "Which bladder cancer subtypes are less common and how does this affect the overall classification of the disease?"
+  },
+  {
+    "id": "Medical-1a7ab06f",
+    "answer_correctness": 0.7337651494264373,
+    "rouge_score": 0.17142857142857143,
+    "question": "What combination of symptoms and test results would suggest an aldosteronoma rather than a cortisol-producing adenoma?"
+  },
+  {
+    "id": "Medical-618ab93c",
+    "answer_correctness": 0.7346412083485176,
+    "rouge_score": 0.2222222222222222,
+    "question": "If a patient is diagnosed with a slow-growing primary cutaneous lymphoma of B-cell origin, which subtypes are likely?"
+  },
+  {
+    "id": "Medical-2b2dd1fb",
+    "answer_correctness": 0.7346481870175594,
+    "rouge_score": 0.22222222222222227,
+    "question": "What combination of symptoms and diagnostic methods would most likely lead to an ALL diagnosis involving the central nervous system?"
+  },
+  {
+    "id": "Medical-9528082d",
+    "answer_correctness": 0.7346923923566283,
+    "rouge_score": 0.25,
+    "question": "Why is detecting either the Philadelphia chromosome or BCR::ABL1 gene sufficient for diagnosing CML?"
+  },
+  {
+    "id": "Medical-80912696",
+    "answer_correctness": 0.7350708402230774,
+    "rouge_score": 0.38461538461538464,
+    "question": "Why should fertility counseling be considered for patients undergoing treatment for nasopharyngeal carcinoma?"
+  },
+  {
+    "id": "Medical-39012a36",
+    "answer_correctness": 0.7353976204187644,
+    "rouge_score": 0.3018867924528302,
+    "question": "Which treatments may be considered for a glioma patient after surgical resection and how is this decision guided?"
+  },
+  {
+    "id": "Medical-193a4b7f",
+    "answer_correctness": 0.736345335361125,
+    "rouge_score": 0.21052631578947367,
+    "question": "What chromosomal abnormality must be present for a diagnosis of chronic myeloid leukemia (CML)?"
+  },
+  {
+    "id": "Medical-aba4e30c",
+    "answer_correctness": 0.7365488049932856,
+    "rouge_score": 0.3076923076923077,
+    "question": "Which stages of pancreatic ductal adenocarcinoma may involve lymph node spread, and how does this affect staging?"
+  },
+  {
+    "id": "Medical-a5d38351",
+    "answer_correctness": 0.73674576946249,
+    "rouge_score": 0.15625,
+    "question": "How does the presence of distant metastasis affect treatment planning for esophageal cancer?"
+  },
+  {
+    "id": "Medical-705f9e89",
+    "answer_correctness": 0.7368671245890909,
+    "rouge_score": 0.36000000000000004,
+    "question": "If a patient aged 25 presents with swollen lymph nodes in the upper body, what cancer type should be highly suspected and why?"
+  },
+  {
+    "id": "Medical-787b9c0b",
+    "answer_correctness": 0.7378626964014448,
+    "rouge_score": 0.490566037735849,
+    "question": "If a tumor in the bile duct is only found in the muscularis layer, how does this affect its staging compared to a tumor confined to the epithelium?"
+  },
+  {
+    "id": "Medical-a0699e9e",
+    "answer_correctness": 0.7382311700089306,
+    "rouge_score": 0.35555555555555557,
+    "question": "Which side effects might a patient experience after radical cystectomy and urinary diversion for bladder cancer?"
+  },
+  {
+    "id": "Medical-60acb9ee",
+    "answer_correctness": 0.7382734291442334,
+    "rouge_score": 0.3111111111111111,
+    "question": "Which patients with throat cancer should undergo dental health assessment and why?"
+  },
+  {
+    "id": "Medical-32861246",
+    "answer_correctness": 0.7394975113306852,
+    "rouge_score": 0.3846153846153846,
+    "question": "Which combination of diagnostic methods is necessary to confirm and stage anal cancer after a patient presents with rectal bleeding and an anal lump?"
+  },
+  {
+    "id": "Medical-09eac393",
+    "answer_correctness": 0.7400096374532226,
+    "rouge_score": 0.34782608695652173,
+    "question": "Why is radioactive iodine therapy not used for medullary thyroid cancer after total thyroidectomy, and what alternative therapies are recommended?"
+  },
+  {
+    "id": "Medical-56f4cb0b",
+    "answer_correctness": 0.7405055442063365,
+    "rouge_score": 0.5357142857142857,
+    "question": "How does the involvement of blood vessels or liver affect the classification of bile duct cancer compared to a tumor confined to the epithelium?"
+  },
+  {
+    "id": "Medical-86e095c3",
+    "answer_correctness": 0.7408920497693094,
+    "rouge_score": 0.4651162790697674,
+    "question": "How does smoking status influence both the risk and treatment outcomes of cervical cancer?"
+  },
+  {
+    "id": "Medical-8435c9f6",
+    "answer_correctness": 0.7409562764464688,
+    "rouge_score": 0.25,
+    "question": "How would the treatment approach change for a primary CNS lymphoma patient with both brain and eye involvement?"
+  },
+  {
+    "id": "Medical-01abc791",
+    "answer_correctness": 0.7411082973184466,
+    "rouge_score": 0.3448275862068966,
+    "question": "Why is intestinal type adenocarcinoma more likely to benefit from targeted therapy compared to diffuse type?"
+  },
+  {
+    "id": "Medical-ec4712e3",
+    "answer_correctness": 0.7414226147181465,
+    "rouge_score": 0.1923076923076923,
+    "question": "Why is a panoramic dental x-ray (Panorex) included in diagnostic evaluation for mouth cancer?"
+  },
+  {
+    "id": "Medical-647b438f",
+    "answer_correctness": 0.7417134808358006,
+    "rouge_score": 0.2545454545454545,
+    "question": "Which biomarkers must be tested to guide targeted therapy decisions in invasive ductal carcinoma, and why?"
+  },
+  {
+    "id": "Medical-a5435dbc",
+    "answer_correctness": 0.7418159391529784,
+    "rouge_score": 0.2962962962962963,
+    "question": "Why is colonoscopy recommended after rectal cancer surgery, and what risk factor may increase its importance?"
+  },
+  {
+    "id": "Medical-2a61ebd2",
+    "answer_correctness": 0.7418980343616364,
+    "rouge_score": 0.34285714285714286,
+    "question": "How does the identification of the PML::RARA fusion gene influence both the classification and treatment of AML?"
+  },
+  {
+    "id": "Medical-ad078f77",
+    "answer_correctness": 0.7424196788527861,
+    "rouge_score": 0.7222222222222222,
+    "question": "Which treatments are available to all patients with pancreatic ductal adenocarcinoma, regardless of stage?"
+  },
+  {
+    "id": "Medical-e9ac42f1",
+    "answer_correctness": 0.7425101955751435,
+    "rouge_score": 0.3508771929824561,
+    "question": "How does the BCR::ABL1 fusion gene relate to both the diagnosis and treatment of CML?"
+  },
+  {
+    "id": "Medical-6d335c18",
+    "answer_correctness": 0.7429149360845061,
+    "rouge_score": 0.33333333333333337,
+    "question": "What histological subtypes are found under RCC and how are they organized in the classification?"
+  },
+  {
+    "id": "Medical-9b3c8ac0",
+    "answer_correctness": 0.742937119343498,
+    "rouge_score": 0.2647058823529412,
+    "question": "Why should fertility preservation be discussed before starting treatment for bone cancer in young patients?"
+  },
+  {
+    "id": "Medical-38fe5331",
+    "answer_correctness": 0.7433173180459235,
+    "rouge_score": 0.3508771929824562,
+    "question": "How does the detection of increased blasts in blood or bone marrow influence the classification of CML phase?"
+  },
+  {
+    "id": "Medical-833304f8",
+    "answer_correctness": 0.7436562382930305,
+    "rouge_score": 0.38095238095238093,
+    "question": "How does the anatomical location of a tumor help distinguish between esophageal squamous cell carcinoma and adenocarcinoma?"
+  },
+  {
+    "id": "Medical-48cb097c",
+    "answer_correctness": 0.7436626590887948,
+    "rouge_score": 0.3880597014925373,
+    "question": "Which anatomical locations are most associated with esophageal squamous cell carcinoma and esophageal adenocarcinoma, and how does this affect treatment planning?"
+  },
+  {
+    "id": "Medical-8e0c15db",
+    "answer_correctness": 0.7438659318398598,
+    "rouge_score": 0.36363636363636365,
+    "question": "What combination of findings would indicate the need for genetic testing in a patient with an adrenal tumor?"
+  },
+  {
+    "id": "Medical-e2ac8ec4",
+    "answer_correctness": 0.744726497545101,
+    "rouge_score": 0.30434782608695654,
+    "question": "How does the addition of bevacizumab to chemotherapy alter the management of metastatic cervical cancer?"
+  },
+  {
+    "id": "Medical-bd7c7e1a",
+    "answer_correctness": 0.7448828537515544,
+    "rouge_score": 0.4897959183673469,
+    "question": "Which patients with recurrent or metastatic cervical cancer are eligible for immunotherapy, and what biomarker guides this decision?"
+  },
+  {
+    "id": "Medical-e9ef7d6f",
+    "answer_correctness": 0.7452211164666928,
+    "rouge_score": 0.36363636363636365,
+    "question": "What distinguishes secondary liver cancer from primary liver cancer in terms of origin and anatomical structure involved?"
+  },
+  {
+    "id": "Medical-99dd217e",
+    "answer_correctness": 0.7460175703880989,
+    "rouge_score": 0.5277777777777777,
+    "question": "What distinguishes early-stage esophageal cancer from locoregional and metastatic disease in terms of anatomical spread and diagnostic requirements?"
+  },
+  {
+    "id": "Medical-91c35427",
+    "answer_correctness": 0.7460551481116007,
+    "rouge_score": 0.5306122448979592,
+    "question": "What is the standard surgical procedure for muscle-invasive bladder cancer, and what urinary diversion options may follow?"
+  },
+  {
+    "id": "Medical-96bb3762",
+    "answer_correctness": 0.7464072358174622,
+    "rouge_score": 0.42857142857142855,
+    "question": "How does the treatment approach differ between Stage 1 and Stage 2 NSCLC?"
+  },
+  {
+    "id": "Medical-02d254bc",
+    "answer_correctness": 0.7466689755028957,
+    "rouge_score": 0.75,
+    "question": "For which stages of cervical cancer is surgery the primary treatment, and when is chemoradiation preferred?"
+  },
+  {
+    "id": "Medical-a56d528c",
+    "answer_correctness": 0.746883546303102,
+    "rouge_score": 0.6511627906976744,
+    "question": "How does the origin of RCC differ from that of urothelial carcinoma within the kidney?"
+  },
+  {
+    "id": "Medical-c6a7964c",
+    "answer_correctness": 0.7473984933451693,
+    "rouge_score": 0.5090909090909091,
+    "question": "How do risk factors for primary liver cancer differ from those for secondary liver cancer according to the ontology?"
+  },
+  {
+    "id": "Medical-96508468",
+    "answer_correctness": 0.7648233621430418,
+    "rouge_score": 0.26666666666666666,
+    "question": "Why are both immunophenotyping and biopsy necessary in the diagnostic workup of follicular lymphoma?"
+  },
+  {
+    "id": "Medical-141fd876",
+    "answer_correctness": 0.7656607780483271,
+    "rouge_score": 0.2647058823529412,
+    "question": "Why are both flow cytometry and immunophenotyping required in the diagnostic process for ALL?"
+  },
+  {
+    "id": "Medical-ca3e2437",
+    "answer_correctness": 0.7694394169450327,
+    "rouge_score": 0.2777777777777778,
+    "question": "Which diagnostic procedures are necessary to both confirm an AML diagnosis and determine the specific subtype?"
+  },
+  {
+    "id": "Medical-ade34649",
+    "answer_correctness": 0.771742113361109,
+    "rouge_score": 0.3673469387755102,
+    "question": "Which diagnostic procedures are used for tissue sampling in throat cancer, and why are they important?"
+  },
+  {
+    "id": "Medical-6108fa72",
+    "answer_correctness": 0.7725612546083098,
+    "rouge_score": 0.2222222222222222,
+    "question": "What follow-up strategies are recommended for CLL patients not requiring immediate therapy, and what is their purpose?"
+  },
+  {
+    "id": "Medical-bcfc4592",
+    "answer_correctness": 0.7741209829019682,
+    "rouge_score": 0.08,
+    "question": "What surveillance methods are recommended after complete remission of Stage III anal cancer, and how does the frequency of these methods vary?"
+  },
+  {
+    "id": "Medical-b272ce63",
+    "answer_correctness": 0.7762367846995673,
+    "rouge_score": 0.26666666666666666,
+    "question": "Which anatomical structures are directly involved in the spread of kidney cancer and how are these structures classified?"
+  },
+  {
+    "id": "Medical-1e1b5f1d",
+    "answer_correctness": 0.7774809531907128,
+    "rouge_score": 0.22641509433962265,
+    "question": "What diagnostic procedures are necessary to confirm follicular lymphoma and why are multiple methods required?"
+  },
+  {
+    "id": "Medical-af6105a0",
+    "answer_correctness": 0.7778538587172542,
+    "rouge_score": 0.2545454545454546,
+    "question": "What are the recommended fertility preservation options for rectal cancer patients, and why might these be important?"
+  },
+  {
+    "id": "Medical-c92bbd26",
+    "answer_correctness": 0.7787104228827325,
+    "rouge_score": 0.1702127659574468,
+    "question": "Why is immunophenotyping by flow cytometry essential in the diagnosis of CLL?"
+  },
+  {
+    "id": "Medical-9626892c",
+    "answer_correctness": 0.7850749539034014,
+    "rouge_score": 0.18518518518518517,
+    "question": "If a patient with a history of cervical cancer presents with anal pain and is found to have HSIL on biopsy, what does this indicate about their risk and disease status?"
+  },
+  {
+    "id": "Medical-e1ede6d6",
+    "answer_correctness": 0.7864781217108543,
+    "rouge_score": 0.3055555555555555,
+    "question": "What distinguishes stage 4 colon cancer from earlier stages in terms of spread and treatment approach?"
+  },
+  {
+    "id": "Medical-32fce5f0",
+    "answer_correctness": 0.7865055835117256,
+    "rouge_score": 0.26086956521739124,
+    "question": "What are the standard hormone replacement options after total thyroidectomy and why are they necessary?"
+  },
+  {
+    "id": "Medical-84ec68f0",
+    "answer_correctness": 0.7931986871468093,
+    "rouge_score": 0.2,
+    "question": "Why is it important to perform both biomarker and genetic risk testing in the diagnosis of stomach cancer?"
+  },
+  {
+    "id": "Medical-cb781b83",
+    "answer_correctness": 0.7948921560816009,
+    "rouge_score": 0.24242424242424243,
+    "question": "What sequence of diagnostic steps is required to confirm a glioma diagnosis and classify its grade and biomarker status?"
+  },
+  {
+    "id": "Medical-d42f24b5",
+    "answer_correctness": 0.7966485730454427,
+    "rouge_score": 0.16666666666666666,
+    "question": "What is the sequence of diagnostic steps for a patient presenting with symptoms of ulcer or mass suspected to be stomach cancer?"
+  },
+  {
+    "id": "Medical-2350fb33",
+    "answer_correctness": 0.7970374102605838,
+    "rouge_score": 0.2857142857142857,
+    "question": "What diagnostic methods should be employed to confirm a suspected case of metastatic stomach cancer with a family history of the disease?"
+  },
+  {
+    "id": "Medical-74b73ed7",
+    "answer_correctness": 0.7981521841593747,
+    "rouge_score": 0.13333333333333333,
+    "question": "What distant organs are common sites of kidney cancer metastasis, and how is this reflected in the classification?"
+  },
+  {
+    "id": "Medical-5581adb2",
+    "answer_correctness": 0.798477360221645,
+    "rouge_score": 0.5,
+    "question": "What combination of symptoms and diagnostic findings would suggest follicular lymphoma with bone marrow involvement?"
+  },
+  {
+    "id": "Medical-6a1c421a",
+    "answer_correctness": 0.7986265826924805,
+    "rouge_score": 0.3,
+    "question": "What diagnostic procedures are essential for confirming ALL in children and why are multiple tests necessary?"
+  },
+  {
+    "id": "Medical-b503f3f3",
+    "answer_correctness": 0.7987074369076097,
+    "rouge_score": 0.1923076923076923,
+    "question": "What combination of diagnostic methods is typically used to confirm Hodgkin lymphoma and assess its extent?"
+  },
+  {
+    "id": "Medical-3d54d9e7",
+    "answer_correctness": 0.801859363552987,
+    "rouge_score": 0.3733333333333333,
+    "question": "Which diagnostic methods are necessary to confirm a diagnosis of ALL and why must both bone marrow and blood tests be used?"
+  },
+  {
+    "id": "Medical-4f5a8531",
+    "answer_correctness": 0.8018811094084316,
+    "rouge_score": 0.21818181818181814,
+    "question": "Why might a patient with actinic keratosis require ongoing dermatologic surveillance even after lesion treatment?"
+  },
+  {
+    "id": "Medical-104b2f70",
+    "answer_correctness": 0.8021089615816668,
+    "rouge_score": 0.43999999999999995,
+    "question": "For a patient with a first-degree relative with colorectal cancer, what risk factors and inherited syndromes should be considered?"
+  },
+  {
+    "id": "Medical-443e3d36",
+    "answer_correctness": 0.8021618987528054,
+    "rouge_score": 0.39999999999999997,
+    "question": "If a patient with chronic hepatitis C and cirrhosis develops elevated AFP, which cancer type and diagnostic methods should be considered?"
+  },
+  {
+    "id": "Medical-d163acf5",
+    "answer_correctness": 0.8025982119047412,
+    "rouge_score": 0.39999999999999997,
+    "question": "How does the function of lymphocytes as white blood cells relate to the pathogenesis of cutaneous B-cell lymphoma?"
+  },
+  {
+    "id": "Medical-575e6d7f",
+    "answer_correctness": 0.8028017844049623,
+    "rouge_score": 0.22727272727272727,
+    "question": "Which phases make up the standard treatment course for AML and what is their primary goal?"
+  },
+  {
+    "id": "Medical-e0f29bbd",
+    "answer_correctness": 0.8028313374270744,
+    "rouge_score": 0.3859649122807018,
+    "question": "What are the preferred systemic therapy options for metastatic CSCC, and when might surgery or radiation be considered?"
+  },
+  {
+    "id": "Medical-d1c9cdcd",
+    "answer_correctness": 0.8031421102010242,
+    "rouge_score": 0.2647058823529412,
+    "question": "What are the common genetic alterations associated with bladder cancer, and how might these influence targeted therapy options?"
+  },
+  {
+    "id": "Medical-6bed629f",
+    "answer_correctness": 0.8034895462108964,
+    "rouge_score": 0.47058823529411764,
+    "question": "How does the management of recurrent ovarian cancer differ based on platinum sensitivity?"
+  },
+  {
+    "id": "Medical-a3c6c911",
+    "answer_correctness": 0.803893607229375,
+    "rouge_score": 0.36065573770491804,
+    "question": "How does the presence of BCR::ABL1 in B-ALL influence both the prognosis and the treatment approach?"
+  },
+  {
+    "id": "Medical-7dd235f1",
+    "answer_correctness": 0.8041311573299811,
+    "rouge_score": 0.2916666666666667,
+    "question": "What is the significance of extranodal extension in regional lymph nodes for mouth cancer staging?"
+  },
+  {
+    "id": "Medical-020cc551",
+    "answer_correctness": 0.8051545425096318,
+    "rouge_score": 0.3548387096774193,
+    "question": "How does the presence of a BRCA1 mutation influence both risk assessment and treatment in HER2-negative breast cancer?"
+  },
+  {
+    "id": "Medical-1c34ae24",
+    "answer_correctness": 0.8053301547555942,
+    "rouge_score": 0.2592592592592593,
+    "question": "What is the clinical significance of PD-L1 expression in the management of metastatic breast cancer?"
+  },
+  {
+    "id": "Medical-43a4d872",
+    "answer_correctness": 0.8061257948151124,
+    "rouge_score": 0.41860465116279066,
+    "question": "What symptoms in an adult patient should prompt evaluation for glioma using imaging and neurological examination?"
+  },
+  {
+    "id": "Medical-569780c4",
+    "answer_correctness": 0.8069223723202481,
+    "rouge_score": 0.48,
+    "question": "How is IDH mutation status relevant for classifying both astrocytoma and oligodendroglioma, and what procedure is necessary to determine this status?"
+  },
+  {
+    "id": "Medical-219da1ba",
+    "answer_correctness": 0.806972187895767,
+    "rouge_score": 0.26865671641791045,
+    "question": "Why should fertility preservation be discussed before chemoradiation in a young patient with Stage II anal cancer?"
+  },
+  {
+    "id": "Medical-48e987ed",
+    "answer_correctness": 0.8080658402785984,
+    "rouge_score": 0.1917808219178082,
+    "question": "How do risk factors and symptoms together contribute to the early detection of CLL?"
+  },
+  {
+    "id": "Medical-0a8d750c",
+    "answer_correctness": 0.8085886713378143,
+    "rouge_score": 0.13793103448275862,
+    "question": "What are the key factors influencing the selection of treatment in AML patients?"
+  },
+  {
+    "id": "Medical-223def84",
+    "answer_correctness": 0.810521663184328,
+    "rouge_score": 0.16901408450704225,
+    "question": "What factors determine whether a newly diagnosed CLL patient should begin treatment immediately or undergo watchful waiting?"
+  },
+  {
+    "id": "Medical-16a39fa8",
+    "answer_correctness": 0.8340189710896163,
+    "rouge_score": 0.30508474576271183,
+    "question": "What role do anatomical layers of the esophagus play in distinguishing early-stage from locoregional esophageal cancer?"
+  },
+  {
+    "id": "Medical-ade4b34a",
+    "answer_correctness": 0.8341779747287554,
+    "rouge_score": 0.24137931034482757,
+    "question": "If a patient with primary CNS lymphoma presents with memory problems and confusion, what imaging modality is most useful and why?"
+  },
+  {
+    "id": "Medical-222ee61b",
+    "answer_correctness": 0.8342247663818446,
+    "rouge_score": 0.2222222222222222,
+    "question": "Why is the diagnostic threshold of 20 percent or more lymphoblasts in bone marrow important for ALL diagnosis?"
+  },
+  {
+    "id": "Medical-c218fffa",
+    "answer_correctness": 0.8343695890880135,
+    "rouge_score": 0.3181818181818182,
+    "question": "Which supportive care approaches are important for pancreatic cancer management, and what symptoms might require them?"
+  },
+  {
+    "id": "Medical-f3af6f24",
+    "answer_correctness": 0.8358069958761724,
+    "rouge_score": 0.2222222222222222,
+    "question": "For a patient with primary CNS lymphoma and cerebrospinal fluid involvement, which specialized treatment is indicated and how is the involvement detected?"
+  },
+  {
+    "id": "Medical-eb7624ca",
+    "answer_correctness": 0.8361141066380684,
+    "rouge_score": 0.3214285714285714,
+    "question": "What is the recommended follow-up strategy after treatment for regional CSCC compared to local low-risk CSCC?"
+  },
+  {
+    "id": "Medical-d7765001",
+    "answer_correctness": 0.837122091546772,
+    "rouge_score": 0.26229508196721313,
+    "question": "Which symptoms should prompt evaluation for possible ovarian cancer using tumor markers and imaging?"
+  },
+  {
+    "id": "Medical-c2af5dd7",
+    "answer_correctness": 0.8372581201599012,
+    "rouge_score": 0.2608695652173913,
+    "question": "Which two risk factors for liver cancer are also major causes of cirrhosis, further increasing cancer risk?"
+  },
+  {
+    "id": "Medical-8f1032c7",
+    "answer_correctness": 0.8374666754906941,
+    "rouge_score": 0.2962962962962963,
+    "question": "What diagnostic steps should be taken for a woman presenting with persistent bloating and pelvic pain suggestive of ovarian cancer?"
+  },
+  {
+    "id": "Medical-f25adcc2",
+    "answer_correctness": 0.8375728195320138,
+    "rouge_score": 0.2909090909090909,
+    "question": "If a primary tumor in intrahepatic bile duct cancer is found in the perimuscular fibrous tissue, why can it not be staged as Tis?"
+  },
+  {
+    "id": "Medical-66e7fe35",
+    "answer_correctness": 0.838716089406738,
+    "rouge_score": 0.33333333333333337,
+    "question": "Which diagnostic methods are necessary to confirm a case of Ewing sarcoma, and which biomarker supports the diagnosis?"
+  },
+  {
+    "id": "Medical-8b16a7bd",
+    "answer_correctness": 0.8390887278879655,
+    "rouge_score": 0.22222222222222218,
+    "question": "What is the rationale for targeting BCR::ABL1 protein activity in CML treatment?"
+  },
+  {
+    "id": "Medical-c4772f49",
+    "answer_correctness": 0.8391262152547024,
+    "rouge_score": 0.25,
+    "question": "How do the submucosa and muscle layer relate to the progression from early-stage to locoregional stomach cancer?"
+  },
+  {
+    "id": "Medical-c0103315",
+    "answer_correctness": 0.839931359332428,
+    "rouge_score": 0.35087719298245607,
+    "question": "What differentiates a functional from a nonfunctioning adrenal adenoma, and how does this impact patient symptoms?"
+  },
+  {
+    "id": "Medical-a0a1a141",
+    "answer_correctness": 0.8400183851733674,
+    "rouge_score": 0.5714285714285714,
+    "question": "Which imaging modalities are used for both diagnosis and staging of throat cancer, and what is their role?"
+  },
+  {
+    "id": "Medical-f7ce6257",
+    "answer_correctness": 0.8403289155215837,
+    "rouge_score": 0.380952380952381,
+    "question": "How does the treatment approach differ between T1 and T2 rectal tumors according to surgical recommendations?"
+  },
+  {
+    "id": "Medical-ac73c113",
+    "answer_correctness": 0.8407464016422869,
+    "rouge_score": 0.5882352941176471,
+    "question": "What combination of diagnostic tools is recommended for staging and detecting metastasis in rectal cancer?"
+  },
+  {
+    "id": "Medical-ee09c8e9",
+    "answer_correctness": 0.8410375993778894,
+    "rouge_score": 0.37500000000000006,
+    "question": "Why is performance status (ECOG) considered in treatment selection for mouth cancer?"
+  },
+  {
+    "id": "Medical-423d4257",
+    "answer_correctness": 0.841237350650776,
+    "rouge_score": 0.32727272727272727,
+    "question": "Which risk factors are shared by cervical cancer and its precursor lesions, and how do they contribute to disease development?"
+  },
+  {
+    "id": "Medical-6e4da4de",
+    "answer_correctness": 0.8416963383719931,
+    "rouge_score": 0.35555555555555557,
+    "question": "What are the main routes of metastasis in throat cancer and which distant sites are commonly involved?"
+  },
+  {
+    "id": "Medical-5a2c0504",
+    "answer_correctness": 0.842236251751125,
+    "rouge_score": 0.24489795918367346,
+    "question": "Which anatomical sites are most commonly affected by metastasis from primary liver cancer, and how is this supported by the ontology?"
+  },
+  {
+    "id": "Medical-3d9e3424",
+    "answer_correctness": 0.8422782881188531,
+    "rouge_score": 0.4918032786885246,
+    "question": "In what situations is a lumbar puncture indicated during the diagnosis of ALL, and what does its use suggest about disease spread?"
+  },
+  {
+    "id": "Medical-45173331",
+    "answer_correctness": 0.8423036420501848,
+    "rouge_score": 0.20833333333333331,
+    "question": "How does the age of onset relate to the risk factors for Hodgkin lymphoma according to the ontology?"
+  },
+  {
+    "id": "Medical-0bd26353",
+    "answer_correctness": 0.8426800594425488,
+    "rouge_score": 0.38095238095238104,
+    "question": "What are the main components of trimodal therapy for bladder cancer and in which clinical context is it used?"
+  },
+  {
+    "id": "Medical-ade95016",
+    "answer_correctness": 0.842739136849173,
+    "rouge_score": 0.21739130434782608,
+    "question": "Which risk factors should be considered for an older adult with a history of organ transplant who develops primary CNS lymphoma?"
+  },
+  {
+    "id": "Medical-38a8b852",
+    "answer_correctness": 0.8434918447402482,
+    "rouge_score": 0.3137254901960784,
+    "question": "Why might a patient with genetic hemochromatosis require regular liver cancer screening, and which methods are used?"
+  },
+  {
+    "id": "Medical-97e7a1d0",
+    "answer_correctness": 0.8441426986306482,
+    "rouge_score": 0.37500000000000006,
+    "question": "If a kidney tumor is found to have sarcomatoid features, what does this indicate regarding its subtype and disease aggressiveness?"
+  },
+  {
+    "id": "Medical-ac86bfad",
+    "answer_correctness": 0.8445896336038134,
+    "rouge_score": 0.5070422535211268,
+    "question": "How does the treatment approach differ between muscle-invasive and non–muscle-invasive bladder cancer?"
+  },
+  {
+    "id": "Medical-d186c439",
+    "answer_correctness": 0.8446853240023451,
+    "rouge_score": 0.5909090909090909,
+    "question": "What distinguishes T-cell lymphoblastic lymphoma (T-LL, T-LBL) from T-cell ALL in terms of disease location?"
+  },
+  {
+    "id": "Medical-4ff142d9",
+    "answer_correctness": 0.8447713684620815,
+    "rouge_score": 0.6666666666666667,
+    "question": "How does the starting location of renal cell carcinoma compare to that of renal sarcoma within the kidney?"
+  },
+  {
+    "id": "Medical-63b4b70c",
+    "answer_correctness": 0.8449225384215729,
+    "rouge_score": 0.7894736842105263,
+    "question": "Which subtypes of cutaneous B-cell lymphoma should be considered when a biopsy confirms B-cell origin in a patient with skin papules?"
+  },
+  {
+    "id": "Medical-0e2be889",
+    "answer_correctness": 0.8450944589008831,
+    "rouge_score": 0.463768115942029,
+    "question": "How does the AJCC TNM system contribute to the staging of nasopharyngeal carcinoma, and what aspects does it assess?"
+  },
+  {
+    "id": "Medical-5c6a1008",
+    "answer_correctness": 0.8451614769641049,
+    "rouge_score": 0.5641025641025642,
+    "question": "Which combination of therapies might be considered for a patient with metastatic prostate cancer and a BRCA2 mutation?"
+  },
+  {
+    "id": "Medical-819d9c6c",
+    "answer_correctness": 0.8457045780999279,
+    "rouge_score": 0.4,
+    "question": "What distinguishes intrahepatic cholangiocarcinoma from other primary liver cancer subtypes in terms of anatomical origin?"
+  },
+  {
+    "id": "Medical-2be4d7f3",
+    "answer_correctness": 0.8457395309319315,
+    "rouge_score": 0.5079365079365079,
+    "question": "Which stages of pancreatic ductal adenocarcinoma are eligible for surgery, and what is the criterion for eligibility at Stage III?"
+  },
+  {
+    "id": "Medical-68ea8206",
+    "answer_correctness": 0.8460114687111364,
+    "rouge_score": 0.5161290322580645,
+    "question": "What is the relationship between Pap smear screening and the detection of cervical dysplasia and cancer?"
+  },
+  {
+    "id": "Medical-bce86fcf",
+    "answer_correctness": 0.8462196469902077,
+    "rouge_score": 0.39024390243902435,
+    "question": "How are germline mutations relevant to bone cancer risk, and what testing modality is used to identify them?"
+  },
+  {
+    "id": "Medical-33af9785",
+    "answer_correctness": 0.8479363458731464,
+    "rouge_score": 0.5641025641025641,
+    "question": "What is the relationship between H. pylori infection, precancerous mucosal changes, and stomach cancer development?"
+  },
+  {
+    "id": "Medical-7b4429ac",
+    "answer_correctness": 0.8550170649773611,
+    "rouge_score": 0.3733333333333333,
+    "question": "What findings on risk assessment would classify a local CSCC as high-risk, and how does this affect treatment choices?"
+  },
+  {
+    "id": "Medical-015f2cf7",
+    "answer_correctness": 0.8565028514469176,
+    "rouge_score": 0.1095890410958904,
+    "question": "How would you distinguish between a functional adenoma and a pheochromocytoma in a patient with an adrenal mass and high blood pressure?"
+  },
+  {
+    "id": "Medical-70db1204",
+    "answer_correctness": 0.858316980140502,
+    "rouge_score": 0.37500000000000006,
+    "question": "How is the stage of mouth cancer determined using both tumor characteristics and lymph node involvement?"
+  },
+  {
+    "id": "Medical-c41cab28",
+    "answer_correctness": 0.8633986257297128,
+    "rouge_score": 0.2692307692307692,
+    "question": "How does the identification of Barrett esophagus change the risk profile and surveillance strategy for esophageal cancer?"
+  },
+  {
+    "id": "Medical-4e39d9d5",
+    "answer_correctness": 0.8645144640147613,
+    "rouge_score": 0.22535211267605634,
+    "question": "What steps are necessary to diagnose and fully characterize an AML case with suspected extramedullary involvement?"
+  },
+  {
+    "id": "Medical-e99acf57",
+    "answer_correctness": 0.8670233601621914,
+    "rouge_score": 0.4090909090909091,
+    "question": "For a patient presenting with redness, swelling, and peau d’orange of the breast, what subtype and stage of breast cancer should be suspected and which diagnostic methods are indicated?"
+  },
+  {
+    "id": "Medical-ef8fe744",
+    "answer_correctness": 0.8682502375744577,
+    "rouge_score": 0.5,
+    "question": "Which diagnostic tests are necessary to confirm and further characterize invasive ductal carcinoma presenting with a breast lump?"
+  },
+  {
+    "id": "Medical-99cbd976",
+    "answer_correctness": 0.8687798749373252,
+    "rouge_score": 0.4266666666666667,
+    "question": "What distinguishes mature B-cell ALL (Burkitt leukemia) from typical B-ALL in terms of classification and treatment?"
+  },
+  {
+    "id": "Medical-15b033b6",
+    "answer_correctness": 0.8700089372331994,
+    "rouge_score": 0.4000000000000001,
+    "question": "How does the origin of ACC differ from that of pheochromocytoma, and how does this affect their typical symptoms?"
+  },
+  {
+    "id": "Medical-c76b58b2",
+    "answer_correctness": 0.8701224024597931,
+    "rouge_score": 0.2153846153846154,
+    "question": "How is the transformation of follicular lymphoma into a more aggressive disease identified and classified?"
+  },
+  {
+    "id": "Medical-29a8ae2e",
+    "answer_correctness": 0.8724862103637592,
+    "rouge_score": 0.2692307692307693,
+    "question": "Why might a pregnancy test and fertility preservation be considered in the management of CLL?"
+  },
+  {
+    "id": "Medical-03451b65",
+    "answer_correctness": 0.8730086590928938,
+    "rouge_score": 0.19999999999999998,
+    "question": "What is the recommended management for a small, noninvasive papillary thyroid carcinoma found to be less than 1 cm with no lymph node involvement?"
+  },
+  {
+    "id": "Medical-5a6b98a7",
+    "answer_correctness": 0.8755435357235182,
+    "rouge_score": 0.2727272727272727,
+    "question": "Why might symptoms of nasopharyngeal carcinoma be absent until advanced stages, and how does this affect the diagnostic process?"
+  },
+  {
+    "id": "Medical-f5089b0a",
+    "answer_correctness": 0.8767356582263253,
+    "rouge_score": 0.35,
+    "question": "What symptoms, if present together, should prompt diagnostic testing for rectal cancer using imaging and endoscopic methods?"
+  },
+  {
+    "id": "Medical-b94e5d8e",
+    "answer_correctness": 0.876757955656718,
+    "rouge_score": 0.3636363636363637,
+    "question": "If a thyroid cancer patient develops brain and bone metastases, which treatment options should be considered?"
+  },
+  {
+    "id": "Medical-4124f00f",
+    "answer_correctness": 0.8768797062854867,
+    "rouge_score": 0.27906976744186046,
+    "question": "If a patient with primary CNS lymphoma relapses in the spinal cord, which diagnostic and treatment strategies should be considered?"
+  },
+  {
+    "id": "Medical-23e6b6df",
+    "answer_correctness": 0.8784791516242834,
+    "rouge_score": 0.32142857142857145,
+    "question": "What are the two main phases of primary CNS lymphoma treatment, and which therapies are typically administered in each?"
+  },
+  {
+    "id": "Medical-032223d5",
+    "answer_correctness": 0.8784836772488167,
+    "rouge_score": 0.16129032258064516,
+    "question": "Why might a patient with a stomach mass and positive family history undergo genetic risk testing in addition to biopsy?"
+  },
+  {
+    "id": "Medical-27281f31",
+    "answer_correctness": 0.8791211727330337,
+    "rouge_score": 0.25,
+    "question": "If a patient develops lymph node recurrence after initial treatment for anal cancer, what are the recommended interventions?"
+  },
+  {
+    "id": "Medical-6624a28a",
+    "answer_correctness": 0.879859767059215,
+    "rouge_score": 0.2727272727272727,
+    "question": "How is clinical stage of throat cancer determined prior to treatment?"
+  },
+  {
+    "id": "Medical-2e2c9c8e",
+    "answer_correctness": 0.8801405436871036,
+    "rouge_score": 0.16393442622950818,
+    "question": "If a rectal cancer patient has dMMR or MSI-H, what does this indicate regarding their tumor, and what testing is required?"
+  },
+  {
+    "id": "Medical-727f425f",
+    "answer_correctness": 0.881294641065304,
+    "rouge_score": 0.2222222222222222,
+    "question": "What follow-up strategies are recommended for a patient on active surveillance for localized prostate cancer?"
+  },
+  {
+    "id": "Medical-7c1c087a",
+    "answer_correctness": 0.8813337111780908,
+    "rouge_score": 0.24000000000000002,
+    "question": "How does the presence of serosa impact the potential for cancer to spread outside the gallbladder or bile duct?"
+  },
+  {
+    "id": "Medical-24373ebe",
+    "answer_correctness": 0.8814307328403825,
+    "rouge_score": 0.2181818181818182,
+    "question": "How does the disease phase of CML affect the types of blood cells present?"
+  },
+  {
+    "id": "Medical-ee49f3e8",
+    "answer_correctness": 0.8817250997180204,
+    "rouge_score": 0.13793103448275862,
+    "question": "Why is surgery not typically a treatment option for Stage 4 NSCLC?"
+  },
+  {
+    "id": "Medical-f078c897",
+    "answer_correctness": 0.8823256656034779,
+    "rouge_score": 0.3278688524590164,
+    "question": "Why is the lamina propria not included in the definition of carcinoma in situ for intrahepatic bile duct cancer?"
+  },
+  {
+    "id": "Medical-732c4e13",
+    "answer_correctness": 0.8824628205077465,
+    "rouge_score": 0.20588235294117646,
+    "question": "How does performance status influence treatment eligibility for glioma patients, and how is it assessed?"
+  },
+  {
+    "id": "Medical-d256aef2",
+    "answer_correctness": 0.883306284504695,
+    "rouge_score": 0.24489795918367344,
+    "question": "If a patient with nasopharyngeal carcinoma presents with enlarged lymph nodes, what does this indicate about possible disease spread and staging?"
+  },
+  {
+    "id": "Medical-55f0c0e2",
+    "answer_correctness": 0.883468939753922,
+    "rouge_score": 0.3333333333333333,
+    "question": "Why is actinic keratosis considered a risk factor for CSCC, and how is it managed to prevent progression?"
+  },
+  {
+    "id": "Medical-0d237b40",
+    "answer_correctness": 0.8836126526713897,
+    "rouge_score": 0.3404255319148936,
+    "question": "Which metastatic sites are most common in nasopharyngeal carcinoma and how is this reflected in the ontology?"
+  },
+  {
+    "id": "Medical-f4972c91",
+    "answer_correctness": 0.8840799851543345,
+    "rouge_score": 0.42857142857142855,
+    "question": "Which treatments are used for metastatic differentiated thyroid cancer that is iodine-avid and which are considered if the disease is not iodine-avid?"
+  },
+  {
+    "id": "Medical-f79d978d",
+    "answer_correctness": 0.8841135410556188,
+    "rouge_score": 0.2950819672131148,
+    "question": "How does the presence of a lung nodule on imaging affect the diagnostic workflow for lung cancer?"
+  },
+  {
+    "id": "Medical-82f4c628",
+    "answer_correctness": 0.8845218035575495,
+    "rouge_score": 0.3823529411764705,
+    "question": "How does the disease site differ between B-cell lymphoblastic lymphoma and T-cell lymphoblastic lymphoma, and what does this imply for clinical presentation?"
+  },
+  {
+    "id": "Medical-648df362",
+    "answer_correctness": 0.8847057738367143,
+    "rouge_score": 0.2456140350877193,
+    "question": "What distinguishes Wilms tumor from other kidney cancer subtypes in terms of patient population and classification?"
+  },
+  {
+    "id": "Medical-95283550",
+    "answer_correctness": 0.8866055121904628,
+    "rouge_score": 0.39999999999999997,
+    "question": "Which metastatic anal cancer patients are eligible for immunotherapy, and which drugs are recommended in this setting?"
+  },
+  {
+    "id": "Medical-daeae948",
+    "answer_correctness": 0.8874060253432798,
+    "rouge_score": 0.39344262295081966,
+    "question": "What are the most common and less common subtypes of RCC, and how are they organized?"
+  },
+  {
+    "id": "Medical-fbc9e7ec",
+    "answer_correctness": 0.8951676361070166,
+    "rouge_score": 0.25,
+    "question": "What supportive care measures are recommended at any stage for primary CNS lymphoma patients experiencing severe side effects from treatment?"
+  },
+  {
+    "id": "Medical-18263083",
+    "answer_correctness": 0.8986333379092212,
+    "rouge_score": 0.19999999999999998,
+    "question": "Which risk factors should be considered when assessing a patient's likelihood of developing bladder cancer?"
+  },
+  {
+    "id": "Medical-2529e505",
+    "answer_correctness": 0.90017865999709,
+    "rouge_score": 0.36000000000000004,
+    "question": "What distinguishes cutaneous B-cell lymphoma from cutaneous T-cell lymphoma in terms of cell of origin and cancer subtype?"
+  },
+  {
+    "id": "Medical-213bbcca",
+    "answer_correctness": 0.9008334488170632,
+    "rouge_score": 0.39999999999999997,
+    "question": "What are the main histological subtypes of cervical cancer and how do their frequencies compare?"
+  },
+  {
+    "id": "Medical-30e7caf0",
+    "answer_correctness": 0.9008395165528886,
+    "rouge_score": 0.27777777777777773,
+    "question": "Which diagnostic methods are required to confirm throat cancer and determine its biomarkers?"
+  },
+  {
+    "id": "Medical-a7fb4f11",
+    "answer_correctness": 0.9011635946772066,
+    "rouge_score": 0.1875,
+    "question": "How does the management plan for CLL change if a patient develops Richter transformation?"
+  },
+  {
+    "id": "Medical-0a90f1f2",
+    "answer_correctness": 0.9020360307187252,
+    "rouge_score": 0.20338983050847456,
+    "question": "How does the management of recurrent basal cell carcinoma differ from initial treatment, and what factors influence this?"
+  },
+  {
+    "id": "Medical-4e5d3831",
+    "answer_correctness": 0.9027075374430062,
+    "rouge_score": 0.1923076923076923,
+    "question": "What role does imaging play in the diagnosis and surveillance of ovarian cancer?"
+  },
+  {
+    "id": "Medical-321f2f6d",
+    "answer_correctness": 0.9029300289840938,
+    "rouge_score": 0.6363636363636364,
+    "question": "What staging system is used for throat cancer, and which parameters does it incorporate?"
+  },
+  {
+    "id": "Medical-50fe4cfa",
+    "answer_correctness": 0.9030957194908716,
+    "rouge_score": 0.17910447761194032,
+    "question": "Why should all rectal tumors be tested for mismatch repair deficiency or microsatellite instability-high, especially in patients with Lynch syndrome?"
+  },
+  {
+    "id": "Medical-ec0be6f4",
+    "answer_correctness": 0.9044066265844771,
+    "rouge_score": 0.32142857142857145,
+    "question": "How is the treatment approach different for a patient with Stage III anal cancer compared to one with Stage IV disease?"
+  },
+  {
+    "id": "Medical-ac502742",
+    "answer_correctness": 0.9097000583892714,
+    "rouge_score": 0.25,
+    "question": "How can PD-L1 expression influence the treatment of throat cancer?"
+  },
+  {
+    "id": "Medical-79d13dd8",
+    "answer_correctness": 0.9128511058233526,
+    "rouge_score": 0.36000000000000004,
+    "question": "What follow-up and surveillance methods are recommended after initial treatment of non–muscle-invasive bladder cancer?"
+  },
+  {
+    "id": "Medical-ee644399",
+    "answer_correctness": 0.922531546530319,
+    "rouge_score": 0.2909090909090909,
+    "question": "Why is lobectomy preferred over total thyroidectomy for some small, low-risk differentiated thyroid cancers?"
+  },
+  {
+    "id": "Medical-31580ac0",
+    "answer_correctness": 0.9228222858200303,
+    "rouge_score": 0.3793103448275862,
+    "question": "Which liver cancer subtype is most likely to be found in younger patients, and what are the main risk factors for its parent cancer type?"
+  },
+  {
+    "id": "Medical-fd4cca6e",
+    "answer_correctness": 0.9236963182937166,
+    "rouge_score": 0.3181818181818182,
+    "question": "When is local excision considered as a treatment option in anal cancer, and what are the tumor characteristics that support this choice?"
+  },
+  {
+    "id": "Medical-0e57f27f",
+    "answer_correctness": 0.9241881261947447,
+    "rouge_score": 0.28125,
+    "question": "When should a clinical trial be considered for a thyroid cancer patient, and what disease characteristics warrant this recommendation?"
+  },
+  {
+    "id": "Medical-3aa8a2c6",
+    "answer_correctness": 0.9282878109414814,
+    "rouge_score": 0.24657534246575344,
+    "question": "How does the site of disease involvement influence the presentation of follicular lymphoma symptoms?"
+  },
+  {
+    "id": "Medical-25c17c3d",
+    "answer_correctness": 0.9365046315699288,
+    "rouge_score": 0.5,
+    "question": "What treatments are recommended for advanced or metastatic pancreatic ductal adenocarcinoma?"
+  },
+  {
+    "id": "Medical-ce7076ea",
+    "answer_correctness": 0.9764377903379765,
+    "rouge_score": 0.1694915254237288,
+    "question": "Why is a comprehensive metabolic panel and assessment of performance status important before starting CLL treatment?"
+  },
+  {
+    "id": "Medical-322bb52d",
+    "answer_correctness": 0.9770739310057724,
+    "rouge_score": 0.12,
+    "question": "How do medical and family history contribute to the diagnostic process for BCC in a patient with a suspicious skin lesion?"
+  },
+  {
+    "id": "Medical-c22fc609",
+    "answer_correctness": 0.9771489332321055,
+    "rouge_score": 0.1923076923076923,
+    "question": "Why must both performance status and nutritional assessment be included in the diagnostic workup for esophageal cancer?"
+  },
+  {
+    "id": "Medical-0125ebb1",
+    "answer_correctness": 0.978206605409111,
+    "rouge_score": 0.2068965517241379,
+    "question": "How do Gleason score and Grade Group contribute to the management of prostate cancer?"
+  },
+  {
+    "id": "Medical-34a70628",
+    "answer_correctness": 0.978592779902554,
+    "rouge_score": 0.18604651162790697,
+    "question": "Which population is most at risk for developing mediastinal gray zone lymphoma based on epidemiology?"
+  },
+  {
+    "id": "Medical-56e2a338",
+    "answer_correctness": 0.9788001578347658,
+    "rouge_score": 0.30769230769230765,
+    "question": "If a stomach cancer is found to be confined to the mucosa and there is no lymph node involvement, what is the stage and which stomach wall layer is affected?"
+  },
+  {
+    "id": "Medical-ad0cc053",
+    "answer_correctness": 0.9796831510575612,
+    "rouge_score": 0.08695652173913045,
+    "question": "If a nasopharyngeal carcinoma patient has both high EBV DNA levels and poor performance status, what does this indicate about their prognosis?"
+  },
+  {
+    "id": "Medical-ee302181",
+    "answer_correctness": 0.9806415627349065,
+    "rouge_score": 0.208955223880597,
+    "question": "Why is it important to perform both flow cytometry and molecular testing in newly diagnosed AML?"
+  },
+  {
+    "id": "Medical-c8dd3e29",
+    "answer_correctness": 0.98064261024656,
+    "rouge_score": 0.14285714285714285,
+    "question": "How do immune suppression and prior radiation therapy interact to affect BCC risk and management?"
+  },
+  {
+    "id": "Medical-a0c1c9cd",
+    "answer_correctness": 0.9809174943558083,
+    "rouge_score": 0.2641509433962264,
+    "question": "Why is the anatomical knowledge of layers like lamina propria and muscularis important for understanding tumor invasion in bile duct cancer?"
+  },
+  {
+    "id": "Medical-1852bc75",
+    "answer_correctness": 0.9809960741396473,
+    "rouge_score": 0.22857142857142856,
+    "question": "What is the rationale for using both oral medications and IV infusions in the treatment of CLL?"
+  },
+  {
+    "id": "Medical-e1ef9e9b",
+    "answer_correctness": 0.9811013372169802,
+    "rouge_score": 0.17142857142857143,
+    "question": "If a patient presents with enlarged lymph nodes and the diagnosis is B-cell lymphoblastic lymphoma, what does this indicate about the disease site and cell of origin?"
+  },
+  {
+    "id": "Medical-370cff35",
+    "answer_correctness": 0.9816556853961336,
+    "rouge_score": 0.15384615384615385,
+    "question": "How does stomach cancer typically progress from a precancerous state to metastatic disease?"
+  },
+  {
+    "id": "Medical-0030eab4",
+    "answer_correctness": 0.9822596935856054,
+    "rouge_score": 0.35555555555555557,
+    "question": "What combination of cell types is used to determine the grade of follicular lymphoma and how does this affect management?"
+  },
+  {
+    "id": "Medical-58981bbb",
+    "answer_correctness": 0.9823366223674678,
+    "rouge_score": 0.391304347826087,
+    "question": "What combination of cell type and clinical presentation would suggest a diagnosis of cutaneous B-cell lymphoma rather than T-cell lymphoma?"
+  },
+  {
+    "id": "Medical-48843076",
+    "answer_correctness": 0.9828525013638041,
+    "rouge_score": 0.10389610389610389,
+    "question": "How does the location and stage of a mouth tumor influence treatment planning?"
+  },
+  {
+    "id": "Medical-7718481e",
+    "answer_correctness": 0.9835986124261257,
+    "rouge_score": 0.2857142857142857,
+    "question": "If imaging and biochemical tests reveal an adrenal mass with excess aldosterone, what is the most probable diagnosis?"
+  },
+  {
+    "id": "Medical-26ced7a1",
+    "answer_correctness": 0.9837904126239474,
+    "rouge_score": 0.14035087719298242,
+    "question": "How are endoscopic and surgical options distinguished for early-stage rectal tumors?"
+  },
+  {
+    "id": "Medical-e9900b5c",
+    "answer_correctness": 0.9838118074315306,
+    "rouge_score": 0.16,
+    "question": "Why is androgen deprivation therapy a key component in the management of metastatic prostate cancer?"
+  },
+  {
+    "id": "Medical-f034d77d",
+    "answer_correctness": 0.9839006394200716,
+    "rouge_score": 0.12698412698412698,
+    "question": "How does UV radiation contribute to both the development and recurrence of basal cell carcinoma?"
+  },
+  {
+    "id": "Medical-aa1b8dbb",
+    "answer_correctness": 0.984424677724377,
+    "rouge_score": 0.1568627450980392,
+    "question": "How does a patient's performance status influence nasopharyngeal carcinoma treatment planning?"
+  },
+  {
+    "id": "Medical-4191d4b2",
+    "answer_correctness": 0.9844619286800343,
+    "rouge_score": 0.125,
+    "question": "Which two diagnostic methods are essential for both initial detection and definitive classification of glioma?"
+  },
+  {
+    "id": "Medical-04e9f25b",
+    "answer_correctness": 0.9848295723293752,
+    "rouge_score": 0.3076923076923077,
+    "question": "Which imaging modalities are used both for staging and surveillance in cervical cancer management?"
+  },
+  {
+    "id": "Medical-b016ff7a",
+    "answer_correctness": 0.9849431564432884,
+    "rouge_score": 0.16901408450704225,
+    "question": "Why is depth of invasion (DOI) important in the TNM staging of mouth cancer?"
+  },
+  {
+    "id": "Medical-4d6219bc",
+    "answer_correctness": 0.9852880135034443,
+    "rouge_score": 0.25806451612903225,
+    "question": "Why is pharmacogenomic and biomarker testing important in the management of pediatric ALL?"
+  },
+  {
+    "id": "Medical-8d55a40b",
+    "answer_correctness": 0.985482560459791,
+    "rouge_score": 0.18181818181818182,
+    "question": "Which cancer type is characterized by the development of abnormal lymphocytes in the skin and can originate from either B or T cells?"
+  },
+  {
+    "id": "Medical-4987de7f",
+    "answer_correctness": 0.9855397277808533,
+    "rouge_score": 0.3,
+    "question": "What are the cellular and molecular hallmarks required to definitively diagnose CML?"
+  },
+  {
+    "id": "Medical-41284331",
+    "answer_correctness": 0.9856399495795606,
+    "rouge_score": 0.5000000000000001,
+    "question": "If a tumor is described as intraductal and confined to the epithelium, what stage and tumor characteristic does it correspond to in intrahepatic bile duct cancer?"
+  },
+  {
+    "id": "Medical-2521e4dd",
+    "answer_correctness": 0.9857811906162339,
+    "rouge_score": 0.16326530612244897,
+    "question": "Why is genetic testing for BRCA mutations recommended for all ovarian cancer patients?"
+  },
+  {
+    "id": "Medical-a9a52704",
+    "answer_correctness": 0.985971557016738,
+    "rouge_score": 0.2222222222222222,
+    "question": "What combination of anatomical location and cell type defines basal cell carcinoma?"
+  },
+  {
+    "id": "Medical-50bafb57",
+    "answer_correctness": 0.986055981262729,
+    "rouge_score": 0.24,
+    "question": "Which blood cell types are abnormally increased in CML and what underlying cellular process causes this?"
+  },
+  {
+    "id": "Medical-c69c2732",
+    "answer_correctness": 0.9865237428976926,
+    "rouge_score": 0.44897959183673475,
+    "question": "What follow-up strategy is recommended for a patient treated for BCC on the neck, and why?"
+  },
+  {
+    "id": "Medical-ddde0e24",
+    "answer_correctness": 0.9867960964455949,
+    "rouge_score": 0.3278688524590164,
+    "question": "For which AML patients is hematopoietic cell transplant considered and what factors influence this decision?"
+  },
+  {
+    "id": "Medical-5459ea22",
+    "answer_correctness": 0.986936827001285,
+    "rouge_score": 0.391304347826087,
+    "question": "Why is a tumor classified as Tis (carcinoma in situ) in intrahepatic bile duct cancer only found in the epithelium and not in deeper layers?"
+  },
+  {
+    "id": "Medical-299b8b83",
+    "answer_correctness": 0.987107144933324,
+    "rouge_score": 0.2711864406779661,
+    "question": "How do risk factors and performance status together influence mouth cancer management?"
+  },
+  {
+    "id": "Medical-f978cb28",
+    "answer_correctness": 0.9872632398371847,
+    "rouge_score": 0.22580645161290325,
+    "question": "What is the role of clinical trials in the management of advanced or refractory CSCC?"
+  },
+  {
+    "id": "Medical-604c9d44",
+    "answer_correctness": 0.9872729753581092,
+    "rouge_score": 0.21875000000000003,
+    "question": "Why is a patient with fair skin and a history of organ transplant at particularly high risk for developing basal cell carcinoma?"
+  },
+  {
+    "id": "Medical-1c53b384",
+    "answer_correctness": 0.9872893974434551,
+    "rouge_score": 0.1694915254237288,
+    "question": "What combination of risk factors should prompt clinicians to consider nasopharyngeal carcinoma in a differential diagnosis?"
+  },
+  {
+    "id": "Medical-7faeddee",
+    "answer_correctness": 0.9873973719140854,
+    "rouge_score": 0.4,
+    "question": "If a patient presents with an ulcer and mass in the stomach, what cancer subtype is most likely and what is the cell of origin?"
+  },
+  {
+    "id": "Medical-b3fece20",
+    "answer_correctness": 0.9874677915382718,
+    "rouge_score": 0.21875,
+    "question": "Why should germline genetic testing be considered for a patient with metastatic prostate cancer?"
+  },
+  {
+    "id": "Medical-cdce534a",
+    "answer_correctness": 0.9876843356222363,
+    "rouge_score": 0.37209302325581395,
+    "question": "In what situation would a pediatric ALL patient receive supportive care in addition to systemic therapy?"
+  },
+  {
+    "id": "Medical-346b12e8",
+    "answer_correctness": 0.987782280268539,
+    "rouge_score": 0.21875,
+    "question": "Why is annual follow-up with full skin exams critical for patients with a history of BCC?"
+  },
+  {
+    "id": "Medical-a4ac550d",
+    "answer_correctness": 0.987843563780168,
+    "rouge_score": 0.27586206896551724,
+    "question": "What is the rationale for using both steroids and multiagent chemotherapy in the treatment of all pediatric ALL patients?"
+  },
+  {
+    "id": "Medical-25d1d605",
+    "answer_correctness": 0.9878611467847812,
+    "rouge_score": 0.21052631578947364,
+    "question": "Why should fertility preservation be discussed with certain mouth cancer patients before treatment?"
+  },
+  {
+    "id": "Medical-7fba506d",
+    "answer_correctness": 0.9880055852593821,
+    "rouge_score": 0.16,
+    "question": "How does the anatomical location within the stomach influence the potential spread of cancer to nearby organs?"
+  },
+  {
+    "id": "Medical-6428d1f1",
+    "answer_correctness": 0.9881776387384896,
+    "rouge_score": 0.3125,
+    "question": "Why is chemoradiation the standard of care for locally advanced cervical cancer rather than surgery?"
+  },
+  {
+    "id": "Medical-db5aa2e3",
+    "answer_correctness": 0.9881833270514715,
+    "rouge_score": 0.25,
+    "question": "What distinguishes Mohs surgery from other surgical options in the treatment of high-risk local CSCC?"
+  },
+  {
+    "id": "Medical-984c0f56",
+    "answer_correctness": 0.9884503562841153,
+    "rouge_score": 0.41379310344827586,
+    "question": "How does the spread of early-stage versus locoregional stomach cancer differ in terms of stomach wall invasion and lymph node involvement?"
+  },
+  {
+    "id": "Medical-2ca88e8f",
+    "answer_correctness": 0.9885855633757764,
+    "rouge_score": 0.27450980392156865,
+    "question": "What factors determine the specific treatment regimen for a pediatric ALL patient?"
+  },
+  {
+    "id": "Medical-a13a1285",
+    "answer_correctness": 0.9886351785988476,
+    "rouge_score": 0.34146341463414637,
+    "question": "What are the distinguishing features between Stage 0 and Stage IV breast cancer in terms of pathology and clinical management?"
+  },
+  {
+    "id": "Medical-a73aa030",
+    "answer_correctness": 0.9886985220457944,
+    "rouge_score": 0.27272727272727276,
+    "question": "Why is polypectomy during colonoscopy considered a preventive strategy for rectal cancer?"
+  },
+  {
+    "id": "Medical-04fc1c61",
+    "answer_correctness": 0.9887543372213013,
+    "rouge_score": 0.339622641509434,
+    "question": "How does the age of a patient influence the management of ALL, and which patient populations are most commonly affected?"
+  },
+  {
+    "id": "Medical-1eab8fa2",
+    "answer_correctness": 0.9887786858694119,
+    "rouge_score": 0.3137254901960784,
+    "question": "Why should a patient with a family history of skin cancer and light eye color be particularly vigilant about skin changes?"
+  },
+  {
+    "id": "Medical-689b17ad",
+    "answer_correctness": 0.9891346677877524,
+    "rouge_score": 0.3333333333333333,
+    "question": "Which biomarker should be tested both before and after treatment in nasopharyngeal carcinoma patients, and why is this monitoring important?"
+  },
+  {
+    "id": "Medical-fe7f2575",
+    "answer_correctness": 0.989394070874977,
+    "rouge_score": 0.2857142857142857,
+    "question": "What two performance status scales are considered when planning treatment for primary bone cancer?"
+  },
+  {
+    "id": "Medical-b0ec1abf",
+    "answer_correctness": 0.9894982251609912,
+    "rouge_score": 0.17391304347826086,
+    "question": "What is the rationale for using both PSA testing and imaging in the follow-up of advanced prostate cancer?"
+  },
+  {
+    "id": "Medical-fe83d01e",
+    "answer_correctness": 0.9895456996891828,
+    "rouge_score": 0.47058823529411764,
+    "question": "What two assessments are necessary for comprehensive care due to the effects of mouth cancer and its treatment on dental health and swallowing?"
+  },
+  {
+    "id": "Medical-01e3a9ea",
+    "answer_correctness": 0.989688292925684,
+    "rouge_score": 0.2571428571428572,
+    "question": "Why might a patient with a shiny bump and a history of radiation therapy require both imaging and biopsy for diagnosis?"
+  },
+  {
+    "id": "Medical-213847bd",
+    "answer_correctness": 0.9897818855682652,
+    "rouge_score": 0.4444444444444445,
+    "question": "Why is clinical trial enrollment especially considered for certain B-ALL and T-ALL cases in children?"
+  },
+  {
+    "id": "Medical-06055fa9",
+    "answer_correctness": 0.9898137527695761,
+    "rouge_score": 0.2051282051282051,
+    "question": "How does the TNM system integrate with tumor grade to determine the stage of primary bone cancer?"
+  },
+  {
+    "id": "Medical-4d01de98",
+    "answer_correctness": 0.989815700051028,
+    "rouge_score": 0.2622950819672131,
+    "question": "How do blood stem cells contribute to the abnormal blood cell profile observed in CML?"
+  },
+  {
+    "id": "Medical-22b8a5ee",
+    "answer_correctness": 0.9898467583112427,
+    "rouge_score": 0.375,
+    "question": "How is small lymphocytic lymphoma (SLL) differentiated from chronic lymphocytic leukemia (CLL) in terms of primary site and diagnostic approach?"
+  },
+  {
+    "id": "Medical-00ef7b5d",
+    "answer_correctness": 0.9899136397396132,
+    "rouge_score": 0.21212121212121213,
+    "question": "How are dMMR/MSI-H and pMMR/MSS statuses determined and how do they influence therapy choices?"
+  },
+  {
+    "id": "Medical-68c30458",
+    "answer_correctness": 0.990104243048658,
+    "rouge_score": 0.2222222222222222,
+    "question": "What is the rationale for recommending molecular testing after a biopsy in glioma diagnosis?"
+  },
+  {
+    "id": "Medical-3447851a",
+    "answer_correctness": 0.9902488126963712,
+    "rouge_score": 0.4324324324324324,
+    "question": "Why should young adults with colon cancer be counseled about fertility preservation before treatment?"
+  },
+  {
+    "id": "Medical-2e171c34",
+    "answer_correctness": 0.9903040823101315,
+    "rouge_score": 0.24615384615384617,
+    "question": "How do risk group classification and molecular biomarker testing together influence treatment selection in prostate cancer?"
+  },
+  {
+    "id": "Medical-ebfc4679",
+    "answer_correctness": 0.9906413591093188,
+    "rouge_score": 0.22641509433962265,
+    "question": "What is the relationship between adenocarcinoma, adenomas, and the development of colon cancer?"
+  },
+  {
+    "id": "Medical-c31057de",
+    "answer_correctness": 0.9906621208207005,
+    "rouge_score": 0.3733333333333333,
+    "question": "What evidence supports the use of both health history and physical exam in the diagnostic workup for Hodgkin lymphoma?"
+  },
+  {
+    "id": "Medical-b2b43c1e",
+    "answer_correctness": 0.9907161671639031,
+    "rouge_score": 0.23529411764705882,
+    "question": "Which bone sarcoma subtype is most likely to originate from cartilage-forming cells, and what biomarker is relevant for its targeted therapy?"
+  },
+  {
+    "id": "Medical-669af50b",
+    "answer_correctness": 0.9911370948613375,
+    "rouge_score": 0.20338983050847456,
+    "question": "How does performance status impact the treatment plan for an AML patient?"
+  },
+  {
+    "id": "Medical-8ff5dd5a",
+    "answer_correctness": 0.9912162645851408,
+    "rouge_score": 0.33333333333333337,
+    "question": "Why might systemic therapy be considered for a patient with BCC that has spread to distant sites?"
+  },
+  {
+    "id": "Medical-97022167",
+    "answer_correctness": 0.9914241813718201,
+    "rouge_score": 0.24324324324324323,
+    "question": "How does the origin of colon cancer from adenomas influence early detection and prevention strategies?"
+  },
+  {
+    "id": "Medical-7bf81d77",
+    "answer_correctness": 0.9914584397648702,
+    "rouge_score": 0.3076923076923077,
+    "question": "Why does carcinoma in situ not involve spread to blood vessels or the liver?"
+  },
+  {
+    "id": "Medical-1892185a",
+    "answer_correctness": 0.9915917816306131,
+    "rouge_score": 0.4090909090909091,
+    "question": "What is the role of p16 protein in distinguishing subtypes of squamous cell carcinoma in the oropharynx?"
+  },
+  {
+    "id": "Medical-edc3c6eb",
+    "answer_correctness": 0.9916645672290749,
+    "rouge_score": 0.45614035087719296,
+    "question": "Why is lung cancer screening particularly important for individuals exposed to air pollution and diesel fumes?"
+  },
+  {
+    "id": "Medical-d1a87cb4",
+    "answer_correctness": 0.9917986158547035,
+    "rouge_score": 0.3076923076923077,
+    "question": "What combination of clinical findings and diagnostic results would indicate metastatic breast cancer (Stage IV)?"
+  },
+  {
+    "id": "Medical-2ebcf55d",
+    "answer_correctness": 0.9918204080098674,
+    "rouge_score": 0.4444444444444444,
+    "question": "What is the clinical significance of detecting a 17p deletion or TP53 mutation in CLL patients?"
+  },
+  {
+    "id": "Medical-14016ce3",
+    "answer_correctness": 0.9919126594862396,
+    "rouge_score": 0.2857142857142857,
+    "question": "What is the rationale for recommending surgery as the most common treatment for BCC lesions on sun-exposed areas?"
+  },
+  {
+    "id": "Medical-ec84ae56",
+    "answer_correctness": 0.992098482697272,
+    "rouge_score": 0.23529411764705885,
+    "question": "Why would a patient with FLT3-ITD mutated AML receive a targeted therapy in addition to chemotherapy?"
+  },
+  {
+    "id": "Medical-a7826934",
+    "answer_correctness": 0.992117001773291,
+    "rouge_score": 0.32,
+    "question": "Explain the relationship between the Philadelphia chromosome, BCR::ABL1 fusion gene, and the origin of CML."
+  },
+  {
+    "id": "Medical-56131016",
+    "answer_correctness": 0.9921260689524642,
+    "rouge_score": 0.2545454545454546,
+    "question": "How do family history and older age together influence the risk and screening approach for CLL?"
+  },
+  {
+    "id": "Medical-4fe06961",
+    "answer_correctness": 0.9921511665039373,
+    "rouge_score": 0.35294117647058826,
+    "question": "What is the sequence of genetic and chromosomal events leading to CML?"
+  },
+  {
+    "id": "Medical-cfc21569",
+    "answer_correctness": 0.9921615979358265,
+    "rouge_score": 0.2631578947368421,
+    "question": "Why is liver cancer screening with ultrasound and AFP test recommended every 6 months for some individuals?"
+  },
+  {
+    "id": "Medical-8488f954",
+    "answer_correctness": 0.9922391598287601,
+    "rouge_score": 0.26666666666666666,
+    "question": "How does performance status influence the treatment plan for a patient with metastatic breast cancer?"
+  },
+  {
+    "id": "Medical-072545c5",
+    "answer_correctness": 0.9923437181327317,
+    "rouge_score": 0.14492753623188406,
+    "question": "What is the role of molecular tests in the management of thyroid nodules and how do they impact surgical decisions?"
+  },
+  {
+    "id": "Medical-7ea7ec68",
+    "answer_correctness": 0.9924072509174923,
+    "rouge_score": 0.20338983050847456,
+    "question": "Why would a patient with a history of exposure to asbestos and a persistent cough be prioritized for lung cancer screening?"
+  },
+  {
+    "id": "Medical-cfab4b2d",
+    "answer_correctness": 0.9924170178483609,
+    "rouge_score": 0.3389830508474576,
+    "question": "Why is immunotherapy with checkpoint inhibitors recommended for some colon cancer patients but not others?"
+  },
+  {
+    "id": "Medical-bb678310",
+    "answer_correctness": 0.9924453407462221,
+    "rouge_score": 0.372093023255814,
+    "question": "What is the hierarchical relationship between non-Hodgkin lymphoma, primary cutaneous lymphoma, and cutaneous B-cell lymphoma?"
+  },
+  {
+    "id": "Medical-91742d51",
+    "answer_correctness": 0.9928991038909971,
+    "rouge_score": 0.26086956521739135,
+    "question": "Why is glioblastoma associated with the worst prognosis among glioma subtypes?"
+  },
+  {
+    "id": "Medical-166bcaa7",
+    "answer_correctness": 0.9929028775934743,
+    "rouge_score": 0.3225806451612903,
+    "question": "Why is Siewert type classification particularly important in the staging and treatment planning of tumors at the esophagogastric junction?"
+  },
+  {
+    "id": "Medical-ffffe4b8",
+    "answer_correctness": 0.992940131263682,
+    "rouge_score": 0.417910447761194,
+    "question": "How is platinum-resistant ovarian cancer managed differently from platinum-sensitive recurrence?"
+  },
+  {
+    "id": "Medical-fd151825",
+    "answer_correctness": 0.9929885154138283,
+    "rouge_score": 0.4642857142857143,
+    "question": "Which patients with anal cancer should be encouraged to enroll in clinical trials, and what phases might these trials include?"
+  },
+  {
+    "id": "Medical-5b17d14f",
+    "answer_correctness": 0.9930339940715637,
+    "rouge_score": 0.3157894736842105,
+    "question": "Why are hyperplastic and inflammatory polyps less concerning than adenomas in colon cancer prevention?"
+  },
+  {
+    "id": "Medical-ac117ebf",
+    "answer_correctness": 0.9932648017169932,
+    "rouge_score": 0.3,
+    "question": "Why is a biopsy essential in both the diagnosis and management planning for breast cancer?"
+  },
+  {
+    "id": "Medical-0955a900",
+    "answer_correctness": 0.9932777158482811,
+    "rouge_score": 0.5454545454545455,
+    "question": "How does the presence of both hepatitis B and alcohol use affect liver cancer risk, and what does the ontology indicate about their combined effect?"
+  },
+  {
+    "id": "Medical-1eda4787",
+    "answer_correctness": 0.9934626717174962,
+    "rouge_score": 0.3793103448275862,
+    "question": "Which patients with breast cancer should receive fertility preservation counseling before treatment, and why?"
+  },
+  {
+    "id": "Medical-a6155d9a",
+    "answer_correctness": 0.9934768571087778,
+    "rouge_score": 0.4727272727272727,
+    "question": "Which systemic therapies may be considered for bone sarcoma patients with MSI-H, dMMR, or TMB-H, and what is the biomarker testing relevance?"
+  },
+  {
+    "id": "Medical-1a56336a",
+    "answer_correctness": 0.9937299872087142,
+    "rouge_score": 0.5777777777777778,
+    "question": "What distinguishes B-cell lymphoblastic lymphoma (B-LL, B-LBL) from B-cell ALL in terms of disease site?"
+  },
+  {
+    "id": "Medical-c5b8734d",
+    "answer_correctness": 0.9937946452527369,
+    "rouge_score": 0.608695652173913,
+    "question": "What distinguishes carcinoma in situ from invasive bile duct cancer based on histological layers?"
+  },
+  {
+    "id": "Medical-24f2e8ea",
+    "answer_correctness": 0.993899289802683,
+    "rouge_score": 0.27999999999999997,
+    "question": "How does the presence of HER2 positivity alter the systemic therapy options for invasive breast cancer?"
+  },
+  {
+    "id": "Medical-4777cfbb",
+    "answer_correctness": 0.9939160380208067,
+    "rouge_score": 0.2972972972972973,
+    "question": "Why would a child with an enlarged thymus and breathing problems be evaluated for T-cell ALL rather than B-cell ALL?"
+  },
+  {
+    "id": "Medical-594504cc",
+    "answer_correctness": 0.9940317413373867,
+    "rouge_score": 0.3870967741935484,
+    "question": "What genetic and biomarker testing is necessary for ALL patients and how does it impact therapy selection?"
+  },
+  {
+    "id": "Medical-c57bf64d",
+    "answer_correctness": 0.9941723032555747,
+    "rouge_score": 0.23529411764705885,
+    "question": "How does family history affect AML risk assessment, and what additional steps should be taken in such cases?"
+  },
+  {
+    "id": "Medical-803f66d8",
+    "answer_correctness": 0.9943121245553238,
+    "rouge_score": 0.37288135593220345,
+    "question": "Why is elevated alpha-fetoprotein (AFP) particularly significant in the context of primary liver cancer screening and diagnosis?"
+  },
+  {
+    "id": "Medical-5e710a7f",
+    "answer_correctness": 0.9943190260487793,
+    "rouge_score": 0.5116279069767442,
+    "question": "Which adrenal tumor is most commonly associated with children under 5, and what is a key difference in its spread compared to benign tumors?"
+  },
+  {
+    "id": "Medical-65f00413",
+    "answer_correctness": 0.9944058081813224,
+    "rouge_score": 0.37931034482758624,
+    "question": "How does the treatment strategy differ between localized low-risk and metastatic prostate cancer?"
+  },
+  {
+    "id": "Medical-b2a64d4a",
+    "answer_correctness": 0.9948808280516828,
+    "rouge_score": 0.45161290322580644,
+    "question": "Which cell type is diagnostic for the most common subtype of Hodgkin lymphoma, and how is this subtype classified in the ontology?"
+  },
+  {
+    "id": "Medical-f3048835",
+    "answer_correctness": 0.995119680426336,
+    "rouge_score": 0.42105263157894735,
+    "question": "What are the main differences in treatment between early and locally advanced NSCLC?"
+  },
+  {
+    "id": "Medical-0be2176d",
+    "answer_correctness": 0.9952291629116683,
+    "rouge_score": 0.35714285714285715,
+    "question": "Why might a patient with FRα-positive platinum-resistant ovarian cancer be treated with mirvetuximab soravtansine-gynx?"
+  },
+  {
+    "id": "Medical-54a3a465",
+    "answer_correctness": 0.9954369271463765,
+    "rouge_score": 0.5909090909090909,
+    "question": "Which maintenance therapies are recommended for a patient with advanced ovarian cancer who is BRCA-mutated after initial treatment?"
+  },
+  {
+    "id": "Medical-136a5739",
+    "answer_correctness": 0.9956559238474814,
+    "rouge_score": 0.35000000000000003,
+    "question": "Which two polyp types are unlikely to progress to rectal cancer, and how does this contrast with adenomas?"
+  },
+  {
+    "id": "Medical-6bd5b75d",
+    "answer_correctness": 0.9956626535099165,
+    "rouge_score": 0.4864864864864865,
+    "question": "What is the rationale for performing a sentinel lymph node biopsy in invasive breast cancer and not in DCIS?"
+  },
+  {
+    "id": "Medical-8b99b755",
+    "answer_correctness": 0.9957315639667522,
+    "rouge_score": 0.3684210526315789,
+    "question": "How does the management of high-risk local CSCC differ from low-risk local CSCC in terms of treatment and follow-up?"
+  },
+  {
+    "id": "Medical-27c72004",
+    "answer_correctness": 0.9957806426539059,
+    "rouge_score": 0.5263157894736842,
+    "question": "How do tobacco and alcohol use impact both the risk and outcomes of mouth cancer treatment?"
+  },
+  {
+    "id": "Medical-6f0e62e5",
+    "answer_correctness": 0.9961369424777151,
+    "rouge_score": 0.5,
+    "question": "Why is follow-up with periodic MRI imaging recommended after treatment for glioma?"
+  },
+  {
+    "id": "Medical-641dcaf5",
+    "answer_correctness": 0.9963484438816899,
+    "rouge_score": 0.4210526315789474,
+    "question": "What distinguishes primary bone cancer from secondary bone malignancy in terms of origin and common cancer types?"
+  },
+  {
+    "id": "Medical-47b62614",
+    "answer_correctness": 0.996418015701183,
+    "rouge_score": 0.631578947368421,
+    "question": "What is the appropriate targeted therapy for a patient with chondrosarcoma harboring an IDH1 mutation, and how is this mutation identified?"
+  },
+  {
+    "id": "Medical-4f7fc60b",
+    "answer_correctness": 0.9968143070442224,
+    "rouge_score": 0.4444444444444445,
+    "question": "How is Stage IV pancreatic cancer defined, and what is its alternative name?"
+  },
+  {
+    "id": "Medical-fc13ecfe",
+    "answer_correctness": 0.9968969532297551,
+    "rouge_score": 0.417910447761194,
+    "question": "What is the rationale for recommending chemotherapy after colectomy in stage 3 colon cancer but not always in stage 2?"
+  },
+  {
+    "id": "Medical-0103d518",
+    "answer_correctness": 0.9971007999089244,
+    "rouge_score": 0.42622950819672134,
+    "question": "How are hereditary breast-ovarian cancer syndrome and HBOC related to pancreatic ductal adenocarcinoma risk?"
+  },
+  {
+    "id": "Medical-d3dfaf75",
+    "answer_correctness": 0.9972240059717725,
+    "rouge_score": 0.7058823529411764,
+    "question": "If a patient presents with rapid heartbeat, headache, and sweating, which adrenal tumor is most likely and what is its origin?"
+  },
+  {
+    "id": "Medical-056e1e60",
+    "answer_correctness": 0.9982044311355174,
+    "rouge_score": 0.6190476190476191,
+    "question": "If a patient with pancreatic ductal adenocarcinoma has chronic pancreatitis and a family history of melanoma, what are their risk factors and what additional testing should be considered?"
+  },
+  {
+    "id": "Medical-df78005a",
+    "answer_correctness": 0.999462640562325,
+    "rouge_score": 0.7692307692307693,
+    "question": "How can you distinguish between classic Hodgkin lymphoma and nodular lymphocyte-predominant Hodgkin lymphoma based on cell morphology?"
+  },
+  {
+    "id": "Medical-0b5acb42",
+    "answer_correctness": 0.9995651656126145,
+    "rouge_score": 0.7999999999999999,
+    "question": "What is the relationship between alpha-1-antitrypsin deficiency, cirrhosis, and liver cancer risk?"
+  }
+]

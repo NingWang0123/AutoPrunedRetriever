@@ -3,20 +3,21 @@ from pathlib import Path
 from statistics import mean
 
 # -------- Paths --------
-GEN_PATH = Path("results/generation_scores_novelv5.json")
-ORIG_QUEST_LOCAL = Path("GraphRAG-Benchmark/Datasets/Questions/novel_questions.json")
-OUT_PATH = Path("results/reval_novel_lowest500_n_by_answer_correctness.json")
+GEN_PATH = Path("results/generation_scores_aprv4.json")
+ORIG_QUEST_LOCAL = Path("GraphRAG-Benchmark/Datasets/Questions/medical_questions.json")
+OUT_PATH = Path("data/medical_complex_reasoning.json")
 
 # -------- Config --------
-SECTION_NAME = "Fact Retrieval"     # as shown in your JSON
+SECTION_NAME = "Complex Reasoning"     # as shown in your JSON
 METRIC = "answer_correctness"       # rank by this
 TIE_METRIC = "rouge_score"          # tie-breaker (ascending)
-TOP_N = 500
+TOP_N = 1000
 
 def load_metrics_items(gen_path: Path, section_name: str):
     """Return list of metric items (dicts) for the given section."""
     data = json.loads(gen_path.read_text())
     # Accept exact key or case-insensitive match
+    print("Available sections:", list(data.keys()))
     sec_key = None
     for k in data.keys():
         if k.lower() == section_name.lower():
