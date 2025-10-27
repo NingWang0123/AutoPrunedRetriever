@@ -1,0 +1,24 @@
+# configs/local_med.yaml
+repo_id: GraphRAG-Bench/GraphRAG-Bench   # disables HF attempts for files below
+dataset: medical  # default
+# templates (only {dataset} changes)
+corpus_file: GraphRAG-Benchmark/Datasets/Corpus/{dataset}.json
+quest_file: Datasets/Questions/{dataset}_questions.json
+
+
+ini_meta_json: outputs/medical/meta_codebook.json
+saved_examples_name: outputs/medical/pref_med.json
+final_json_path: outputs/medical/results.json
+
+seed_n: 20
+test_n: 2024
+top_m: 20
+top_k: 200
+combine_ent_sim: 0.93
+q_combine_sim: 0.93
+aft_combine_sim: 0.93
+semantic_overlap_sim: 0.93
+reward_func: reward_sbert_inclusive
+reward_func_mode: non_llm
+chunking_use: rebel
+# llm_api: 
