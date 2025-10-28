@@ -1,0 +1,1939 @@
+[
+  {
+    "id": "Biology-Brown bear-1",
+    "source": "STEM",
+    "question": "According to the migration hypotheses, which North American brown bear type descends from broad‑skulled bears from Kamchatka rather than narrow‑skulled bears from northern Siberia, and why?",
+    "answer": "Kodiak bears descend from the broad‑skulled Kamchatka bears, whereas inland grizzlies trace to narrow‑skulled bears from northern Siberia.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "inland brown bears, also known as grizzlies, are thought to stem from narrow‑skulled bears which migrated from northern Siberia.",
+      "Kodiak bears descend from broad‑skulled bears from Kamchatka."
+    ],
+    "evidence_relations": "Two contrasting clauses in the same sentence specify distinct ancestral sources: narrow‑skulled Siberian lineage for inland grizzlies versus broad‑skulled Kamchatkan lineage for Kodiaks."
+  },
+  {
+    "id": "Biology-Brown bear-2",
+    "source": "STEM",
+    "question": "Why do ABC Islands brown bears carry polar‑bear mitochondrial DNA even though North American brown bears are generally genetically homogeneous?",
+    "answer": "Because introgressive hybridization between polar bears and brown bears during the Pleistocene left polar‑bear mtDNA in the ABC Islands brown bears despite overall brown‑bear genetic homogeneity.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "brown bears in North America are genetically quite homogeneous except for ... the enigmatic ABC Islands bears that have the mtDNA of the polar bear.",
+      "Analyses of the genomes of bears have recovered multiple instances of introgressive hybridization ... including introgression of polar bear DNA into brown bears during the Pleistocene."
+    ],
+    "evidence_relations": "The exception (ABC Islands mtDNA) is explained by the documented introgressive hybridization from polar bears into brown bears."
+  },
+  {
+    "id": "Biology-Brown bear-3",
+    "source": "STEM",
+    "question": "Did brown bears arrive in Europe before or after they reached Alaska?",
+    "answer": "They arrived in Europe first (about 250,000 years ago) and reached Alaska later (about 100,000 years ago).",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Brown bears entered Europe about 250,000 years ago. ",
+      "The species entered Alaska 100,000 years ago. "
+    ],
+    "evidence_relations": "Comparing the stated entrance times shows Europe (≈250kya) predates Alaska (≈100kya)."
+  },
+  {
+    "id": "Biology-Brown bear-4",
+    "source": "STEM",
+    "question": "What competitor likely prevented brown bears from spreading south in North America until it declined, and how did this affect their migration?",
+    "answer": "The much larger short‑faced bear likely prevented brown bears from spreading south mainly through competition (and some predation) until it dwindled into extinction.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "a more dangerous competitor was encountered ... in the form of the short-faced bear, ... estimated to have weighed about twice as much on average than a modern Kodiak bear.",
+      "Until it declined ... the short-faced bear presumably prevented the brown bear from spreading south, mainly through competition but also, to some extent, predation."
+    ],
+    "evidence_relations": "The description of the short‑faced bear’s size and the explicit note that it prevented southern spread together explain the migration constraint."
+  },
+  {
+    "id": "Biology-Brown bear-5",
+    "source": "STEM",
+    "question": "Why are adult brown bears generally unable to climb trees, unlike American black bears?",
+    "answer": "Because brown bears’ heavy bodies and long, straighter, blunt claws make tree climbing impractical, whereas black bears have sharper claws.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Brown bear claws are longer and straighter than those of American black bears (\"Ursus americanus\").",
+      "The claws are blunt, while those of a black bear are sharp.",
+      "Due to their claw structure, in addition to their excessive weight, adult brown bears cannot typically climb trees."
+    ],
+    "evidence_relations": "Claw geometry (long, straight, blunt) plus body mass leads to the stated inability to climb; the text explicitly connects these causes to the outcome."
+  },
+  {
+    "id": "Economic History-Industrial Revolution-1",
+    "source": "STEM",
+    "question": "Why did Britain, more than France or Spain, have a large domestic market favorable to early industrialization?",
+    "answer": "England had abolished internal tariffs long before France (1789) and Spain (1839), unifying its domestic market and thereby favoring industrialization.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The presence of a large domestic market should also be considered an important driver of the Industrial Revolution, particularly explaining why it occurred in Britain.",
+      "In other nations, such as France, markets were split up by local regions, which often imposed tolls and tariffs on goods traded among them.",
+      "Internal tariffs were abolished by Henry VIII of England ... 1789 in France and 1839 in Spain."
+    ],
+    "evidence_relations": "Abolishing internal tariffs earlier creates a unified market (cause) that supports industrialization (effect), unlike tariff‑fragmented France and Spain."
+  },
+  {
+    "id": "Economic History-Industrial Revolution-2",
+    "source": "STEM",
+    "question": "What do economic historians agree about GDP per capita trends before and after the Industrial Revolution?",
+    "answer": "GDP per capita was broadly stable before the Industrial Revolution, and the Industrial Revolution began an era of sustained per‑capita growth in capitalist economies.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "GDP per capita was broadly stable before the Industrial Revolution and the emergence of the modern capitalist economy.",
+      "the Industrial Revolution began an era of per-capita economic growth in capitalist economies."
+    ],
+    "evidence_relations": "Juxtaposing the pre‑IR stability with the post‑IR growth shows the inflection in GDP per capita."
+  },
+  {
+    "id": "Economic History-Industrial Revolution-3",
+    "source": "STEM",
+    "question": "Why is rapid growth dated to after 1870 as the Second Industrial Revolution, and how did its innovations differ from earlier ones that failed to sustain high growth in the 1840s–1850s?",
+    "answer": "Growth accelerated after 1870 due to a new wave—new steel processes, large‑scale machine tools, and advanced machinery—whereas late‑period earlier innovations like the electrical telegraph were not powerful enough to drive high growth.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Rapid economic growth began to occur after 1870, springing from a new group of innovations in what has been called the Second Industrial Revolution.",
+      "These new innovations included new steel making processes, the large-scale manufacture of machine tools and the use of increasingly advanced machinery.",
+      "Innovations developed late in the period, such as ... the electrical telegraph ... were not powerful enough to drive high rates of growth."
+    ],
+    "evidence_relations": "Contrasting the potency of post‑1870 innovations with the insufficiency of earlier late‑period ones explains the dating of rapid growth to the Second Industrial Revolution."
+  },
+  {
+    "id": "Economic History-Industrial Revolution-4",
+    "source": "STEM",
+    "question": "How did the patent system both accelerate and slow the spread of steam power?",
+    "answer": "Patents rewarded inventors like James Watt with monopoly rights that spurred development, but the same monopoly delayed competing improvements and retarded the spread of steam power.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Governments' grant of limited monopolies to inventors under a developing patent system ... is considered an influential factor.",
+      "The patent system rewarded inventors such as James Watt by allowing them to monopolise the production of the first steam engines.",
+      "Watt's monopoly prevented other inventors ... from introducing improved steam engines, thereby retarding the spread of steam power."
+    ],
+    "evidence_relations": "Monopoly protection both incentivized invention and, by excluding rivals, delayed diffusion—two linked but opposing effects."
+  },
+  {
+    "id": "Economic History-Industrial Revolution-5",
+    "source": "STEM",
+    "question": "How did the Romantic movement react to industrialization, and which phrase encapsulated this critique?",
+    "answer": "Romanticism venerated rural tradition and recoiled from industrial upheaval; Blake’s phrase “Dark satanic mills” encapsulated this critique.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Romanticism revered the traditionalism of rural life and recoiled against the upheavals caused by industrialization.",
+      "the \"Dark satanic mills\" of Blake's poem \"And did those feet in ancient time\"."
+    ],
+    "evidence_relations": "The movement’s values (nature/tradition) and Blake’s emblematic phrase together express a critical stance toward industry."
+  },
+  {
+    "id": "Physics-Spacetime-1",
+    "source": "STEM",
+    "question": "What invariant quantity allows observers in different inertial frames to disagree on distances and times yet still agree on the form of physical laws?",
+    "answer": "The spacetime interval remains invariant across inertial frames, and relativity requires that physical laws take the same tensorial form in all coordinate systems.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "the spacetime interval is independent of the inertial frame of reference in which they are recorded.",
+      "relativity theory ... stipulates these (and all other physical) laws must take the same form in all coordinate systems."
+    ],
+    "evidence_relations": "Frame‑independence of the interval underpins expressing laws in tensor form that is identical across coordinate systems."
+  },
+  {
+    "id": "Physics-Spacetime-2",
+    "source": "STEM",
+    "question": "If two events are simultaneous in one inertial frame, can either cause the other? Explain using interval classification.",
+    "answer": "No. Simultaneity in a particular frame implies a spacelike interval between the events, which makes them non‑causally related.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "if two events are simultaneous in a particular reference frame, they are necessarily separated by a spacelike interval and thus are noncausally related."
+    ],
+    "evidence_relations": "Single statement directly links simultaneity → spacelike interval → no causality."
+  },
+  {
+    "id": "Physics-Spacetime-3",
+    "source": "STEM",
+    "question": "In the example with proper time 5 m, what elapsed times does an observer measure for clocks moving at 0.3 c and 0.7 c, and what effect does this demonstrate?",
+    "answer": "The observer measures 5.24 m at 0.3 c and 7.00 m at 0.7 c, demonstrating time dilation.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "For a clock traveling at 0.3 c, the elapsed time measured by the observer is 5.24 meters.",
+      "for a clock traveling at 0.7 c, the elapsed time measured by the observer is 7.00 meters.",
+      "This illustrates the phenomenon known as \"time dilation\"."
+    ],
+    "evidence_relations": "The two measured times, larger than the proper time, are explicitly tied to time dilation in the cited example."
+  },
+  {
+    "id": "Physics-Spacetime-4",
+    "source": "STEM",
+    "question": "What distinguishes timelike from spacelike invariant hyperbolae in Minkowski spacetime, and what do these differences imply about possible motion and causality?",
+    "answer": "Timelike hyperbolae correspond to intervals traversable by particles and allow causal relations; spacelike hyperbolae correspond to intervals where no causality is possible.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "the magenta hyperbolae ... are termed \"timelike\" ... these hyperbolae represent actual paths that can be traversed by (constantly accelerating) particles in spacetime.",
+      "the green hyperbolae ... are termed \"spacelike\" ... no causality is possible between any two points on one of these hyperbolae."
+    ],
+    "evidence_relations": "Contrasting definitions yield the motion/causality implications for the two families of invariant hyperbolae."
+  },
+  {
+    "id": "Physics-Spacetime-5",
+    "source": "STEM",
+    "question": "How can two observers disagree about the timing and location of the same event yet still agree on conservation laws?",
+    "answer": "Different coordinate charts yield different measured 4‑tuples for an event, but relativity requires that conservation laws keep the same form in all coordinate systems.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "they will disagree about the exact location and timing of this impact, i.e., they will have different 4-tuples.",
+      "relativity theory requires ... these (and all other physical) laws must take the same form in all coordinate systems."
+    ],
+    "evidence_relations": "Frame‑dependent coordinates vs. frame‑independent form of physical laws explains agreement on conservation despite differing measurements."
+  },
+  {
+    "id": "Statistics-Beta distribution-1",
+    "source": "STEM",
+    "question": "Starting from a uniform prior on a Bernoulli probability p, what is the posterior after s successes in n trials and the expected probability of success in the next trial?",
+    "answer": "With a Beta(1,1) prior, the posterior is Beta(s+1, n−s+1), whose mean yields Laplace’s rule of succession for the next‑trial success probability.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "the beta distribution is the conjugate prior probability distribution for the Bernoulli, binomial ... distributions.",
+      "the expected value of the posterior distribution over \"p,\" namely Beta(\"s\"+1, \"n\"−\"s\"+1) ... if one assumes a uniform prior ... Beta(1, 1)."
+    ],
+    "evidence_relations": "Conjugacy plus the stated posterior for a uniform prior directly yields Laplace’s rule for the next‑trial expectation."
+  },
+  {
+    "id": "Statistics-Beta distribution-2",
+    "source": "STEM",
+    "question": "How can you simulate a Beta(α,β) variate using independent gamma variates?",
+    "answer": "Generate X ~ Gamma(α,1) and Y ~ Gamma(β,1) independently and return X/(X+Y).",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "one algorithm for generating beta variates is to generate \"X\"/(\"X\" + \"Y\"), where \"X\" is a gamma variate with parameters (α, 1) and \"Y\" is an independent gamma variate with parameters (β, 1)."
+    ],
+    "evidence_relations": "The construction directly defines a method to sample from the Beta distribution."
+  },
+  {
+    "id": "Statistics-Beta distribution-3",
+    "source": "STEM",
+    "question": "When α and β are small integers, what order‑statistic method can be used to generate a Beta(α,β) random variate?",
+    "answer": "Draw α+β−1 uniforms on [0,1] and take the α‑th smallest (the relevant order statistic).",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "the \"k\"th order statistic of \"n\" uniformly distributed variates is ... so an alternative if α and β are small integers is to generate α + β − 1 uniform variates and choose the α-th smallest."
+    ],
+    "evidence_relations": "The order‑statistic property yields a constructive simulation scheme when the parameters are integers."
+  },
+  {
+    "id": "Statistics-Beta distribution-4",
+    "source": "STEM",
+    "question": "How do the mode and end‑behavior differ for symmetric Beta(α,α) when α>1 versus α<1?",
+    "answer": "For α=β>1, the mode is 1/2; when α and β are both <1, the endpoints are anti‑modes and the density is lowest between them.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Letting \"α\" = \"β\", the expression for the mode simplifies to 1/2, showing that for \"α\" = \"β\" > 1 the mode ... is 1/2.",
+      "When both parameters are less than one (\"α\", \"β\" < 1), this is the anti-mode: the lowest point of the probability density curve."
+    ],
+    "evidence_relations": "Contrasting parameter regimes (α>1 vs α<1) explains the shift from central mode to endpoint anti‑modes."
+  },
+  {
+    "id": "Statistics-Beta distribution-5",
+    "source": "STEM",
+    "question": "Which members of the four‑parameter beta family violate positive‑definiteness of the Fisher information, and which cause components to blow up?",
+    "answer": "The Wigner semicircle (Beta(3/2,3/2,a,c)) and arcsine (Beta(1/2,1/2,a,c)) have negative Fisher information determinants, while the parabolic (Beta(2,2,a,c)) and uniform (Beta(1,1,a,c)) have information components that blow up.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "parabolic distribution (Beta(2,2,a,c)) and the uniform distribution (Beta(1,1,a,c)) have Fisher information components ... that blow up ... in the four-parameter case.",
+      "The four-parameter Wigner semicircle distribution (Beta(3/2,3/2,a,c)) and arcsine distribution (Beta(1/2,1/2,a,c)) have negative Fisher information determinants."
+    ],
+    "evidence_relations": "Two sets of examples illustrate distinct pathologies: divergence of components vs. negative determinants."
+  },
+  {
+    "id": "Genetics-Quantitative genetics-1",
+    "source": "STEM",
+    "question": "How can genetic drift counteract selection, and what extreme outcome can occur in a single generation?",
+    "answer": "Selection and drift often act in conflict; in extreme cases a single syngamy sampling can undo what selection has achieved.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "these two forces of frequency change are seldom in concert, and may often act contrary to each other.",
+      "In extreme cases, a single syngamy sampling can undo what selection has achieved."
+    ],
+    "evidence_relations": "The text explicitly notes conflict between forces and the extreme possibility of drift reversing selection’s gains."
+  },
+  {
+    "id": "Genetics-Quantitative genetics-2",
+    "source": "STEM",
+    "question": "Using the definitions of the selection differential and response, show why ΔG = h·S and interpret the result.",
+    "answer": "Because ΔG = (i·σ)·h and S = i·σ, it follows that ΔG = h·S, meaning response scales with heritability times the selection differential.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Therefore, ΔG = (i σ) h, where \"(i σ)\" = \"S\" previously.",
+      "S / σ = y / Prob., ... the \"standardized selection differential (i)\"."
+    ],
+    "evidence_relations": "Substituting S = iσ into ΔG = (iσ)h yields ΔG = hS; the definitions are stated in the cited lines."
+  },
+  {
+    "id": "Genetics-Quantitative genetics-3",
+    "source": "STEM",
+    "question": "What is the difference between broad‑sense and narrow‑sense heritability, and which did Fisher suggest is appropriate for natural selection?",
+    "answer": "Broad‑sense (H) uses the total genotypic variance; narrow‑sense (h) uses the genic (additive) variance, and Fisher proposed using narrow‑sense heritability for Darwinian evolution.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Where the numerator variance is the whole Genotypic variance ( σ ), the heritability is known as the \"broadsense\" heritability (\"H\").",
+      "If only Genic variance (σ) is used in the numerator, the heritability may be called \"narrow sense\" (h).",
+      "Fisher proposed that this narrow-sense heritability might be appropriate ... with regard to quantifying Darwinian evolution."
+    ],
+    "evidence_relations": "The definitions distinguish H vs h, and Fisher’s proposal selects h for evolutionary response."
+  },
+  {
+    "id": "Genetics-Quantitative genetics-4",
+    "source": "STEM",
+    "question": "If two traits vary independently, what are their covariance and correlation, and why?",
+    "answer": "Their covariance is zero and thus their correlation coefficient, being scaled covariance, is also zero.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "If the two attributes vary independently of each other, the covariance will be zero.",
+      "The degree of association between the attributes is quantified by the correlation coefficient ... the ratio of the \"covariance\" to the geometric mean of the two variances."
+    ],
+    "evidence_relations": "Zero covariance implies zero correlation because correlation is scaled covariance."
+  },
+  {
+    "id": "Genetics-Quantitative genetics-5",
+    "source": "STEM",
+    "question": "Why does response to truncation selection (ΔG) typically diminish across cycles, and by when does the cumulative advance approach its asymptote in the example discussed?",
+    "answer": "Selection reduces phenotypic variance and heritability via truncation, so ΔG declines; in the cited example, the cumulative advance nearly saturates by generation 6.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "successive ΔG declines because the \"input\" [the phenotypic variance ( σ )] is reduced by the previous selection.  The heritability also is reduced.",
+      "The accumulated genetic advance (ΣΔG) has virtually reached its asymptote by generation 6 in this example."
+    ],
+    "evidence_relations": "Reduced variance and heritability explain diminishing ΔG; the example gives the approximate generation at which gains plateau."
+  },
+  {
+    "id": "American History-California Trail-1",
+    "source": "STEM",
+    "question": "Which Sierra route was the only overland path that could be kept partially open in winter for at least horse traffic, and how was it used in 1860–1861 and 1860–1869?",
+    "answer": "The Johnson Cutoff (Placerville Route) was used year‑round by the Pony Express (1860–61) and in summer by stage lines (1860–69); it was the only overland route kept partially open in winter for horse traffic.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The Johnson Cutoff ... was used by the Pony Express (1860–61) year-round and in the summer by the stage lines (1860–69).",
+      "It was the only overland route from the East to California that could be kept partially open for at least horse traffic in the winter."
+    ],
+    "evidence_relations": "Usage details and the winter‑open constraint identify the Johnson Cutoff as the unique route."
+  },
+  {
+    "id": "American History-California Trail-2",
+    "source": "STEM",
+    "question": "Why did California Trail traffic rapidly fall off after 1869?",
+    "answer": "Because the First Transcontinental Railroad made the trip much faster (about seven days) and affordable (about $69), drawing travelers away from the trail.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Trail traffic rapidly fell off as the cross-country trip was much quicker and easier by train—about seven days.",
+      "The economy class fare ... about $69 was affordable by most California-bound travelers."
+    ],
+    "evidence_relations": "The two cited advantages—speed and price—explain the drop in overland trail use."
+  },
+  {
+    "id": "American History-California Trail-3",
+    "source": "STEM",
+    "question": "By 1847, which two frontier forts marked major trailheads for alternative routes to Northern California, and where were they located?",
+    "answer": "Fort Bridger on the Green River (present‑day Wyoming) and Fort Hall on the Snake River (present‑day Idaho) served as the main trailheads.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "two former fur trading frontier forts marked trailheads for major alternative routes ... The first was Jim Bridger's Fort Bridger ... on the Green River.",
+      "Fort Hall (est. 1836) on the Snake River in present-day Idaho."
+    ],
+    "evidence_relations": "Both locations are explicitly identified as trailheads, with their rivers and states specified."
+  },
+  {
+    "id": "American History-California Trail-4",
+    "source": "STEM",
+    "question": "Which early emigrant routes reached the Sacramento Valley versus the Placerville gold region?",
+    "answer": "The Truckee Trail led to the Sacramento Valley, while the Carson Trail led to the American River and Placerville region.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The main routes initially (1846–48) were the Truckee Trail to the Sacramento Valley.",
+      "after about 1849 the Carson Trail route to the American River and the Placerville, California gold digging region."
+    ],
+    "evidence_relations": "Each clause maps a trail to its destination region."
+  },
+  {
+    "id": "American History-California Trail-5",
+    "source": "STEM",
+    "question": "How did migrant numbers contribute to California’s statehood by 1850, considering census corrections?",
+    "answer": "Roughly 2,700 settlers arrived by 1849 and more than 250,000 came from 1848 to 1869; combined with corrected 1850 census totals over 120,000 residents, California met the population for statehood in 1850.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The trail was used by about 2,700 settlers from 1846 up to 1849.",
+      "Starting in late 1848 till 1869, more than 250,000 ... passed over the California Trail to California.",
+      "The corrected California U.S. 1850 Census is over 120,000."
+    ],
+    "evidence_relations": "Combining pre‑1849 and Gold‑Rush era arrivals with the corrected census figure shows why statehood was achieved by 1850."
+  },
+  {
+    "id": "Pharmacology-Bicalutamide-1",
+    "source": "STEM",
+    "question": "What pharmacokinetic properties of bicalutamide enable convenient once‑daily dosing?",
+    "answer": "The active (R)‑enantiomer has a long terminal half‑life (≈5.8 days after a single dose and 7–10 days with repeated dosing), and unchanged bicalutamide predominates in plasma—together allowing once‑daily dosing.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "(\"R\")-Bicalutamide has a long terminal half-life of 5.8 days ... and a terminal half-life of 7–10 days with repeated administration, which allows for convenient once-daily dosing.",
+      "Following administration of bicalutamide, only low concentrations of the metabolites are detectable in blood plasma, while unchanged bicalutamide predominates."
+    ],
+    "evidence_relations": "Long half‑life plus predominance of parent drug rationalize the daily dosing schedule."
+  },
+  {
+    "id": "Pharmacology-Bicalutamide-2",
+    "source": "STEM",
+    "question": "Which enantiomer of bicalutamide is active, and how is it metabolized compared with the inactive enantiomer?",
+    "answer": "The (R)‑enantiomer is the active form and is hydroxylated by CYP3A4 to (R)‑hydroxybicalutamide before glucuronidation; the (S)‑enantiomer is inactive and is rapidly cleared via glucuronidation.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "(\"R\")-Bicalutamide is almost exclusively metabolized via hydroxylation into (\"R\")-hydroxybicalutamide by the cytochrome P450 enzyme CYP3A4.",
+      "The inactive (\"S\")-enantiomer is metabolized mainly by glucuronidation and is rapidly cleared from circulation."
+    ],
+    "evidence_relations": "Contrasting the metabolic pathways and activity states of the two enantiomers explains their different roles."
+  },
+  {
+    "id": "Pharmacology-Bicalutamide-3",
+    "source": "STEM",
+    "question": "Does bicalutamide cross the blood–brain barrier in humans, and what evidence supports your conclusion compared with animal findings?",
+    "answer": "Yes. Although animal findings suggested poor penetration, in humans bicalutamide shows central effects, indicating it crosses the blood–brain barrier.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "it was initially thought that bicalutamide was unable to cross the blood–brain barrier ... Based on animal research.",
+      "it appears that ... the drug does indeed cross the blood–brain barrier and affect central function in humans."
+    ],
+    "evidence_relations": "Contrasting animal‑based expectations with human evidence supports the conclusion of BBB penetration in humans."
+  },
+  {
+    "id": "Pharmacology-Bicalutamide-4",
+    "source": "STEM",
+    "question": "Which newer antiandrogen differs from bicalutamide by negligible brain penetration and correspondingly does not increase testosterone levels in humans?",
+    "answer": "Darolutamide; it negligibly crosses the blood–brain barrier and, unlike bicalutamide, does not increase testosterone levels in humans.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "A newer , darolutamide, has been found to negligibly cross the blood–brain barrier in both animals \"and\" humans.",
+      "unlike bicalutamide, does not increase ... testosterone levels in humans."
+    ],
+    "evidence_relations": "Different BBB penetration profiles explain the differing hormonal effects."
+  },
+  {
+    "id": "Pharmacology-Bicalutamide-5",
+    "source": "STEM",
+    "question": "Do food, age, body weight, renal impairment, or mild‑to‑moderate hepatic impairment affect bicalutamide pharmacokinetics?",
+    "answer": "No. Bicalutamide pharmacokinetics are unaffected by food, age, body weight, renal impairment, and mild‑to‑moderate hepatic impairment.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The pharmacokinetics of bicalutamide are unaffected by food, age, body weight, renal impairment, and mild-to-moderate hepatic impairment."
+    ],
+    "evidence_relations": "Single statement lists the covariates and the lack of effect on PK."
+  },
+  {
+    "id": "History of Technology-History of radar-1",
+    "source": "STEM",
+    "question": "How are range and direction combined in pulsed radar to locate (fix) a target relative to the antenna?",
+    "answer": "Radar times short pulses on an oscilloscope to determine range and uses antenna direction for angle; together these produce a positional ‘fix.’",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "By timing the pulses on an oscilloscope, the range could be determined and the direction of the antenna revealed the angular location of the targets.",
+      "The two, combined, produced a \"fix\", locating the target relative to the antenna."
+    ],
+    "evidence_relations": "The two measured quantities (range by timing, angle by pointing) combine to fix position."
+  },
+  {
+    "id": "History of Technology-History of radar-2",
+    "source": "STEM",
+    "question": "What key technological advance enabled modern radar, and which eight nations developed such systems independently between 1934 and 1939?",
+    "answer": "The advance was producing short pulses of radio energy; independently developed by the UK, Germany, the United States, the USSR, Japan, the Netherlands, France, and Italy.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The development of systems able to produce short pulses of radio energy was the key advance that allowed modern radar systems to come into existence.",
+      "In the 1934–1939 period, eight nations developed independently ... the United Kingdom, Germany, the United States, the USSR, Japan, the Netherlands, France, and Italy."
+    ],
+    "evidence_relations": "The enabling technology is tied to a specific list of independent developers in the stated years."
+  },
+  {
+    "id": "History of Technology-History of radar-3",
+    "source": "STEM",
+    "question": "How did sharing the cavity magnetron through the Tizard Mission affect Allied radar capabilities in WWII?",
+    "answer": "Britain shared its high‑power cavity magnetron with the U.S.; its adoption enabled compact centimetric radars and gave the Allies a considerable performance advantage.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "an early 6 kW version ... was given to the US government in September 1940 ... The British magnetron was a thousand times more powerful than the best American transmitter at the time.",
+      "The cavity magnetron was widely used during World War II in microwave radar equipment and is often credited with giving Allied radar a considerable performance advantage."
+    ],
+    "evidence_relations": "Transfer of a vastly more powerful source (cause) → widespread use and superior performance (effect)."
+  },
+  {
+    "id": "History of Technology-History of radar-4",
+    "source": "STEM",
+    "question": "In what sense do some authors argue radar was decisive in World War II and a precursor to modern technologies?",
+    "answer": "They argue radar, more than the atomic bomb, contributed to Allied victory and seeded a family tree of postwar technologies.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Far more than the atomic bomb, radar contributed to the Allied victory in World War II.",
+      "radar has been the root of a wide range of achievements since the war, producing a veritable family tree of modern technologies."
+    ],
+    "evidence_relations": "Two evaluative statements—wartime impact and postwar legacy—support the conclusion."
+  },
+  {
+    "id": "History of Technology-History of radar-5",
+    "source": "STEM",
+    "question": "Which facility began as a radar astronomy station using surplus 71 MHz equipment, and what radar astronomy achievements were later made at Arecibo?",
+    "answer": "Jodrell Bank started as a radar astronomy facility using a surplus GL‑II at 71 MHz; Arecibo later mapped Mars’ surface roughness and made the first radar image of an asteroid in 1989.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The Jodrell Bank Observatory ... was originally started ... to be a radar astronomy facility.  It initially used a war-surplus GL-II radar system operating at 71 MHz.",
+      "Many significant scientific discoveries have been made using the Arecibo radar telescope, including mapping of surface roughness of Mars ... In 1989, the observatory radar-imaged an asteroid for the first time in history."
+    ],
+    "evidence_relations": "One quote names Jodrell’s origin and equipment; the other lists Arecibo’s radar achievements, enabling the comparison."
+  },
+  {
+    "id": "Transportation-History of the New York City Subway-1",
+    "source": "STEM",
+    "question": "Why do the IND and BMT operate together as the B Division while the IRT remains a separate A Division?",
+    "answer": "Because the IND and BMT were physically connected and operate as one B Division, whereas IRT tunnels and stations are too small and sharply curved for B Division cars, so the IRT remains its own A Division.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Integration was slow, but several connections were built between the IND and BMT, and now operate as one division called the B Division. ",
+      "Since the IRT tunnel segments are too small and stations too narrow to accommodate B Division cars, and contain curves too sharp for B Division cars, the IRT remains its own division, the A Division. "
+    ],
+    "evidence_relations": "First evidence establishes that IND and BMT were connected into the B Division; the second shows why the IRT could not be integrated—its infrastructure cannot accommodate B Division cars—so it remains the A Division."
+  },
+  {
+    "id": "Transportation-History of the New York City Subway-2",
+    "source": "STEM",
+    "question": "Place these milestones in chronological order: the first elevated rapid-transit line in NYC, the first underground subway line, the opening of the first IND line, and the city's purchase of the private systems.",
+    "answer": "The first elevated line came first (almost 35 years before 1904), then the first underground line on October 27, 1904, then the first city‑owned IND line in 1932, and finally the city's purchase of the private systems in 1940.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The first underground line opened on October 27, 1904, almost 35 years after the opening of the first elevated line in New York City, which became the IRT Ninth Avenue Line.",
+      "The first line of the city-owned and operated Independent Subway System (IND) opened in 1932…",
+      "In 1940, the two private systems were bought by the city…"
+    ],
+    "evidence_relations": "From the first quote we infer the elevated line predates 1904 by ~35 years; the second and third give the later two dates, allowing an unambiguous timeline."
+  },
+  {
+    "id": "Transportation-History of the New York City Subway-3",
+    "source": "STEM",
+    "question": "After the September 11 attacks, which line running under the World Trade Center was most directly affected, and when did full service south of Chambers Street resume?",
+    "answer": "The IRT Broadway–Seventh Avenue Line, which ran directly under the World Trade Center, was most directly affected; service south of Chambers Street resumed on September 15, 2002.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The September 11 attacks resulted in service disruptions on lines running through Lower Manhattan, particularly the IRT Broadway–Seventh Avenue Line, which ran directly underneath the World Trade Center…",
+      "…requiring suspension of service on that line south of Chambers Street… The rest (except for Cortlandt Street on the IRT Broadway–Seventh Avenue Line) reopened on September 15, 2002 along with service south of Chambers Street."
+    ],
+    "evidence_relations": "Evidence identifies the specific line and the suspension; it also provides the date when service south of Chambers Street resumed."
+  },
+  {
+    "id": "Transportation-History of the New York City Subway-4",
+    "source": "STEM",
+    "question": "Which expansion opened first in the 2000s—the 7 Subway Extension or the first phase of the Second Avenue Subway—and by about how long?",
+    "answer": "The 7 Subway Extension opened first in September 2015, roughly sixteen months before the Second Avenue Subway’s first phase opened on January 1, 2017.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Since the 2000s, construction has been undertaken in order to expand the subway system.  Expansions include the 7 Subway Extension that opened in September 2015, and the Second Avenue Subway, the first phase of which opened on January 1, 2017. "
+    ],
+    "evidence_relations": "The single sentence provides both opening dates; comparing them shows the 7 Extension preceded the Second Avenue Subway by about 16 months."
+  },
+  {
+    "id": "Transportation-History of the New York City Subway-5",
+    "source": "STEM",
+    "question": "Despite being an underground railroad from 1844, why isn’t the Atlantic Avenue Tunnel considered part of the New York City Subway?",
+    "answer": "Because, although built underground in 1844, it had no underground subway stops and was constructed mainly as a grade‑separated right of way, so it does not meet the subway’s station‑based service model.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Even though there was an earlier, underground railroad called the Atlantic Avenue Tunnel since 1844, it had no underground subway stops. ",
+      "Construction of this tunnel, which was built mainly to create a grade-separated right of way for the Brooklyn and Jamaica Railroad… began in May 1844 and the tunnel was open by December 1844. "
+    ],
+    "evidence_relations": "The tunnel predated the subway but lacked underground stations and served as a grade-separated railroad right of way, so by function it is not a subway."
+  },
+  {
+    "id": "Energy-Plug-in hybrid-1",
+    "source": "STEM",
+    "question": "Under what charging condition would a plug‑in hybrid emit zero tailpipe greenhouse gases while running only on battery power?",
+    "answer": "When its batteries are charged directly from renewable sources off the electrical grid, a PHEV running in all‑electric mode has zero tailpipe greenhouse‑gas emissions.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Plug-in hybrids' greenhouse-gas emissions… depend on the type of power plant used to feed the electrical grid when the battery is charged.",
+      "If the batteries are charged directly from renewable sources off the electrical grid, then the tailpipe greenhouse gas emissions are zero when running only on battery power."
+    ],
+    "evidence_relations": "The first sentence sets the dependency on charging source; the second states that using renewables makes tailpipe GHG zero in all‑electric operation."
+  },
+  {
+    "id": "Energy-Plug-in hybrid-2",
+    "source": "STEM",
+    "question": "According to U.S. definitions and IEEE, what capability distinguishes a plug‑in hybrid from a regular hybrid, and what minimum all‑electric range does IEEE require?",
+    "answer": "PHEVs can draw electricity from the grid, unlike regular hybrids; IEEE further requires that a PHEV be able to drive at least ten miles (16 km) in all‑electric mode.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The Energy Independence and Security Act of 2007 defines a plug-in electric drive vehicle… This distinguishes PHEVs from regular hybrid cars mass marketed today, which do not use any electricity from the grid.",
+      "The Institute of Electrical and Electronics Engineers (IEEE) defines PHEVs similarly, but also requires that the hybrid electric vehicle be able to drive at least ten miles (16 km) in all-electric mode (PHEV-10; PHEV16km), while consuming no gasoline or diesel fuel."
+    ],
+    "evidence_relations": "First evidence contrasts grid-charging capability; second adds IEEE’s ten‑mile all‑electric requirement."
+  },
+  {
+    "id": "Energy-Plug-in hybrid-3",
+    "source": "STEM",
+    "question": "As of the mid‑2010s, which country among those listed had the largest stock of plug‑in hybrids, and which model family was the world’s best‑selling plug‑in hybrid to date?",
+    "answer": "The United States had the largest stock (193,770 units as of 2015), and the Chevrolet Volt/Opel–Vauxhall Ampera family was the best‑selling plug‑in hybrid with about 134,500 units by 2016.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "As of 2016, the Chevrolet Volt family, including its siblings Opel/Vauxhall Ampera, is the world's best-selling plug-in hybrid in history with combined sales of about 134,500 units.",
+      "As of 2015, the United States ranked as the world's largest plug-in hybrid car market with a stock of 193,770 units, followed by China with 86,580 vehicles, the Netherlands with 78,160, Japan with 55,470 units, and the UK with 28,250."
+    ],
+    "evidence_relations": "The quotes provide the comparative figures needed to identify both the top market and the top‑selling model family."
+  },
+  {
+    "id": "Energy-Plug-in hybrid-4",
+    "source": "STEM",
+    "question": "What does the change in global plug‑in hybrid sales from 2010 to 2015 show about adoption, and what was the approximate global stock of PHEVs by the end of 2016?",
+    "answer": "Adoption accelerated sharply—from just over 300 units sold in 2010 to almost 222,000 in 2015—and by the end of 2016 the global stock of plug‑in hybrids was almost 800,000.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Global sales of plug-in hybrids grew from over 300 units in 2010 to almost 9,000 in 2011, jumped to over 60,000 in 2012, and reached almost 222,000 in 2015.",
+      "About 279,000 light-duty plug-in hybrids were sold in 2016, raising the global stock to almost 800,000 highway legal plug-in hybrid electric cars… at the end of 2016."
+    ],
+    "evidence_relations": "The first quote shows rapid year‑over‑year growth; the second states the resulting cumulative stock by 2016."
+  },
+  {
+    "id": "Energy-Plug-in hybrid-5",
+    "source": "STEM",
+    "question": "Which U.S. stimulus law added incentives relevant to PHEVs, and what DOE funding announcements supported the goal of one million PHEVs by 2015?",
+    "answer": "The American Recovery and Reinvestment Act of 2009 added new tax credits (including for plug‑in conversion kits); in March 2009 DOE announced up to $2 billion for advanced battery and drive‑component manufacturing and up to $400 million for transportation‑electrification projects to help meet the goal of one million PHEVs by 2015.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The American Recovery and Reinvestment Act of 2009 modifies the tax credits, including a new one for plug-in electric drive conversion kits… The ultimate total included in the Act that is going to PHEVs is over $6 billion.",
+      "In March 2009… the US Department of Energy announced… up to $2 billion… for manufacturing of advanced batteries and related drive components as well as up to $400 million for transportation electrification… This announcement will also help meet the President Barack Obama's goal of putting one million plug-in hybrid vehicles on the road by 2015."
+    ],
+    "evidence_relations": "The first quote names the law and incentives; the second details DOE funding and explicitly ties it to the one‑million‑PHEV goal."
+  },
+  {
+    "id": "Biology-Evidence of common descent-1",
+    "source": "STEM",
+    "question": "Why do shared nonfunctional DNA elements across species count as strong evidence for common descent rather than for common function?",
+    "answer": "Because even nonfunctional sequence elements (repeats, transposons, pseudogenes, and neutral mutations) show shared patterns across lineages—patterns that are best explained by inheritance from a common ancestor, not by convergent function.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Phylogenetic relationships also extend to a wide variety of nonfunctional sequence elements, including repeats, transposons, pseudogenes, and mutations in protein-coding sequences that do not result in changes in amino-acid sequence.  While a minority of these elements might later be found to harbor function, in aggregate they demonstrate that identity must be the product of common descent rather than common function."
+    ],
+    "evidence_relations": "The quote directly states that shared nonfunctional elements, taken together, indicate common descent rather than shared function."
+  },
+  {
+    "id": "Biology-Evidence of common descent-2",
+    "source": "STEM",
+    "question": "How do biogeography and plate tectonics, combined with the fossil record, strengthen the case for common descent?",
+    "answer": "By allowing scientists to match present‑day species distributions with fossil evidence within a plate‑tectonic framework, yielding a logically consistent historical explanation of how distributions changed through time—exactly what common descent predicts.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Further evidence comes from the field of biogeography… This is especially obvious in the field of insular biogeography.  Combined with the well-established geological theory of plate tectonics, common descent provides a way to combine facts about the current distribution of species with evidence from the fossil record to provide a logically consistent explanation of how the distribution of living organisms has changed over time."
+    ],
+    "evidence_relations": "The sentence explicitly ties biogeography to plate tectonics and fossils to form an explanatory framework predicted by common descent."
+  },
+  {
+    "id": "Biology-Evidence of common descent-3",
+    "source": "STEM",
+    "question": "Which real‑world observations demonstrate that evolution by natural selection and speciation are ongoing processes?",
+    "answer": "The development and spread of antibiotic‑resistant bacteria and directly observed cases of speciation in the lab and in nature show evolution and speciation are ongoing.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The development and spread of antibiotic resistant bacteria provides evidence that evolution due to natural selection is an ongoing process in the natural world.",
+      "Speciation has been observed directly and indirectly in the lab and in nature."
+    ],
+    "evidence_relations": "Together, these observations show both adaptive change within species and the splitting of lineages happening now, not just in the past."
+  },
+  {
+    "id": "Biology-Evidence of common descent-4",
+    "source": "STEM",
+    "question": "Given that humans have 23 pairs of chromosomes while other apes have 24, what historical genomic event explains this difference, and what evidence supports it?",
+    "answer": "An end‑to‑end fusion of two ancestral ape chromosomes produced human chromosome 2; evidence includes a relic of a telomere‑telomere fusion at the fusion point.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "All hominidae have 24 pairs of chromosomes, except humans, who have only 23 pairs.  Human chromosome 2 is a result of an end-to-end fusion of two ancestral chromosomes.",
+      "“We conclude that the locus cloned in cosmids c8.1 and c29B is the relic of an ancient telomere-telomere fusion and marks the point at which two ancestral ape chromosomes fused to give rise to human chromosome 2.”"
+    ],
+    "evidence_relations": "The first sentence states the numerical difference and the fusion explanation; the second provides molecular evidence of the fusion site."
+  },
+  {
+    "id": "Biology-Evidence of common descent-5",
+    "source": "STEM",
+    "question": "What do cytochrome c sequence comparisons imply about relatedness and divergence time when two species share an identical sequence versus a one‑amino‑acid difference?",
+    "answer": "Identical cytochrome c sequences imply extremely close relatedness (as with humans and chimpanzees), whereas a single amino‑acid difference (as between humans and rhesus monkeys) implies a more distant relationship and, using an estimated mutation rate, a calculable divergence time.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Both humans and chimpanzees share the identical molecule, while rhesus monkeys share all but one of the amino acids: the 66th amino acid is isoleucine in the former and threonine in the latter.",
+      "…it can be calculated how long ago the two species diverged by multiplying the number of base pair substitutions by the estimated time it takes for a substituted base pair of the cytochrome c gene to be successfully passed on."
+    ],
+    "evidence_relations": "The first quote gives concrete sequence differences; the second explains how differences map to divergence time."
+  },
+  {
+    "id": "Nuclear Accidents-Chernobyl disaster-1",
+    "source": "STEM",
+    "question": "Explain the causal chain that led from the Chernobyl safety test to the multi‑day atmospheric release of radioisotopes.",
+    "answer": "During a late‑night station‑blackout safety test with safety systems deliberately disabled, operator actions and design flaws drove the reactor into uncontrolled conditions, causing a steam explosion and an open‑air graphite fire whose updrafts lofted fission products into the atmosphere for about nine days.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The event occurred during a late-night safety test which simulated a station blackout power-failure and in which safety systems were deliberately turned off.  A combination of inherent reactor design flaws and the reactor operators arranging the core in a manner contrary to the checklist for the test, eventually resulted in uncontrolled reaction conditions.",
+      "Water flashed into steam generating a destructive steam explosion and a subsequent open-air graphite fire.  This fire produced considerable updrafts for about nine days.  These lofted plumes of fission products into the atmosphere."
+    ],
+    "evidence_relations": "The first quote sets the test setup and causal errors; the second details the explosion, fire, and the nine‑day lofting of radionuclides."
+  },
+  {
+    "id": "Nuclear Accidents-Chernobyl disaster-2",
+    "source": "STEM",
+    "question": "Which two nuclear energy accidents are classified at level 7 (the maximum) on the International Nuclear Event Scale?",
+    "answer": "Chernobyl (1986) and the Fukushima Daiichi disaster in Japan (2011) are the only level‑7 nuclear energy accidents.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "It is one of only two nuclear energy accidents classified as a level 7 event (the maximum classification) on the International Nuclear Event Scale, the other being the Fukushima Daiichi nuclear disaster in Japan in 2011."
+    ],
+    "evidence_relations": "The evidence explicitly names both level‑7 events."
+  },
+  {
+    "id": "Nuclear Accidents-Chernobyl disaster-3",
+    "source": "STEM",
+    "question": "What were the approximate human and financial scales of the post‑accident safeguarding and decontamination efforts?",
+    "answer": "Over 500,000 workers were involved, and the efforts cost an estimated 18 billion rubles.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "…the later decontamination efforts of the surroundings, ultimately involved over 500,000 workers and cost an estimated 18 billion rubles."
+    ],
+    "evidence_relations": "The quote provides both the workforce and cost figures."
+  },
+  {
+    "id": "Nuclear Accidents-Chernobyl disaster-4",
+    "source": "STEM",
+    "question": "Summarize the documented immediate and subsequent fatalities among workers and first responders, and the documented childhood thyroid cancer deaths among the wider population as of 2011.",
+    "answer": "Two people were killed by the blast; 134 were hospitalized with acute radiation symptoms, of whom 28 died in the days to months afterward; approximately 14 cancer deaths among that initially hospitalized group occurred within ten years; among the wider population, an excess of 15 childhood thyroid cancer deaths had been documented as of 2011.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "During the accident, blast effects caused 2 deaths within the facility, later 134 were hospitalized with acute radiation symptoms, of which 28 firemen and employees died in the days-to-months afterward… in addition, approximately 14 cancer deaths amongst this group of initially hospitalized survivors was to follow within the next ten years(1996).",
+      "Whilst among the wider population, an excess of 15 childhood thyroid cancer deaths had been documented as of 2011."
+    ],
+    "evidence_relations": "The two quotes report the immediate and delayed fatalities among workers and the wider‑population thyroid cancer deaths up to 2011."
+  },
+  {
+    "id": "Nuclear Accidents-Chernobyl disaster-5",
+    "source": "STEM",
+    "question": "What was the purpose and limitation of the ‘Object Shelter’ built over Chernobyl’s Unit 4, and which neighboring reactor continued operating until 2000?",
+    "answer": "The ‘Object Shelter’ (sarcophagus) was built to reduce the spread of radioactivity from and protect the wreckage from the elements; it was not intended as a radiation shield. Reactor No. 3 continued to produce electricity into 2000.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The remains of the No.4 reactor building were enclosed in a large cover which was named the \"Object Shelter\". It is often known as the sarcophagus, its purpose is to reduce the spread of radioactivity from the wreckage and to protect the wreckage from the elements. It was not intended as a (radiation shield)…",
+      "…with No.3 continuing to produce electricity into 2000."
+    ],
+    "evidence_relations": "The first sentence states the enclosure’s purpose and limitation; the second identifies the neighboring reactor’s continued operation through 2000."
+  },
+  {
+    "id": "Maritime-Maritime history of California-1",
+    "source": "STEM",
+    "question": "Which named historical period of California’s maritime history includes the 1769 Portolà expedition to settle Alta California?",
+    "answer": "The Spanish colonial period (1769–1821) includes the 1769 Portolà expedition.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The maritime history of California can be divided into several periods: the Native American period; European exploration period from 1542 to 1769; the Spanish colonial period, 1769 to 1821; the Mexican period, 1821 to 1847; and United States statehood period, which continues to the present day.",
+      "To prevent Russia or Britain from establishing settlements in California in 1769, the Spanish Visitor General, José de Gálvez… proceeded to plan a five part expedition to settle Alta California.  Gaspar de Portolà volunteered to command the expedition."
+    ],
+    "evidence_relations": "The period list ties 1769 to the start of the Spanish colonial era; the second quote identifies the 1769 Portolà expedition."
+  },
+  {
+    "id": "Maritime-Maritime history of California-2",
+    "source": "STEM",
+    "question": "Why did the Spanish crown halt further California exploration by Manila galleons, and what was a notable consequence for geographic knowledge of the region?",
+    "answer": "Because a year’s worth of profit from the Philippines could not be risked, the crown forbade further such expeditions; as a result, San Francisco Bay escaped outside knowledge until it was finally sighted on November 4, 1769.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Subsequently, the Spanish crown decreed that no further exploration or colonization attempts in California would be made with Manila galleons; a years worth of profit from the Philippines could not be risked.",
+      "One of the greatest bays on the west coast—San Francisco Bay—escaped outside-the-area knowledge until sited on November 4, 1769."
+    ],
+    "evidence_relations": "The economic rationale led to a halt in exploration; consequently, a major bay remained unrecognized by outsiders until 1769."
+  },
+  {
+    "id": "Maritime-Maritime history of California-3",
+    "source": "STEM",
+    "question": "Using the listed county totals that were missing from the official count, explain why historians conclude the corrected 1850 California population exceeded 120,000.",
+    "answer": "Because adding the separately reported populations—San Francisco (36,134 in 1852), Santa Clara (6,158), and Contra Costa (2,786) plus the 21,000 estimate for San Francisco city/county—pushes the statewide total over 120,000, consistent with the article’s statement.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Newspaper accounts in 1850 (\"Alta Californian\") gives the population of San Francisco city/county at 21,000; The special California state Census of 1852 finds 6,158 residents of Santa Clara county, 2,786 residents of Contra Costa County and 36,134 in the fast-growing San Francisco city/county.  The \"corrected\" California U.S. 1850 Census is over 120,000."
+    ],
+    "evidence_relations": "The quote lists the missing counts and concludes the corrected total is over 120,000; summing the missing figures explains the conclusion."
+  },
+  {
+    "id": "Maritime-Maritime history of California-4",
+    "source": "STEM",
+    "question": "Which came first—the first California lighthouse contract or the first Point Reyes Life‑Saving Station—and what prompted the lighthouse program?",
+    "answer": "The lighthouse contract came first (1853; Alcatraz lighthouse operating by 1855); the first Point Reyes Life‑Saving Station opened later in 1889. The lighthouse program was prompted by California congressmen petitioning for lighthouses to return customs revenue to the state.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The first Collector of Customs in California was Edward H. Harrison appointed by General Kearny in 1848.  To get some of this revenue flowing back to California, California congressmen started petitioning for lighthouses and Congress soon agreed.",
+      "The firm of Francis A. Gibbons and Francis Kelly was awarded the contract to build California's first seven lighthouses in 1853.  The lighthouse on Alcatraz Island was the first built and was in operation in the San Francisco Bay by 1855…",
+      "The Life-Saving Service opened the first of two Life Saving Stations built at Point Reyes in 1889."
+    ],
+    "evidence_relations": "Petitions led to the lighthouse program (1853/55), which predates the Life‑Saving Station (1889)."
+  },
+  {
+    "id": "Maritime-Maritime history of California-5",
+    "source": "STEM",
+    "question": "What geopolitical concern motivated José de Gálvez’s five‑part plan to settle Alta California in 1769, and who led the land expedition?",
+    "answer": "Spanish fears that Russia or Britain would establish settlements in California motivated the plan; Gaspar de Portolà led the expedition, accompanied by missionaries, settlers, and soldiers.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "A potential colonial power interested in Alta California was Russia… After the conclusion of the Seven Year War… Spain, Russia and Britain were the only colonial powers left in North America.",
+      "To prevent Russia or Britain from establishing settlements in California in 1769, the Spanish Visitor General, José de Gálvez… proceeded to plan a five part expedition to settle Alta California.  Gaspar de Portolà volunteered to command the expedition."
+    ],
+    "evidence_relations": "The first quote sets the geopolitical context; the second states the preventive plan and identifies Portolà as leader."
+  },
+  {
+    "id": "Inventions-List of Dutch inventions and discoveries-1",
+    "source": "STEM",
+    "question": "Why was Gemma Frisius’s 1530 method for determining longitude impractical at the time, and who later made it feasible?",
+    "answer": "It required a very accurate clock that did not yet exist; John Harrison’s 1761 marine chronometer made Frisius’s longitude method feasible at sea.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The Dutch-Frisian geographer Gemma Frisius was the first to propose the use of a chronometer to determine longitude in 1530… how to use a very accurate clock to determine longitude.  The problem was that in Frisius’ day, no clock was sufficiently precise to use his method.",
+      "In 1761, the British clock-builder John Harrison constructed the first marine chronometer, which allowed the method developed by Frisius."
+    ],
+    "evidence_relations": "The first quote explains the requirement and why it was impractical; the second shows Harrison’s chronometer enabled the method."
+  },
+  {
+    "id": "Inventions-List of Dutch inventions and discoveries-2",
+    "source": "STEM",
+    "question": "Trace the progression from Frisius’s triangulation concept to early systematic mapping and then to a country‑scale triangulation network.",
+    "answer": "Frisius set out the idea of triangulation; Jacob van Deventer was among the first to make systematic use of it; Willebrord Snell later built a 33‑triangle network to survey ~110 km across the Netherlands.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Triangulation had first emerged as a map-making method… when the Dutch-Frisian mathematician Gemma Frisius set out the idea…",
+      "Dutch cartographer Jacob van Deventer was among the first to make systematic use of triangulation…",
+      "The modern systematic use of triangulation networks stems from… Willebrord Snell… who in 1615 surveyed the distance from Alkmaar to Bergen op Zoom… using a chain of quadrangles containing 33 triangles in all."
+    ],
+    "evidence_relations": "The three quotes link the conceptual origin, early practice, and large‑scale implementation of triangulation."
+  },
+  {
+    "id": "Inventions-List of Dutch inventions and discoveries-3",
+    "source": "STEM",
+    "question": "What property made the Mercator projection the standard for nautical use, and how did Waghenaer’s atlas complement that for practical navigation?",
+    "answer": "Mercator’s projection represents rhumb lines (constant‑course lines) as straight segments preserving angles with meridians, and Waghenaer’s ‘De Spieghel der Zeevaerdt’ was the first printed atlas of nautical charts that systematically codified such charts with sailing directions.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The Mercator projection… became the standard map projection for nautical purposes because of its ability to represent lines of constant course, known as rhumb lines or loxodromes, as straight segments which conserve the angles with the meridians.",
+      "The first printed atlas of nautical charts (\"De Spieghel der Zeevaerdt\"… )… was the first attempt to systematically codify nautical maps… and was an immediate success."
+    ],
+    "evidence_relations": "Mercator provides the navigational geometry; Waghenaer supplies standardized nautical charting for practical use."
+  },
+  {
+    "id": "Inventions-List of Dutch inventions and discoveries-4",
+    "source": "STEM",
+    "question": "How did the Dutch gable architectural feature spread and evolve beyond its Low Countries origin, and where outside Europe is it notably visible?",
+    "answer": "Dutch gables spread with Dutch‑Flemish Renaissance architecture across northern Europe and were later absorbed into Baroque architecture; outside Europe, Barbados is well known for Dutch‑gabled historic buildings.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The Dutch gable was a notable feature of the Dutch-Flemish Renaissance architecture… that spread to northern Europe… Later Dutch gables with flowing curves became absorbed into Baroque architecture.",
+      "Examples of Dutch-gabled buildings can be found… beyond Europe, for example Barbados is well known for Dutch gables on its historic buildings."
+    ],
+    "evidence_relations": "The first quote describes spread and stylistic evolution; the second gives a prominent non‑European example."
+  },
+  {
+    "id": "Inventions-List of Dutch inventions and discoveries-5",
+    "source": "STEM",
+    "question": "How did Hendrick Hamel’s captivity lead to the first detailed Western account of Korea, and under what constraints was he held?",
+    "answer": "After being shipwrecked in 1653 and held for 13 years in isolationist Joseon Korea, Hamel escaped and published his report in 1666, providing the first detailed, accurate description of Korea to the Western world.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "…Hendrick Hamel was the first westerner to experience first-hand and write about Korea in Joseon era… shipwrecked… and they remained captives in Korea for more than a decade… After thirteen years (1653–1666), Hamel and seven of his crewmates managed to escape… and from there to the Netherlands.  In 1666, three different publishers published his report… giving the first detailed and accurate description of Korea to the western world.",
+      "The Joseon dynasty was often referred to as the \"Hermit Kingdom\"… The shipwrecked Dutchmen were given some freedom of movement, but were forbidden to leave the country."
+    ],
+    "evidence_relations": "The first quote provides the shipwreck, captivity duration, escape, and publication; the second explains the constraints under Joseon isolationism."
+  },
+  {
+    "id": "Physics-History of electromagnetic theory-1",
+    "source": "STEM",
+    "question": "Which experimental work verified Maxwell’s prediction of electromagnetic waves in free space, and what technological development did it enable?",
+    "answer": "Heinrich Hertz’s 1887 experiments demonstrated transverse electromagnetic waves in free space, paving the way for the development of radio in the late 19th century.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "In 1887, the German physicist Heinrich Hertz in a series of experiments proved the actual existence of electromagnetic waves, showing that transverse free space electromagnetic waves can travel over some distance as predicted by Maxwell and Faraday.  Hertz published his work… \"Electric waves…\"  The discovery of electromagnetic waves in space led to the development of radio in the closing years of the 19th century."
+    ],
+    "evidence_relations": "Hertz’s experiments empirically confirmed Maxwell’s prediction; the same passage notes the consequence—radio."
+  },
+  {
+    "id": "Physics-History of electromagnetic theory-2",
+    "source": "STEM",
+    "question": "How did Lorentz and Poincaré’s ideas foreshadow special relativity while still retaining an ether in their frameworks?",
+    "answer": "Lorentz introduced length contraction and local time and formulated the transformations that bear his name; Poincaré interpreted local time as clock synchronization by light and promoted the relativity principle, yet both retained an ether and distinguished between ‘apparent’ and ‘real’ time.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Lorentz… introduced concepts like physical length contraction (1892)… and the mathematical concept of local time (1895)… resulting in the formulation of the so-called Lorentz transformation…",
+      "Continuing the work of Lorentz, Henri Poincaré… interpreted Lorentz's local time as the result of clock synchronization by light signals… declared the relativity principle a general law of nature… However, historians pointed out that he still used the notion of an ether and distinguished between \"apparent\" and \"real\" time…"
+    ],
+    "evidence_relations": "The first quote details Lorentz’s mathematical tools; the second shows Poincaré’s conceptual steps and the continued use of ether concepts."
+  },
+  {
+    "id": "Physics-History of electromagnetic theory-3",
+    "source": "STEM",
+    "question": "Explain Maxwell’s displacement current concept by contrasting currents in conductors with those in dielectrics, and how this leads to wave propagation.",
+    "answer": "In conductors, a continuous electric current (a displacement of electricity) flows against a resistive ‘friction’; in dielectrics, charging sets up momentary ‘displacement currents’ whose energy returns on discharge. Extending this to the ether of free space implies oscillatory displacement currents that propagate as electromagnetic waves—light.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Maxwell… contended that in the charging of a condenser… some \"displacement\" currents are set up in the insulating medium… which currents continue until the resisting force of the medium equals that of the charging force.  In a closed conductor circuit, an electric current is also a displacement of electricity.",
+      "…the displacement currents in a dielectric are momentary and… the currents of discharge are of an oscillatory or alternating nature.  Maxwell extended this view of displacement currents in dielectrics to the ether of free space… the undulations corresponding to those of light are propagated as an electromagnetic effect in the ether."
+    ],
+    "evidence_relations": "The two passages contrast conduction and displacement currents and then extend the idea to propagating electromagnetic waves."
+  },
+  {
+    "id": "Physics-History of electromagnetic theory-4",
+    "source": "STEM",
+    "question": "Who coined the term ‘electron’ and who first identified plasma, and why were cathode‑ray experiments pivotal for the discovery of X‑rays?",
+    "answer": "G. Johnstone Stoney coined ‘electron’ (term 1894; posited as a unit of charge in 1874); Sir William Crookes first identified plasma in 1879; electricity in Crookes tubes produced cathode rays, leading directly to the discovery of X‑rays.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The electron as a unit of charge in electrochemistry was posited by G. Johnstone Stoney in 1874, who also coined the term \"electron\" in 1894.  Plasma was first identified in a Crookes tube, and so described by Sir William Crookes in 1879 (he called it \"radiant matter\").",
+      "…the discovery of those beautiful phenomena of the Crookes Tube… viz., Cathode rays, and later to the discovery of Roentgen or X-rays, must not be overlooked, since without electricity as the excitant of the tube the discovery of the rays might have been postponed indefinitely."
+    ],
+    "evidence_relations": "The first passage supplies dates and names; the second explains the causal role of Crookes‑tube experiments in discovering X‑rays."
+  },
+  {
+    "id": "Physics-History of electromagnetic theory-5",
+    "source": "STEM",
+    "question": "What two ‘ultimate results’ of Oliver Heaviside’s work illustrate the interplay between mathematical methods and physical unification in electromagnetism?",
+    "answer": "Mathematically, his vectorial algebra streamlined physical investigations compared to quaternions; physically, his work unified telegraphy, telephony, ‘Teslaic’ and ‘Hertzian’ phenomena with the fundamental properties of the ether.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Of the changes in the field of electromagnetic theory… The ultimate results of his work are twofold.  (1) The first ultimate result is purely mathematical… The system of \"vectorial algebra\" as developed by Mr. Heaviside was used because of ease for physical investigations to the methods of quaternions.",
+      "(2) The second ultimate result is physical.  It consists in more closely uniting the more recondite problems of telegraphy, telephony, \"Teslaic phenomena\" and \"Hertzian phenomena\" with the fundamental properties of the aether."
+    ],
+    "evidence_relations": "The quoted summary explicitly lists both results, showing mathematics enabling and reflecting physical unification."
+  },
+  {
+    "id": "Chemistry-History of gunpowder-1",
+    "source": "STEM",
+    "question": "Why is the early ‘fire lance’ not considered a true gun, even after shrapnel was added?",
+    "answer": "Because it initially had no projectile and later added fragments did not occlude the barrel, so they were merely swept along rather than being propelled as in a true gun.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The early fire lance, considered to be the ancestor of firearms, is not considered a true gun because it did not include projectiles.  Later on, shrapnel such as ceramics and bits of iron were added, but these didn't occlude the barrel, and were only swept along with the discharge rather than make use of windage."
+    ],
+    "evidence_relations": "The passage defines the criterion for a ‘true gun’ and explains why the fire lance fails to meet it."
+  },
+  {
+    "id": "Chemistry-History of gunpowder-2",
+    "source": "STEM",
+    "question": "How did changes in gunpowder composition by the mid‑14th century increase its explosive potential and enable new munitions?",
+    "answer": "Raising nitrate content to as high as 91% produced maximum explosive potential; this allowed the Chinese to pack hollow shells with the more powerful powder to create explosive round shot.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "By the time of Jiao Yu and his \"Huolongjing\"… the explosive potential of gunpowder was perfected, as the level of nitrate in gunpowder formulas had risen from a range of 12% to 91%, with at least 6 different formulas in use that are considered to have maximum explosive potential for gunpowder.",
+      "By that time, the Chinese had discovered how to create explosive round shot by packing their hollow shells with this nitrate-enhanced gunpowder."
+    ],
+    "evidence_relations": "The first quote gives the compositional change; the second links it to the capability of explosive round shot."
+  },
+  {
+    "id": "Chemistry-History of gunpowder-3",
+    "source": "STEM",
+    "question": "Arrange these milestones chronologically and state the earliest written gunpowder formula outside China: Wei Boyang’s ‘three powders’ description, Ge Hong’s heated saltpeter experiments, Chinese invention of gunpowder, Song‑dynasty written formula, and Roger Bacon’s formula in the ‘Opus Majus’.",
+    "answer": "Chronology: Wei Boyang (142 AD) → Ge Hong (year 300) → invention in the late Tang dynasty (9th century) → earliest written formula in the Song dynasty (11th century) → Roger Bacon’s 1267 formula in the ‘Opus Majus’ (the earliest written formula outside China).",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The very earliest possible reference to gunpowder appeared in 142 AD… Wei Boyang wrote about a substance with the properties of gunpowder… a mixture of three powders that would \"fly and dance\" violently…",
+      "The next possible reference to gunpowder appeared in the year 300… Ge Hong… records of his experiments with heated saltpeter… resulting in explosion…",
+      "The invention of gunpowder is… one of the \"Four Great Inventions\" of China.  It was invented during the late Tang dynasty (9th century) but the earliest record of a written formula appeared in the Song dynasty (11th century).",
+      "…the earliest written formula for it outside of China contained within the Opus Majus, a 1267 treatise by the English friar Roger Bacon."
+    ],
+    "evidence_relations": "The four quotes provide the dates needed to order the milestones and identify Bacon’s 1267 formula as the first written outside China."
+  },
+  {
+    "id": "Chemistry-History of gunpowder-4",
+    "source": "STEM",
+    "question": "How did South Asian resources and rocketry influence European military technology in the 17th–18th centuries?",
+    "answer": "Indian saltpeter supplied European gunpowder; Mysore’s iron‑cased rockets proved effective in battle and inspired Sir William Congreve’s standardized military rockets in England.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Gujarāt supplied Europe saltpeter for use in gunpowder warfare during the 17th century.  Bengal and Mālwa participated in saltpeter production.  The Dutch, French, Portuguese, and English used Chāpra as a center of saltpeter refining.",
+      "Hyder Ali… developed war bombs with… metal pipes to contain the combustion powder… Tippu Sultan… increased the number of rocket troops… In England Sir William Congreve began to experiment… standardized construction details… and used improved production techniques."
+    ],
+    "evidence_relations": "The first quote shows the resource flow (saltpeter) from India to Europe; the second shows Mysore rockets’ features and Congreve’s subsequent standardization in England."
+  },
+  {
+    "id": "Chemistry-History of gunpowder-5",
+    "source": "STEM",
+    "question": "Beyond warfare, what civil engineering applications of gunpowder are documented in China and Europe, and what do they suggest about early engineering practice?",
+    "answer": "Gunpowder blasting was used to improve China’s Grand Canal in 1541, and major European canals such as France’s Canal du Midi and New York’s Erie Canal also employed black powder—showing gunpowder’s early role as a versatile engineering tool.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Gunpowder was used for hydraulic engineering in China by 1541… to improve the Grand Canal…",
+      "In Europe gunpowder was utilized in the construction of the Canal du Midi… completed in 1681… Another noteworthy consumer of black powder was the Erie canal in New York… starting in 1817."
+    ],
+    "evidence_relations": "The two quotes document non‑military blasting on landmark canal projects across continents, indicating an engineering practice of using gunpowder for excavation."
+  },
+  {
+    "id": "Criticism of Facebook-1",
+    "source": "STEM",
+    "question": "After Facebook’s 2010 privacy changes, what happened to a user’s previously ‘Friends Only’ family/relationship information, and how does this illustrate the broader change?",
+    "answer": "It became publicly viewable by ‘Everyone,’ illustrating that the change forced previously private items like friends lists and profile details to be public by default.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "This new policy declared certain information, including \"lists of friends\", to be \"publicly available\", with no privacy settings; it was previously possible to keep access to this information restricted.",
+      "For example, a user whose \"Family and Relationships\" information was set to be viewable by \"Friends Only\" would default to being viewable by \"Everyone\" (publicly viewable)."
+    ],
+    "evidence_relations": "The first sentence shows the policy made certain fields inherently public; the second shows the specific default shift from 'Friends Only' to 'Everyone'."
+  },
+  {
+    "id": "Criticism of Facebook-2",
+    "source": "STEM",
+    "question": "Which regulatory decision in India effectively ended Facebook’s Free Basics program, and with which telecom was Facebook collaborating for that program?",
+    "answer": "TRAI’s 2016 ruling against differential data pricing effectively ended zero‑rating platforms, ending Free Basics in India; Facebook had collaborated with Reliance Communications.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "In February 2016, TRAI ruled against differential data pricing for limited services from mobile phone operators effectively ending zero-rating platforms in India.",
+      "Facebook's Free Basics program was a collaboration with Reliance Communications to launch Free Basics in India.",
+      "The TRAI ruling against differential pricing marked the end of Free Basics in India."
+    ],
+    "evidence_relations": "The first and third sentences explain the effect of the ruling; the second identifies the telecom partner."
+  },
+  {
+    "id": "Criticism of Facebook-3",
+    "source": "STEM",
+    "question": "How were the prominent HarvardConnection allegations ultimately resolved, and what happened with the subsequent 2011 lawsuit?",
+    "answer": "The original suit was settled in 2009 with about $20 million in cash and 1.25 million shares, and a new lawsuit in 2011 was dismissed.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The company has also been subject to multiple litigation cases over the years, with its most prominent case concerning allegations that CEO Mark Zuckerberg broke an oral contract with Cameron Winklevoss, Tyler Winklevoss, and Divya Narendra to build the then-named \"HarvardConnection\" social network in 2004, instead allegedly opting to steal the idea and code to launch Facebook months before HarvardConnection began.",
+      "The original lawsuit was eventually settled in 2009, with Facebook paying approximately $20 million in cash and 1.25 million shares.",
+      "A new lawsuit in 2011 was dismissed."
+    ],
+    "evidence_relations": "The first sentence establishes the dispute; the second and third provide the sequential outcomes (settlement in 2009; dismissal in 2011)."
+  },
+  {
+    "id": "Criticism of Facebook-4",
+    "source": "STEM",
+    "question": "What two Facebook features did the Electronic Frontier Foundation identify in 2010 that exposed information beyond user intent, and how did each mechanism work?",
+    "answer": "The EFF identified “connections” and “instant personalization”: a ‘connection’ via Like buttons is treated as public and can display the user’s identity on the product/service page, while ‘instant personalization’ shared account information with affiliated sites to auto‑customize content.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "In 2010, the Electronic Frontier Foundation identified two personal information aggregation techniques called \"connections\" and \"instant personalization\".",
+      "They demonstrated that anyone could get access to information saved to a Facebook profile, even if the information was not intended to be made public.",
+      "A \"connection\" is created when a user clicks a \"Like\" button for a product or service, either on Facebook itself or an external site.  Facebook treats such relationships as public information, and the user's identity may be displayed on the Facebook page of the product or service.",
+      "Instant Personalization was a pilot program which shared Facebook account information with affiliated sites, such as sharing a user's list of \"liked\" bands with a music website, so that when the user visits the site, their preferred music plays automatically."
+    ],
+    "evidence_relations": "The first two lines establish the risk; the third and fourth explain the mechanisms of each feature."
+  },
+  {
+    "id": "Criticism of Facebook-5",
+    "source": "STEM",
+    "question": "In 2015, what identification policy caused user backlash, and what could happen if users refused to provide the requested documents?",
+    "answer": "Facebook suspended users unless they provided government IDs; those who did not comply could be permanently locked out of their accounts, even though such documents were not required at signup.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "In 2015, it was reported that a growing number of Facebook users are being wrongfully and inexplicably being suspended from their accounts by Facebook to give up copies of their private identification information, such as copies of their driver's license, state-issued ID cards, passports, military cards, etc, with users being permanently locked out of their accounts if this information isn't given up.",
+      "Facebook does not require the release of such information when individuals sign up for the site."
+    ],
+    "evidence_relations": "Users were asked post‑signup for ID; refusal could lead to permanent lockout."
+  },
+  {
+    "id": "List of ecoregions in North America (CEC)-1",
+    "source": "STEM",
+    "question": "Which body produced the North American ecoregion framework and in what report/year was this continent‑wide framework provided?",
+    "answer": "The Commission for Environmental Cooperation provided it in its 1997 report, “Ecological Regions of North America.”",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "This list of ecoregions of North America provides an overview of North American ecoregions designated by the Commission for Environmental Cooperation (CEC) in its North American Environmental Atlas.",
+      "The Commission's 1997 report, \"Ecological Regions of North America\", provides a framework that may be used by government agencies, non-governmental organizations, and academic researchers as a basis for risk analysis, resource management, and environmental study of the continent's ecosystems."
+    ],
+    "evidence_relations": "The first line identifies the CEC; the second provides the report title and year."
+  },
+  {
+    "id": "List of ecoregions in North America (CEC)-2",
+    "source": "STEM",
+    "question": "What are the four classification levels in the CEC system, and which levels are fully shown in this list?",
+    "answer": "Levels I–IV are the classification levels, but only Levels I–III are shown; Level IV is a further subdivision that is still being mapped (largely complete across the U.S.).",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The classification system has four levels.  Only the first three levels are shown on this list.",
+      "\"Level I\" divides North America into 15 broad ecoregions.  \"Level II\" subdivides the continent into 52 smaller ecoregions.  \"Level III\" subdivides those regions again into 182 ecoregions.  \"Level IV\" is a further subdivision of Level III ecoregions.  Level IV mapping is still underway but is complete across most of the United States."
+    ],
+    "evidence_relations": "These sentences enumerate the four levels and state that Levels I–III are shown while Level IV is still in progress."
+  },
+  {
+    "id": "List of ecoregions in North America (CEC)-3",
+    "source": "STEM",
+    "question": "Why is vegetation sparse in the Arctic Cordillera, and which plants are still found there despite these conditions?",
+    "answer": "Because about three‑quarters of the landscape is ice or exposed bedrock with continuous permafrost, vegetation is largely absent; in sheltered valleys, moss, cottongrass, and Arctic heather occur.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "In addition, the landscape is 75% covered by ice or exposed bedrock, with a continuous permafrost that persists throughout the year, making plant and animal life somewhat scarce.",
+      "Vegetation is largely absent in this area due to permanent ice and snow.",
+      "Moss, cottongrass, and Arctic heather are examples of plant life that can be found in valleys."
+    ],
+    "evidence_relations": "The first two lines give the cause for scarcity; the third names surviving plants."
+  },
+  {
+    "id": "List of ecoregions in North America (CEC)-4",
+    "source": "STEM",
+    "question": "Based on the stated population and composition, approximately how many Inuit live in the Arctic Cordillera?",
+    "answer": "About 800 Inuit live there, since 80% of a population of 1,000 are Inuit.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Although the terrain is infamous for its unforgiving conditions, humans maintained an established population of 1000 people – 80% of which were Inuit."
+    ],
+    "evidence_relations": "80% of 1000 ≈ 800 Inuit."
+  },
+  {
+    "id": "List of ecoregions in North America (CEC)-5",
+    "source": "STEM",
+    "question": "Which desert resources are described as renewable with sustainable exploitation, and in which U.S. states (and area) are large solar panel fields reported?",
+    "answer": "Sunlight and water are cited as renewable resources with sustainable exploitation; solar panel fields are reported in New Mexico, Texas, Arizona, and the Great Basin area.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Sunlight is one of the deserts most important resource as it is renewable and has sustainable exploitations.",
+      "Water is also a resource found in the desert that can be reused and has sustainable exploitations.",
+      "Areas such as New Mexico, Texas, Arizona, and the Great Basin area, put up fields for green energy."
+    ],
+    "evidence_relations": "The first two quotes name renewable resources; the third lists locations of solar panel fields."
+  },
+  {
+    "id": "Plug-in electric vehicle-1",
+    "source": "STEM",
+    "question": "Why do plug‑in hybrids reduce range anxiety relative to all‑electric cars, and what operating change occurs when their batteries reach the minimum state of charge?",
+    "answer": "Because the combustion engine works as a backup, PHEVs eliminate range anxiety; when the battery reaches its minimum SOC, the vehicle switches from all‑electric (charge‑depleting) to charge‑sustaining mode.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Plug-in hybrids eliminate the problem of range anxiety associated to all-electric vehicles, because the combustion engine works as a backup when the batteries are depleted, giving PHEVs driving range comparable to other vehicles with gasoline tanks.",
+      "A plug-in hybrid operates as an all-electric vehicle or BEV when operating in charge-depleting mode, but it switches to charge-sustaining mode after the battery has reached its minimum state of charge (SOC) threshold, exhausting the vehicle's all-electric range (AER)."
+    ],
+    "evidence_relations": "First line explains the cause of reduced anxiety; second line describes the operational switch at minimum SOC."
+  },
+  {
+    "id": "Plug-in electric vehicle-2",
+    "source": "STEM",
+    "question": "Comparing energy efficiency and costs, why are PEVs cheaper to drive per mile than conventional cars?",
+    "answer": "Because electric drivetrains are far more efficient (around 80% on‑board) than gasoline engines (about 15% effective), typical electricity costs lead to $0.02–$0.04 per mile in all‑electric mode versus $0.08–$0.20 per mile for standard automobiles.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Typically, conventional gasoline engines effectively use only 15% of the fuel energy content to move the vehicle or to power accessories, and diesel engines can reach on-board efficiencies of 20%, while electric drive vehicles typically have on-board efficiencies of around 80%.",
+      "In the United States, as of early 2010 with a national average electricity rate of per kWh, the cost per mile for a plug-in electric vehicle operating in all-electric mode is estimated between $0.02 to $0.04, while the cost per mile of a standard automobile varies between $0.08 to $0.20, considering a gasoline price of $3.00 per gallon."
+    ],
+    "evidence_relations": "Higher efficiency of electric drive explains lower per‑mile energy cost."
+  },
+  {
+    "id": "Plug-in electric vehicle-3",
+    "source": "STEM",
+    "question": "As of 2016, which three plug‑in hybrids ranked first, second, and third in cumulative global sales, and about how many units had each sold?",
+    "answer": "First: Chevrolet Volt/Opel‑Vauxhall Ampera family (~134,500 units). Second: Mitsubishi Outlander P‑HEV (~119,500). Third: first‑generation Toyota Prius Plug‑in Hybrid (~75,400).",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "s of 2016 , the Volt/Ampera family is the world's best selling plug-in hybrid and the third best selling plug-in electric car after the Nissan Leaf and the Model S. Chevrolet Volt and Opel/Vauxhaul Ampera combined sales totaled about 134,500 units worldwide through December 2016, including just over 10,000 Opel/Vauxhall Amperas sold in Europe through June 2016.",
+      "Ranking next is the Mitsubishi Outlander P-HEV with around 119,500 units sold worldwide as of 2016 .",
+      "Ranking third is the first generation Toyota Prius Plug-in Hybrid with 75,400 units sold worldwide through April 2016."
+    ],
+    "evidence_relations": "The three sentences provide the ranked cumulative totals."
+  },
+  {
+    "id": "Plug-in electric vehicle-4",
+    "source": "STEM",
+    "question": "Which vehicles belong in the plug‑in electric vehicle category, and why aren’t conventional HEVs included?",
+    "answer": "PEVs include BEVs, PHEVs, and electric conversions of hybrids or ICE vehicles; conventional HEVs aren’t included because they cannot be recharged from an off‑vehicle electric source.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Plug-in electric vehicles are also sometimes referred to as grid-enabled vehicles (GEV) and also as electrically chargeable vehicles. PEV is a subcategory of electric vehicles that includes battery electric vehicles (BEVs), plug-in hybrid vehicles, (PHEVs), and electric vehicle conversions of hybrid electric vehicles and conventional internal combustion engine vehicles.",
+      "Even though conventional hybrid electric vehicles (HEVs) have a battery that is continually recharged with power from the internal combustion engine and regenerative braking, they can not be recharged from an off-vehicle electric energy source, and therefore, they do not belong to the category of plug-in electric vehicles."
+    ],
+    "evidence_relations": "First sentence defines PEV membership; second explains why HEVs are excluded."
+  },
+  {
+    "id": "Plug-in electric vehicle-5",
+    "source": "STEM",
+    "question": "What formal terms are used in U.S. federal law and in parts of Europe to designate vehicles eligible for incentives?",
+    "answer": "In U.S. federal legislation the term is “plug‑in electric drive vehicle,” while in some European countries—particularly France—the term is “electrically chargeable vehicle.”",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "\"Plug-in electric drive vehicle\" is the legal term used in U.S. federal legislation to designate the category of motor vehicles eligible for federal tax credits depending on battery size and their all-electric range.",
+      "In some European countries, particularly in France, \"electrically chargeable vehicle\" is the formal term used to designate the vehicles eligible for these incentives."
+    ],
+    "evidence_relations": "Direct comparison of the U.S. legal term and the formal European term."
+  },
+  {
+    "id": "Global storm activity of 2010-1",
+    "source": "STEM",
+    "question": "What suggests that the late‑December Alaska snowstorm and the early‑January Russian Far East storm were part of the same system?",
+    "answer": "The Alaska warning on December 30 was likely part of the same weather system that hit the Russian Far East from December 30 to January 5.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "A major snow-related weather warning was put out in Alaska on December 30.",
+      "The expected snowstorm was probably part of the same weather system that hit the Russian Far East from December 30 to January 5."
+    ],
+    "evidence_relations": "The second sentence explicitly links the two events temporally and causally."
+  },
+  {
+    "id": "Global storm activity of 2010-2",
+    "source": "STEM",
+    "question": "During Tropical Storm Agatha’s aftermath, what did the National Hurricane Center say about regeneration chances, and what were the documented impacts across Central America?",
+    "answer": "On June 1, the NHC said Agatha’s remnants had only a low chance of regeneration; Guatemala’s principal airport was severely damaged and the storm caused 152 deaths and 100 missing in Guatemala, 16 deaths in Honduras, 13 in El Salvador, and 1 in Nicaragua.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "On June 1, the National Hurricane Centre stated that the remnants of Tropical Storm Agatha had only a low chance of regeneration in the western Caribbean Sea.",
+      "The storm had severely damaged Guatemala's principal airport with rain induced floods.",
+      "It also resulted in the death of 1 person in Nicaragua, 152 people killed and 100 left missing in Guatemala (due to landslides), 13 deaths in El Salvador and 16 fatalities in Honduras."
+    ],
+    "evidence_relations": "First sentence sets the NHC assessment; the next two enumerate impacts by country."
+  },
+  {
+    "id": "Global storm activity of 2010-3",
+    "source": "STEM",
+    "question": "Which city experienced one of the state’s worst mudslides at a resort on Ilha Grande, and how many fatalities were reported there?",
+    "answer": "Angra dos Reis in Rio de Janeiro state suffered one of its worst mudslides at a resort on Ilha Grande, with at least 35 fatalities.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The worst affected municipality has been Angra dos Reis, about 150 km southwest of the city of Rio de Janeiro.",
+      "At least 35 people were killed at a resort on Ilha Grande: about 40 people were staying in the hotel which was buried under a mudslide, and the death toll is expected to rise further.",
+      "It is reported to be one of the worst mudslides in Reo De Janero's history."
+    ],
+    "evidence_relations": "The quotes identify the location (Angra dos Reis/Ilha Grande) and death toll, and qualify the event as among the worst."
+  },
+  {
+    "id": "Global storm activity of 2010-4",
+    "source": "STEM",
+    "question": "Which capitals saw extreme river levels during early June, and what EU financial response was recorded for Slovakia?",
+    "answer": "Budapest’s river reached 8.2 m and Warsaw’s reached 7.80 m; Slovakia received €25 million in EU aid.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "On June 7, 150 Polish schools were closed, flood hit Slovakia received 25,000,000 Euros ($30,000,000) in EU aid, and river levels in Budapest reached 8.2 m .",
+      "The river level in Warsaw reached 7.80 m and a local dam collapsed, flooding part of the city on June 8."
+    ],
+    "evidence_relations": "The two sentences provide both the river levels and the EU aid figure."
+  },
+  {
+    "id": "Global storm activity of 2010-5",
+    "source": "STEM",
+    "question": "At the end of September 2010, how severe was flooding in Agra, and what advice was given to tourists at the Taj Mahal?",
+    "answer": "By September 27–28, floodwaters in Agra reached 152.4 m; nearly half the city lacked drinking water, and tourists were asked to stay far from the raging river near the Taj Mahal.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "September 27 and 28 saw the flood situation reaching its worst at Agra where the river water level touched 152.4 m on the morning of September 27.",
+      "Almost half of the city was without drinking water.",
+      "Tourists visiting the Taj Mahal were asked to stay far away from the raging river."
+    ],
+    "evidence_relations": "The first sentence gives timing and level; the others provide consequences and guidance."
+  },
+  {
+    "id": "Buildings and architecture of Brighton and Hove-1",
+    "source": "STEM",
+    "question": "How extensive is conservation area coverage in Brighton and Hove, and how many conservation areas does the city have?",
+    "answer": "About 18% of the urban area is in conservation areas, and there are 34 conservation areas in total.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The city of Brighton and Hove has 34 conservation areas, which are defined by Sections 69 and 70 of the Planning (Listed Buildings and Conservation Areas) Act 1990 as \"principally urban areas of special architectural or historic interest, the character or appearance of which it is desirable to preserve or enhance\".",
+      "About 18% of the urban area is covered by this designation."
+    ],
+    "evidence_relations": "The two sentences provide the count and proportion."
+  },
+  {
+    "id": "Buildings and architecture of Brighton and Hove-2",
+    "source": "STEM",
+    "question": "What 1930s Modernist proposal threatened to reshape the Brighton seafront, and what civic response did it trigger?",
+    "answer": "A plan championed by Alderman Sir Herbert Carden to replace seafront buildings with Embassy Court‑style Modernist structures (and even demolish the Royal Pavilion) stimulated the formation of the Regency Society.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Wells Coates was commissioned to build a block of flats next to Brunswick Terrace.  The high-class speculative development was named Embassy Court and was completed in 1935.",
+      "Alderman Sir Herbert Carden, who campaigned for every other building along the seafront to be demolished and replaced with Embassy Court-style Modernist structures, all the way from Hove to Kemp Town.  He also wanted to demolish the Royal Pavilion and replace it with a conference centre.",
+      "This encouraged the formation of the Regency Society, the first of many local conservation and architectural interest groups."
+    ],
+    "evidence_relations": "The evidence links the Embassy Court model and Carden’s campaign to the creation of the Regency Society."
+  },
+  {
+    "id": "Buildings and architecture of Brighton and Hove-3",
+    "source": "STEM",
+    "question": "Which two structures illustrate wartime damage in Brighton and Hove, and what visible trace remains on one of them?",
+    "answer": "St Cuthman’s Church was destroyed in 1943, and the central arches of the London Road viaduct had to be rebuilt after a direct hit—the replacement brickwork’s different colour remains visible.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The urban area was not as badly affected by World War II bombing as some coastal towns, notably Eastbourne, but some buildings were damaged or destroyed.",
+      "The central arches of London Road viaduct had to be rebuilt after a direct hit left the tracks hanging in mid-air; the different coloured replacement brickwork is still visible.",
+      "St Cuthman's Church, built in 1937 on the new Whitehawk estate, was destroyed in 1943."
+    ],
+    "evidence_relations": "The sentences name both structures and the lasting visual trace on the viaduct."
+  },
+  {
+    "id": "Buildings and architecture of Brighton and Hove-4",
+    "source": "STEM",
+    "question": "Why did many buildings disappear in the 1960s–70s, and what countervailing force preserved others?",
+    "answer": "Brighton’s increasing regional importance encouraged redevelopment in the 1960s–70s, but conservation movements were influential in saving other buildings.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Many buildings were lost in the 1960s and 1970s, when Brighton's increasing regional importance encouraged redevelopment, but conservation movements were influential in saving other buildings."
+    ],
+    "evidence_relations": "Direct cause (redevelopment) and countervailing effect (conservation)."
+  },
+  {
+    "id": "Buildings and architecture of Brighton and Hove-5",
+    "source": "STEM",
+    "question": "How was the University of Sussex’s original campus architecture characterized and what influences did it show?",
+    "answer": "The Buildings of England called it “the best architecture of the second half of the 20th century” in Brighton and Hove; Basil Spence’s 1960–65 ensemble is post‑1955 Modernist, influenced by Le Corbusier and Ancient Roman monumentality.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The \"Buildings of England\" series called the \"majestic and intimate\" University of Sussex \"the best architecture of the second half of the 20th century\" in Brighton and Hove.",
+      "Spence's buildings are \"post-1955 Modernist\", influenced by both Le Corbusier and the \"epic monumentality\" of Ancient Roman architecture."
+    ],
+    "evidence_relations": "First sentence gives the evaluative claim; second gives stylistic influences."
+  },
+  {
+    "id": "Technological and industrial history of 20th-century Canada-1",
+    "source": "STEM",
+    "question": "How did CPR’s expansion underpin early 20th‑century mining and smelting developments that led to the creation of a major company and mine?",
+    "answer": "CPR access enabled ore transport to Trail, where roasting and later smelting/lead refining were built; the CPR’s subsidiary Consolidated Mining and Smelting Company of Canada began developing the Sullivan Mine in 1909.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The CPR also provided access to the B.C. interior, where lead, copper, silver and gold ores had been discovered in the Rossland area in 1891.  The ores were transported to Trail, B.C., where they were roasted.",
+      "After CPR built the Crowsnest Pass it purchased the Trail roasting facility and in 1899 built a blast furnace to smelt lead ore.",
+      "In 1902 the first electrolytic lead refining plant using the Betts Cell Process began operation in Trail.",
+      "The Consolidated Mining and Smelting Company of Canada Ltd. was founded as a CPR subsidiary and began to develop the Sullivan Mine with its lead, zinc and silver ores, in Kimberley in 1909."
+    ],
+    "evidence_relations": "Sequential development from access → roasting → smelting/refining → company/mine creation."
+  },
+  {
+    "id": "Technological and industrial history of 20th-century Canada-2",
+    "source": "STEM",
+    "question": "What late‑20th‑century public‑spending preference is noted, and what national estimate quantified its consequence for infrastructure?",
+    "answer": "Canadians preferred spending on social programmes over technical infrastructure; in 2008 the Federation of Canadian Municipalities estimated a $123 billion backlog to restore and repair aging urban infrastructure.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "In the latter part of the 20th century there is evidence that Canadian values prefer public expenditures on social programmes at the expense of public spending on the maintenance and expansion of public technical infrastructure.",
+      "This can be seen in the fact that in 2008 the Federation of Canadian Municipalities estimated that it would take $123 billion to restore and repair aging urban infrastructure across Canada."
+    ],
+    "evidence_relations": "The first sentence states the preference; the second quantifies the consequence."
+  },
+  {
+    "id": "Technological and industrial history of 20th-century Canada-3",
+    "source": "STEM",
+    "question": "Which communications milestones in the 1950s–60s modernized Canadian connectivity, and what ‘world first’ emergency service was launched where in 1959?",
+    "answer": "Milestones included the first trans‑Atlantic telephone cable (1956), the CANTAT cable (1961), the COMPAC cable (1963), Telex (1956), direct‑distance dialing (1958), and the Trans‑Canada Microwave system (1958); Winnipeg launched the world’s first 9‑1‑1 emergency telephone service in 1959.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The first trans-Atlantic telephone cable, jointly owned by the Canadian Overseas Telecommunication Corporation, British Post Office and AT&T, was brought into service in 1956, paving the way for telephone calls from Canada to Britain and Europe.  An improved cable, CANTAT was installed in 1961.  A similar service on the west coast, COMPAC, the Commonwealth Pacific Cable System was inaugurated in 1963, linking Canada by undersea telephone cable with New Zealand and Australia.",
+      "CN/CP Telecommunications introduced the well known Telex service to Canada in 1956.  Direct distance dialing was initiated in Canada in 1958, beginning with customers in Toronto and on 1 July of that year the Trans-Canada Microwave system, known as the Trans-Canada Skyway, went into service.",
+      "The concept and operation of a dedicated emergency telephone number originated in Canada, where the City of Winnipeg established the world's first 9-1-1 service in 1959."
+    ],
+    "evidence_relations": "The first two sentences list the milestones; the third identifies the 9‑1‑1 first and location."
+  },
+  {
+    "id": "Technological and industrial history of 20th-century Canada-4",
+    "source": "STEM",
+    "question": "Which building held Canada’s height record in 1931 within the early ‘race to build the tallest,’ and what sequence of earlier record‑holders demonstrates this competition?",
+    "answer": "The Canadian Imperial Bank of Commerce in Toronto held the record in 1931, following earlier record‑holders such as the Traders Bank of Canada (1905), Dominion Building (1910), World (Sun) Tower (1912), Canadian Pacific Building (1913), and the Royal Bank (Toronto, 1915; Montreal, 1928).",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "It was the age of the skyscraper and the race to build the tallest structure in the British Empire set off a competition among cities across Canada.",
+      "Successive record holders included the Traders Bank of Canada, 15 floors, Yonge St, Toronto, 1905, the Dominion Building, 13 floors, Vancouver, 1910, World (Sun) Tower, 17 floors, Vancouver, 1912, the Canadian Pacific Building, 16 floors, Toronto, 1913, the Royal Bank, 20 floors, Toronto, 1915, the Royal Bank, Montreal, 1928, the Royal York Hotel, Toronto, 1929 and the Canadian Imperial Bank of Commerce, Toronto, in 1931."
+    ],
+    "evidence_relations": "The second sentence enumerates the sequence culminating in 1931."
+  },
+  {
+    "id": "Technological and industrial history of 20th-century Canada-5",
+    "source": "STEM",
+    "question": "What transportation shortfall contributed to Montreal–Mirabel Airport’s failure to attract traffic, and which contemporaneous Quebec megaproject is cited as a contrasting success?",
+    "answer": "Mirabel was supposed to be linked to Montreal by a fast train that was never built, leading to low patronage; by contrast, the James Bay Project’s La Grande River dams and transmission lines provided Hydro‑Québec with major electricity supply.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The facility was to be linked to the heart of Montreal with a fast train.  The train was never built and both passengers and air carriers stayed away in droves.",
+      "On the other hand, the James Bay Project undertaken in Quebec at the same time was a booming success.  Several large dams on the La Grande River with their associated long distance transmission lines provide Hydro-Québec with an important source of electricity."
+    ],
+    "evidence_relations": "The first sentence explains Mirabel’s shortfall; the second contrasts it with the successful James Bay hydro project."
+  },
+  {
+    "id": "List of former state routes in Georgia (U.S. state)-1",
+    "source": "STEM",
+    "question": "Trace the sequence of events that led from SR 1’s relocation to SR 1E’s eventual transfer to Floyd County by 1985.",
+    "answer": "US 27/SR 1 was relocated in 1938; the old alignment became SR 1 and was reassigned as SR 1E in 1955; after US 27’s 1968 relocation to the Rome Connector, SR 1E was truncated, and the state transferred the old business‑route alignment to Floyd County in 1985.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "US 27/SR 1 had been relocated along former SR 1 Spur, which is present-day US 27/SR 1 from Old Cedartown Road to present-day US 411 in 1938 with the old route remaining as SR 1 through Lindale.",
+      "Originally part of US 27/SR 1, it was originally designated as SR 1 before being reassigned as SR 1E in 1955.",
+      "When US 27 was upgraded and relocated in 1968 to the Rome Connector, SR 1E was truncated to end at the present-day interchange of Maple Avenue.",
+      "Essentially a business route for an unincorporated community south of Rome, the state no longer saw the value in retaining an old alignment and transferred control to Floyd County in 1985."
+    ],
+    "evidence_relations": "Four sentences provide the chronological steps from 1938 relocation to 1985 transfer."
+  },
+  {
+    "id": "List of former state routes in Georgia (U.S. state)-2",
+    "source": "STEM",
+    "question": "By when was SR 3W fully hard‑surfaced in Albany, and what redesignations occurred by 1957?",
+    "answer": "By the middle of 1950 its entire length was hard‑surfaced; by July 1957, SR 3 in northern Albany was redesignated SR 3 Conn. as SR 3W was redesignated as part of SR 3.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "By the middle of 1950, the entire length of SR 3W was hard surfaced.",
+      "By July 1957, SR 3 in the northern part of Albany was redesignated as SR 3 Conn. due to SR 3W being redesignated as part of SR 3."
+    ],
+    "evidence_relations": "First sentence gives completion date; second details the later redesignations."
+  },
+  {
+    "id": "List of former state routes in Georgia (U.S. state)-3",
+    "source": "STEM",
+    "question": "What establishment and decommissioning timeline is given for SR 1056 in Martinez?",
+    "answer": "SR 1056 existed between January 1997 and January 2009 along Davis Road and was decommissioned by January 2013.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "State Route 1056 (SR 1056) was a short state highway that existed in the central part of Martinez.  Between January 1997 and January 2009, it was established on Davis Road from either Executive Center Drive or King Road west-northwest to SR 104 (Washington Road).  By January 2013, it was decommissioned."
+    ],
+    "evidence_relations": "The evidence states both its existence span and decommissioning by 2013."
+  },
+  {
+    "id": "List of former state routes in Georgia (U.S. state)-4",
+    "source": "STEM",
+    "question": "For SR 1082 in Martinez/Evans, which segments were canceled by January 2013 and when was the remaining proposed segment canceled?",
+    "answer": "By January 2013, the second and third proposed segments were canceled and the fourth (signed) segment was decommissioned; by January 2017, the first segment was canceled.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "State Route 1082 (SR 1082) was a state highway that existed entirely in Martinez with portions proposed in Evans and Martinez.  Between January 1997 and January 2009, it had three proposed segments and one signed portion.",
+      "By January 2013, the second and third segments were canceled, and the fourth segment was decommissioned.  By January 2017, the first segment was canceled."
+    ],
+    "evidence_relations": "Sentence two explicitly states the staggered cancellations/decommissioning."
+  },
+  {
+    "id": "List of former state routes in Georgia (U.S. state)-5",
+    "source": "STEM",
+    "question": "What was SR 1109 intended to do in Effingham County, and what became of the proposal?",
+    "answer": "It was planned as a northern bypass of Springfield from SR 21 to SR 119, but between 2012 and 2015 the proposal was canceled.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "State Route 1109 (SR 1109) was a proposed state highway that was planned for the central part of Effingham County.  Between the beginning of 1997 and the beginning of 2010, it was proposed as a northern bypass of Springfield, from SR 21 north-northwest of the city to SR 119 in the northern part of the city.",
+      "Between the beginning of 2012 and the beginning of 2015, SR 1109 was canceled."
+    ],
+    "evidence_relations": "The first sentence describes the intended bypass; the second gives its cancellation window."
+  },
+  {
+    "id": "Radiation effects from the Fukushima Daiichi nuclear disaster-1",
+    "source": "STEM",
+    "question": "What immediate protective action and population displacement followed the Fukushima accident by early 2013?",
+    "answer": "Authorities set a 20 km exclusion zone around the plant, and approximately 156,000 people remained displaced as of early 2013.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "This resulted in Japanese authorities implementing a 20 km exclusion zone around the power plant, and the continued displacement of approximately 156,000 people as of early 2013."
+    ],
+    "evidence_relations": "Single sentence states both the zone and displacement figure."
+  },
+  {
+    "id": "Radiation effects from the Fukushima Daiichi nuclear disaster-2",
+    "source": "STEM",
+    "question": "For which subgroup did WHO project the largest relative cancer risk increase, and by how much did the lifetime thyroid risk change?",
+    "answer": "Girls exposed as infants in the most affected areas had the largest increase: a 70% higher risk of thyroid cancer, raising lifetime risk from 0.75% to 1.25%.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The World Health Organization (WHO) released a report that estimates an increase in risk for specific cancers for certain subsets of the population inside the Fukushima Prefecture.",
+      "A 2013 WHO report predicts that for populations living in the most affected areas there is a 70% higher risk of developing thyroid cancer for girls exposed as infants (the risk has risen from a lifetime risk of 0.75% to 1.25%)."
+    ],
+    "evidence_relations": "The second sentence directly provides both the subgroup and the quantified risk change."
+  },
+  {
+    "id": "Radiation effects from the Fukushima Daiichi nuclear disaster-3",
+    "source": "STEM",
+    "question": "Outside the most affected areas, what did WHO/UNSCEAR anticipate regarding observable cancer increases, and how many Fukushima workers had doses that slightly elevated risk?",
+    "answer": "They anticipated no observable cancer increases above natural variation outside the hardest‑hit areas; 167 Fukushima workers received doses that slightly elevate their cancer risk.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Preliminary dose-estimation reports by WHO and the United Nations Scientific Committee on the Effects of Atomic Radiation (UNSCEAR) indicate that, outside the geographical areas most affected by radiation, even in locations within Fukushima prefecture, the predicted risks remain low and no observable increases in cancer above natural variation in baseline rates are anticipated.",
+      "However, 167 Fukushima plant workers received radiation doses that slightly elevate their risk of developing cancer."
+    ],
+    "evidence_relations": "The first clause covers the general population outside hot spots; the second covers worker exposures."
+  },
+  {
+    "id": "Radiation effects from the Fukushima Daiichi nuclear disaster-4",
+    "source": "STEM",
+    "question": "Given TEPCO’s release estimates and the half‑lives of the main isotopes, which released isotope would you expect to pose longer‑term persistence risks, and why?",
+    "answer": "Caesium‑137 would be expected to persist longer because, unlike iodine‑131’s 8‑day half‑life, caesium‑137 has a half‑life of over 30 years.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "On 24 May 2012, more than a year after the disaster, TEPCO released their estimate of radioactivity releases ... A total of 511,000 TBq of iodine-131 was released into both the atmosphere and the ocean, 13,500 TBq of caesium-134 and 13,600 TBq of caesium-137.",
+      "Iodine-131 has a half-life of 8 days while caesium-137 has a half-life of over 30 years."
+    ],
+    "evidence_relations": "The TEPCO figures identify the isotopes released; longer half‑life of Cs‑137 supports greater long‑term persistence."
+  },
+  {
+    "id": "Radiation effects from the Fukushima Daiichi nuclear disaster-5",
+    "source": "STEM",
+    "question": "Despite localized high cesium in some fish, what did assessments conclude about overall risks to marine life and consumers near Fukushima?",
+    "answer": "Measurements suggested minor consequences for marine life as of autumn 2011 and that radiation risks were below levels generally considered harmful to marine animals and human consumers, even though some fish showed high cesium concentrations.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The results of measurements of both the seawater and the coastal sediments led to the supposition that the consequences of the accident, in terms of radioactivity, would be minor for marine life as of autumn 2011 (weak concentration of radioactivity in the water and limited accumulation in sediments).",
+      "Despite caesium isotopic concentration in the waters off of Japan being 10 to 1000 times above concentration prior to the accident, radiation risks are below what is generally considered harmful to marine animals and human consumers.",
+      "Around August 2012 two greenling were caught close to the Fukushima shore, they contained more than 25,000 becquerels a kilogram of cesium, the highest cesium levels found in fish since the disaster and 250 times the government’s safety limit."
+    ],
+    "evidence_relations": "First two sentences state overall risk assessment; the third provides a contrasting example of high contamination in individual fish."
+  },
+  {
+    "id": "University of Scranton buildings and landmarks-1",
+    "source": "STEM",
+    "question": "Why was the Harry and Jeanette Weinberg Memorial Library built to replace the Alumni Memorial Library, and how did its design address the specific shortcomings?",
+    "answer": "It was built because the Alumni Memorial Library could no longer serve the growing student body, house expanding collections, or support needed wiring; the Weinberg Library more than doubled the size, added five floors, and seating for 700–1000, directly addressing capacity and modernization needs.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Completed in 1992, the Harry and Jeanette Weinberg Memorial Library was designed to replace the Alumni Memorial Library, which proved unable to serve adequately the growing student population, to house the vast library collections, and lacked the necessary wiring for modernizing the library with new technological advances.",
+      "More than double the size of the Alumni Memorial Library, the Weinberg Memorial Library has five floors which can seat anywhere from 700 to 1000 users at cubicles, tables, group study rooms, and lounges."
+    ],
+    "evidence_relations": "The first sentence states the reasons for replacing the Alumni Memorial Library; the second shows how the new library’s greater size and seating directly remedied those deficits."
+  },
+  {
+    "id": "University of Scranton buildings and landmarks-2",
+    "source": "STEM",
+    "question": "Among the three churches the University acquired in the 1980s, which one became the principal campus setting for university liturgies, and what evidence supports this?",
+    "answer": "Rock Hall became the principal campus setting for university liturgies because it houses the Madonna Della Strada Chapel, identified as the main venue for campus liturgies.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Rock Hall is one of three churches the university acquired and preserved during the 1980s once their congregations were no longer able to maintain the buildings.",
+      "It currently houses Madonna Della Strada Chapel, the principal campus setting for university liturgies."
+    ],
+    "evidence_relations": "The text first lists Rock Hall as one of three acquired churches, then explicitly states that it houses the Madonna Della Strada Chapel—the principal setting for university liturgies—thereby identifying Rock Hall as the one used for regular campus liturgies."
+  },
+  {
+    "id": "University of Scranton buildings and landmarks-3",
+    "source": "STEM",
+    "question": "What policy change triggered the University’s temporary use of Navy barracks buildings, and how long were those buildings used before permanent structures replaced them?",
+    "answer": "The post–World War II G.I. Bill caused a surge in enrollment; the Navy barracks obtained in 1947 were intended as temporary space but were used for nearly fifteen years before permanent buildings replaced them.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "In 1945, with the end of World War II and the creation of the G.I. Bill enrollment exploded at the University of Scranton.",
+      "Originally intended as temporary measures to accommodate the larger student body, the Barracks buildings were used for nearly fifteen years before being replaced by permanent structures."
+    ],
+    "evidence_relations": "The G.I. Bill is cited as driving enrollment growth; the text then explains that the acquired barracks, meant as temporary accommodations, remained in use for nearly fifteen years until permanent buildings replaced them."
+  },
+  {
+    "id": "University of Scranton buildings and landmarks-4",
+    "source": "STEM",
+    "question": "Which structure remained in service longer after the 1940s—the Throop House or the Engineering (E) Building—and what events demonstrate this?",
+    "answer": "The Engineering (E) Building outlasted Throop House: Throop House was demolished in January 1943, whereas E Building was dismantled in 1960 and then served as a grade school annex before being demolished in the 1980s.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Though its former barn was used by the University until 1956, Throop House was demolished in January 1943, because it was considered a fire hazard.",
+      "In 1960, E Building was dismantled in order to make room for St. Thomas Hall.  It was then shipped to St. Jude's Parish in Mountaintop, Pennsylvania to be used as a grade school annex.  It was subsequently demolished in the 1980s."
+    ],
+    "evidence_relations": "Throop House ended in 1943, while E Building continued into the 1960s and 1980s, proving E Building remained in service much longer."
+  },
+  {
+    "id": "University of Scranton buildings and landmarks-5",
+    "source": "STEM",
+    "question": "What was the stated rationale for renaming the President’s Office Building to Scranton Hall in 1984?",
+    "answer": "It was renamed to honor the Scranton family’s long-standing contributions to the region and the University.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "From 1958 until 1984, the building was known simply as the President’s Office Building.",
+      "In 1984, the University’s President Rev. J.A. Panuska, S.J. renamed the building as Scranton Hall to honor the contributions of the Scranton family.  He stated that: \"Ever since the Scrantons began migrating to Northeastern Pennsylvania in the late 1830s, their vision has touched the life of this region to such an extent that this city and this University bear their name.\""
+    ],
+    "evidence_relations": "The first quote establishes the original name and date span; the second provides the explicit purpose and Panuska’s statement explaining the honor, hence the rationale."
+  },
+  {
+    "id": "Christchurch Transport Board-1",
+    "source": "STEM",
+    "question": "What was the sequence of mode changes after the Board rebranded in December 1951—specifically, when did trams cease, trolley buses end, and full dieselization occur?",
+    "answer": "After the December 5, 1951 rebranding, the last trams were withdrawn in 1954, trolley buses ended in 1956, and the fleet became entirely diesel by 1964.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The name of the Board was changed ... to Christchurch Transport Board effective from 5 December 1951.",
+      "The last of the Board's trams were withdrawn in 1954, followed by its trolley buses in 1956.",
+      "Its operations were fully converted to diesel buses in 1964 when the last of its older vehicles were replaced, including its petrol buses."
+    ],
+    "evidence_relations": "These statements together establish the timeline: rebrand (Dec 1951) → trams end (1954) → trolley buses end (1956) → full diesel conversion (1964)."
+  },
+  {
+    "id": "Christchurch Transport Board-2",
+    "source": "STEM",
+    "question": "How did the Board secure financing for trolley buses after an initial loan rejection, and what condition had to be met?",
+    "answer": "After an initial loan rejection, the Board obtained permission for a £950,000 loan subject to approval by plebiscite, and an aggressive advertising campaign won voter approval.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "…the Loans Board rejected the application for a loan to cover the cost of the buses and stabling facilities.",
+      "Permission for a loan of £950,000 was granted, subject to approval by plebiscite.  This time, an aggressive advertising campaign preceding the poll succeeded in winning approval for the loan."
+    ],
+    "evidence_relations": "First, the loan was rejected; then approval was permitted only if a plebiscite passed, which it did after campaigning—explaining how financing was ultimately secured."
+  },
+  {
+    "id": "Christchurch Transport Board-3",
+    "source": "STEM",
+    "question": "Which tram route was kept running during the early 1950s bus conversions, and what infrastructure action was taken to do so?",
+    "answer": "The Papanui–Cashmere tram route was retained, and track was relaid to keep the service going.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Despite the move to introduce buses on many tram routes, trams were still favoured for the Papanui–Cashmere route so it was decided to relay track on this line to keep the service going."
+    ],
+    "evidence_relations": "The line specifies both the exception (Papanui–Cashmere) and the enabling action (relaying track), allowing the deduction."
+  },
+  {
+    "id": "Christchurch Transport Board-4",
+    "source": "STEM",
+    "question": "After the Board was disestablished in 1989, what organizational changes occurred to its bus operations up through 1999?",
+    "answer": "Following disestablishment, the bus operation moved to a Local Authority Trading Enterprise after 1991 deregulation, and the remnants survive today as Christchurch City Council–owned Red Bus, the name used since 1999.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "…disestablished in 1989 by local government reforms.",
+      "Subsequent to its demise, the Board's bus operation was transferred to a Local Authority Trading Enterprise (LATE)… following deregulation in mid-1991.",
+      "The remnants of the Board survive today as the Christchurch City Council-owned Red Bus, the name by which it has been known since 1999."
+    ],
+    "evidence_relations": "These sentences trace the post-1989 evolution—disestablishment → LATE transfer after deregulation → current identity as Red Bus since 1999."
+  },
+  {
+    "id": "Christchurch Transport Board-5",
+    "source": "STEM",
+    "question": "What was the final public service of the early Walker ‘Beetle’ vehicle, and what happened to its body and chassis afterward?",
+    "answer": "Its last public service was a weekend cemetery shuttle ending on January 1, 1922; afterward it was dismantled—the body was lengthened and mounted on another chassis, and the Walker chassis was cut up for parts.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "…to run an afternoon shuttle service… between the Brighton tramline at Linwood Avenue and the Bromley Cemetery during weekends.  This proved to be its last public service, ending on 1 January 1922, after which it was dismantled.",
+      "The body was later lengthened and mounted on another chassis while the Walker chassis was cut up for parts."
+    ],
+    "evidence_relations": "The first quote fixes the last service and date; the second explains the subsequent fates of the body and original chassis."
+  },
+  {
+    "id": "Reduced muscle mass in space-1",
+    "source": "STEM",
+    "question": "Despite the presence of iRED on the ISS, why did long-duration crews still show ~23–25% knee strength losses comparable to Mir missions?",
+    "answer": "Because exercise hardware often failed to meet science requirements (iRED providing only half the required load) and was not continuously available, leading to significant strength losses despite slightly better preservation of lean mass.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "…the interim RED [iRED] provides only half of that amount. … it will likely not provide sufficient load in a zero-gravity environment to prevent loss of muscle and bone tissue…",
+      "…only for 2 short periods during Expeditions 3 and 4 were all three U.S. onboard exercise devices… capable of being used under nominal conditions… The almost continuously suboptimal availability of exercise equipment likely has reduced maintenance of crew physical fitness.",
+      "…knee extensor and knee flexor strength losses in long-duration crewmembers after flights aboard Mir and ISS were ~23% and ~25%, respectively… despite apparent slightly increased preservation of muscle mass…"
+    ],
+    "evidence_relations": "The first two statements show hardware shortfalls and availability problems; the third quantifies similar strength losses on Mir and ISS, explaining the observed outcome despite iRED. "
+  },
+  {
+    "id": "Reduced muscle mass in space-2",
+    "source": "STEM",
+    "question": "Why do bed-rest models understate back-muscle losses compared with actual spaceflight?",
+    "answer": "During bed rest, back muscles remain used for positional adjustments and protection against compression, whereas in microgravity they are less used because they need not support the body against gravity.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "There is good correlation between long-duration bed rest and spaceflight of similar duration except that losses in the back muscles are much less with bed rest.",
+      "This likely reflects use of these muscles during bed rest to adjust body position and to reduce the potential for vascular compression and tissue injury.  During spaceflight the back muscles are apparently less used because they do not have to support the upright body against Earth gravity…"
+    ],
+    "evidence_relations": "The text directly contrasts bed rest versus spaceflight back-muscle use, explaining smaller losses in bed rest and larger in spaceflight. "
+  },
+  {
+    "id": "Reduced muscle mass in space-3",
+    "source": "STEM",
+    "question": "What single type of in-flight countermeasure has been used in the U.S. program, and why is it necessary given the effects of microgravity on antigravity muscles?",
+    "answer": "Physical exercise is the only in-flight countermeasure used; it is necessary because decreased mechanical loading in microgravity causes decreased strength and increased fatigability, especially in antigravity muscles.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "In the U.S. human space program, the only in-flight countermeasure to skeletal muscle functional deficits that has been utilized thus far is physical exercise.",
+      "…effects related to the decrease in the level of mechanical loading that occurs during microgravity exposure logically would be reflected most acutely in these muscles.  Changes… are paralleled by… decreased muscle strength and increased muscle fatigability."
+    ],
+    "evidence_relations": "The second quote explains the problem (microgravity unloading harms antigravity muscles), and the first states the mitigation (exercise), linking need to countermeasure."
+  },
+  {
+    "id": "Reduced muscle mass in space-4",
+    "source": "STEM",
+    "question": "According to postflight ASCR functional tests, how quickly are most performance decrements reversed?",
+    "answer": "Most decrements reverse by postflight day 30 with ground-based exercises.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "…functional tests… reveal that crewmembers return with less physical capability than when they launch but that most of the decrements are reversed by postflight day 30 secondary to the ground-based exercises…"
+    ],
+    "evidence_relations": "The sentence explicitly gives the timeline (reversed by day 30) and ties it to postflight exercise."
+  },
+  {
+    "id": "Reduced muscle mass in space-5",
+    "source": "STEM",
+    "question": "What fundamental physiological balance explains why lean body mass decreases after spaceflight even though whole-body protein synthesis increased during flight?",
+    "answer": "Lean mass falls because protein degradation rates increase more than synthesis, so despite increased synthesis, net balance is negative after spaceflight.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Direct measurement of protein synthesis during spaceflight using 15N-glycine… revealed an increase in whole-body protein synthesis rates.",
+      "These results indicated that the significant decrease in lean body mass observed after spaceflight must be associated with a significant increase in protein degradation rates rather than an inhibition of protein synthesis."
+    ],
+    "evidence_relations": "The quotes show increased synthesis during flight but decreased lean mass overall; the explanation is increased degradation overwhelming synthesis."
+  },
+  {
+    "id": "Northern goshawk-1",
+    "source": "STEM",
+    "question": "How can one distinguish a juvenile northern goshawk from a juvenile Cooper’s hawk when size seems similar?",
+    "answer": "Juvenile goshawks have heavier, more even vertical streaking and, despite apparent size overlap, wing and tail morphometrics do not overlap with Cooper’s; the teardrop-like tapered streaking is typical of juvenile Cooper’s hawks.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "…the juvenile goshawk displays a heavier, vertical streaking pattern on chest and abdomen, with the juvenile Cooper's hawk streaking frequently (but not always) in a “teardrop” pattern wherein the streaking appears to taper at the top, as opposed to the more even streaking of the goshawk.",
+      "Although there appears to be a size overlap between small male goshawks and large female Cooper's hawks, morphometric measurements (wing and tail length) of both species demonstrate no such overlap…"
+    ],
+    "evidence_relations": "Plumage pattern distinguishes them and morphometrics rule out true size overlap, guiding correct identification."
+  },
+  {
+    "id": "Northern goshawk-2",
+    "source": "STEM",
+    "question": "Why can human logging activity cause goshawk nesting failure while research visits typically do not?",
+    "answer": "Noisy timber harvests near nests caused incubation failures, whereas researchers minimize disturbance by keeping visits brief and showed no deterrent effect on brood success.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "…all nesting attempts that were occurring within 50 to of active logging failed, frequently after parents abandoned the nest.",
+      "Wildlife researchers and biologists do not seem to negatively affect goshawk nests, as they aware to keep forays to the nest brief and capture of adult goshawks for radio-tagging was found to not determent their success at raising broods."
+    ],
+    "evidence_relations": "The first statement links logging noise to failures; the second explains researchers’ minimal impact due to brief, careful visits."
+  },
+  {
+    "id": "Northern goshawk-3",
+    "source": "STEM",
+    "question": "Even though federal listing petitions were declined, what protections does the northern goshawk still have in North America?",
+    "answer": "It is listed as a “sensitive species” by the U.S. Forest Service, protected federally under the Migratory Bird Treaty Act (since 1972 amendment), and included in CITES Appendix II.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The United States Forest Service (US Dept of Agriculture) has listed the goshawk as a \"sensitive species\", while it also benefits from various protection at the state level.",
+      "In North America, the goshawk is federally protected under the Migratory Bird Treaty Act of 1918 by an amendment incorporating native birds of prey into the Act in 1972.",
+      "The northern goshawk is also listed in Appendix II of the Convention on International Trade in Endangered Species (CITES)."
+    ],
+    "evidence_relations": "These sentences enumerate existing protections despite the lack of an ESA listing, establishing a layered protection regime."
+  },
+  {
+    "id": "Northern goshawk-4",
+    "source": "STEM",
+    "question": "Where did the northern goshawk likely diversify before expanding west and east, and what evidence supports its early presence in North America?",
+    "answer": "It likely diversified in northern–central Eurasia, spread west into Europe and later east into North America across the Bering Land Bridge; fossils show goshawks were present in California by the Pleistocene.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The northern goshawk appears to have diversified in northern, central Eurasia and spread both westwards to occupy Europe and, later on, eastwards to spread into North America across the Bering Land Bridge.",
+      "Fossil remains show that goshawks were present in California by the Pleistocene era."
+    ],
+    "evidence_relations": "The first quote gives the diversification and dispersal route; the second corroborates presence in North America in the Pleistocene."
+  },
+  {
+    "id": "Northern goshawk-5",
+    "source": "STEM",
+    "question": "Name two types of non-avian predators that threaten goshawks at or near the nest, and explain when fledglings are particularly vulnerable.",
+    "answer": "Mammals such as raccoons and bobcats can prey on nestlings, and fledglings are vulnerable to canids like coyotes and red foxes when they perch low and are clumsier shortly after leaving the nest.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "…raccoons (\"Procyon lotor\"), bobcats (\"Lynx rufus\") and American black bears (\"Ursus americanus\").",
+      "Fledgling goshawks are also vulnerable to canids such as coyotes (\"Canis latrans\"), gray wolves (\"Canis lupus\") and red foxes as they may perch lower to the ground and are clumsier, more unsteady and less cautious than older birds."
+    ],
+    "evidence_relations": "The first quote lists mammalian nest predators; the second explains fledgling vulnerability and identifies canids as threats."
+  },
+  {
+    "id": "US Speed limits by jurisdiction-1",
+    "source": "STEM",
+    "question": "Between Texas and Wyoming, which jurisdiction allows a higher posted maximum speed and by how much?",
+    "answer": "Texas allows the nation’s highest posted speed—85 mph—on a single rural tollway segment, which is 5 mph faster than Wyoming’s 80 mph maximum.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The highest speed limit in the country is 85 mph , which is posted on a single stretch of tollway in rural Texas.",
+      "Wyoming's highest speed limit is 80 mph, found on its Interstate highways…"
+    ],
+    "evidence_relations": "These two statements allow a direct 85 vs. 80 mph comparison, showing Texas is higher by 5 mph."
+  },
+  {
+    "id": "US Speed limits by jurisdiction-2",
+    "source": "STEM",
+    "question": "If a California driver is cited for 60 mph on a two‑lane undivided highway posted at 55 mph, what legal defense could they argue under the Basic Speed Law?",
+    "answer": "They could argue, with competent evidence, that their speed—even if over the posted limit—was nevertheless safe for the time, place, and conditions, because California’s Basic Speed Law sets prima facie (not absolute) limits.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "…because the Basic Speed Law establishes \"prima facie\" limits, not absolute ones, they can also defend against a citation for speeding \"by competent evidence that the speed in excess of said limits did not constitute a violation of the basic speed law at the time, place and under the conditions then existing\", per section 22351(b)…",
+      "…\"a person traveling over the speed limit–but less than the usual 65 mph maximum speed (55 mph for two-lane undivided highways)–isn't necessarily violating the law\"…"
+    ],
+    "evidence_relations": "These passages explain the prima facie nature of California’s speed limits and the evidentiary defense available for speeds above posted limits if conditions were safe."
+  },
+  {
+    "id": "US Speed limits by jurisdiction-3",
+    "source": "STEM",
+    "question": "Which state was the last in the continental U.S. to raise its maximum speed limit above 55 mph, and when did it do so?",
+    "answer": "Connecticut was the last, increasing the maximum from 55 to 65 mph on October 1, 1998.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "…Connecticut was among the last states to raise its maximum speed limit… The statewide maximum speed limit was increased from to on October 1, 1998, making Connecticut the last state in the continental United States to raise its speed limit above ."
+    ],
+    "evidence_relations": "The sentence explicitly identifies Connecticut and the date, framing it as the last state to raise the limit above 55 mph."
+  },
+  {
+    "id": "US Speed limits by jurisdiction-4",
+    "source": "STEM",
+    "question": "What legislative changes increased Wyoming’s lawful speeds on selected highways in 2014–2016, and what were the resulting maxima for two‑lane highways?",
+    "answer": "A 2014 bill raised selected freeway segments to 80 mph (effective July 1, 2014), and a separate provision—enacted in 2015 and implemented in 2016—raised certain two‑lane highways to 70 mph.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "In February 2014, the state Assembly passed a bill that would raise the speed limit from 75 to 80 mph on certain freeway segments… raised the speed limit… to 80 mph on July 1, 2014.",
+      "…an attempt to raise the speed limit to 70 on two lane highways … was turned down that same month, but this same provision became law in February 2015.  On February 1, 2016, the speed limit on WY 120 … increased to 70 mph."
+    ],
+    "evidence_relations": "These statements show the two-step process: freeway speeds to 80 mph in 2014 and later two‑lane highway increases to 70 mph (law in 2015, specific segments by Feb. 2016)."
+  },
+  {
+    "id": "US Speed limits by jurisdiction-5",
+    "source": "STEM",
+    "question": "Under statutory urban limits, what speeds apply in the densest urban districts versus rustic roads, and what does that imply for posting requirements?",
+    "answer": "Statutory limits apply at 25 mph in the densest urban districts (and 35 mph in light development) while rustic roads can be 45 mph; alleging failure to post such a statutory limit is not a legal defense.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "In the densest urban districts a statutory 25 mph limit is effective when adequate signage is used, as are 35 mph limits in areas of light development.  The same applies to 45 mph limits on highways designated as \"rustic\" roads.",
+      "However, \"an alleged failure to post [such a speed limit sign] is not a defense to a prosecution\" in the case of such statutory limits."
+    ],
+    "evidence_relations": "The first statement lists the statutory limits by context; the second clarifies that lack of signage is not a defense for statutory limits, shaping posting expectations."
+  },
+  {
+    "id": "Architecture of Wales-1",
+    "source": "STEM",
+    "question": "Identify two national projects that exemplify 21st‑century architecture in Wales and explain their contrasting aims as described.",
+    "answer": "The Wales Millennium Centre is highlighted as the most striking building, hosting performing arts across multiple resident organizations, while the Senedd was designed as an open, transparent democratic venue with a public Siambr and viewing gallery.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The most striking building of 21st-century Wales is the Millennium centre on Cardiff Bay.",
+      "The Centre comprises one large theatre and two smaller halls with shops, bars and restaurants.  It houses the national orchestra and opera, dance, theatre and literature companies, a total of eight arts organisations in residence.",
+      "The Senedd houses the debating chamber and committee rooms of the Welsh Assembly… The building was designed to be as open and accessible as possible… “a transparent envelope… making visible the inner workings of the Assembly and encouraging public participation in the democratic process.”"
+    ],
+    "evidence_relations": "These passages collectively show the Millennium Centre’s cultural hosting role and the Senedd’s transparency-oriented civic design."
+  },
+  {
+    "id": "Architecture of Wales-2",
+    "source": "STEM",
+    "question": "How does the tallest building in Wales compare to the country’s first true skyscraper in terms of height and date, and what does that indicate about building trends?",
+    "answer": "The Tower, Meridian Quay (2010) at 107 m and 29 storeys surpasses the earlier Capital Tower (1969–70) at 25 storeys, indicating a later move to taller residential high‑rises after earlier commercial high‑rise beginnings.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Currently the tallest building in Wales is The Tower, Meridian Quay at Swansea, which is 107 meters high and completed in 2010. The tower has 29 storeys…",
+      "The first true skyscraper in Wales was the Capital Tower in Cardiff.  It was completed in 1969–70… over 25 storeys."
+    ],
+    "evidence_relations": "Placing the two statements together shows a temporal progression from the first skyscraper (1969–70) to a taller modern residential tower (2010)."
+  },
+  {
+    "id": "Architecture of Wales-3",
+    "source": "STEM",
+    "question": "Which 19th‑century public building exemplifies the Greek Revival in Wales, and what defining feature marks its façade?",
+    "answer": "Swansea Museum (1839–1841) exemplifies the Greek Revival, with a three‑bay portico supported on Ionic columns faced in Bath ashlar stone.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The Greek revival style was chosen for many public buildings in Wales.  Swansea Museum of 1839–1841… is a finely detailed and well balanced example with a three bay portico supported on Ionic columns.  It is faced in Bath ashlar stone."
+    ],
+    "evidence_relations": "The sentence names Swansea Museum and describes the Ionic portico, the hallmark used here to identify the style."
+  },
+  {
+    "id": "Architecture of Wales-4",
+    "source": "STEM",
+    "question": "What superlative attribute of the National Botanic Garden of Wales’ Great Glasshouse is specified, and what is the geometric term used for its roof form?",
+    "answer": "It is the largest single‑span glasshouse in the world (110 m by 60 m), and its roof is an “elliptical torus” carried on twenty‑four elliptical arches.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "This is the largest single span glasshouse in the world 110 metres long and 60 metres wide.",
+      "The roof an \"elliptical torus\" is carried on twenty-four elliptical arches…"
+    ],
+    "evidence_relations": "The two quotes jointly provide the superlative size and the specific geometric roof description."
+  },
+  {
+    "id": "Architecture of Wales-5",
+    "source": "STEM",
+    "question": "Why is C. F. Voysey’s Ty Bronna considered a precursor of Modernist architecture in Wales?",
+    "answer": "Because its clean, stone‑faced form with gabled ends, hipped roof, battered buttresses, and bowed east window exemplified a simplification that Pevsner viewed as anticipating Modernism.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Then in 1903 – 6 he comes back to Wales to design the little known Ty Bronna… a minor masterpiece with its clean white outline, faced in stone, gabled at each end with a hipped roof and the angled battered buttresses… It has a bowed east window…",
+      "Pevsner sees buildings such as this by Voysey as being a precursor of Modernist architecture."
+    ],
+    "evidence_relations": "The first quote describes Ty Bronna’s simplified forms; the second explicitly connects that to being a precursor of Modernism, supporting the interpretation."
+  },
+  {
+    "id": "Flint water crisis-1",
+    "source": "STEM",
+    "question": "What causal chain linked the 2014 source switch to dangerous lead exposure in Flint’s drinking water?",
+    "answer": "Switching from treated Lake Huron/Detroit River water to the Flint River without corrosion inhibitors caused lead to leach from aging pipes, elevating lead levels and exposing residents to a serious public‑health danger.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The Flint drinking water contamination issue started in April 2014 when Flint changed its water source from treated Detroit Water and Sewerage Department water (sourced from Lake Huron and the Detroit River) to the Flint River.",
+      "Officials failed to apply corrosion inhibitors to the water.",
+      "…caused lead from aging pipes to leach into the water supply, leading to extremely elevated levels of the heavy metal neurotoxin."
+    ],
+    "evidence_relations": "These consecutive statements present the full chain: source change → no corrosion control → pipe leaching → elevated lead exposure."
+  },
+  {
+    "id": "Flint water crisis-2",
+    "source": "STEM",
+    "question": "How long after the April 2014 switch was a federal state of emergency declared, and what guidance remained in early 2017 despite water quality improving?",
+    "answer": "About 21 months later (January 2016) a federal emergency was declared; even after quality returned to acceptable levels by early 2017, residents were told to keep using bottled or filtered water until all lead pipes were replaced (no sooner than 2020).",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "…a federal state of emergency was declared in January 2016…",
+      "As of early 2017, the water quality had returned to acceptable levels; however, residents were instructed to continue to use bottled or filtered water until all the lead pipes have been replaced, which is expected to be completed no sooner than 2020."
+    ],
+    "evidence_relations": "Counting from April 2014 to January 2016 yields ~21 months; the second quote explains continued guidance despite improvement."
+  },
+  {
+    "id": "Flint water crisis-3",
+    "source": "STEM",
+    "question": "Which specific public‑funding actions were taken in 2016 to address Flint’s crisis, and for what purposes?",
+    "answer": "Michigan approved $165 million on June 29, 2016 for lead‑pipe replacements and reimbursements, and Congress passed a $170 million stopgap bill in December 2016 for water‑system repairs and healthcare support.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Another $165 million for lead pipe replacements and water bill reimbursements was approved by Snyder on June 29, 2016.",
+      "A $170 million stopgap spending bill for repairing and upgrading the city of Flint's water system and helping with healthcare costs was approved by the U.S. House of Representatives on December 8, 2016.  The Senate approved it the next day."
+    ],
+    "evidence_relations": "These sentences list two distinct 2016 allocations and their purposes."
+  },
+  {
+    "id": "Flint water crisis-4",
+    "source": "STEM",
+    "question": "What policy lesson did the American Journal of Public Health highlight to prevent future contamination crises, and how does it relate to Flint’s decisions?",
+    "answer": "Officials should consult qualified professionals and make evidence‑based decisions; Snyder’s administration introduced a corrosive source without adequate corrosion control, illustrating the risk of bypassing professional standards.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "…to prevent another contamination crisis, officials such as Governor Snyder should consult \"professionals\" and make \"qualified\" decisions.",
+      "\"Snyder and his administration introduced a corrosive water source into an aging water filtration system without adequate corrosion control (APHA).\""
+    ],
+    "evidence_relations": "The first quote states the general recommendation; the second ties that principle to Flint’s misstep, showing the lesson’s relevance."
+  },
+  {
+    "id": "Flint water crisis-5",
+    "source": "STEM",
+    "question": "What health impact on children was reported as a consequence of the water change, and how much might the elevated blood‑lead prevalence have increased?",
+    "answer": "Between 6,000 and 12,000 children were exposed to high lead levels, and the share with elevated blood‑lead may have risen from about 2.5% (2013) to as much as 5% (2015).",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "In Flint, between 6,000 and 12,000 children have been exposed to drinking water with high levels of lead…",
+      "…the percentage of Flint children with elevated blood-lead levels may have risen from about 2.5% in 2013 to as much as 5% in 2015."
+    ],
+    "evidence_relations": "The two statements together quantify exposure and the potential doubling in elevated blood‑lead prevalence."
+  },
+  {
+    "id": "Well-being factors-1",
+    "source": "STEM",
+    "question": "According to positive psychology, what constitutes “the good life,” and which principle indicates its priority over mere hedonism?",
+    "answer": "Positive psychology views the good life as living happily, engaged, and meaningfully by using one’s signature strengths; as Peterson put it, “eudaimonia trumps hedonism.”",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Positive psychology is concerned with eudaimonia, \"the good life\" or flourishing… While not attempting a strict definition of the good life, positive psychologists agree that one must live a happy, engaged, and meaningful life…",
+      "Martin Seligman referred to \"the good life\" as \"using your signature strengths every day to produce authentic happiness and abundant gratification\".",
+      "According to Christopher Peterson, \"eudaimonia trumps hedonism\"."
+    ],
+    "evidence_relations": "These lines define and qualify the good life and explicitly state the priority of eudaimonia over hedonism."
+  },
+  {
+    "id": "Well-being factors-2",
+    "source": "STEM",
+    "question": "Which foundational frameworks are cited as central to studying well‑being, and how broad is the scope of topics they cover?",
+    "answer": "Central frameworks include Diener’s tripartite model, Ryff’s six‑factor model, Keyes’s work on flourishing, and Seligman’s PERMA; research spans biological, personal, relational, institutional, cultural, and global dimensions.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Central theories are Diener's tripartite model of subjective well-being, Ryff's Six-factor Model of Psychological Well-being, Corey Keyes work on flourishing, and Seligmann's contributions to positive psychology and his theories on \"authentic happiness\" and P.E.R.M.A.",
+      "Research on positive psychology, well-being, eudaimonia and happiness… cover a broad range of levels and topics, including \"the biological, personal, relational, institutional, cultural, and global dimensions of life.\""
+    ],
+    "evidence_relations": "The first sentence lists the frameworks; the second articulates their broad, multi‑level scope."
+  },
+  {
+    "id": "Well-being factors-3",
+    "source": "STEM",
+    "question": "Why did researchers argue that adolescents merit special attention in eudaimonic studies, and which theory framed their approach?",
+    "answer": "Adolescents face rapid cognitive, social, and physical changes yet were under‑studied; researchers used the eudaimonic identity theory to examine development via self‑discovery and self‑realization.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "…there has been little research done in the areas of adolescence and youth.",
+      "Adolescents rapidly face cognitive, social and physical changes, making them prime subjects to study for development and well-being.",
+      "The \"eudaimonic identity theory\" was used in their research to examine the development of identity through self-discovery and self-realization."
+    ],
+    "evidence_relations": "These passages supply both the research gap and the framing theory applied to adolescents."
+  },
+  {
+    "id": "Well-being factors-4",
+    "source": "STEM",
+    "question": "Within the eudaimonic identity theory context, what are the three developmental elements researchers examined, and how do self‑defining activities shape social environments?",
+    "answer": "The elements were self‑defining activities, personal expressiveness, and goal‑directed behaviours; by choosing self‑defining activities, adolescents help determine their social environments—for example, sports involvement draws like‑minded active, competitive peers.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Researchers focused their studies on PYD (positive youth development) and the \"eudaimonic identity theory\" in the context of 3 developmental elements: \"self-defining activities\", \"personal expressiveness\" and \"goal-directed behaviours\".",
+      "These \"self-defining activities\" also help determine the adolescent's social environments.  For example, an adolescent involved in sports, would likely surround themselves with like-minded active and competitive people."
+    ],
+    "evidence_relations": "The first quote enumerates the three elements; the second explains the social‑environmental implications of self‑defining activities with a concrete example."
+  },
+  {
+    "id": "Well-being factors-5",
+    "source": "STEM",
+    "question": "Which core concepts are explicitly linked as related to well‑being in positive psychology, and what overarching aim do they support?",
+    "answer": "Eudaimonia, happiness, flourishing, quality of life, contentment, and meaningful life are linked; together they support pursuing a well‑lived and fulfilling life.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Well-being is a much-studied topic in psychology, especially positive psychology.  Related concepts are eudaimonia, happiness, flourishing, quality of life, contentment, and meaningful life."
+    ],
+    "evidence_relations": "The sentence lists the interrelated concepts, framing the aim of a fulfilling life studied in positive psychology."
+  }
+]

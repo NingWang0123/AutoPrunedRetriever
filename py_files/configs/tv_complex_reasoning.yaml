@@ -1,0 +1,37 @@
+# HF repo (set to null to force local-only)
+repo_id: null
+
+# default dataset key (override with -d/--dataset)
+dataset: tv
+
+# input templates
+corpus_file: data/corpus/tv_corpus.json
+# quest is from local
+quest_file: data/tv_QnA_modified.json
+
+# runner/processing knobs
+chunking_use: rebel
+
+# outputs (template by dataset; optionally include chunking_use)
+ini_meta_json: outputs/{dataset}/meta_codebook_{chunking_use}.json
+saved_examples_name: outputs/{dataset}/reasoning_pref_{dataset}.json
+final_json_path: outputs/{dataset}/reasoning_{dataset}_results.json
+
+# sizes
+seed_n: 20
+test_n: 2024
+
+# retrieval / consolidation
+top_m: 20
+top_k: 200
+combine_ent_sim: 0.93
+q_combine_sim: 0.93
+aft_combine_sim: 0.93
+semantic_overlap_sim: 0.93
+
+# reward + mode
+reward_func: reward_sbert_inclusive
+reward_func_mode: non_llm
+
+# optional; prefer env OPENAI_API_KEY if omitted
+llm_api: null
