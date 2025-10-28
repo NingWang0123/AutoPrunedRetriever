@@ -655,6 +655,14 @@ def main():
         "history": {
             "corpus": "./Datasets/Corpus/history_corpus.json",
             "questions": "./Datasets/Questions/history_QnA.json"
+        },
+        "stem": {
+            "corpus": "./Datasets/Corpus/stem_corpus.json",
+            "questions": "./Datasets/Questions/stem_QnA_modified.json"
+        },
+        "tv": {
+            "corpus": "./Datasets/Corpus/tv_corpus.json",
+            "questions": "./Datasets/Questions/tv_QnA_modified.json"
         }
     }
 
