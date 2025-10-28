@@ -638,11 +638,11 @@ def main():
     SUBSET_PATHS = {
         "medical": {
             "corpus": "./Datasets/Corpus/medical.json",
-            "questions": "./Datasets/Questions/medical_questions.json"
+            "questions": "./Datasets/Questions/medical_complex_reasoning.json"
         },
         "novel": {
             "corpus": "./Datasets/Corpus/novel.json",
-            "questions": "./Datasets/Questions/novel_questions.json"
+            "questions": "./Datasets/Questions/novel_complex_reasoning.json"
         },
         "2wikimultihop": {
             "corpus": "./Datasets/Corpus/2wikimultihop.json",
