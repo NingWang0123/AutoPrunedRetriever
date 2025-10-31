@@ -29,6 +29,7 @@ from optimize_combine_storage import ann_feat_combine,ann_merge_questions_answer
 from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 from rouge_score import rouge_scorer
 from test_continous_chunk import embed_triples_as_sentences,segment_by_centroid_sim,merge_chunks_by_boundary 
+from math import ceil
 
 Triplet = Tuple[str, str, str]
 
@@ -3978,148 +3979,432 @@ class AutoPrunedRetriver:
         self.set_include_answers()
         self.set_include_facts()
 
-    def preload_context_json(self, json_path: str, chunk_tokens: int = 1200, overlap_tokens: int = 100, sub_chunk_chars: int = 300, sub_chunk_overlap: int = 50, tokenizer_name: str = "gpt-4o-mini", subchunk_batch: int = 500):
-        import json
+    # def preload_context_json(self, json_path: str, chunk_tokens: int = 1200, overlap_tokens: int = 100, sub_chunk_chars: int = 300, sub_chunk_overlap: int = 50, tokenizer_name: str = "gpt-4o-mini", subchunk_batch: int = 500):
+    #     import json
+    #     import tiktoken
+
+    #     with open(json_path, "r", encoding="utf-8") as f:
+    #         data = json.load(f)
+
+    #     try:
+    #         tokenizer = tiktoken.encoding_for_model(tokenizer_name)
+    #     except KeyError:
+    #         tokenizer = tiktoken.get_encoding("cl100k_base")
+
+    #     def _chunk_text(text: str, *, chunk_tokens: int = 1200, overlap_tokens: int = 100, sub_chunk_chars: int = 300, sub_chunk_overlap: int = 50, tokenizer=tokenizer):
+    #         import re
+            
+    #         text = (text or "").strip()
+    #         if not text:
+    #             return []
+            
+    #         sentence_pattern = r'(?<=[.!?])\s+(?=[A-Z])|(?<=[。！？])\s*'
+    #         sentences = re.split(sentence_pattern, text)
+    #         sentences = [s.strip() for s in sentences if s.strip()]
+            
+    #         if not sentences:
+    #             return [text]  
+            
+
+    #         token_chunks = []
+    #         current_chunk_sentences = []
+    #         current_chunk_tokens = 0
+            
+    #         for sentence in sentences:
+    #             sentence_tokens = len(tokenizer.encode(sentence))
+                
+    #             if current_chunk_tokens + sentence_tokens > chunk_tokens and current_chunk_sentences:
+    #                 chunk_text = ' '.join(current_chunk_sentences).strip()
+    #                 if chunk_text:
+    #                     token_chunks.append(chunk_text)
+
+    #                 if overlap_tokens > 0 and current_chunk_sentences:
+    #                     overlap_sentences = []
+    #                     overlap_token_count = 0
+                        
+    #                     for prev_sentence in reversed(current_chunk_sentences):
+    #                         prev_tokens = len(tokenizer.encode(prev_sentence))
+    #                         if overlap_token_count + prev_tokens <= overlap_tokens:
+    #                             overlap_sentences.insert(0, prev_sentence)
+    #                             overlap_token_count += prev_tokens
+    #                         else:
+    #                             break
+                        
+    #                     current_chunk_sentences = overlap_sentences
+    #                     current_chunk_tokens = overlap_token_count
+    #                 else:
+    #                     current_chunk_sentences = []
+    #                     current_chunk_tokens = 0
+
+    #             current_chunk_sentences.append(sentence)
+    #             current_chunk_tokens += sentence_tokens
+
+    #         if current_chunk_sentences:
+    #             chunk_text = ' '.join(current_chunk_sentences).strip()
+    #             if chunk_text:
+    #                 token_chunks.append(chunk_text)
+
+    #         def _sub_chunk_by_chars(text, chunk_size, overlap):
+    #             if not text or len(text) <= chunk_size:
+    #                 return [text] if text else []
+
+    #             sentences = re.split(sentence_pattern, text)
+    #             sentences = [s.strip() for s in sentences if s.strip()]
+                
+    #             if not sentences:
+    #                 return [text]
+                
+    #             sub_chunks = []
+    #             current_chunk_sentences = []
+    #             current_chunk_chars = 0
+                
+    #             for sentence in sentences:
+    #                 sentence_chars = len(sentence)
+  
+    #                 if current_chunk_chars + sentence_chars + 1 > chunk_size and current_chunk_sentences:  # +1 for space
+    #                     sub_chunk_text = ' '.join(current_chunk_sentences).strip()
+    #                     if sub_chunk_text:
+    #                         sub_chunks.append(sub_chunk_text)
+                        
+    #                     if overlap > 0 and current_chunk_sentences:
+    #                         overlap_sentences = []
+    #                         overlap_char_count = 0
+                            
+    #                         for prev_sentence in reversed(current_chunk_sentences):
+    #                             prev_chars = len(prev_sentence)
+    #                             if overlap_char_count + prev_chars + 1 <= overlap:  # +1 for space
+    #                                 overlap_sentences.insert(0, prev_sentence)
+    #                                 overlap_char_count += prev_chars + 1
+    #                             else:
+    #                                 break
+                            
+    #                         current_chunk_sentences = overlap_sentences
+    #                         current_chunk_chars = overlap_char_count
+    #                     else:
+    #                         current_chunk_sentences = []
+    #                         current_chunk_chars = 0
+                    
+    #                 current_chunk_sentences.append(sentence)
+    #                 current_chunk_chars += sentence_chars + (1 if current_chunk_sentences else 0)  # +1 for space if not first
+                
+    #             if current_chunk_sentences:
+    #                 sub_chunk_text = ' '.join(current_chunk_sentences).strip()
+    #                 if sub_chunk_text:
+    #                     sub_chunks.append(sub_chunk_text)
+                
+    #             return sub_chunks if sub_chunks else [text]
+            
+    #         all_sub_chunks = []
+    #         for token_chunk in token_chunks:
+    #             all_sub_chunks.extend(_sub_chunk_by_chars(token_chunk, sub_chunk_chars, sub_chunk_overlap))
+    #         return all_sub_chunks
+
+    #     items = data if isinstance(data, list) else [data]
+    #     all_chunks = []
+    #     for item in items:
+    #         ctx = (item.get("context") or "").strip()
+    #         if ctx:
+    #             item_chunks = _chunk_text(ctx, chunk_tokens=chunk_tokens, overlap_tokens=overlap_tokens, sub_chunk_chars=sub_chunk_chars, sub_chunk_overlap=sub_chunk_overlap)
+    #             all_chunks.extend(item_chunks)
+
+    #     if not all_chunks:
+    #         return None
+
+    #     total_chunks = len(all_chunks)
+    #     batch_size = max(1, len(all_chunks) // subchunk_batch) if subchunk_batch > 0 else len(all_chunks)
+    #     num_batches = (total_chunks + batch_size - 1) // batch_size
+    #     print(f"[preload_context_json] Total chunks: {total_chunks}, batch_size={batch_size}, num_batches: {num_batches}")
+
+    #     # combined = None
+    #     batch_num = 0
+    #     facts_codebook_lst = []
+    #     for i in range(0, total_chunks, batch_size):
+
+
+
+    #         batch_chunks = all_chunks[i:i+batch_size]
+    #         fact_cb = get_code_book(
+    #             batch_chunks,
+    #             type='facts',
+    #             rule="Store factual statements.",
+    #             batch_size=1,
+    #             parser_choice=self.chunking_use,
+    #             api=self.chunking_api,
+    #         )
+
+    #         print(f'batch {batch_num} codebook is generated')
+
+    #         facts_codebook_lst.append(fact_cb)
+
+
+    #         # facts_codebook_lst.append(fact_cb)
+
+
+    #         batch_num+=1
+
+    #     return facts_codebook_lst
+    
+    def preload_context_json(
+        self,
+        json_path: str,
+        *,
+        # primary (sentence → token chunks)
+        chunk_tokens: int = 1200,
+        overlap_tokens: int = 100,
+        tokenizer_name: str = "gpt-4o-mini",
+        # secondary (sub-chunk) controls
+        subchunk_mode: str = "chars",          # "chars" (original) or "tokens" (new)
+        sub_chunk_chars: int = 300,
+        sub_chunk_overlap: int = 50,
+        sub_chunk_token_size: int = 300,       # used when subchunk_mode="tokens"
+        sub_chunk_token_overlap: int = 50,     # used when subchunk_mode="tokens"
+        # batching
+        subchunk_batch: int = 500,
+    ):
+        import json, re
         import tiktoken
 
+        # ---------- load ----------
         with open(json_path, "r", encoding="utf-8") as f:
             data = json.load(f)
+        items = data if isinstance(data, list) else [data]
 
+        # ---------- tokenizer ----------
         try:
             tokenizer = tiktoken.encoding_for_model(tokenizer_name)
         except KeyError:
             tokenizer = tiktoken.get_encoding("cl100k_base")
 
-        def _chunk_text(text: str, *, chunk_tokens: int = 1200, overlap_tokens: int = 100, sub_chunk_chars: int = 300, sub_chunk_overlap: int = 50, tokenizer=tokenizer):
-            import re
-            
+        # ---------- helpers ----------
+        sentence_pattern = r'(?<=[.!?])\s+(?=[A-Z])|(?<=[。！？])\s*'
+
+        def split_sentences(text: str):
+            sents = re.split(sentence_pattern, text)
+            return [s.strip() for s in sents if s.strip()]
+
+        def force_split_by_tokens(sentence: str, max_tokens: int):
+            ids = tokenizer.encode(sentence)
+            if len(ids) <= max_tokens:
+                return [sentence]
+            parts = []
+            start = 0
+            while start < len(ids):
+                end = min(start + max_tokens, len(ids))
+                parts.append(tokenizer.decode(ids[start:end]))
+                start = end
+            return parts
+
+        def chunk_by_tokens_with_overlap(sentences, chunk_tokens: int, overlap_tokens: int):
+            """Token-aware chunking over sentence list with overlap (by tokens)."""
+            # precompute token counts to avoid re-encoding repeatedly
+            tok_counts = [len(tokenizer.encode(s)) for s in sentences]
+
+            chunks = []
+            cur, cur_tok = [], 0
+
+            i = 0
+            while i < len(sentences):
+                s, t = sentences[i], tok_counts[i]
+
+                # handle sentences longer than chunk size by force-splitting first
+                if t > chunk_tokens:
+                    # flush current before inserting forced splits
+                    if cur:
+                        chunks.append(" ".join(cur).strip())
+                        cur, cur_tok = [], 0
+
+                    long_parts = force_split_by_tokens(s, chunk_tokens)
+                    # first n-1 parts are full chunks
+                    for p in long_parts[:-1]:
+                        chunks.append(p.strip())
+                    # the last part can start a new working chunk
+                    last_p = long_parts[-1].strip()
+                    cur = [last_p] if last_p else []
+                    cur_tok = len(tokenizer.encode(last_p)) if last_p else 0
+                    i += 1
+                    continue
+
+                # normal packing
+                if cur_tok + t > chunk_tokens and cur:
+                    chunks.append(" ".join(cur).strip())
+
+                    # build token-overlap from the tail of cur
+                    if overlap_tokens > 0 and cur:
+                        overlap_sents = []
+                        overlap_tok = 0
+                        # walk backward over *cur* using cached counts
+                        j = len(cur) - 1
+                        while j >= 0 and overlap_tok + len(tokenizer.encode(cur[j])) <= overlap_tokens:
+                            overlap_sents.insert(0, cur[j])
+                            overlap_tok += len(tokenizer.encode(cur[j]))
+                            j -= 1
+                        cur = overlap_sents
+                        cur_tok = overlap_tok
+                    else:
+                        cur, cur_tok = [], 0
+
+                cur.append(s)
+                cur_tok += t
+                i += 1
+
+                # if exactly hits the limit, flush immediately
+                if cur_tok == chunk_tokens:
+                    chunks.append(" ".join(cur).strip())
+                    cur, cur_tok = [], 0
+
+            if cur:
+                chunks.append(" ".join(cur).strip())
+            return chunks
+
+        def subchunk_by_chars(text: str, chunk_size: int, overlap: int):
+            """Original char-based sub-chunking (sentence-aware)."""
+            if not text:
+                return []
+            if len(text) <= chunk_size:
+                return [text]
+
+            sents = split_sentences(text) or [text]
+            sub_chunks, cur, cur_chars = [], [], 0
+
+            for s in sents:
+                sc = len(s)
+                if cur and (cur_chars + sc + 1 > chunk_size):  # +1 for the joining space
+                    sub_text = " ".join(cur).strip()
+                    if sub_text:
+                        sub_chunks.append(sub_text)
+
+                    # overlap (by chars)
+                    if overlap > 0 and cur:
+                        overlap_sents, overlap_chars = [], 0
+                        for prev in reversed(cur):
+                            pc = len(prev)
+                            if overlap_chars + pc + (1 if overlap_sents else 0) <= overlap:
+                                overlap_sents.insert(0, prev)
+                                overlap_chars += pc + (1 if overlap_sents else 0)
+                            else:
+                                break
+                        cur, cur_chars = overlap_sents, overlap_chars
+                    else:
+                        cur, cur_chars = [], 0
+
+                # add current sentence
+                if cur:
+                    cur_chars += 1  # space
+                cur.append(s)
+                cur_chars += sc
+
+            if cur:
+                sub_text = " ".join(cur).strip()
+                if sub_text:
+                    sub_chunks.append(sub_text)
+            return sub_chunks or [text]
+
+        def subchunk_by_tokens(text: str, chunk_tok: int, overlap_tok: int):
+            """New token-based sub-chunking over sentence list, with token overlap."""
+            if not text:
+                return []
+            sents = split_sentences(text) or [text]
+            # precompute counts once
+            tok_counts = [len(tokenizer.encode(s)) for s in sents]
+
+            subs, cur, cur_tok = [], [], 0
+            i = 0
+            while i < len(sents):
+                s, t = sents[i], tok_counts[i]
+
+                if t > chunk_tok:
+                    # flush current
+                    if cur:
+                        subs.append(" ".join(cur).strip())
+                        cur, cur_tok = [], 0
+                    # force split the long sentence
+                    parts = force_split_by_tokens(s, chunk_tok)
+                    subs.extend(p.strip() for p in parts[:-1] if p.strip())
+                    last_p = parts[-1].strip()
+                    if last_p:
+                        cur = [last_p]
+                        cur_tok = len(tokenizer.encode(last_p))
+                    i += 1
+                    continue
+
+                if cur_tok + t > chunk_tok and cur:
+                    subs.append(" ".join(cur).strip())
+
+                    # token overlap
+                    if overlap_tok > 0 and cur:
+                        overlap_sents, overlap_cnt = [], 0
+                        j = len(cur) - 1
+                        while j >= 0:
+                            tt = len(tokenizer.encode(cur[j]))
+                            if overlap_cnt + tt <= overlap_tok:
+                                overlap_sents.insert(0, cur[j])
+                                overlap_cnt += tt
+                                j -= 1
+                            else:
+                                break
+                        cur, cur_tok = overlap_sents, overlap_cnt
+                    else:
+                        cur, cur_tok = [], 0
+
+                cur.append(s)
+                cur_tok += t
+                i += 1
+
+                if cur_tok == chunk_tok:
+                    subs.append(" ".join(cur).strip())
+                    cur, cur_tok = [], 0
+
+            if cur:
+                subs.append(" ".join(cur).strip())
+            return subs or [text]
+
+        def chunk_then_subchunk(text: str):
             text = (text or "").strip()
             if not text:
                 return []
-            
-            sentence_pattern = r'(?<=[.!?])\s+(?=[A-Z])|(?<=[。！？])\s*'
-            sentences = re.split(sentence_pattern, text)
-            sentences = [s.strip() for s in sentences if s.strip()]
-            
+
+            # 1) token-aware sentence chunking with token overlap
+            sentences = split_sentences(text)
             if not sentences:
-                return [text]  
-            
+                # fallback: treat entire text as a "sentence", still enforce long-sentence splitting
+                sentences = force_split_by_tokens(text, chunk_tokens)
 
-            token_chunks = []
-            current_chunk_sentences = []
-            current_chunk_tokens = 0
-            
-            for sentence in sentences:
-                sentence_tokens = len(tokenizer.encode(sentence))
-                
-                if current_chunk_tokens + sentence_tokens > chunk_tokens and current_chunk_sentences:
-                    chunk_text = ' '.join(current_chunk_sentences).strip()
-                    if chunk_text:
-                        token_chunks.append(chunk_text)
+            token_chunks = chunk_by_tokens_with_overlap(
+                sentences, chunk_tokens=chunk_tokens, overlap_tokens=overlap_tokens
+            )
 
-                    if overlap_tokens > 0 and current_chunk_sentences:
-                        overlap_sentences = []
-                        overlap_token_count = 0
-                        
-                        for prev_sentence in reversed(current_chunk_sentences):
-                            prev_tokens = len(tokenizer.encode(prev_sentence))
-                            if overlap_token_count + prev_tokens <= overlap_tokens:
-                                overlap_sentences.insert(0, prev_sentence)
-                                overlap_token_count += prev_tokens
-                            else:
-                                break
-                        
-                        current_chunk_sentences = overlap_sentences
-                        current_chunk_tokens = overlap_token_count
-                    else:
-                        current_chunk_sentences = []
-                        current_chunk_tokens = 0
+            # 2) sub-chunk each token-chunk by chosen mode
+            out = []
+            if subchunk_mode.lower() == "tokens":
+                for tc in token_chunks:
+                    out.extend(subchunk_by_tokens(tc, sub_chunk_token_size, sub_chunk_token_overlap))
+            else:  # "chars" (original)
+                for tc in token_chunks:
+                    out.extend(subchunk_by_chars(tc, sub_chunk_chars, sub_chunk_overlap))
+            return out
 
-                current_chunk_sentences.append(sentence)
-                current_chunk_tokens += sentence_tokens
-
-            if current_chunk_sentences:
-                chunk_text = ' '.join(current_chunk_sentences).strip()
-                if chunk_text:
-                    token_chunks.append(chunk_text)
-
-            def _sub_chunk_by_chars(text, chunk_size, overlap):
-                if not text or len(text) <= chunk_size:
-                    return [text] if text else []
-
-                sentences = re.split(sentence_pattern, text)
-                sentences = [s.strip() for s in sentences if s.strip()]
-                
-                if not sentences:
-                    return [text]
-                
-                sub_chunks = []
-                current_chunk_sentences = []
-                current_chunk_chars = 0
-                
-                for sentence in sentences:
-                    sentence_chars = len(sentence)
-  
-                    if current_chunk_chars + sentence_chars + 1 > chunk_size and current_chunk_sentences:  # +1 for space
-                        sub_chunk_text = ' '.join(current_chunk_sentences).strip()
-                        if sub_chunk_text:
-                            sub_chunks.append(sub_chunk_text)
-                        
-                        if overlap > 0 and current_chunk_sentences:
-                            overlap_sentences = []
-                            overlap_char_count = 0
-                            
-                            for prev_sentence in reversed(current_chunk_sentences):
-                                prev_chars = len(prev_sentence)
-                                if overlap_char_count + prev_chars + 1 <= overlap:  # +1 for space
-                                    overlap_sentences.insert(0, prev_sentence)
-                                    overlap_char_count += prev_chars + 1
-                                else:
-                                    break
-                            
-                            current_chunk_sentences = overlap_sentences
-                            current_chunk_chars = overlap_char_count
-                        else:
-                            current_chunk_sentences = []
-                            current_chunk_chars = 0
-                    
-                    current_chunk_sentences.append(sentence)
-                    current_chunk_chars += sentence_chars + (1 if current_chunk_sentences else 0)  # +1 for space if not first
-                
-                if current_chunk_sentences:
-                    sub_chunk_text = ' '.join(current_chunk_sentences).strip()
-                    if sub_chunk_text:
-                        sub_chunks.append(sub_chunk_text)
-                
-                return sub_chunks if sub_chunks else [text]
-            
-            all_sub_chunks = []
-            for token_chunk in token_chunks:
-                all_sub_chunks.extend(_sub_chunk_by_chars(token_chunk, sub_chunk_chars, sub_chunk_overlap))
-            return all_sub_chunks
-
-        items = data if isinstance(data, list) else [data]
+        # ---------- process ----------
         all_chunks = []
         for item in items:
             ctx = (item.get("context") or "").strip()
-            if ctx:
-                item_chunks = _chunk_text(ctx, chunk_tokens=chunk_tokens, overlap_tokens=overlap_tokens, sub_chunk_chars=sub_chunk_chars, sub_chunk_overlap=sub_chunk_overlap)
-                all_chunks.extend(item_chunks)
+            if not ctx:
+                continue
+            all_chunks.extend(chunk_then_subchunk(ctx))
 
         if not all_chunks:
-            return None
+            # match original spirit but friendlier to callers
+            print("[preload_context_json] No chunks produced.")
+            return []
 
+        # ---------- batching (fix: interpret subchunk_batch as target chunks per batch) ----------
         total_chunks = len(all_chunks)
-        batch_size = max(1, len(all_chunks) // subchunk_batch) if subchunk_batch > 0 else len(all_chunks)
-        num_batches = (total_chunks + batch_size - 1) // batch_size
+        batch_size = subchunk_batch if (subchunk_batch and subchunk_batch > 0) else total_chunks
+        num_batches = ceil(total_chunks / batch_size)
         print(f"[preload_context_json] Total chunks: {total_chunks}, batch_size={batch_size}, num_batches: {num_batches}")
 
-        # combined = None
         batch_num = 0
         facts_codebook_lst = []
         for i in range(0, total_chunks, batch_size):
-
-
 
             batch_chunks = all_chunks[i:i+batch_size]
             fact_cb = get_code_book(
@@ -4136,12 +4421,10 @@ class AutoPrunedRetriver:
             facts_codebook_lst.append(fact_cb)
 
 
-            # facts_codebook_lst.append(fact_cb)
-
-
             batch_num+=1
 
         return facts_codebook_lst
+
 
 
     def encode_question(self,q_prompt,rule):
@@ -4453,7 +4736,10 @@ class AutoPrunedRetriver:
         chunk_tokens=1200, overlap_tokens=100,
         sub_chunk_chars=600, sub_chunk_overlap=50,
         tokenizer_name="gpt-4o-mini",
-        subchunk_batch = 500
+        subchunk_batch = 500,
+        subchunk_mode = 'chars',
+        sub_chunk_token_size: int = 300,       # used when subchunk_mode="tokens"
+        sub_chunk_token_overlap: int = 50,     # used when subchunk_mode="tokens"
     ):
         if not facts_json_path:
             return None
@@ -4470,7 +4756,10 @@ class AutoPrunedRetriver:
                 sub_chunk_chars=sub_chunk_chars,
                 sub_chunk_overlap=sub_chunk_overlap,
                 tokenizer_name=tokenizer_name,
-                subchunk_batch = subchunk_batch
+                subchunk_batch = subchunk_batch,
+                subchunk_mode =subchunk_mode,
+                sub_chunk_token_size =sub_chunk_token_size,
+                sub_chunk_token_overlap = sub_chunk_token_overlap
             )
             for cb in facts_codebook_lst:
                 if cb:

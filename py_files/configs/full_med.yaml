@@ -33,4 +33,4 @@ reward_func: reward_sbert_inclusive
 reward_func_mode: non_llm
 
 # optional; prefer env OPENAI_API_KEY if omitted
-llm_api: null
+# llm_api: null
