@@ -700,7 +700,7 @@ def main():
     }
 
     parser = argparse.ArgumentParser(description="LightRAG: Process Corpora and Answer Questions")
-    parser.add_argument("--subset", required=True, choices=["medical", "novel", "2wikimultihop", "hotpotqa", "history"], help="Subset to process (medical, novel, 2wikimultihop, hotpotqa, or history)")
+    parser.add_argument("--subset", required=True, choices=["medical", "novel", "2wikimultihop", "hotpotqa", "history", "stem", "tv"], help="Subset to process (medical, novel, 2wikimultihop, hotpotqa, or history)")
     parser.add_argument("--q_start", type=int, default=None, help="Start index of questions (1-based, inclusive)")
     parser.add_argument("--q_end", type=int, default=None, help="End index of questions (1-based, inclusive)")
 
