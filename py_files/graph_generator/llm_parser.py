@@ -181,7 +181,7 @@ def triplet_parser_llm(
     *,
     device: Optional[Union[str, int]] = None,
     batch_size: int = 8,
-    max_new_tokens: int = 256,
+    max_new_tokens: int = 1200,
     do_sample: bool = False,
     num_beams: int = 1,
     api: Optional[Union[str, Mapping]] = None,   
@@ -218,14 +218,14 @@ def triplet_parser_llm(
         results.extend(batch_results)
     return results
 
-def _extract_triplets_single(client, text: str, max_new_tokens: int) -> Set[Triplet]:
+def _extract_triplets_single(client, text: str, max_new_tokens: int,model: str = "gpt-4o-mini") -> Set[Triplet]:
     """Extract triplets from a single text using GPT-4o mini."""
     # Create prompt for triplet extraction
     prompt = f"""Extract relationship triplets from the following text. 
-Return triplets in the format: <triplet> subject <subj> object <obj> relation </s>
+Return triplets in the format: <triplet> subject <subj> object <obj> relation </s> and If you know the information give the exact information to replace he/she/we/they/it... with the exact info.
 
 Examples:
-- "John works at Google" → <triplet> John <subj> Google <obj> works at </s>
+- "John works at Google" → <triplet> John <subj> Google <obj> works at </s> if it follows "he likes apples", you should replace he with John.
 - "The cat sits on the mat" → <triplet> cat <subj> mat <obj> sits on </s>
 
 Text to analyze:
@@ -235,7 +235,7 @@ Extracted triplets:"""
 
     try:
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model=model,
             messages=[
                 {"role": "system", "content": "You are an expert at extracting structured relationship triplets from text. Always follow the exact format specified."},
                 {"role": "user", "content": prompt}
@@ -252,13 +252,13 @@ Extracted triplets:"""
         print(f"Error calling GPT-4o mini: {e}")
         return set()  # Return empty set on error
 
-def _extract_triplets_batch(client, texts: List[str], max_new_tokens: int) -> List[Set[Triplet]]:
+def _extract_triplets_batch(client, texts: List[str], max_new_tokens: int,model: str = "gpt-4o-mini") -> List[Set[Triplet]]:
     """Extract triplets from multiple texts using GPT-4o mini."""
     results = []
     
     for text in texts:
         truncated = _truncate_to_max_tokens(text, max_tokens=8000)
-        result = _extract_triplets_single(client, truncated, max_new_tokens)
+        result = _extract_triplets_single(client, truncated, max_new_tokens,model)
         results.append(result)
         
         # Add small delay to avoid rate limiting

@@ -278,7 +278,7 @@ def preload_context_json(json_path: str, chunk_chars: int = 1200, overlap: int =
     print(f"{json_path} chunk num:", total_chunks)
     return combined
     
-preload_context_json("/Users/lancelotchu/Desktop/GraphRAG-Benchmark/Datasets/Corpus/medical.json", chunk_chars=1200, overlap=100)
+preload_context_json("Datasets/Corpus/medical.json", chunk_chars=1200, overlap=100)
 
 def get_code_book(
     prompt: Union[str, List[str]],
@@ -286,7 +286,7 @@ def get_code_book(
     rule: str = "Answer questions.",
     factparser: bool = False,   
     *,
-    batch_size: int = 64       
+    batch_size: int = 1       
 ):
     valid_types = {'questions', 'answers', 'thinkings', 'facts'}
     if type not in valid_types:

@@ -76,6 +76,7 @@ def ensure_list_of_triples(triples):
 
 # tau_default = 0.5
 tau_default = 0.7
+tail_head_bonus_default = 0.05
 
 def segment_by_centroid_sim(
     triples: List[Triple],
@@ -85,7 +86,7 @@ def segment_by_centroid_sim(
     patience: int = 0,            # consecutive below-threshold sims before cutting
     relu_floor: float = 0.0,      # clamp negative sims up to 0 if desired
     bonus_tail_head: bool = True, # small structural continuity bonus
-    tail_head_bonus: float = 0.05,
+    tail_head_bonus: float = tail_head_bonus_default,
 ) -> List[List[Triple]]:
     """
     Segment an ordered triple list into chunks using cosine similarity of
@@ -184,7 +185,7 @@ def should_merge_boundary(
     patience: int = 0,
     relu_floor: float = 0.0,
     bonus_tail_head: bool = True,
-    tail_head_bonus: float = 0.05,
+    tail_head_bonus: float = tail_head_bonus_default,
     sent_emb:HuggingFaceEmbeddings = None
 ) -> bool:
     """
@@ -240,7 +241,7 @@ def merge_chunks_by_boundary(
     patience: int = 0,
     relu_floor: float = 0.0,
     bonus_tail_head: bool = True,
-    tail_head_bonus: float = 0.05,
+    tail_head_bonus: float = tail_head_bonus_default,
     sent_emb:HuggingFaceEmbeddings = None
 ) -> List[List[List[int]]]:
     """
