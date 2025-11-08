@@ -30,6 +30,7 @@ from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 from rouge_score import rouge_scorer
 from test_continous_chunk import embed_triples_as_sentences,segment_by_centroid_sim,merge_chunks_by_boundary 
 from math import ceil
+from concurrent.futures import ThreadPoolExecutor, as_completed
 # from retrieve_gpu_boosted import coarse_filter_optimized_gpu_ver
 
 Triplet = Tuple[str, str, str]
@@ -926,6 +927,131 @@ def get_code_book(
             feat_name: chunk_to_global,
         })
 
+        print(codebook)
+
+    codebook.pop('sid', None)
+    return codebook
+
+
+def get_code_book_paralleled_ver(
+    prompt: Union[str, List[str]],
+    type: str = 'questions',
+    rule: str = "Answer questions.",
+    factparser: bool = False,
+    *,
+    batch_size: int = 1,          # kept for compat
+    sent_emb = word_emb,
+    parser_choice: str = 'rebel',
+    api: Optional[Union[str, Mapping]] = None,
+    model: str = "gpt-4o-mini",
+    parallel: bool = True,       # NEW
+    max_workers: int = 8,         # NEW
+):
+    # pick parser
+    if parser_choice == 'rebel':
+        parser = triplet_parser        # per-text
+    elif parser_choice == 'llm':
+        parser = partial(triplet_parser_llm, api=api, model=model)
+    else:
+        raise ValueError("parser must be one of 'rebel' and 'llm' ")
+
+    valid_types = {'questions', 'answers', 'thinkings', 'facts'}
+    if type not in valid_types:
+        raise ValueError(f"type must be one of {valid_types}, got: {type}")
+
+    processing_texts_lst = False
+
+    # single string
+    if isinstance(prompt, str):
+        triples_merged: Set[Triplet] = parser(prompt)
+    else:
+        processing_texts_lst = True
+        texts: List[str] = [t for t in prompt if isinstance(t, str) and t.strip()]
+
+        if not texts:
+            triples_merged = set()
+
+        elif not parallel:
+            # ORIGINAL SEQUENTIAL BEHAVIOR
+            acc: List[Iterable[Triplet]] = []
+            for txt in texts:
+                parsed = parser(txt)
+                if isinstance(parsed, set):
+                    acc.append(parsed)
+                elif isinstance(parsed, list):
+                    for s in parsed:
+                        acc.append(s if isinstance(s, set) else set(s))
+                else:
+                    acc.append(set(parsed))
+            triples_merged = _merge_sets(acc)
+
+        else:
+            # PARALLEL BUT ORDER-PRESERVING
+            # run all in parallel, store by index
+            results_by_idx = [None] * len(texts)  # type: ignore
+
+            with ThreadPoolExecutor(max_workers=max_workers) as ex:
+                futures = {
+                    ex.submit(parser, texts[i]): i
+                    for i in range(len(texts))
+                }
+                for fut in as_completed(futures):
+                    idx = futures[fut]
+                    results_by_idx[idx] = fut.result()
+
+            # now REPLAY in original order exactly like sequential
+            acc: List[Iterable[Triplet]] = []
+            for parsed in results_by_idx:
+                if isinstance(parsed, set):
+                    acc.append(parsed)
+                elif isinstance(parsed, list):
+                    for s in parsed:
+                        acc.append(s if isinstance(s, set) else set(s))
+                else:
+                    acc.append(set(parsed))
+
+            triples_merged = _merge_sets(acc)
+
+    # empty -> skeleton
+    if not triples_merged:
+        feat_name = f"{type}(edges[i])"
+        return {
+            "e": [],
+            "r": [],
+            "edges([e,r,e])": [],
+            feat_name: [],
+            "rule": rule,
+        }
+
+    feat_name = f"{type}(edges[i])"
+
+    if parser_choice == 'llm':
+        print(f"token stats are {TOKEN_STATS}")
+
+    # single-text path
+    if not processing_texts_lst:
+        codebook, ent2id, rel2id = build_codebook_from_triples(triples_merged, rule)
+        edges = edges_from_triples(triples_merged, ent2id, rel2id)
+        codebook.update({
+            "edges([e,r,e])": edges,
+            feat_name: all_chains_no_subchains(edges, False),
+        })
+    else:
+        # list-of-texts path
+        T_vecs = embed_triples_as_sentences(triples_merged, sent_emb)
+        chunks = segment_by_centroid_sim(
+            triples_merged, T_vecs,
+            tau=0.7,
+            patience=0,
+            bonus_tail_head=True,
+        )
+        codebook, ent2id, rel2id = build_codebook_from_chunks(chunks, rule)
+        chunked_edges = edges_from_chunks(chunks, ent2id, rel2id)
+        edges, idx_map, chunk_to_global = flatten_edges_with_index(chunked_edges)
+        codebook.update({
+            "edges([e,r,e])": edges,
+            feat_name: chunk_to_global,
+        })
         print(codebook)
 
     codebook.pop('sid', None)
@@ -4356,14 +4482,24 @@ class AutoPrunedRetriver:
         for i in range(0, total_chunks, batch_size):
 
             batch_chunks = all_chunks[i:i+batch_size]
-            fact_cb = get_code_book(
-                batch_chunks,
-                type='facts',
-                rule="Store factual statements.",
-                batch_size=1,
-                parser_choice=self.chunking_use,
-                api=self.chunking_api,
-            )
+
+            if self.chunking_choice == 'llm':
+                fact_cb = get_code_book_paralleled_ver(batch_chunks,
+                    type='facts',
+                    rule="Store factual statements.",
+                    batch_size=1,
+                    parser_choice=self.chunking_use,
+                    api=self.chunking_api,)
+            
+            else:
+                fact_cb = get_code_book(
+                    batch_chunks,
+                    type='facts',
+                    rule="Store factual statements.",
+                    batch_size=1,
+                    parser_choice=self.chunking_use,
+                    api=self.chunking_api,
+                )
 
             print(f'batch {batch_num} codebook is generated')
 
