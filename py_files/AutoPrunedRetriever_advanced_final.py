@@ -4483,7 +4483,7 @@ class AutoPrunedRetriver:
 
             batch_chunks = all_chunks[i:i+batch_size]
 
-            if self.chunking_choice == 'llm':
+            if self.chunking_use == 'llm':
                 fact_cb = get_code_book_paralleled_ver(batch_chunks,
                     type='facts',
                     rule="Store factual statements.",
