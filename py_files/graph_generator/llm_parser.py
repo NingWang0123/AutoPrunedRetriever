@@ -9,6 +9,25 @@ from typing import Any, Mapping, Sequence
 import numpy as np
 import pandas as pd
 
+
+# -----------------------------
+# 1) Global token tracker
+# -----------------------------
+TOKEN_STATS = {
+    "prompt_tokens": 0,
+    "completion_tokens": 0,
+    "total_tokens": 0,
+}
+
+def record_usage(usage):
+    """usage is response.usage from OpenAI; update global totals."""
+    if not usage:
+        return
+    TOKEN_STATS["prompt_tokens"] += getattr(usage, "prompt_tokens", 0)
+    TOKEN_STATS["completion_tokens"] += getattr(usage, "completion_tokens", 0)
+    TOKEN_STATS["total_tokens"] += getattr(usage, "total_tokens", 0)
+
+
 # Type definitions to match REBEL interface
 Triplet = Tuple[str, str, str]
 
@@ -244,6 +263,8 @@ Extracted triplets:"""
             temperature=0.1,
             top_p=1.0
         )
+
+        record_usage(response.usage)
         
         generated = response.choices[0].message.content or ""
         return _extract_triplets_from_gpt_response(generated)

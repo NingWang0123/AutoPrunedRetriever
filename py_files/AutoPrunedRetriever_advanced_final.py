@@ -18,7 +18,7 @@ from optimize_combine_ent import combine_ents_auto, combine_ents_ann_knn, coarse
 from copy import deepcopy
 from textwrap import dedent
 from graph_generator.rebel_large import triplet_parser
-from graph_generator.llm_parser import triplet_parser_llm
+from graph_generator.llm_parser import triplet_parser_llm,TOKEN_STATS  
 import time
 from sentence_embed_overlap import get_unique_or_overlap_by_sentence_embedded
 import gensim.downloader as api
@@ -29,7 +29,7 @@ from optimize_combine_storage import ann_feat_combine,ann_merge_questions_answer
 from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 from rouge_score import rouge_scorer
 from test_continous_chunk import embed_triples_as_sentences,segment_by_centroid_sim,merge_chunks_by_boundary 
-# from math import ceil
+from math import ceil
 # from retrieve_gpu_boosted import coarse_filter_optimized_gpu_ver
 
 Triplet = Tuple[str, str, str]
@@ -898,6 +898,10 @@ def get_code_book(
         }
 
     feat_name = f"{type}(edges[i])"
+
+    if parser_choice == 'llm':
+        print(f"token stats are {TOKEN_STATS}")
+
 
     if not processing_texts_lst:
         codebook, ent2id, rel2id = build_codebook_from_triples(triples_merged, rule)
@@ -4100,7 +4104,7 @@ class AutoPrunedRetriver:
         subchunk_mode: str = "chars",          # "chars" (original) or "tokens" (new)
         sub_chunk_chars: int = 300,
         sub_chunk_overlap: int = 50,
-        sub_chunk_token_size: int = 300,       # used when subchunk_mode="tokens"
+        sub_chunk_token_size: int = 256,       # used when subchunk_mode="tokens"
         sub_chunk_token_overlap: int = 50,     # used when subchunk_mode="tokens"
         # batching
         subchunk_batch: int = 500,
@@ -4742,6 +4746,17 @@ class AutoPrunedRetriver:
                                                                    sent_emb = self.sentence_emb)
         
         self.meta_codebook['facts_lst'] = remove_duplicate_inner_lists(self.meta_codebook['facts_lst'])
+
+        try:
+            print(f"token stats are {TOKEN_STATS}")
+            # turn dict -> DataFrame -> CSV
+            import pandas as pd
+            df = pd.DataFrame([TOKEN_STATS])
+            df.to_csv('chunk_tokens_stats.csv', index=False)
+        except Exception as e:
+            print("rebel has no tokens being used")
+
+
 
     def run_work_flow(self, q_prompt, rule="Answer questions", 
                       facts_json_path: list = None, chunk_chars: int = 800, 

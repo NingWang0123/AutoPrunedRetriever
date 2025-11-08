@@ -1,227 +1,219 @@
-import asyncio
-import os, json, re, random
-from pathlib import Path
-from typing import List, Dict, Tuple, Optional
+import os
 import json
-import pathlib
-import numpy   as np
-import pandas as pd
-from tqdm import tqdm
-import copy
-from huggingface_hub import hf_hub_download
-from langchain_community.embeddings import HuggingFaceEmbeddings
-
-from AutoPrunedRetriever_advanced_final import (
-    AutoPrunedRetriver
-)
-
-from dpo_exactgraphrag import (    
-    make_preference_dataset_2head, train_dpo_2head,make_preference_dataset_2head_using_llm,
-    default_reward, answer_with_auto_strategy,save_pref_examples,load_pref_examples,ANSWERS_CHOICES,THINKINGS_CHOICES,FACTS_CHOICES
-)
-
-from llm_api import OpenAILLM ,Word2VecEmbeddings
-from langchain_community.embeddings import HuggingFaceBgeEmbeddings
-from langchain_openai import ChatOpenAI
-# from evaluation_func_graphrag import compute_answer_correctness
-import reward_func_dpo
-from functools import partial
-import sys
+import argparse
+from pathlib import Path
 from glob import glob
+from typing import List, Optional, Dict, Tuple
+import numpy as np
+from tqdm import tqdm
+from huggingface_hub import hf_hub_download
+
+# Embeddings / LLM wrappers
+from langchain_community.embeddings import HuggingFaceEmbeddings
+# from langchain_community.embeddings import HuggingFaceBgeEmbeddings  # not used
+# from langchain_openai import ChatOpenAI  # not used
+
+# Your project modules
+from AutoPrunedRetriever_advanced_final import AutoPrunedRetriver
+from dpo_exactgraphrag import (
+    make_preference_dataset_2head,
+    train_dpo_2head,
+    make_preference_dataset_2head_using_llm,  # not used but kept
+    default_reward,
+    answer_with_auto_strategy,
+    save_pref_examples,
+    load_pref_examples,
+    ANSWERS_CHOICES,
+    THINKINGS_CHOICES,
+    FACTS_CHOICES,
+)
+import reward_func_dpo
+
 
 # ---------------------------------------------------------------------
-# 0) Paths / constants
+# Helpers: robust path handling + HF fallback + env fallbacks
 # ---------------------------------------------------------------------
-REPO_ID      = "GraphRAG-Bench/GraphRAG-Bench"
-CORPUS_FILE  = "GraphRAG-Benchmark/Datasets/Corpus/medical.json"
-QUEST_FILE   = "Datasets/Questions/medical_questions.json"
-
-# ---------------------------------------------------------------------
-# 1) Initialise embeddings & LLM
-# ---------------------------------------------------------------------
-
-def _is_existing_file(p: str) -> bool:
-    try:
-        return Path(p).expanduser().resolve().is_file()
-    except Exception:
-        return False
 
 def _resolve_rel_to_config(cfg_path: Optional[str], p: Optional[str]) -> Optional[Path]:
+    """Resolve a path relative to the config file location (if provided)."""
     if not p:
         return None
     P = Path(p)
     if P.is_absolute():
         return P
-    # resolve relative to the config file’s directory if provided; else CWD
-    base = Path(cfg_path).parent if cfg_path else Path.cwd()
+    base = Path(cfg_path).resolve().parent if cfg_path else Path.cwd()
     return (base / P).resolve()
 
-def resolve_path_or_hf(repo_id: Optional[str], file_or_glob: str, cfg_path: Optional[str]=None) -> List[Path]:
+
+def resolve_path_or_hf(repo_id: Optional[str], file_or_glob: str, cfg_path: Optional[str] = None) -> List[Path]:
     """
-    Returns one or more concrete local Paths.
-    - If file_or_glob exists locally (file or glob), return matching paths.
-    - Else if repo_id is set, try to download via hf_hub_download.
-    - Else raise.
+    Returns concrete local Paths:
+      1) Try local (file or glob), resolved relative to cfg file dir if provided.
+      2) Else if repo_id is set AND 'file_or_glob' is a single path (no wildcards),
+         download via hf_hub_download(repo_type='dataset').
+      3) Else raise.
     """
-    # 1) try local (exact or glob)
     local_candidate = _resolve_rel_to_config(cfg_path, file_or_glob)
-    matches = []
+    matches: List[Path] = []
     if local_candidate:
         if local_candidate.is_file():
             matches = [local_candidate]
         else:
-            # glob against string; keep relative-to-config semantics
             mg = glob(str(local_candidate))
             matches = [Path(m).resolve() for m in mg if Path(m).is_file()]
     if matches:
         return matches
 
-    # 2) try HF hub (only for a SINGLE file path, not globs)
-    if repo_id and ("*" not in file_or_glob and "?" not in file_or_glob and "[" not in file_or_glob):
-        try:
-            p = hf_hub_download(repo_id, file_or_glob, repo_type="dataset")
-            return [Path(p).resolve()]
-        except Exception as e:
-            raise FileNotFoundError(
-                f"Neither local path nor HF worked for '{file_or_glob}'. "
-                f"Tried repo_id='{repo_id}'. Error: {e}"
-            )
+    if repo_id and not any(sym in file_or_glob for sym in "*?[]"):
+        # HF dataset path
+        p = hf_hub_download(repo_id, file_or_glob, repo_type="dataset")
+        return [Path(p).resolve()]
 
-    # 3) give up
-    raise FileNotFoundError(
-        f"No local file(s) matched '{file_or_glob}' and no HF repo_id provided."
-    )
+    raise FileNotFoundError(f"No local file(s) matched '{file_or_glob}' and no HF repo_id provided.")
 
-def load_questions_any(repo_id: Optional[str], quest_spec: str, cfg_path: Optional[str]=None) -> List[dict]:
-    """
-    Loads questions from JSON or JSONL—either local or HF.
-    """
+
+def ensure_parent(path_like) -> Path:
+    """Create parent directory for a file path if missing."""
+    p = Path(path_like)
+    p.parent.mkdir(parents=True, exist_ok=True)
+    return p
+
+
+def _maybe_from_env(v, env_key: Optional[str]):
+    """Config/CLI > env (if key provided) > None."""
+    return v if v not in (None, "", []) else (os.getenv(env_key) if env_key else None)
+
+
+def _load_config(path: str) -> dict:
+    import yaml
+    with open(path, "r", encoding="utf-8") as f:
+        if path.endswith((".yml", ".yaml")):
+            return yaml.safe_load(f)
+        return json.load(f)
+
+
+def load_questions_any(repo_id: Optional[str], quest_spec: str, cfg_path: Optional[str] = None) -> List[dict]:
+    """Load questions from JSON or JSONL (local or HF dataset)."""
     paths = resolve_path_or_hf(repo_id, quest_spec, cfg_path)
     if len(paths) != 1:
         raise ValueError(f"Expected exactly one questions file, got: {paths}")
     p = paths[0]
     if p.suffix.lower() == ".jsonl":
         return [json.loads(line) for line in p.read_text(encoding="utf-8").splitlines() if line.strip()]
-    else:
-        return json.loads(p.read_text(encoding="utf-8"))
+    return json.loads(p.read_text(encoding="utf-8"))
 
 
-def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
-                          top_m,top_k,combine_ent_sim,q_combine_sim,aft_combine_sim,semantic_overlap_sim,  # all the params can be optimized
-                          ini_meta_json = Path("meta_codebook.json") ,saved_examples_name = "sbert_pref_examples_medical.json",
-                          reward_func = None,reward_func_mode = 'non_llm',final_json_path = "results/compressrag_medical_data_test.json",chunking_use='rebel',chunking_api = None,llm_api = None,
-                          cfg_path: Optional[str]=None):
+# ---------------------------------------------------------------------
+# Core workflow
+# ---------------------------------------------------------------------
+
+def compress_rag_workflow(
+    REPO_ID: Optional[str],
+    CORPUS_FILE: str,
+    QUEST_FILE: str,
+    SEED_N: int,
+    TEST_N: int,
+    top_m: int,
+    top_k: int,
+    combine_ent_sim: float,
+    q_combine_sim: float,
+    aft_combine_sim: float,
+    semantic_overlap_sim: float,
+    ini_meta_json,
+    saved_examples_name,
+    reward_func,
+    reward_func_mode: str,
+    final_json_path,
+    chunking_use: str = "rebel",
+    chunking_api: Optional[str] = None,
+    llm_api: Optional[str] = None,
+    cfg_path: Optional[str] = None,
+    subchunk_mode = 'chars'
+):
     print("» Initialising embeddings & LLM …")
-    word_emb = HuggingFaceEmbeddings(
-        model_name="BAAI/bge-large-en-v1.5"
-    )
-    sent_emb = HuggingFaceEmbeddings(
-        model_name="BAAI/bge-large-en-v1.5"
-    )
-    api_llm = OpenAILLM(  
-        include_thinkings=True,                 
-        model_name="gpt-4o-mini",  
+    # You can share the same model for word/sentence; keeping your original two for parity.
+    word_emb = HuggingFaceEmbeddings(model_name="BAAI/bge-large-en-v1.5")
+    sent_emb = HuggingFaceEmbeddings(model_name="BAAI/bge-large-en-v1.5")
+
+    # Your OpenAI wrapper; expects key via llm_api (already resolved with env fallback in main)
+    from llm_api import OpenAILLM
+    api_llm = OpenAILLM(
+        include_thinkings=True,
+        model_name="gpt-4o-mini",
         max_new_tokens=256,
         temperature=0.2,
         top_p=0.9,
         use_cache=True,
-        api_key=llm_api,  
+        api_key=llm_api,
     )
 
+    # Normalize IO path types
+    ini_meta_json = Path(ini_meta_json)
+    saved_examples_name = Path(saved_examples_name)
+    final_json_path = Path(final_json_path)
 
-    if ini_meta_json:
-        pre_loaded_meta = False
-
-        if ini_meta_json.is_file():
-            try:
-                with ini_meta_json.open("r", encoding="utf-8") as f:
-                    ini = json.load(f)
-                    pre_loaded_meta = True
-            except json.JSONDecodeError:
-                print("[warn] meta_codebook.json is not valid JSON; starting fresh.")
-                ini = {}
-                pre_loaded_meta = False
-        else:
-            ini = {}
-    else:
-        ini = {}
-
-
-    cr = AutoPrunedRetriver(
-        ini_meta_codebook = ini,
-        sentence_emb      = sent_emb,
-        word_emb          = word_emb,
-        llm               = api_llm,
-        thinkings_choice    = 'not_include',
-        answers_choice      = 'unique',
-        facts_choice = 'include_all',
-        top_m = top_m,
-        top_k = top_k,
-        combine_ent_sim = combine_ent_sim,
-        q_combine_sim = q_combine_sim,
-        aft_combine_sim = aft_combine_sim,
-        semantic_overlap_sim = semantic_overlap_sim,
-        use_word = True,
-        chunking_use = chunking_use,
-        chunking_api = chunking_api,
-    )
-
-    # ---------------------------------------------------------------------
+    # -----------------------------------------------------------------
     # 2) Load benchmark Q-A-E data
-    # ---------------------------------------------------------------------
+    # -----------------------------------------------------------------
     print("» Loading benchmark questions / answers / evidence …")
     qrows = load_questions_any(REPO_ID, QUEST_FILE, cfg_path=cfg_path)
-    row_lookup  = {r["question"].strip(): r for r in qrows}
+    row_lookup = {r["question"].strip(): r for r in qrows}
     gold_lookup = {q: r["answer"] for q, r in row_lookup.items()}
 
-    # q_fp = hf_hub_download(REPO_ID, QUEST_FILE, repo_type="dataset")
-    # qrows = json.load(open(q_fp, encoding="utf-8"))
-    # row_lookup  = {r["question"].strip(): r for r in qrows}
-    # gold_lookup = {q: r["answer"]        for q, r in row_lookup.items()}
-
-    all_questions  = list(row_lookup.keys())
+    all_questions = list(row_lookup.keys())
     all_seed_questions = all_questions[:SEED_N]
     midpoint = len(all_seed_questions) // 2
-    # for labeling only
     train_questions = all_seed_questions[:midpoint]
-    seed_questions   = all_seed_questions[midpoint:]
+    seed_questions = all_seed_questions[midpoint:]
+    train_answers = [gold_lookup.get(q) for q in train_questions]
+    test_questions = all_questions[SEED_N: SEED_N + TEST_N]
 
-    train_answers = []
+    # -----------------------------------------------------------------
+    # 3) Build/Load AutoPrunedRetriever and preload facts (corpus)
+    # -----------------------------------------------------------------
+    ini = {}
+    pre_loaded_meta = False
+    if ini_meta_json.is_file():
+        try:
+            ini = json.loads(ini_meta_json.read_text(encoding="utf-8"))
+            pre_loaded_meta = True
+        except json.JSONDecodeError:
+            print("[warn] ini_meta_json exists but invalid; starting with empty meta.")
 
-    for q in train_questions:
-        train_answers.append(gold_lookup.get(q))
+    cr = AutoPrunedRetriver(
+        ini_meta_codebook=ini,
+        sentence_emb=sent_emb,
+        word_emb=word_emb,
+        llm=api_llm,
+        thinkings_choice="not_include",
+        answers_choice="unique",
+        facts_choice="include_all",
+        top_m=top_m,
+        top_k=top_k,
+        combine_ent_sim=combine_ent_sim,
+        q_combine_sim=q_combine_sim,
+        aft_combine_sim=aft_combine_sim,
+        semantic_overlap_sim=semantic_overlap_sim,
+        use_word=True,
+        chunking_use=chunking_use,
+        chunking_api=chunking_api,
+    )
 
-    test_questions = all_questions[SEED_N : SEED_N+TEST_N]
-
-    # ---------------------------------------------------------------------
-    # 3) Pre-load corpus as facts into CR
-    # ---------------------------------------------------------------------
-    # only load if we do not have ini_meta 
     if not pre_loaded_meta:
-        # corpus file is the facts
+        print("» Pre-loading corpus as facts …")
         cr.load_and_merge_facts(
-            CORPUS_FILE,
+            CORPUS_FILE,            # already absolute path (resolved in main)
             chunk_tokens=1200,
             overlap_tokens=100,
             sub_chunk_chars=200,
             sub_chunk_overlap=50,
             tokenizer_name="gpt-4o-mini",
-            subchunk_batch =1000
+            subchunk_batch=1000,
+            subchunk_mode = subchunk_mode,
+            sub_chunk_token_size = 256,       # used when subchunk_mode="tokens"
+            sub_chunk_token_overlap = 50,     # used when subchunk_mode="tokens"
         )
         cr._facts_preloaded = True
-        # cr.top_m = 5          # sentence-embedding rerank top-m
-
-        print(cr.meta_codebook)
-
-        print('===============================================================')
-        print('===============================================================')
-        print('===============================================================')
-
-        print("len(cr.meta_codebook[facts_lst])",len(cr.meta_codebook["facts_lst"]))
-
-        print('===============================================================')
-        print('===============================================================')
-        print('===============================================================')
 
         def make_json_safe(obj):
             """Recursively convert numpy arrays into lists."""
@@ -233,78 +225,45 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
                 return [make_json_safe(v) for v in obj]
             return obj
 
-        with open(ini_meta_json.name, "w") as f:
-            json.dump(make_json_safe(cr.meta_codebook), f, indent=2)
-
-        print('===============================================================')
-        print('===============================================================')
-        print('===============================================================')
-
-        print("after changed len(cr.meta_codebook[facts_lst])",len(cr.meta_codebook["facts_lst"]))
-
-        print('===============================================================')
-        print('===============================================================')
-        print('===============================================================')
-
+        ensure_parent(ini_meta_json)
+        ini_meta_json.write_text(json.dumps(make_json_safe(cr.meta_codebook), indent=2), encoding="utf-8")
 
         print(f"[DEBUG] after facts-merge: |E|={len(cr.meta_codebook['e'])} "
-            f"|R|={len(cr.meta_codebook['r'])} "
-            f"|edges|={len(cr.meta_codebook['edge_matrix'])}")
-        
+              f"|R|={len(cr.meta_codebook['r'])} "
+              f"|edges|={len(cr.meta_codebook['edge_matrix'])}")
 
-    # ---------------------------------------------------------------------
-    # 4) Build DPO preference dataset on seed Q-A pairs
-    # ---------------------------------------------------------------------
-    # print(cr.meta_codebook)
-    # use cr_training to train
-
+    # -----------------------------------------------------------------
+    # 4) Build/Load DPO preference dataset on seed Q-A pairs
+    # -----------------------------------------------------------------
     print("» Building preference pairs for DPO …")
-
-    # # using llm one to replace the old one
-    # # using answer_correctness from graph rag benchmark
-    if os.path.exists(saved_examples_name):
-        pref_ds = load_pref_examples(saved_examples_name)
+    if saved_examples_name.exists():
+        pref_ds = load_pref_examples(str(saved_examples_name))
         print(f"loaded {len(pref_ds)} cached preference examples")
-
     else:
         cr.record_labeled_q_and_a(train_questions, train_answers)
-
-
-
         pref_ds = make_preference_dataset_2head(
-                cr,
-                questions= seed_questions,
-                gold_answers=gold_lookup,
-                per_q_samples = 6,
-                feature_dim = 1024,
-                reward_fn = reward_func,
-                seed = 0,
-                isolate_state = True,
-                ANSWERS_CHOICES = ANSWERS_CHOICES,
-                THINKINGS_CHOICES = THINKINGS_CHOICES,
-                FACTS_CHOICES = FACTS_CHOICES
+            cr,
+            questions=seed_questions,
+            gold_answers=gold_lookup,
+            per_q_samples=6,
+            feature_dim=1024,
+            reward_fn=reward_func,
+            seed=0,
+            isolate_state=True,
+            ANSWERS_CHOICES=ANSWERS_CHOICES,
+            THINKINGS_CHOICES=THINKINGS_CHOICES,
+            FACTS_CHOICES=FACTS_CHOICES,
+        )
+        ensure_parent(saved_examples_name)
+        save_pref_examples(str(saved_examples_name), pref_ds)
 
-            )
-        
-        # saving the pref examples
-        
-        save_pref_examples(saved_examples_name,pref_ds)
-        
-
-    # throw away the store info from qa
-    cr.meta_codebook['questions_lst'] = []
-    cr.meta_codebook['answers_lst'] = []
-
-             
-
+    # Clear stored QA (as in your code)
+    cr.meta_codebook["questions_lst"] = []
+    cr.meta_codebook["answers_lst"] = []
 
     policy, _ = train_dpo_2head(pref_ds, input_dim=1024)
 
-
-    def dump_results(
-        questions: List[str],
-        out_path: str,
-    ):
+    def dump_results(questions: List[str], out_path: Path):
         rows = []
         run_metrics = []
         answers_choices = []
@@ -313,23 +272,26 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
         total_q_left = len(questions)
         finished_q = 0
 
-        with tqdm(questions,
-          desc="Processing questions",
-          total=len(questions),
-          dynamic_ncols=True,
-          mininterval=0.2,
-          smoothing=0.0,
-          delay=0) as pbar:
+        with tqdm(
+            questions,
+            desc="Processing questions",
+            total=len(questions),
+            dynamic_ncols=True,
+            mininterval=0.2,
+            smoothing=0.0,
+            delay=0,
+        ) as pbar:
             for q in pbar:
                 start_idx = len(cr.llm.metrics_runs)
                 pred, _meta = answer_with_auto_strategy(
-                    cr, policy, q,
-                    reward_fn       = default_reward,
-                    gold_answer     = gold_lookup[q],
-                    greedy          = True
+                    cr,
+                    policy,
+                    q,
+                    reward_fn=default_reward,
+                    gold_answer=gold_lookup[q],
+                    greedy=True,
                 )
 
-                # --- get and sanitize gen_metrics ---
                 gen_metrics = (cr.llm.metrics_runs[start_idx:] or [{}])[-1] or {}
                 if isinstance(gen_metrics, dict) and q in gen_metrics and isinstance(gen_metrics[q], dict):
                     gen_metrics = gen_metrics[q]
@@ -347,48 +309,42 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
                 gen_metrics = {k: v for k, v in gen_metrics.items() if k in _ALLOWED_KEYS}
                 run_metrics.append({"question": q, **gen_metrics})
 
-                # --- update progress bar with latest latencies ---
+                # Update progress
                 if "latency_sec" in gen_metrics or "gen_latency_sec" in gen_metrics:
                     pbar.set_postfix({
                         "lat": f"{gen_metrics.get('latency_sec', 0):.2f}s",
                         "gen": f"{gen_metrics.get('gen_latency_sec', 0):.2f}s",
-                        "ret": f"{gen_metrics.get('retrieval_latency_sec', 0):.2f}s"
+                        "ret": f"{gen_metrics.get('retrieval_latency_sec', 0):.2f}s",
                     })
 
-                import json
-
-                # --- build row ---
                 row = row_lookup[q]
-
                 rows.append({
                     "id":               row["id"],
                     "question":         q,
-                    "source":           row["source"],
-                    "context":          _meta['fact_context'],
-                    "evidence":         row["evidence"],
-                    "question_type":    row["question_type"],
+                    "source":           row.get("source"),
+                    "context":          _meta.get("fact_context"),
+                    "evidence":         row.get("evidence"),
+                    "question_type":    row.get("question_type"),
                     "generated_answer": pred,
-                    "ground_truth":     row["answer"],
-                    "answers_choice":   _meta['answers_choice'],
-                    "thinkings_choice": _meta['thinkings_choice'],
-                    "facts_choice":     _meta['facts_choice'],
-                    "meta_codebook_json_bytes": _meta['meta_codebook_json_bytes'],
-                    "meta_codebook_json_MB": _meta['meta_codebook_json_MB'],
+                    "ground_truth":     row.get("answer"),
+                    "answers_choice":   _meta.get("answers_choice"),
+                    "thinkings_choice": _meta.get("thinkings_choice"),
+                    "facts_choice":     _meta.get("facts_choice"),
+                    "meta_codebook_json_bytes": _meta.get("meta_codebook_json_bytes"),
+                    "meta_codebook_json_MB":    _meta.get("meta_codebook_json_MB"),
                 })
 
-                answers_choices.append(_meta['answers_choice'])
-                thinkings_choices.append(_meta['thinkings_choice'])
-                facts_choices.append(_meta['facts_choice'])
+                answers_choices.append(_meta.get("answers_choice"))
+                thinkings_choices.append(_meta.get("thinkings_choice"))
+                facts_choices.append(_meta.get("facts_choice"))
 
+                finished_q += 1
+                total_q_left -= 1
+                print(f"{finished_q} finished")
+                print(f"{total_q_left} q left")
 
-                finished_q+=1
-                total_q_left-=1
-
-                print(f'{finished_q} finished')
-                print(f'{total_q_left} q left')
-
-        # --- merge metrics + rows ---
-        Path(out_path).parent.mkdir(parents=True, exist_ok=True)
+        ensure_parent(out_path)
+        # merge metrics + rows
         metrics_by_q = {m["question"]: m for m in run_metrics}
         merged_results = []
         for row in rows:
@@ -397,75 +353,83 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
             merged.update(row)
             merged_results.append(merged)
 
-        with open(out_path, "w") as f:
-            json.dump(merged_results, f, indent=2)
-            print(f"✓ wrote {len(merged_results)} merged rows → {out_path}")
-
+        out_path.write_text(json.dumps(merged_results, indent=2), encoding="utf-8")
+        print(f"✓ wrote {len(merged_results)} merged rows → {out_path}")
         return merged_results, answers_choices, thinkings_choices, facts_choices
 
     print("» Answering evaluation questions …")
-    # still giving the all questions
-    generated_rows,answers_choices,thinkings_choices,facts_choices = dump_results(all_questions, out_path= final_json_path)
+    _ = dump_results(all_questions, out_path=final_json_path)
 
 
-
-import argparse, yaml
-
-def _load_config(path: str) -> dict:
-    with open(path, "r", encoding="utf-8") as f:
-        if path.endswith((".yml", ".yaml")):
-            return yaml.safe_load(f)
-        return json.load(f)
-
-def _coerce_path(p):
-    return Path(p) if isinstance(p, str) else p
-
-def _maybe_from_env(v, env_key: Optional[str]):
-    # if config leaves it blank, try environment var
-    return v or (os.getenv(env_key) if env_key else None)
+# ---------------------------------------------------------------------
+# CLI
+# ---------------------------------------------------------------------
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Run CompressRAG workflow with a config file.")
+    parser = argparse.ArgumentParser(description="Run AutoPrunedRetriever pipeline with a config file.")
     parser.add_argument("--config", "-c", required=True, help="Path to YAML/JSON config")
-    parser.add_argument("--llm_api", default=None, help="Override LLM API key (else use config or OPENAI_API_KEY)")
+    parser.add_argument("--llm_api", default=None, help="Override LLM API key (else config or OPENAI_API_KEY)")
+    parser.add_argument("--chunking_api", default=None, help="Override Chunking API key (else config or CHUNKING_API)")
     args = parser.parse_args()
 
     cfg_path = args.config
     cfg = _load_config(args.config)
 
-    # --- required-ish top-levels ---
-    REPO_ID     = cfg.get("repo_id", "GraphRAG-Bench/GraphRAG-Bench")
-    CORPUS_FILE = cfg.get("corpus_file", "GraphRAG-Benchmark/Datasets/Corpus/medical.json")
-    QUEST_FILE  = cfg.get("quest_file",  "Datasets/Questions/medical_questions.json")
+    # --- read knobs first ---
+    dataset      = cfg.get("dataset", "tv")
+    chunking_use = cfg.get("chunking_use", "rebel")
+    subchunk_mode = cfg.get("subchunk_mode","chars")
 
-    # --- hyper-params / knobs ---
-    SEED_N  = int(cfg.get("seed_n", 20))
-    TEST_N  = int(cfg.get("test_n", 2042))
+    # -------- Inputs (config-relative + HF fallback) --------
+    REPO_ID = cfg.get("repo_id", None)  # allow null => local-only
+    CORPUS_SPEC = cfg.get("corpus_file", "GraphRAG-Benchmark/Datasets/Corpus/medical.json")
+    QUEST_SPEC = cfg.get("quest_file", "Datasets/Questions/medical_questions.json")
 
-    top_m                = int(cfg.get("top_m", 20))
-    top_k                = int(cfg.get("top_k", top_m * 10))
-    combine_ent_sim      = float(cfg.get("combine_ent_sim", 0.93))
-    q_combine_sim        = float(cfg.get("q_combine_sim", 0.93))
-    aft_combine_sim      = float(cfg.get("aft_combine_sim", 0.93))
+    CORPUS_FILE = str(resolve_path_or_hf(REPO_ID, CORPUS_SPEC, cfg_path=cfg_path)[0])
+    QUEST_FILE = str(resolve_path_or_hf(REPO_ID, QUEST_SPEC, cfg_path=cfg_path)[0])
+
+    # -------- Hyper-params / knobs --------
+    SEED_N = int(cfg.get("seed_n", 20))
+    TEST_N = int(cfg.get("test_n", 2042))
+
+    top_m = int(cfg.get("top_m", 20))
+    top_k = int(cfg.get("top_k", top_m * 10))
+    
+    combine_ent_sim = float(cfg.get("combine_ent_sim", 0.93))
+    q_combine_sim = float(cfg.get("q_combine_sim", 0.93))
+    aft_combine_sim = float(cfg.get("aft_combine_sim", 0.93))
     semantic_overlap_sim = float(cfg.get("semantic_overlap_sim", 0.93))
 
-    # --- IO paths ---
-    ini_meta_json       = _coerce_path(cfg.get("ini_meta_json", "meta_codebook.json"))
-    saved_examples_name = cfg.get("saved_examples_name", "pref_examples_medical_exact_openai.json")
-    final_json_path     = cfg.get("final_json_path", "results/compressrag_medical_data.json")
+    # -------- Outputs (resolved relative to config; dirs created later) --------
+    # --- format templated output paths from YAML ---
+    def _fmt(s: str) -> str:
+        return s.format(dataset=dataset, chunking_use=chunking_use)
 
-    # --- optional modules/modes ---
+    ini_meta_json_raw       = _fmt(cfg.get("ini_meta_json", "meta_codebook.json"))
+    saved_examples_name_raw = _fmt(cfg.get("saved_examples_name", "pref_examples.json"))
+    final_json_path_raw     = _fmt(cfg.get("final_json_path", "results/out.json"))
+
+    # --- resolve them relative to the CONFIG file folder ---
+    ini_meta_json       = _resolve_rel_to_config(cfg_path, ini_meta_json_raw)
+    saved_examples_name = _resolve_rel_to_config(cfg_path, saved_examples_name_raw)
+    final_json_path     = _resolve_rel_to_config(cfg_path, final_json_path_raw)
+    # -------- Modes / options --------
     chunking_use = cfg.get("chunking_use", "rebel")
-    chunking_api = cfg.get("chunking_api", None)
+
+    # -------- Rewards --------
+    reward_func_name = cfg.get("reward_func", "reward_sbert_inclusive")
+    reward_func = getattr(reward_func_dpo, reward_func_name)
+
     reward_func_mode = cfg.get("reward_func_mode", "non_llm")
 
-    # --- rewards ---
-    # you can switch here to other reward funcs you have
-    reward_func = getattr(reward_func_dpo, cfg.get("reward_func", "reward_sbert_inclusive"))
+    # -------- Keys: CLI > config > ENV --------
+    llm_api_cfg = cfg.get("llm_api", None)
+    llm_api = args.llm_api or _maybe_from_env(llm_api_cfg, "OPENAI_API_KEY")
 
-    # --- LLM key precedence: CLI > config > ENV ---
-    llm_api = args.llm_api or _maybe_from_env(cfg.get("llm_api", None), "OPENAI_API_KEY")
+    chunking_api_cfg = cfg.get("chunking_api", None)
+    chunking_api = args.chunking_api or _maybe_from_env(chunking_api_cfg, "CHUNKING_API")
 
+    # -------- Run --------
     compress_rag_workflow(
         REPO_ID=REPO_ID,
         CORPUS_FILE=CORPUS_FILE,
@@ -484,7 +448,8 @@ if __name__ == "__main__":
         reward_func_mode=reward_func_mode,
         final_json_path=final_json_path,
         chunking_use=chunking_use,
-        chunking_api=chunking_api,
-        llm_api=llm_api,
-        cfg_path=cfg_path
+        chunking_api=chunking_api,   # ← picks up from CLI or config or ENV: CHUNKING_API
+        llm_api=llm_api,             # ← picks up from CLI or config or ENV: OPENAI_API_KEY
+        cfg_path=cfg_path,
+        subchunk_mode = subchunk_mode
     )
