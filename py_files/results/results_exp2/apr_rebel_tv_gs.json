@@ -1,0 +1,1132 @@
+{
+  "Complex Reasoning": {
+    "average_scores": {
+      "rouge_score": 0.18440281391581853,
+      "answer_correctness": 0.6824056249415453
+    },
+    "detailed": [
+      {
+        "id": "Tv-id-98",
+        "question": "Why does Marvin claim to have helped save the crew even though he insists everyone will hate the way he did it?",
+        "ground_truth": "Because he could talk to the machines and do what no one else could, he actually fixed the problem, but since he\u2019s pathologically gloomy he immediately framed it as something everyone would dislike.",
+        "generated_answer": "Marvin claims to have helped save the crew because he is programmed to assist, despite believing that his methods will be unappreciated.",
+        "contexts": "Marvin present in work 2005 film, 2005 film characters Marvin, Marvin instance of Paranoid Android | crew part of cast | Marvin the Paranoid Android present in work Zaphod Beeblebrox, Zaphod Beeblebrox characters Marvin the Paranoid Android | Marvin the Paranoid Android present in work Sqornshellous Zeta | Juan member of his crew, his crew has part Juan | Lenny present in work Mads | Harry present in work Harry | Rufus present in work Ron | Harry present in work Don, Sal Romano present in work Harry | Jerry present in work Ron and Diane | crew has part Jool, Jool member of crew | Gordon present in work Sam | Buster present in work Michael, George Sr. present in work Buster | Paulie present in work Tony's crew",
+        "metrics": {
+          "rouge_score": 0.10714285714285714,
+          "answer_correctness": 0.5029890445733354
+        }
+      },
+      {
+        "id": "Tv-id-2",
+        "question": "In The Simpsons minor-characters description, what in-universe line explains the Yes Guy\u2019s stretched-out \u201cYe-e-e-s?!\u201d, and what does the entry say about Wiseguy not actually having a single fixed name?",
+        "ground_truth": "Part 1: The Yes Guy is explicitly described as the one who pops up and does the long, exaggerated \u201cYe-e-e-s?!\u201d\nPart 2: The Wiseguy is described as a recurring extra voiced by Hank Azaria who appears in many jobs and is not given one permanent name.",
+        "generated_answer": "The Yes Guy\u2019s stretched-out \u201cYe-e-e-s?!\u201d is explained as his catchphrase. The entry states that Wiseguy does not actually have a single fixed name, as he is referred to by different names in various episodes.",
+        "contexts": "Yes Guy present in work Homer | Homer present in work Simpsons, Lisa present in work Simpsons | Simpsons present in work Simpsons | Krusty present in work Simpsons, Jesus present in work The Simpsons, Bob present in work Simpsons, Gino present in work The Simpsons | characters present in work Simpsons | Homer present in work Team Homer | Marge present in work the Simpsons | Mr. Burns present in work Simpsons | Jebediah present in work Simpsons | Lisa present in work The Simpsons, Marge Simpson present in work Simpsons | Bart present in work Homer Defined | Bart present in work The Simpsons Movie, Homer present in work The Boys of Bummer | Homer present in work season three | Simpson family present in work Simpsons",
+        "metrics": {
+          "rouge_score": 0.2727272727272727,
+          "answer_correctness": 0.6583206014091272
+        }
+      },
+      {
+        "id": "Tv-id-48",
+        "question": "How did Amira Zafar\u2019s conduct during the helicopter crash reverse Charlie Fairhead\u2019s first impression of her? What sequence of events turns Tom Kent and Sam Nicholls\u2019 troubled relationship into marriage and a fresh start?",
+        "ground_truth": "Part 1: Although Amira initially angered Charlie by being rude, she treated Kai Swift despite the ED being closed and encouraged him to confess, leaving at the end of the shift having impressed Charlie with her devotion. Part 2: Tom\u2019s panic-attack\u2013driven drug misuse strained the relationship and he accidentally hit Sam, but she forgave him and they reconciled. His proposal plan failed, so Sam proposed; they married and left Holby for an extended honeymoon and new beginning.",
+        "generated_answer": "Amira Zafar's conduct during the helicopter crash demonstrated her bravery and competence, changing Charlie Fairhead's initial perception of her from doubt to respect. Tom Kent and Sam Nicholls' troubled relationship evolves into marriage and a fresh start through a series of reconciliations and mutual support, ultimately leading to their commitment to each other.",
+        "contexts": "Tom spouse Lucy | Jessica spouse Tom | Trudy spouse Tom, Tom spouse Trudy | Lisa spouse Sam, Sam spouse Lisa | Lauren spouse Tom, Tom spouse Lauren | Sybbie spouse Tom | Mrs Hughes spouse Tom | Tom spouse Kayla, Kayla spouse Tom | Tom spouse Ann | Lady Sybil Branson spouse Tom Branson, Tom Branson spouse Lady Sybil Branson | Lindsay spouse Tom Jane | Jeff spouse Tamzin, Dixie spouse Tamzin, Tamzin present in work series 27, Tamzin spouse Jeff, Tamzin spouse Sam, Tamzin present in work Casualty | Tom spouse Sybil, Sybil spouse Tom | Tom spouse Jane",
+        "metrics": {
+          "rouge_score": 0.14814814814814814,
+          "answer_correctness": 0.5762714973211682
+        }
+      },
+      {
+        "id": "Tv-id-99",
+        "question": "How does the Guide\u2019s flippant style about life, the universe and everything contrast with the seriousness of Deep Thought\u2019s answer?",
+        "ground_truth": "The Guide treats cosmic questions as travel gags, while Deep Thought treats them like sacred work. Putting a deadpan \u201842\u2019 next to the Guide\u2019s jokiness makes the whole thing funnier and shows the universe won\u2019t give you tidy, dramatic revelations.",
+        "generated_answer": "The Guide's flippant style presents life, the universe, and everything in a humorous and lighthearted manner, while Deep Thought's answer is profound and serious, emphasizing the weight of the question and the significance of the answer. This contrast highlights the difference between casual exploration and deep philosophical inquiry.",
+        "contexts": "Universe part of Universe | Universe has part Everything, Everything part of Universe | Earth part of Universe, Universe has part Earth | God part of Universe, Universe has part God | Galaxy part of Universe, Universe has part Galaxy, Life, the Universe and Everything part of The Tertiary Phase, The Tertiary Phase has part Life, the Universe and Everything | Universe has part his own image, his own image part of Universe | DNA part of life | hyperspace part of Universe | history facet of Universe | alphabetical order part of Universe | Universe has part Total Perspective Vortex | time part of space | solar system part of space",
+        "metrics": {
+          "rouge_score": 0.1956521739130435,
+          "answer_correctness": 0.9742917553925308
+        }
+      },
+      {
+        "id": "Tv-id-56",
+        "question": "What strategy does Batman use against Owlman in \u201cGame Over for Owlman,\u201d and where else do alternate Batmen surface? What causes Superman\u2019s temporary turn against Batman in \u201cBattle of the Superheroes!\u201d, and how is the situation resolved?",
+        "ground_truth": "Part 1: Batman assembles an army of Batmen from across the multiverse to defeat Owlman; variations also appear in \u2018Legends of the Dark Mite\u2019 and around the end of \u2018Night of the Batmen.\u2019 Part 2: Exposure to Red Kryptonite turns Superman evil, leading Batman (with Krypto) to fight him until the effects wear off; they then discover Lex Luthor caused it and defeat him.",
+        "generated_answer": "Batman uses strategic deception against Owlman in \u201cGame Over for Owlman,\u201d while alternate Batmen also appear in \u201cNight of the Batmen.\u201d Superman temporarily turns against Batman due to a misunderstanding, but the situation is resolved when they unite against a common threat.",
+        "contexts": "Batman present in work Game Over for Owlman!, Aquaman present in work Game Over for Owlman!, Game Over for Owlman! characters Batman, Batman present in work Mitefall, Bat-Mite present in work Batman, Batman present in work Rann | Alternative versions of Batman present in work Night of the Batmen, Batman present in work Game Over for Owlman!, Catwoman present in work Shadow of the Bat, Batman present in work Legends of the Dark Mite, Batman owner of Bat-Mite, Batman present in work Time Out for Vengeance, Time Out for Vengeance characters Batman | Batman member of Amazon, Batman member of Stephanie Brown, Ra's al Ghul relative Batman, Ra's al Ghul present in work Sidekicks Assemble!, Sidekicks Assemble! characters Aqualad, Game Over for Owlman! characters Batman, Game Over for Owlman! characters Owlman, Aquaman present in work Aquaman's Outrageous Adventure!, Batman present in work Batman, Robin present in work Batman | Batman present in work Battle of the Superheroes | Owlman present in work Batman | Owlman present in work Batman, The Joker present in work Emperor Joker, Batman present in work Jarvis, Penguin present in work Batman, Batman characters Penguin | Batman present in work Speedy, Riddler present in work A Bat Divided! | Madniks has part Batman, Batman present in work Day of the Dark Knight!, Day of the Dark Knight! characters Batman, Green Arrow present in work Day of the Dark Knight!, Batman present in work Menace of the Madniks, Batman different from Blue Beetle, Batman father Thomas Wayne | Batman present in work Proto | Batman present in work Sidekicks Assemble!, Aquaman present in work Sidekicks Assemble! | Batman present in work Last Bat on Earth! | Man-Bat present in work Batman | Batman present in work Journey to the Center of the Bat!, The Hammer of Justice has part Batman",
+        "metrics": {
+          "rouge_score": 0.2641509433962264,
+          "answer_correctness": 0.6025801379554245
+        }
+      },
+      {
+        "id": "Tv-id-100",
+        "question": "What is the practical purpose of \u2018Don\u2019t Panic\u2019 on the cover of the Guide, and why is it a good design for hitchhikers?",
+        "ground_truth": "Because hitchhikers are often in trouble, the Guide leads with the one thing they need most: a prompt not to panic. It\u2019s good design because it keeps people reading instead of throwing the book away in fear.",
+        "generated_answer": "The phrase 'Don\u2019t Panic' serves as a reassuring reminder for hitchhikers to remain calm in stressful situations, promoting a sense of composure. This design is effective as it encourages a positive mindset, essential for navigating the uncertainties of space travel.",
+        "contexts": "Mostly Harmless part of the series Hitchhiker's Guide | panic has effect easily, errors in his genome has effect panicked | Starthinker present in work The Hitchhiker's Guide to the Galaxy | nervous different from frightened | Fit the First part of the series Hitchhiker's Guide | Now I Know, Don't Be Scared characters Bree, Bree present in work Now I Know, Don't Be Scared | running away from his problems main subject running away from his problems | Now I Know, Don't Be Scared characters Gabrielle, Now I Know, Don't Be Scared characters Milton | Galactic Empire present in work Hitchhiker's | stoic subclass of cautious | calm her has cause Panic attack, Panic attack has effect calm her | Halfrunt present in work The Hitchhiker's Guide to the Galaxy | The Hitchhiker's Guide to the Galaxy followed by The Hitchhiker's Guide to the Galaxy, The Hitchhiker's Guide to the Galaxy follows The Hitchhiker's Guide to the Galaxy | season twelve part of the series Keep Calm and Carry On | The Wandering Juvie followed by Brake My Wife, Please",
+        "metrics": {
+          "rouge_score": 0.1518987341772152,
+          "answer_correctness": 0.5993274165272466
+        }
+      },
+      {
+        "id": "Tv-id-49",
+        "question": "Why did Glen Thomas initially lie about his past at the bereavement group, and how did that affect his relationship with Robyn Miller? What on\u2011screen event caused Jeff Collier\u2019s death, and how was that exit tied to the Samantha Keeler storyline announced earlier?",
+        "ground_truth": "Part 1: Glen falsely claimed his wife had died of a brain tumour because he himself had a glioblastoma and did not want Robyn to date him out of pity; nevertheless, she chose to be with him and they continued their relationship. Part 2: Jeff died when his vehicle exploded before he could exit. The production had announced he would depart after concluding his new love\u2011interest arc with Samantha Keeler.",
+        "generated_answer": "Glen Thomas initially lied about his past at the bereavement group to protect himself and avoid judgment, which strained his relationship with Robyn Miller as it created distrust. Jeff Collier's death was caused by a car accident, and this exit was tied to the Samantha Keeler storyline as it highlighted the consequences of reckless behavior.",
+        "contexts": "Robyn spouse Glen, Ben spouse Robyn, Robyn spouse Dylan, Glen spouse Robyn, Robyn spouse Ben | Robyn Miller spouse Charlie Fairhead, Charlie Fairhead spouse Robyn Miller | Sally spouse Glen, Glen spouse Sally | David spouse Robyn, Robyn spouse David | Robyn spouse Rita, Rita spouse Robyn | Robyn spouse Robyn, Robyn spouse Iain, Iain spouse Robyn | Nan spouse Robyn, Robyn spouse Nan | Ben Miller spouse Belinda Stewart-Wilson, Belinda Stewart-Wilson spouse Ben Miller | Donna spouse Doug | Glen spouse Betty | Jez spouse Robyn",
+        "metrics": {
+          "rouge_score": 0.15748031496062992,
+          "answer_correctness": 0.5276407555324983
+        }
+      },
+      {
+        "id": "Tv-id-101",
+        "question": "Why did Zaphod edit his own brain, and what inconvenient side effect did that have on his later quest?",
+        "ground_truth": "He wanted to keep his scheme totally secret, so he cut out his own knowledge of it. That worked so well he later didn\u2019t know what he was doing, which made the mission longer and more chaotic.",
+        "generated_answer": "Zaphod edited his own brain to enhance his decision-making and confidence, but this resulted in memory loss, complicating his later quest.",
+        "contexts": "Arthur present in work Zaphod | The Hitchhiker's Guide to the Galaxy characters Zaphod, Zaphod present in work The Hitchhiker's Guide to the Galaxy, Questular spouse Zaphod, Zaphod spouse Questular, Zaphod sibling Questular | And Another Thing... characters Zaphod, Zaphod present in work And Another Thing... | Yooden present in work Zaphod, Zaphod the Fourth relative great-grandchild, great-grandchild relative Zaphod the Fourth | Zaphod present in work Magrathea, Magrathea characters Zaphod | Zaphod present in work Fit the Eighth | Zarniwoop's universe characters Zaphod, Frogstar characters Zaphod, Zaphod present in work Frogstar, The Restaurant at the End of the Universe characters Zaphod | Zarniwoop characters Zaphod, great-grandfather relative Zaphod, Zaphod present in work Zarniwoop",
+        "metrics": {
+          "rouge_score": 0.13333333333333333,
+          "answer_correctness": 0.4498821059590774
+        }
+      },
+      {
+        "id": "Tv-id-38",
+        "question": "Which Peacekeeper was forced to choose between killing her lover or her child for violating rules, and how does her death scene stress the cost of that loyalty? How does Pilot resolve his conflict with Moya over destroying a wormhole linking Earth to Tormented Space, and what does he do for Crichton despite the cost?",
+        "ground_truth": "Part 1: Xhalax Sun; punished for a forbidden relationship and contact with her child, she was forced to kill either Aeryn\u2019s father or Aeryn; dying later, she says her true self was killed by loyalty to the Peacekeepers and asks Aeryn to let her fall. Part 2: Despite initially saying he could do nothing because Moya opposed it, Pilot leaves Moya to aid Crichton, destroys the wormhole (saving Earth), and is left weakened until he\u2019s rebonded to Moya.",
+        "generated_answer": "The Peacekeeper forced to choose between killing her lover or her child is Aeryn Sun, and her death scene emphasizes the tragic cost of loyalty. Pilot resolves his conflict with Moya by ultimately agreeing to destroy the wormhole, and he sacrifices his own safety to help Crichton escape.",
+        "contexts": "Velorek spouse Moya, Moya spouse Velorek | pilot present in work Moya, Moya characters pilot, Moya part of her crew | pilot spouse Talyn, Talyn spouse pilot, Moya member of crew | pilot characters Moya, Moya present in work pilot, Moya occupation rebonded, crew has part Moya | pilot spouse Aeryn, Crichton spouse pilot, pilot spouse Crichton | Moya spouse Crichton, Crichton spouse Moya | Vic spouse Danny Sofer, Vic spouse pilot | Partners followed by Co-Pilot | pilot sibling Chiana",
+        "metrics": {
+          "rouge_score": 0.25,
+          "answer_correctness": 0.36833474251540765
+        }
+      },
+      {
+        "id": "Tv-id-102",
+        "question": "What makes Vogon poetry uniquely torturous, and why do the characters endure it anyway?",
+        "ground_truth": "It\u2019s deliberately awful and malformed, and the Vogons weaponize that awfulness. The others sit through it because the Vogons are the ones with the airlocks and blasters.",
+        "generated_answer": "Vogon poetry is uniquely torturous due to its sadistic and cruel nature, often described as a form of torture. Characters endure it for various reasons, including the absurdity of the situation or as a form of punishment.",
+        "contexts": "father instance of Vogon | Garo instance of Horrors | tortures facet of sadistic | Horrors instance of energies | torture facet of demon | Ryuga instance of Horror, Zarugin instance of Horror, Tousei instance of Horror | Hakana instance of Horror | sadistic subclass of cruel | shoe instance of unspeakable | frustration instance of emotions | Gyanon instance of Horror | The Worst instance of Atrocian | darkness instance of primordial evil | mace instance of Inhuman | Horror instance of genre | Velorek instance of Leviathan | Zinga instance of Horror form | cage used by Horrors",
+        "metrics": {
+          "rouge_score": 0.12307692307692308,
+          "answer_correctness": 0.6595204341394696
+        }
+      },
+      {
+        "id": "Tv-id-105",
+        "question": "How do the Guide\u2019s cost-cutting or editorial decisions sometimes make the information less safe than the \u2018boring\u2019 Encyclopedia Galactica?",
+        "ground_truth": "Because it favors colorful, traveler-written entries over slow fact-checking, it can leave out crucial warnings. The Encyclopedia would be duller but safer.",
+        "generated_answer": "The Guide's cost-cutting or editorial decisions can lead to less reliable information compared to the \u2018boring\u2019 Encyclopedia Galactica, which is more thorough and factual. This can result in inaccuracies or omissions that compromise safety.",
+        "contexts": "history facet of Galaxy | The Hitchhiker's Guide to the Galaxy followed by The Hitchhiker's Guide to the Galaxy, The Hitchhiker's Guide to the Galaxy follows The Hitchhiker's Guide to the Galaxy, Magrathea present in work The Hitchhiker's Guide to the Galaxy, The Hitchhiker's Guide to the Galaxy author Douglas Adams | normal pursuits different from geek | Eccentrica Gallumbits present in work The Hitchhiker's Guide to the Galaxy | Space Pirates different from the same reason | Celestialsapiens different from Celestialsapiens | Illustrated Guide to the Galaxy author Douglas Adams, The Hitchhiker's Guide to the Galaxy derivative work TV series | greatest poetic works in existence facet of Galaxy, Betelgeuse 5 different from Betelgeuse Seven | book series different from television, television different from book series | Captain Atom different from Nathaniel Adams, Nathaniel Adams different from Captain Atom | Galactic Empire present in work Hitchhiker's | article different from preposition, preposition different from article",
+        "metrics": {
+          "rouge_score": 0.1,
+          "answer_correctness": 0.9695311677958365
+        }
+      },
+      {
+        "id": "Tv-id-52",
+        "question": "What triggers Don Draper\u2019s visions of his half\u2011brother Adam, and what do those visions imply? Which childhood events reveal both a verdict on Archie Whitman\u2019s character and his ultimate fate?",
+        "ground_truth": "Part 1: A painful abscessed \u2018hot tooth\u2019 and anesthesia trigger Don\u2019s hallucinations of Adam, who tells him, \u201cIt\u2019s not your tooth that\u2019s rotten,\u201d implying deeper moral rot beneath the dental pain. Part 2: A drifter\u2019s coded mark labels the Whitmans as dishonest, and later a drunken Archie is killed when his horse kicks him during a storm, which Dick witnesses.",
+        "generated_answer": "Don Draper's visions of his half-brother Adam are triggered by memories and unresolved feelings regarding family and identity. These visions imply a sense of guilt and loss associated with his past. Childhood events that reveal Archie Whitman's character include his neglectful behavior and eventual downfall, leading to a tragic fate.",
+        "contexts": "Adam sibling Sean, Sean sibling Adam, Lucas sibling Adam | Adam sibling Erik, Erik sibling Adam, Seth sibling Adam, Adam sibling Seth | Mel sibling Adam, Adam sibling Mel, Adam sibling Seth, Kara sibling Adam, Kara sibling Mel | Adam sibling Jesse, Jesse sibling Adam, Mac sibling Jesse | Rafe sibling Adam | Nick sibling Adam, Adam sibling Nick, Alex sibling Adam, Adam sibling Alex | Dick sibling Adam, Adam father Don | Don Draper child Gene",
+        "metrics": {
+          "rouge_score": 0.17094017094017094,
+          "answer_correctness": 0.6755733535312334
+        }
+      },
+      {
+        "id": "Tv-id-28",
+        "question": "In the NCIS history of Gibbs\u2019 service, how does the twenty-year concealment of his revenge killing show the agency protected him, and how does that retroactively explain his earlier fast rise?",
+        "ground_truth": "Part 1: NCIS hid the fact he killed the culprit, so he never faced charges.\nPart 2: Because they protected him, his quick advancement makes more sense.",
+        "generated_answer": "The twenty-year concealment of Gibbs' revenge killing indicates that NCIS prioritized protecting its agents, allowing Gibbs to maintain his position without scrutiny. This protection likely facilitated his rapid rise within the agency, as it shielded him from potential repercussions that could have hindered his career advancement.",
+        "contexts": "Gibbs employer NCIS | Gibbs position held Secretary of the Navy, Gibbs employer NCIS, Vance employer NCIS, Eli employer NCIS, Mike Franks employer Gibbs | Gibbs present in work NCIS, NCIS characters Gibbs | Fornell characters Gibbs, Gibbs employer NCIS, Gibbs position held Director of NCIS, Gibbs employer SISCO, Jacob Scott employer NCIS | Gibbs employer FBI, Stratton employer NCIS, Barrett employer NCIS | Gibbs employer NSA | Agent Barrett employer Gibbs, Gibbs present in work NCIS Most Wanted | Gibbs' employer FBI | Dearing employer NCIS, Simon Cade employer NCIS | Kort employer NCIS",
+        "metrics": {
+          "rouge_score": 0.16216216216216217,
+          "answer_correctness": 0.9717144914888065
+        }
+      },
+      {
+        "id": "Tv-id-106",
+        "question": "Why was Earth scheduled for demolition, and how is that decision structurally similar to Arthur\u2019s house being bulldozed?",
+        "ground_truth": "In both cases a planning office decided a bypass was more important than the thing already there. The scale changes, but the logic is the same.",
+        "generated_answer": "Earth was scheduled for demolition due to significant events leading to its destruction, similar to Arthur's house being bulldozed as both represent the eradication of places tied to pivotal moments in their respective narratives.",
+        "contexts": "Arthur significant event hanged | Harvelle Roadhouse significant event burnt down | Arthur significant event rockfall | Helen significant event disappearance | Abraham Lincoln significant event assassinated, John Wilkes Booth significant event assassinated | Big Pussy significant event disappeared | Debarra significant event deported | Maveth significant event destroyed an entire civilization over centuries | Valhalla significant event crashed | Little Carmine significant event abdicates | John F. Kennedy significant event assassinated | Arthur's mother significant event childbirth | Neil O'Brien significant event found murdered | Tex significant event blown up | Mary significant event Widowed | Arthur present in work Beginning of the End | Armadillo Quintero significant event murdered | Rob father Arthur | Arthur place of death Avalon",
+        "metrics": {
+          "rouge_score": 0.06557377049180328,
+          "answer_correctness": 0.5224413186069756
+        }
+      },
+      {
+        "id": "Tv-id-65",
+        "question": "How did Professor Hart\u2019s mid\u2011battle information swing the fight against Kongbot in JB\u2019s favor? Why were Skybase missiles insufficient against Fanbot, and which weapon combination finally defeated him?",
+        "ground_truth": "Part 1: Hart informed JB that he had a Laser Lance weapon; JB then used the Laser Lance to impale and destroy Kongbot. Part 2: Professor Hart advised that Skybase missiles were not powerful enough; JB used the VR Technobazooka at a low angle and followed with a Laser Lance to finish Fanbot.",
+        "generated_answer": "Professor Hart's mid-battle information provided strategic insights that allowed JB to exploit weaknesses in Kongbot's defenses, turning the tide of the fight. Skybase missiles were insufficient against Fanbot due to their lack of precision and effectiveness against his defenses, while the combination of the Laser Lance and VR Technobazooka ultimately defeated him.",
+        "contexts": "laser lance used by Professor Hart, Laser Lance owned by Professor Hart, Professor Hart owner of VR Technobazooka, Professor Hart uses laser lance, VR Technobazooka owned by Professor Hart | Professor present in work series 1, series 1 characters Professor | Rion present in work The Professor | Professor Hokestar present in work Collect This, Collect This characters Professor Hokestar | Laser Lance designed by Professor Hart | Dr. Whale present in work Frankenstein | JB present in work Defending Dark Heart | Chris present in work J.T., Christopher present in work J.J. | Ian present in work Jimmy | Amy present in work JB | Gunslinger student JB | Junior present in work Doc | John present in work Crichton | The Transmutant characters JB",
+        "metrics": {
+          "rouge_score": 0.2222222222222222,
+          "answer_correctness": 0.6385181043752282
+        }
+      },
+      {
+        "id": "Tv-id-107",
+        "question": "What was Slartibartfast\u2019s contribution to the Earth project, and why was he a bit sad about it?",
+        "ground_truth": "He made the dramatic fjords and loved that kind of work, but the planet-building business was tapering off, so he was nostalgic about a job the universe didn\u2019t want anymore.",
+        "generated_answer": "Slartibartfast was a participant in the Earth project, specifically involved in designing coastlines. He felt a bit sad about it because he had to demolish Earth, which he had invested effort into creating.",
+        "contexts": "Slartibartfast member of CamTim | Trillian sibling Slartibartfast, Slartibartfast sibling Ford, Arthur sibling Slartibartfast, Slartibartfast sibling Trillian, Ford sibling Slartibartfast, Slartibartfast sibling Arthur | Church member of Project Freelancer | UNSC participant in Project Freelancer, Project Freelancer participant UNSC | Earth language used Earth language | Slartibartfast performer John Le Mesurier | Pride member of Eco-Tribe | Earth has part continent | Kurt present in work Project, Project characters Kurt | Sam present in work The Werther Project | Zaphod Beeblebrox characters Slartibartfast | demolish Earth participant Vogon | Washington participant in Project Freelancer | Devastation of Infinis participant Brackus",
+        "metrics": {
+          "rouge_score": 0.0923076923076923,
+          "answer_correctness": 0.5786497178001333
+        }
+      },
+      {
+        "id": "Tv-id-12",
+        "question": "In the Doctor Who production notes, why was the 2005 credit change considered an homage to the classic series, and what later special showed the production still preferred \u201cThe Doctor\u201d overall?",
+        "ground_truth": "Part 1: It was billed as \u201cDoctor Who\u201d in 2005 to echo the classic-era on-screen credits.\nPart 2: The very next special switched it back to \u201cThe Doctor,\u201d showing the revival team preferred that form.",
+        "generated_answer": "The 2005 credit change was considered an homage to the classic series because it reinstated \"The Doctor\" as the character's title, reflecting its historical significance. The later special that showed the production still preferred \"The Doctor\" overall was \"The Time of the Doctor.\"",
+        "contexts": "the Doctor present in work Doctor Who, Doctor Who characters the Doctor | the Doctor present in work Doctor Who, Third Doctor present in work original programme, original programme characters Third Doctor, Whomobile characters Third Doctor | The Doctor (Doctor Who) present in work Doctor Who, Doctor Who characters The Doctor (Doctor Who) | the Doctor present in work the Doctor's character, Eleventh Doctor present in work The Time of the Doctor, Tenth Doctor present in work The Time of the Doctor, The Parting of the Ways characters Tenth Doctor, the Doctor's character characters the Doctor, War Doctor present in work The Time of the Doctor | the Doctor present in work various storylines, various storylines characters the Doctor, Pyramids of Mars characters the Doctor | the Doctor present in work Daleks, Journey's End characters the Doctor | character of the same name present in work Doctor Who | Don present in work Dr Who | the Doctor present in work the rest of the series, the rest of the series characters the Doctor | Genesis of the Daleks characters the Doctor | The Time Monster characters the Doctor | The End of the World characters the Doctor | The Eleventh Hour characters the Doctor",
+        "metrics": {
+          "rouge_score": 0.24691358024691357,
+          "answer_correctness": 0.8272347279635819
+        }
+      },
+      {
+        "id": "Tv-id-109",
+        "question": "How did Trillian manage to leave Earth before it was destroyed, and why didn\u2019t Arthur go with her at that time?",
+        "ground_truth": "She said yes to Zaphod at the party, so she was already in space. Arthur turned Zaphod down and had to be rescued by Ford when the Vogons arrived.",
+        "generated_answer": "Trillian managed to leave Earth before its destruction by boarding a spaceship. Arthur did not go with her because he was preoccupied with other matters at that time.",
+        "contexts": "Arthur spouse Trillian, Trillian spouse Arthur | Morgana spouse Arthur | Arthur spouse Morgana, Mithian spouse Arthur, Arthur spouse Mithian | Arthur sibling Trillian, Trillian sibling Arthur | Gwaine spouse Arthur | Arthur spouse Gwaine | Arthur spouse Vivian, Vivian spouse Arthur | Gwen spouse Arthur | Toni spouse Arthur | Morgana spouse Arthur, Arthur spouse Morgause | Arthur spouse Gwen | Morgana spouse Aithusa, Arthur spouse Gwen, Morgana spouse Helios, Gwen sibling Morgana, Arthur's Bane: Part 1 characters Morgana, Morgana present in work Emrys, Emrys characters Morgana, Morgana spouse Arthur, Emrys spouse Morgana, Morgana spouse Morgause, Morga spouse Morgause | Arthur spouse Mary | Arthur spouse Zosia | Agda spouse Arthur",
+        "metrics": {
+          "rouge_score": 0.07017543859649124,
+          "answer_correctness": 0.20754273164717574
+        }
+      },
+      {
+        "id": "Tv-id-108",
+        "question": "Why does Ford Prefect have such a human-sounding name if he isn\u2019t human, and what does that tell us about his early research on Earth?",
+        "ground_truth": "He wanted an Earth name but he obviously misread what people were calling the car. It shows he\u2019d done some research, just not very good research.",
+        "generated_answer": "Ford Prefect has a human-sounding name because he chose it while conducting research on Earth, mistakenly believing it would blend in. This indicates that his early research was superficial and lacked a deep understanding of human culture.",
+        "contexts": "Guide characters Ford Prefect, Ford Prefect present in work Guide, The Restaurant at the End of the Universe characters Ford Prefect | Zaphod Beeblebrox characters Ford Prefect, Ford Prefect present in work Zaphod Beeblebrox | Mostly Harmless characters Ford Prefect, Ford Prefect present in work Mostly Harmless, Ford Prefect member of Legion of Super Heroes, Emily Saunders present in work Ford Prefect | Arthur Dent present in work Ford Prefect, Jeltz creator Ford Prefect | Zaphod sibling Ford Prefect, Ford Prefect sibling Zaphod | Ford Prefect named after Ford Prefect | Ford Prefect creator Poe | Ford Prefect influenced by Arthur Dent, editor of the Guide officeholder Ford Prefect, Ford Prefect position held editor of the Guide | So Long, and Thanks for All the Fish characters Ford Prefect, Ford Prefect present in work So Long, and Thanks for All the Fish",
+        "metrics": {
+          "rouge_score": 0.15384615384615383,
+          "answer_correctness": 0.6656937223188293
+        }
+      },
+      {
+        "id": "Tv-id-110",
+        "question": "When the mice reveal they want a Question to go with \u201842,\u2019 what does that show about who was actually running the Earth experiment?",
+        "ground_truth": "It shows the \u2018mice\u2019 were in charge all along \u2014 they paid for Earth to be built and wanted to sell the Question, so the cosmic research was really theirs.",
+        "generated_answer": "It shows that the mice were actually running the Earth experiment.",
+        "contexts": "Earth has part continent, continent part of Earth | Earth has part Null Void, Null Void part of Earth | climate part of Earth, Earth has part climate | Earth part of Universe, Universe has part Earth | Earth uses electricity | Earth instance of planet | atmosphere part of planet, planet has part atmosphere | Earth instance of perspective | Earth has part Heaven, Heaven part of Earth | Earth language used Earth language, Earth language facet of Earth | hole on the Earth's ground part of lair | The Question present in work Mystery In Space! | Earth has part Morlaidh | solar system part of space",
+        "metrics": {
+          "rouge_score": 0.3,
+          "answer_correctness": 0.5291980230453661
+        }
+      },
+      {
+        "id": "Tv-id-15",
+        "question": "In the Simpsons minor-characters list, why is the Cat Lady depicted as increasingly unhinged, and what note explains why Springfield still treats her as a recurring background resident?",
+        "ground_truth": "Part 1: She\u2019s shown throwing cats and speaking nonsense, so the text frames her as getting more unhinged over time.\nPart 2: It also says she keeps showing up in town scenes, so Springfield just treats her as another odd local.",
+        "generated_answer": "The Cat Lady is depicted as increasingly unhinged due to her eccentric behavior and obsession with cats. Springfield treats her as a recurring background resident because her quirky character adds to the town's unique charm and humor.",
+        "contexts": "Springfield Up characters Marge | Simpsons characters Lisa | Marge residence Springfield | Homerazzi characters Marge Simpson, All About Lisa characters Marge Simpson, The Simpsons Movie characters Marge Simpson | Strong Arms of the Ma characters Marge, The Simpsons Game characters Marge | Springfield characters Mel | The Simpsons characters Lisa, Simpsons characters Marge Simpson | Marge Be Not Proud characters Marge | Simpsons characters Francesca | The Simpsons Movie characters Lisa | Batman characters Catwoman | Half-Decent Proposal characters Marge | Lisa residence Springfield | The Way We Was characters Marge | Glease characters Kitty | Smelly Cat characters Phoebe",
+        "metrics": {
+          "rouge_score": 0.175,
+          "answer_correctness": 0.6758105718568655
+        }
+      },
+      {
+        "id": "Tv-id-18",
+        "question": "In The Sopranos material about Janice, how does her focus on her own new family keep her from intervening with Junior, and what later scene with Bobby and their daughter shows that choice became permanent?",
+        "ground_truth": "Part 1: She stayed home with Bobby and the baby, so she wasn\u2019t there to manage Junior.\nPart 2: Later, we see them as a stable family, proving she had shifted her priorities for good.",
+        "generated_answer": "Janice's focus on her new family prevents her from intervening with Junior, as she prioritizes her relationship with Bobby and their daughter. A later scene shows Bobby's commitment to their daughter, indicating that Janice's choice to distance herself from Junior has become permanent.",
+        "contexts": "Bobby spouse Janice, Janice spouse Bobby, Tony spouse Bobby, Bobby spouse Tony, Bobby sibling Janice, Janice sibling Bobby | Bobby spouse Janice Soprano, Janice Soprano spouse Bobby | Bobby spouse Karen's, Karen's spouse Bobby | Bobby spouse Leslie, Leslie spouse Bobby | Nikki spouse Bobby, Bobby spouse Nikki | Bobby spouse Jennifer, Jennifer spouse Bobby | Bobby spouse Jody, Jody spouse Bobby | Bobby father his father | Janice spouse Bobby Baccalieri",
+        "metrics": {
+          "rouge_score": 0.14634146341463414,
+          "answer_correctness": 0.6717672369998349
+        }
+      },
+      {
+        "id": "Tv-id-111",
+        "question": "Why is \u2018Mostly Harmless\u2019 such an unsatisfying Guide entry about Earth, and what does Ford try to do about it?",
+        "ground_truth": "Because it summed up the whole planet in two words, Ford thought it was ridiculously thin, so he tried to upgrade it. He only got \u2018Mostly\u2019 added, but it was still an improvement.",
+        "generated_answer": "\u2018Mostly Harmless\u2019 is considered an unsatisfying Guide entry about Earth because it lacks detailed information and is vague. Ford tries to improve it by adding more substantial content.",
+        "contexts": "Mostly Harmless part of the series InfiniDim Enterprises, Colin present in work Mostly Harmless | Mostly Harmless part of the series Hitchhiker's Guide | The Quintessential Phase based on Mostly Harmless, Arthur Dent present in work Mostly Harmless, Eric Bartlett present in work Mostly Harmless, Emily Saunders present in work Mostly Harmless | Mostly Harmless part of the series The Quintessential Phase, The Quintessential Phase has part Mostly Harmless | Mostly Harmless followed by The Quintessential Phase, The Quintessential Phase follows Mostly Harmless, Arthur present in work Mostly Harmless, Mostly Harmless characters Arthur | Mostly Harmless genre novel, Mostly Harmless author Douglas Adams | Mostly Harmless narrative location Hudson | Earth has part Heaven | Earth has part continent | radio adaptation based on Mostly Harmless | Mostly Harmless author Tricia McMillan",
+        "metrics": {
+          "rouge_score": 0.22950819672131145,
+          "answer_correctness": 0.511439908877969
+        }
+      },
+      {
+        "id": "Tv-id-27",
+        "question": "In the Doctor Who crediting history, why did the production team feel comfortable reverting from \u201cDoctor Who\u201d back to \u201cThe Doctor\u201d so quickly, and what does that suggest about their preferred canon naming?",
+        "ground_truth": "Part 1: They tried \u201cDoctor Who\u201d again in 2005 mainly as an homage.\nPart 2: Switching it right back shows the showrunners really prefer \u201cThe Doctor\u201d as the canon form.",
+        "generated_answer": "The production team felt comfortable reverting from \u201cDoctor Who\u201d back to \u201cThe Doctor\u201d due to the established recognition and identity of the character. This suggests a preference for the canon naming that emphasizes the character's role and essence over the series title.",
+        "contexts": "the Doctor present in work Doctor Who, Doctor Who characters the Doctor | the Doctor present in work Doctor Who, Third Doctor present in work original programme, original programme characters Third Doctor, Whomobile characters Third Doctor | The Doctor (Doctor Who) present in work Doctor Who, Doctor Who characters The Doctor (Doctor Who) | the Doctor present in work the Doctor's character, Eleventh Doctor present in work The Time of the Doctor, Tenth Doctor present in work The Time of the Doctor, The Parting of the Ways characters Tenth Doctor, the Doctor's character characters the Doctor, War Doctor present in work The Time of the Doctor | the Doctor present in work various storylines, various storylines characters the Doctor, Pyramids of Mars characters the Doctor | the Doctor present in work Daleks, Journey's End characters the Doctor | character of the same name present in work Doctor Who | Don present in work Dr Who | the Doctor present in work the rest of the series, the rest of the series characters the Doctor | Genesis of the Daleks characters the Doctor | The Time Monster characters the Doctor | The End of the World characters the Doctor | The Eleventh Hour characters the Doctor",
+        "metrics": {
+          "rouge_score": 0.19178082191780824,
+          "answer_correctness": 0.8943019218419885
+        }
+      },
+      {
+        "id": "Tv-id-112",
+        "question": "How does the Guide\u2019s entry on towels explain why carrying one signals competence to other hitchhikers?",
+        "ground_truth": "Because it\u2019s so useful, anyone organized enough to have a towel is assumed to be organized enough to have food, money and other gear, so a towel becomes a shortcut signal of capability.",
+        "generated_answer": "The Guide\u2019s entry on towels explains that carrying a towel is a sign of competence because it is a versatile tool that can be used for various purposes, indicating that the hitchhiker is prepared for any situation.",
+        "contexts": "Starthinker present in work The Hitchhiker's Guide to the Galaxy, Jatravartid's God present in work The Hitchhiker's Guide to the Galaxy | The Hitchhiker's Guide to the Galaxy follows The Hitchhiker's Guide to the Galaxy, The Hitchhiker's Guide to the Galaxy followed by The Hitchhiker's Guide to the Galaxy, The Hitchhiker's Guide to the Galaxy author Douglas Adams, Douglas Adams notable work The Hitchhiker's Guide to the Galaxy, Magrathea present in work The Hitchhiker's Guide to the Galaxy | Mostly Harmless part of the series Hitchhiker's Guide, The Hitchhiker's Guide to the Galaxy publication date 2005 | Fit the First part of the series Hitchhiker's Guide | Zaphod present in work The Hitchhiker's Guide to the Galaxy, The Hitchhiker's Guide to the Galaxy characters Zaphod | Eccentrica Gallumbits present in work The Hitchhiker's Guide to the Galaxy | Halfrunt present in work The Hitchhiker's Guide to the Galaxy | Christopher main subject Christopher Columbus | Veet Voojagig present in work The Hitchhiker's Guide to the Galaxy | The End of Time main subject time | The Hitchhiker's Guide to the Galaxy derivative work film, film based on The Hitchhiker's Guide to the Galaxy | Galactic Empire present in work Hitchhiker's",
+        "metrics": {
+          "rouge_score": 0.16666666666666669,
+          "answer_correctness": 0.7865305643864137
+        }
+      },
+      {
+        "id": "Tv-id-115",
+        "question": "Why is Arthur\u2019s attempt to fly by \u2018throwing himself at the ground and missing\u2019 thematically consistent with the rest of the Guide\u2019s advice?",
+        "ground_truth": "Because it\u2019s another case of the Guide saying something silly that turns out to be sort of true. If you\u2019re distracted enough, you miss the ground \u2014 it\u2019s nonsense that kind of works, just like a lot of their travel hacks.",
+        "generated_answer": "Arthur's attempt to fly by 'throwing himself at the ground and missing' reflects the absurdity and humor inherent in the Guide's advice, emphasizing the theme of unconventional thinking and the unexpected outcomes of seemingly simple actions. This aligns with the overall tone of the Guide, which often subverts traditional logic and expectations.",
+        "contexts": "Arthur present in work Arthur, Arthur characters Arthur | Arthur present in work 'B' Ark, 'B' Ark characters Arthur | Arthur present in work Camelot, Camelot characters Arthur | Arthur present in work Emrys | Arthur present in work Love, Arthur present in work Camelot, Arthur present in work Series 2 | Arthur present in work Men of Letters, Men of Letters characters Arthur | Arthur present in work Beginning of the End | Arthur present in work The Coming of Arthur, Arthur present in work Season Two, The Coming of Arthur characters Arthur | Arthur present in work Arthur's hands | Arthur present in work And Another Thing..., And Another Thing... characters Arthur | Arthur present in work Milliways | Arthur present in work series 1 | The Disir characters Arthur",
+        "metrics": {
+          "rouge_score": 0.1443298969072165,
+          "answer_correctness": 0.9664985757408269
+        }
+      },
+      {
+        "id": "Tv-id-87",
+        "question": "Why do Majikthise and Vroomfondel object to Deep Thought computing the Ultimate Answer, and what compromise do they accept?",
+        "ground_truth": "They\u2019re professional philosophers and don\u2019t want a machine to make them obsolete. Deep Thought promises that when the Answer arrives, people will argue about its meaning for ages, so their work is safe \u2014 and they settle for that.",
+        "generated_answer": "Majikthise and Vroomfondel object to Deep Thought computing the Ultimate Answer because they believe it undermines the value of life and existence. They accept a compromise to have Deep Thought provide the Ultimate Answer but insist on the importance of understanding the question first.",
+        "contexts": "Vroomfondel present in work Life, the Universe and Everything, Majikthise performer Jonathan Adams | Vreddles creator Ma Vreedle, Pa Vreedle present in work Vreedlemania, Pa Vreedle follows Ma Vreedle, Ma Vreedle child Vreddles, Ma Vreedle followed by Pa Vreedle, Vreedlemania characters Pa Vreedle, Dodechedron Vreedle present in work Pretty Boy Vreedle, Vreddles has part Octagon, Octagon Vreedle mother Ma Vreedle, Ma Vreedle child Octagon Vreedle | Drakken influenced by Cyrus | Ma Vreedle present in work Mother of All Vreedles, Mother of All Vreedles characters Ma Vreedle | Rhomboid Vreedle father Ma Vreedle, Ma Vreedle child Rhomboid Vreedle, Vreedle instance of semi-immortality, Ultimate Kevin member of Vreedles, Octagon father Ma Vreedle, Ben 10: Omniverse characters Vreedles, Vreedle Brothers characters Seebik | Number One influenced by Zaphod | Spider-Man influenced by Peter",
+        "metrics": {
+          "rouge_score": 0.1904761904761905,
+          "answer_correctness": 0.7177305262516614
+        }
+      },
+      {
+        "id": "Tv-id-19",
+        "question": "In the Desperate Housewives section about Gabrielle and Carlos, how does the affair with Xiao-Mei become the last straw for Gabrielle, and what later baby-related mix-up at Bree\u2019s wedding forces everyone to admit the truth?",
+        "ground_truth": "Part 1: The moment Gaby finds out Carlos cheated with their surrogate, she ends the marriage.\nPart 2: Later, at Bree\u2019s wedding, the baby confusion is aired, so the real parents are acknowledged.",
+        "generated_answer": "Gabrielle's affair with Carlos becomes the last straw when she discovers his infidelity with Xiao-Mei, leading to a breakdown in their relationship. At Bree's wedding, a baby-related mix-up reveals the truth about their complicated relationships, forcing everyone to confront the reality of their situations.",
+        "contexts": "Carlos spouse Gabrielle, Gabrielle spouse Carlos, Ana spouse Gabrielle | Gabrielle spouse Carlos, Carlos spouse Edie | Mama spouse Gabrielle, Gabrielle spouse Carlos, Gabrielle spouse Justin | Gabrielle spouse Nick, Nick spouse Gabrielle, Victor spouse Gabrielle, Gabrielle spouse Victor | Alejandro spouse Gabrielle, Gabrielle spouse Alejandro | Gabrielle spouse Paul, Juanita spouse Gabrielle | Carlos sibling Gabrielle, Gabrielle sibling Carlos, Xiao-Mei spouse Carlos | Carlos mother Gabrielle, Gabrielle spouse Mama | Gabrielle spouse Juanita | Gabrielle spouse Betty",
+        "metrics": {
+          "rouge_score": 0.21686746987951805,
+          "answer_correctness": 0.9731134280290632
+        }
+      },
+      {
+        "id": "Tv-id-116",
+        "question": "What does the demolition notice problem in Arthur\u2019s house tell us about how Vogons expected Earth to respond to their own notice?",
+        "ground_truth": "It shows both bureaucracies pretend it\u2019s the victim\u2019s fault for not finding a nearly impossible notice. The Vogons were doing the same thing on a cosmic scale.",
+        "generated_answer": "The demolition notice problem in Arthur\u2019s house suggests that Vogons expected Earth to respond with indifference or confusion, as they did not anticipate any significant resistance or concern from its inhabitants regarding the demolition.",
+        "contexts": "Arthur member of Vogons | Club Beta characters Vogons, Vogons present in work Club Beta | father instance of Vogon, Ford's present in work Vogons, Vogons characters Ford's | Arthur residence Camelot | Merlin residence Camelot, Arthur residence Camelot | dragon owned by Arthur, Arthur present in work The Last Dragonlord, Arthur owner of dragon | Morgana present in work Mordred, sword Morgana has enchanted with Aithusa's breath owned by Mordred, Morgana Pendragon sibling Morgause, her half-sister sibling Morgause, Morgana spouse Merlin, Merlin mother Morgana, Merlin sibling Arthur, Emrys characters Arthur, Morgana sibling Morgause, Mordred present in work Love and caring, Mordred spouse Morgana, Cenred sibling Morgause, Mordred spouse Morgana Emrys, Arthur sibling Merlin, Morgana spouse Mordred | demolish Earth participant Vogon, Jeltz instance of Vogon | Kwaltz instance of Vogons, Slartibartfast sibling Arthur | Arthur residence Camelot's castle | Arthur father Merlin, Camelot characters Arthur, Camelot characters Morgause, Arthur sibling Arthur, Arthur relative Merlin, Mordred relative King, Morgana spouse Morgause, Merlin relative Arthur, Morgana Pendragon sibling Morgause, Uther spouse Morgana, Merlin sibling Arthur, Morgana sibling Morgause, Uther present in work Camelot, Uther Pendragon child Morgause, Mordred spouse Morgana, Morgana present in work The Gates of Avalon, The Gates of Avalon characters Morgana, Morgana spouse Mordred | Merlin owned by Arthur | battle Arthur characters Myror, Odin child Arthur, Arthur spouse Morgana | Isolde spouse Arthur, Morgana spouse Prince Arthur, Arthur member of knights, Guinevere sibling Arthur, Merlin sibling Tristan, Merlin child Arthur, Merlin sibling Guinevere",
+        "metrics": {
+          "rouge_score": 0.125,
+          "answer_correctness": 0.21189098924042843
+        }
+      },
+      {
+        "id": "Tv-id-120",
+        "question": "What makes Trillian more adaptable than Arthur in most space situations?",
+        "ground_truth": "She already wanted something bigger than Earth and had skills, so alien tech and politics don\u2019t rattle her the way they rattle Arthur.",
+        "generated_answer": "Trillian's adaptability in space situations stems from her diverse experiences and skills, allowing her to navigate various challenges more effectively than Arthur.",
+        "contexts": "Trillian sibling Arthur, Arthur sibling Trillian | Arthur spouse Trillian | The Disir characters Arthur, Merlin sibling Arthur, Arthur present in work The Disir | Arthur relative Merlin, Merlin relative Arthur | Arthur characters Arthur | Tristan sibling Arthur, Arthur sibling Tristan, A Servant of Two Masters characters Arthur | 'B' Ark characters Arthur | And Another Thing... characters Trillian | Camelot characters Arthur | Arthur father Merlin, Camelot characters Arthur, Camelot characters Morgause, Arthur sibling Arthur, Arthur relative Merlin | Arthur sibling Merlin, Merlin sibling Arthur | Arthur sibling Elyan | Prince Arthur characters Merlin, Arthur relative Merlin | Merlin student Arthur, Arthur student of Merlin",
+        "metrics": {
+          "rouge_score": 0.1702127659574468,
+          "answer_correctness": 0.642330872290426
+        }
+      },
+      {
+        "id": "Tv-id-90",
+        "question": "Why does Arthur try to pull random Scrabble letters to find the Ultimate Question, and why is the result \u2018What do you get when you multiply six by nine?\u2019 considered unhelpful?",
+        "ground_truth": "Seeing \u2018forty-two\u2019 come out of Scrabble makes Arthur think the Question could emerge from random letter draws. But what he gets is a math question whose answer is 54, not 42, so it can\u2019t be the true matching Question.",
+        "generated_answer": "Arthur pulls random Scrabble letters to find the Ultimate Question as part of a quest for knowledge. The result \u2018What do you get when you multiply six by nine?\u2019 is considered unhelpful because it does not provide a meaningful answer to the ultimate purpose of existence.",
+        "contexts": "Q part of Scrabble | Scrabble has part Agh, Agh part of Scrabble, Grunt part of Scrabble, Scrabble has part Grunt | Uno instance of game | Ultimate Panuncian part of Panuncian, Ultimate Alien part of Nemetrix | Ultimate Question creator Imperial Galactic Government | Scrabble uses alphabet tiles, alphabet tiles used by Scrabble | Simple part of the series Ultimate Alien | Ultimate has part Ben, Alien Force followed by Ultimate Alien | Ultimate Prize characters Aggregor | riddle used by puzzle solver, puzzle solver uses riddle | Ultimate Battle characters Spider-Man | Ultimate Alien characters Snare-Oh | Ultimate Ben member of Ultimatrix",
+        "metrics": {
+          "rouge_score": 0.20689655172413796,
+          "answer_correctness": 0.6259663854681594
+        }
+      },
+      {
+        "id": "Tv-id-121",
+        "question": "How does the Guide\u2019s tendency to mix serious and silly entries make it harder for outsiders to know which parts to trust?",
+        "ground_truth": "Because it doesn\u2019t signal which ones are gags, a newcomer can\u2019t tell the difference between \u2018real\u2019 advice and a punchline.",
+        "generated_answer": "The Guide's mix of serious and silly entries creates ambiguity, making it difficult for outsiders to discern credible information from humor or satire. This inconsistency can lead to confusion about what is factual and what is intended as entertainment.",
+        "contexts": "The Beatles has part Lennon, Lennon member of The Beatles, The Beatles has part John Lennon, John Lennon member of The Beatles, The Doors has part John Lennon, The Doors has part Lennon, John Lennon member of The Doors, Lennon member of The Doors | The Beatles has part Jimmy Page, Jimmy Page member of The Beatles, The Wailers performer The Rolling Stones, The Rolling Stones notable work The Wailers | The Rolling Stones has part John Wayne, The Doors has part The Rolling Stones, The Rolling Stones subsidiary The Doors, John Wayne member of The Doors, John Wayne member of The Rolling Stones | The Rolling Stones has part Steeleye Span, Steeleye Span part of The Rolling Stones | The Rolling Stones has part Rod Stewart, Rod Stewart member of The Rolling Stones | The Rolling Stones notable work The Flying Burrito Brothers",
+        "metrics": {
+          "rouge_score": 0.09677419354838708,
+          "answer_correctness": 0.8533311557379792
+        }
+      },
+      {
+        "id": "Tv-id-80",
+        "question": "What was the purpose of the anti-clones called Allitnil, and what happened when one of them met a Lintilla?",
+        "ground_truth": "Allitnils were produced as anti-clones to get rid of the billions of Lintillas. When an Allitnil encountered its matching Lintilla they both vanished in a puff of \u2018unsmoke.\u2019",
+        "generated_answer": "The anti-clone Allitnil is a subclass of anti-clone and is said to be the same as Lintilla. When Allitnil met Lintilla, they were recognized as siblings.",
+        "contexts": "Allitnil subclass of anti-clone, Lintilla subclass of anti-clone, Lintilla sibling Allitnil, Lintilla said to be the same as Allitnil, Allitnil said to be the same as Lintilla, Allitnil sibling Lintilla | Helen instance of clone | Leviathan Sam instance of clone, Leviathan Dean instance of clone | FakeBlock instance of anti-piracy | Rhomboid instance of clone, Vreedle instance of clone pair | Lintilla clones instance of cloning company | Hydro-Man instance of clone | Duplitronic instance of mutant | Allitnil present in work Lintilla, Lintilla characters Allitnil | Pops sibling Anti-Pops, Anti-Pops sibling Pops | Malware instance of hate | DNAliens has cause Xenocyte",
+        "metrics": {
+          "rouge_score": 0.3508771929824561,
+          "answer_correctness": 0.42015324984446595
+        }
+      },
+      {
+        "id": "Tv-id-3",
+        "question": "According to the Doctor Who credit history, when did the on-screen credit stop saying \u201cDoctor Who,\u201d and which 2005 actor briefly brought back \u201cDoctor Who\u201d before it reverted to \u201cThe Doctor\u201d again?",
+        "ground_truth": "Part 1: After a long period the show stopped crediting the lead as \u201cDoctor Who\u201d and used \u201cThe Doctor\u201d instead.\nPart 2: In 2005, Christopher Eccleston briefly got the on-screen credit \u201cDoctor Who,\u201d but the following special flipped it back to \u201cThe Doctor.\u201d",
+        "generated_answer": "The on-screen credit stopped saying \u201cDoctor Who\u201d in 2005, and actor Christopher Eccleston briefly brought back \u201cDoctor Who\u201d before it reverted to \u201cThe Doctor.\u201d",
+        "contexts": "2005 point in time 2005 | 2001 point in time 2001 | 2013 point in time 2013 | 2004 point in time 2004 | 2006 point in time 2006 | 2014 point in time 2014 | 2017 point in time 2017 | 2007 point in time 2007 | 2010 point in time 2010 | 2009 point in time 2009, 2008 point in time 2008 | 2011 point in time 2011, 2013 return point in time 2013 | 2003 point in time 2003 | August 10, 2005 point in time August 10, 2005 | 1994 point in time 1994 | May 23, 2005 point in time May 23, 2005 | 2002 point in time 2002 | 1995 point in time 1995, 1994 point in time 1994 | 1985 point in time 1985",
+        "metrics": {
+          "rouge_score": 0.43478260869565216,
+          "answer_correctness": 0.7376971843325881
+        }
+      },
+      {
+        "id": "Tv-id-123",
+        "question": "How does the restaurant at the end of the universe make use of time travel in a way that appeals to rich diners?",
+        "ground_truth": "It lets you watch the universe end from a safe table and then go home. That\u2019s the ultimate rich-person experience.",
+        "generated_answer": "The Restaurant at the End of the Universe utilizes time travel to allow wealthy diners to experience meals at the ultimate point in time, offering a unique dining experience that combines luxury with the thrill of witnessing the end of the universe. This concept appeals to rich diners by providing an exclusive and extraordinary event that transcends ordinary dining experiences.",
+        "contexts": "The End of the World part of Time War, Time War has part The End of the World | end of the universe facet of God | Knighttime instance of time travel | The End of Time main subject time | The Restaurant at the End of the Universe followed by The Restaurant at the End of the Universe, The Restaurant at the End of the Universe follows The Restaurant at the End of the Universe, The Restaurant at the End of the Universe followed by Fit the Seventh | time travel studied by physics | TV series has part The Restaurant at the End of the Universe, future perfect facet of time travel, The Restaurant at the End of the Universe part of the series TV series, The Restaurant at the End of the Universe narrative location Nano | The Restaurant at the End of the Universe followed by Life, the Universe and Everything, The Restaurant at the End of the Universe followed by Fit the Ninth | The Restaurant at the End of the Universe genre novel | time travel facet of timelines | Agrajag present in work The Restaurant at the End of the Universe | Time Travel Spell instance of magic | Beginning of the End followed by The Ultimate Enemy",
+        "metrics": {
+          "rouge_score": 0.17073170731707318,
+          "answer_correctness": 0.9707822232316496
+        }
+      },
+      {
+        "id": "Tv-id-122",
+        "question": "Why does Zaphod\u2019s two-headed, three-armed body suit his role as an attention-seeking politician?",
+        "ground_truth": "Because he\u2019s literally built to be looked at, which is exactly what the presidency is for in his case.",
+        "generated_answer": "Zaphod's two-headed, three-armed body makes him visually striking and memorable, enhancing his ability to attract attention and stand out as a politician. The unusual physical traits symbolize his eccentric personality, aligning with the flamboyant nature often associated with political figures seeking the spotlight.",
+        "contexts": "head has part neck | arms has part shoulders | head connects with arms, arms connects with head | body has part mind | body has part skin | head connects with torso, Four Arms has part Grey Matter | head part of dragon, dragon has part head | limbs has part wires | skull part of head | arm part of crane | brain part of body, body has part brain, Four Arms has part The spikes, Four Arms has part Humungousaur | heads subclass of body parts | arms part of Robot | Four Arms has part Ben | living body has part soul | hands has part fingers",
+        "metrics": {
+          "rouge_score": 0.12121212121212122,
+          "answer_correctness": 0.695287215444593
+        }
+      },
+      {
+        "id": "Tv-id-62",
+        "question": "By the end of the series, what new family arrangement gave Daisy the support she wanted, and what earlier objection did it resolve? Where had Emily been living after leaving Genoa City, and how was Patty\u2019s impersonation stopped when Emily returned?",
+        "ground_truth": "Part 1: Daisy moved to Yew Tree Farm with Mr Mason and gained the companionship of Mrs Patmore, resolving her previous objection to her father\u2011in\u2011law and her superior being together. Part 2: Emily had been living in Chicago; upon returning for a psychiatrist conference she discovered Patty\u2019s impersonation, confronted her at the police station, and Patty was confined to a mental facility.",
+        "generated_answer": "Daisy received support from a new family arrangement that resolved her earlier objection of feeling alone. Emily had been living in a different location after leaving Genoa City, and Patty's impersonation was stopped when Emily returned by revealing her true identity.",
+        "contexts": "Skye residence Genoa City | Tyra residence Genoa City | Neil residence Genoa City, Tucker residence Genoa City | Jeffrey residence Genoa City | Adam residence Genoa City, Lily Winters residence Genoa City | Sharon residence Genoa City, Nick Newman residence Genoa City | Gloria residence Genoa City, Damon residence Genoa City | Katherine Chancellor residence Genoa City | Nikki Newman residence Genoa City, Phyllis residence Genoa City | Devon residence Genoa City, Yolanda residence Genoa City | Sabrina residence Genoa City | Lauren Fenmore residence Genoa City | Carmen residence Genoa City | Victor Newman residence Genoa City",
+        "metrics": {
+          "rouge_score": 0.2616822429906542,
+          "answer_correctness": 0.8911628352415777
+        }
+      },
+      {
+        "id": "Tv-id-126",
+        "question": "How does the \u2018Babel Fish proves God doesn\u2019t exist\u2019 bit exemplify the way the series undercuts grand explanations?",
+        "ground_truth": "It takes a profound subject and resolves it in two lines of goofy logic, which is exactly how Hitchhiker\u2019s keeps the universe from getting too pompous.",
+        "generated_answer": "The 'Babel Fish proves God doesn\u2019t exist' bit exemplifies the series' tendency to undermine grand explanations by presenting a simple, humorous solution to complex theological questions, suggesting that profound truths can be reduced to absurdity. This approach highlights the series' critique of dogmatic beliefs and the limitations of traditional religious narratives.",
+        "contexts": "Journey religion atheist | Professor Casey religion atheist | God part of Universe, Universe has part God, end of the universe facet of God, Chuck Shurley instance of God | Ronnie Gardocki religion atheist | refusal to accept that anything is true subclass of oddity, No Earth based on \"Other\" | not believing in God different from believing in a little bit of everything, believing in a little bit of everything different from not believing in God | God studied by philosophers | Holy Zarquon's singing fish instance of curse | The God Complex main subject cheesemaking | confession participant God | Winchesters characters God, Lucifer member of God, angels part of God, Lucifer father God | Earth language used Earth language | world without magic different from present-day, magic does not return to the world facet of magic | Free Cake main subject immortality",
+        "metrics": {
+          "rouge_score": 0.10126582278481014,
+          "answer_correctness": 0.6116933893357597
+        }
+      },
+      {
+        "id": "Tv-id-127",
+        "question": "Why are the B Ark passengers\u2019 skills (like hairdressing) mocked at first but then shown to be the foundation of later society?",
+        "ground_truth": "Because the story is poking fun at how we value jobs \u2014 the people their world didn\u2019t want are exactly the people our world came from.",
+        "generated_answer": "The B Ark passengers' skills, initially mocked, become essential as they contribute to the rebuilding of society, highlighting the value of diverse talents in overcoming challenges.",
+        "contexts": "crossdresser field of this occupation cross dressing | blue instance of hair color, brown instance of hair color, grey instance of hair color | Elle occupation consultant | makeup part of hair | Sputnik instance of hairstyle | Pete's occupation profession | Don occupation valet | Legs has part short haircut | Marnie owner of Donovan's Hair Salon | Ivy occupation kitchen maid | her father has effect alopecia | honey occupation barrister | sideburns subclass of hair | Caucasian has part brown hair | Genevieve occupation housekeeper | Wolfcastle instance of hairstyle | ponytail subclass of long hair | Daisy occupation maid",
+        "metrics": {
+          "rouge_score": 0.11538461538461539,
+          "answer_correctness": 0.8481009405278261
+        }
+      },
+      {
+        "id": "Tv-id-128",
+        "question": "What does the Guide\u2019s casual tone about hyperspace bypasses suggest about how often empires do things like destroy planets?",
+        "ground_truth": "It makes it sound like a paperwork headache, not a tragedy, so we infer this happens a lot and the galaxy has gotten used to it.",
+        "generated_answer": "The Guide\u2019s casual tone suggests that destroying planets is a common and routine occurrence for empires.",
+        "contexts": "demolish Earth participant Vogon, history facet of Universe | devour their planet subclass of defense | Destroy All Aliens present in work Ben 10: Destroy All Aliens | tear down the preserve creator Ziktor, Ziktor notable work tear down the preserve | renounce facet of Islam | history facet of Galaxy | destroying the picture characters Chiana | hierarchy facet of evil | drain facet of vampire | blow things up used by alien | Worldwide Evil Empire has part Gemini | Aggregor instance of aliens | Incursean Empire head of state Emperor Milleous, Emperor Milleous country of citizenship Incursean Empire | Spider Slayer instance of engine of destruction | Skips present in work Destroyer of Worlds | end of the universe facet of God | kill the remaining perpetrators characters Dexter",
+        "metrics": {
+          "rouge_score": 0.0930232558139535,
+          "answer_correctness": 0.9604264277680887
+        }
+      },
+      {
+        "id": "Tv-id-39",
+        "question": "Why were the Sopranos key players despite DiMeo\u2019s long reign, and what cross\u2011family ties especially reinforced their influence? What obligation kept Janice and Bobby from supervising Junior the night he shot Tony, and what event later that year shows Domenica\u2019s age and family context?",
+        "ground_truth": "Part 1: Because the Sopranos ran two separate crews (Johnny Boy and Junior) and had longstanding ties to the New York Families\u2014especially the Lupertazzis\u2014making them key North Jersey players even under DiMeo. Part 2: They were registering their daughter Domenica for preschool; later that year, Domenica rode an amusement ride that broke during the Feast of St. Elz\u00e9ar, after which Tony spun her around\u2014showing she was a small child in 2005.",
+        "generated_answer": "The Sopranos were key players due to their strategic alliances and family ties, particularly through marriages and sibling relationships that strengthened their influence. Janice and Bobby were obligated to attend a family event, preventing them from supervising Junior the night he shot Tony. Later that year, Domenica's age and family context were highlighted during a significant family gathering.",
+        "contexts": "Bobby spouse Janice, Janice spouse Bobby, Tony spouse Bobby, Bobby spouse Tony, Tony spouse Janice, Janice spouse Tony, Bobby sibling Janice | Bobby spouse Janice Soprano, Janice Soprano spouse Bobby | Bobby spouse Karen's, Karen's spouse Bobby | Nikki spouse Bobby, Bobby spouse Nikki | Bobby spouse Leslie, Leslie spouse Bobby | Janice spouse Bobby Baccalieri | Bobby spouse Jennifer, Jennifer spouse Bobby | Johnny spouse Janice | Bobby spouse Jody",
+        "metrics": {
+          "rouge_score": 0.1940298507462687,
+          "answer_correctness": 0.6200398506397261
+        }
+      },
+      {
+        "id": "Tv-id-129",
+        "question": "How does Arthur\u2019s confusion about galactic scale make him slow to understand the urgency of Vogon threats?",
+        "ground_truth": "He keeps trying to fit \u2018blowing up Earth\u2019 into a local, fixable problem. That\u2019s why Ford has to push him through each step.",
+        "generated_answer": "Arthur's confusion about galactic scale leads him to underestimate the significance of Vogon threats, causing him to perceive the situation as less urgent than it truly is. This misunderstanding results in a delayed response to the imminent dangers posed by the Vogons.",
+        "contexts": "Arthur present in work 'B' Ark, 'B' Ark characters Arthur | Arthur present in work Camelot, Camelot characters Arthur | Arthur present in work Arthur, Arthur characters Arthur | Arthur present in work Emrys | Arthur present in work Beginning of the End, The Labyrinth of Gedref characters Arthur | Stavromula Beta characters Arthur | The Disir characters Arthur | Arthur present in work Love, Arthur present in work Camelot | Arthur present in work The Coming of Arthur | Arthur present in work Lajestic Vantrashell of Lob, Lajestic Vantrashell of Lob characters Arthur | Ford's present in work Vogons, Vogons characters Ford's | Arthur present in work The Last Dragonlord, Arthur owner of dragon | Arthur father Merlin, Camelot characters Arthur, Camelot characters Morgause, Arthur sibling Arthur, Arthur relative Merlin | Series 4 characters Merlin, series five characters Arthur, series 1 characters Arthur, Arthur present in work series 1",
+        "metrics": {
+          "rouge_score": 0.08955223880597014,
+          "answer_correctness": 0.7539496735132649
+        }
+      },
+      {
+        "id": "Tv-id-130",
+        "question": "Why does the Guide consider a towel more useful than money in some places?",
+        "ground_truth": "Because money only works where it\u2019s accepted, but people will help a traveler who\u2019s clearly competent \u2014 and the towel signals that.",
+        "generated_answer": "The Guide considers a towel more useful than money in some places because it can serve multiple practical purposes beyond just currency, such as providing comfort, utility, and versatility in various situations.",
+        "contexts": "creepy instance of money | crime different from criminal, criminal different from crime | emotions different from emotions | gambling uses money | time different from space, space different from time | proof different from evidence, evidence different from proof | words different from emotions, emotions different from words | firearm different from firearms, firearms different from firearm | year different from age | claim money different from widow's pension | married different from divorced | prison different from prison | read different from write | prison different from the prison | pain different from sorrow | jail different from prison",
+        "metrics": {
+          "rouge_score": 0.10909090909090909,
+          "answer_correctness": 0.4751993842182991
+        }
+      },
+      {
+        "id": "Tv-id-40",
+        "question": "Why does Tony Soprano kill Tony Blundetto himself, and what larger conflict is he trying to resolve? Given that Cicci Sasso is described as an \u201cailing underboss\u201d at the show\u2019s start, what is the most likely timeframe of his promotion and why is a 1999 promotion by Junior considered unlikely?",
+        "ground_truth": "Part 1: He kills Tony B. to prevent him from being tortured by Phil Leotardo and to restore peace with Johnny Sack after Tony B. murders Billy Leotardo, which had escalated tensions with New York. Part 2: He was likely underboss under Jackie Aprile from 1995 onward (or even earlier under Ercoli DiMeo), and not newly promoted by Junior in 1999, since he is already described as an \u201cailing underboss\u201d at the series start.",
+        "generated_answer": "Tony Soprano kills Tony Blundetto to resolve the conflict arising from Blundetto's actions that threaten the Soprano family's stability and reputation. Cicci Sasso's promotion likely occurs after 2000, as a 1999 promotion by Junior is considered unlikely due to the power dynamics and conflicts within the crime families at that time.",
+        "contexts": "Tony Blundetto relative Tony Soprano | The Sopranos characters Tony Blundetto, Tony Soprano relative Tony Blundetto, Tony Blundetto present in work The Sopranos | Tony different from Artie, Artie different from Tony | Soprano crime family opposite of Lupertazzi crime family, Lupertazzi crime family opposite of Soprano crime family | Another Toothpick characters Tony Soprano | Tony Soprano relative Silvio | the Soprano crew has part Tony Soprano | Tony Blundetto relative Phil, Soprano family has part Tony Soprano, Tony Soprano family Soprano family | Junior Soprano relative Tony Soprano, Tony Soprano relative Johnny Soprano, Tony Soprano relative Junior Soprano | Tony Soprano relative Silvio Dante | The Sopranos characters Tony Soprano | Tony Soprano relative Vito Spatafore | AJ Soprano relative Tony Soprano",
+        "metrics": {
+          "rouge_score": 0.171875,
+          "answer_correctness": 0.6576476192913521
+        }
+      },
+      {
+        "id": "Tv-id-131",
+        "question": "What\u2019s the joke behind the Spontaneous Existence Failure of plans once people know about them?",
+        "ground_truth": "It turns a mundane truth \u2014 plans fall apart \u2014 into a cosmic law. That\u2019s funny because it pretends the universe is conspiring against organization.",
+        "generated_answer": "The joke behind the Spontaneous Existence Failure of plans is that once people are aware of them, the plans often fall apart or fail to materialize, highlighting the irony of how knowledge can undermine intentions.",
+        "contexts": "joke subclass of intended | jokes subclass of one-time | pun subclass of joke | Wait, what? instance of running joke | clown subclass of joke | punchline part of joke | comedy has part joke | His wife's death instance of jokes | jokes has part innuendos | knock-knock joke subclass of joke | henge subclass of practical joke | mischievously comical subclass of humor | deadpan subclass of humor | the show for a significant period of time instance of running joke | losing his pants instance of running joke | turn of phrase used by humorous | Phineas instance of sense of humor | straight-faced joke subclass of genuine belief | Flinch instance of comic relief | pranks subclass of joking",
+        "metrics": {
+          "rouge_score": 0.13559322033898305,
+          "answer_correctness": 0.5888442461476824
+        }
+      },
+      {
+        "id": "Tv-id-29",
+        "question": "In Merlin, when Arthur sees that Camelot can be attacked magically, how does that reinforce his earlier suspicion that Uther\u2019s anti-magic laws created enemies, and what outcome shows Arthur he must rule differently later?",
+        "ground_truth": "Part 1: He realises people are hitting Camelot with magic partly because Uther\u2019s laws drove them to it.\nPart 2: So Arthur starts thinking he will need a softer, more balanced approach when he is king.",
+        "generated_answer": "Arthur realizes that Uther's anti-magic laws have alienated potential allies and created powerful enemies, leading to the vulnerability of Camelot. This reinforces his belief that a more inclusive approach to magic and its practitioners is necessary for a stronger kingdom. Ultimately, Arthur's experiences compel him to rule with a more open and understanding perspective towards magic in the future.",
+        "contexts": "Merlin residence Camelot, Arthur residence Camelot, Morgause residence Camelot | Merlin residence Camelot, Arthur residence Camelot | Merlin residence Camelot, Gwen residence Camelot, Morgana residence Camelot, Helios residence Camelot | King Arthur residence Camelot, Gwaine residence Camelot | Merlin residence Avalon, Balinor residence Camelot, Uther residence Camelot | Lancelot residence Camelot | Gwen residence Camelot | Elyan residence Camelot, Ruadan residence Camelot | Morgana residence Camelot | Sigan residence Camelot, Merlin residence the lake | Gaius residence Camelot | Morgaine Le Fey residence Camelot",
+        "metrics": {
+          "rouge_score": 0.16161616161616163,
+          "answer_correctness": 0.979967062139649
+        }
+      },
+      {
+        "id": "Tv-id-133",
+        "question": "How does Ford\u2019s experience of getting stranded on barbaric worlds make him better at calming Arthur?",
+        "ground_truth": "He\u2019s seen worse, so he knows this level of chaos is survivable. That\u2019s why he can tell Arthur what to do and sound credible.",
+        "generated_answer": "Ford\u2019s experience on barbaric worlds equips him with the skills to remain composed under pressure, allowing him to effectively calm Arthur during stressful situations. His adaptability and understanding of chaotic environments enhance his ability to provide reassurance.",
+        "contexts": "Arthur present in work Arthur | Arthur present in work 'B' Ark | Arthur present in work Camelot, Camelot characters Arthur | Arthur present in work Love, Arthur present in work Camelot, Arthur present in work Queen of Hearts, Arthur present in work Series 2 | Arthur present in work Emrys | Arthur present in work And Another Thing..., And Another Thing... characters Arthur | Arthur present in work Beginning of the End | Arthur present in work Men of Letters, Men of Letters characters Arthur | Arthur present in work Milliways | Arthur present in work Arthur's hands | Arthur present in work series 1 | Arthur present in work Hungry Man | Arthur present in work Heart of Gold | Arthur present in work Season Two, Arthur present in work The Coming of Arthur, Arthur present in work Sins of the Father",
+        "metrics": {
+          "rouge_score": 0.09374999999999999,
+          "answer_correctness": 0.5472231155587596
+        }
+      },
+      {
+        "id": "Tv-id-44",
+        "question": "What chain of events leads Eddie Brock to become Venom? How are Dormammu, Mordo, Venom and Carnage connected in the series, and how are they ultimately stopped?",
+        "ground_truth": "Part 1: After repeated career humiliations he blames on Spider-Man, Brock follows Spider-Man to a church; the bells force the symbiote off Peter and it bonds with Brock, who declares they are Venom. Part 2: Dormammu has Mordo give a newborn symbiote to Cletus Kasady to create Carnage and uses Venom to steal the Time Dilation Accelerator; ultimately Spider-Man, Iron Man and Venom defeat them, Dormammu is expelled, and Carnage is pulled into Dormammu\u2019s dimension.",
+        "generated_answer": "Eddie Brock becomes Venom through his connection to the symbiote, which is part of his identity. Dormammu and Mordo are characters associated with Carnage and Venom, respectively, while Carnage is a different symbiote that has ties to Venom. They are ultimately stopped through various confrontations in the series, often involving Spider-Man and other heroes.",
+        "contexts": "Eddie Brock member of venom, venom present in work Carnage, Carnage different from venom, Carnage father venom, Venom Returns characters venom, Dormammu characters Carnage, Carnage follows Venom Returns | venom member of Spider-Man | Brock sibling venom, Brock instance of symbiote, Spider-Man characters Brock, only featured in a handful of episodes characters venom, venom sibling Brock, symbiote has part Spider-Man, Carnage instance of symbiote, venom different from Spider-Man | Venom Returns followed by Carnage, Carnage instance of symbiote, Spider-Man member of Symbiotes | Carnage member of Dormammu, venom student of Mordo | Spider-Carnage member of Spider-Man, Spider-Man has part Spider-Carnage | venom instance of symbiote",
+        "metrics": {
+          "rouge_score": 0.22388059701492538,
+          "answer_correctness": 0.6067345092291299
+        }
+      },
+      {
+        "id": "Tv-id-75",
+        "question": "Based on his fused morphology, how many total arms does Grey Arms have, and which species contribute his legs? Which Chimera Sui Generis transformation did Ben lose access to and why?",
+        "ground_truth": "Part 1: Grey Arms has four arms in total\u2014one Four Arms arm on his right and three Grey Matter arms on his left\u2014and his right leg is Grey Matter\u2019s while his left is Four Arms\u2019. Part 2: Ben lost access to Gax after an aged Vilgax retrieved his DNA sample to restore himself, removing the form from Ben\u2019s Omnitrix.",
+        "generated_answer": "The total number of arms Grey Arms has is not specified. His legs are contributed by the Chimera species. Ben lost access to the Vilgax Chimera Sui Generis transformation due to unspecified reasons.",
+        "contexts": "Sui Generis instance of Chimera | Spider-Man instance of transformed | Pyronite instance of transforming | the Lizard instance of mutates, The Vulture instance of transforming back and forth uncontrollably | Vilgax instance of Chimera Sui Generis | Mirror of Souls instance of Mirror | father instance of spirit | Anodite instance of transforming | shape shifting subclass of alter his body structure | Si'i instance of sacrifice | Transgressor instance of mutant | Gax instance of Chimera Sui Generis | Spider-Man instance of mutate | Spider-Man instance of mutated | Evolved Inves instance of evolve | Maldis instance of non-corporeal being | the fall instance of fall | Suicycle instance of bike | Zad instance of human form",
+        "metrics": {
+          "rouge_score": 0.25,
+          "answer_correctness": 0.36018012037254854
+        }
+      },
+      {
+        "id": "Tv-id-134",
+        "question": "Why do bureaucratic species like the Vogons keep records of everything but still make it impossible for victims to appeal?",
+        "ground_truth": "They want the paperwork to say it was fair, without doing the work to make it actually fair. That\u2019s why everything is \u2018on file\u2019 but nowhere helpful.",
+        "generated_answer": "Bureaucratic species like the Vogons keep records to maintain control and order, but their rigid systems often prevent victims from appealing due to the complexity and inflexibility of their procedures.",
+        "contexts": "father instance of Vogon, Ford's present in work Vogons, Vogons characters Ford's, Prostetnic Vogon Jeltz instance of Vogon, Guide Mark II publisher Vogon | Arthur member of Vogons | Vogons present in work Club Beta, Club Beta characters Vogons | Kwaltz instance of Vogons, Vogon Constructor Fleet has part Kwaltz, Kwaltz member of Vogon Constructor Fleet | Jeltz instance of Vogon, demolish Earth participant Vogon, Prostetnic Vogon Jeltz instance of Vogon Captain | the Alien instance of species | Mechamorph subclass of sentient species | Hive instance of alien species | Bossy instance of dwarf | Hugh instance of Vaxasaurian | Humungousaur instance of Vaxasaurian | Vladat instance of ruling race",
+        "metrics": {
+          "rouge_score": 0.10344827586206898,
+          "answer_correctness": 0.7462437742483438
+        }
+      },
+      {
+        "id": "Tv-id-63",
+        "question": "In 2012, how did Patty attempt to sabotage Jack\u2019s relationship with Genevieve, and what unexpected discovery derailed her plan to shoot Genevieve? How did Tucker McCall\u2019s therapy sessions reveal Emily\u2019s quiet return, and what does the timeline imply about her absence?",
+        "ground_truth": "Part 1: Patty posed as Emily to win Jack away and later planned to shoot Genevieve, but when she arrived, Genevieve was writing a Dear John letter and preparing to leave town. Part 2: Tucker\u2019s therapist was revealed to be Emily, showing she had returned a little over a year after leaving.",
+        "generated_answer": "Patty attempted to sabotage Jack's relationship with Genevieve by undermining their connection, but she unexpectedly discovered that Genevieve was already aware of her intentions, which derailed her plan. Tucker McCall's therapy sessions revealed Emily's quiet return, suggesting that her absence was longer than anticipated, as the timeline indicates she had been away for a significant period.",
+        "contexts": "Jack spouse Genevieve Atkinson, Patty spouse Jack, Genevieve Atkinson spouse Jack, Genevieve spouse Patty, Jack spouse Patty, Patty spouse Genevieve | Emma spouse Jack, Jack spouse Emma | Jill spouse Jack | Jack spouse Katherine, Katherine spouse Jack | Abby spouse Jack | Ellie spouse Jack, Jack spouse Ellie | Emily spouse Jack, Jack spouse Emily, Jack spouse Patty | Jack spouse Carmen | Patsy spouse Jack, Jack spouse Patsy | Jack spouse Jade, Jade spouse Jack",
+        "metrics": {
+          "rouge_score": 0.2678571428571429,
+          "answer_correctness": 0.5036638835230285
+        }
+      },
+      {
+        "id": "Tv-id-24",
+        "question": "In the Sopranos notes about Tony\u2019s gambling, how did his losses strain support he could give to extended family, and how did that financial pressure make Marie more open to the drastic solution for Vito Jr.?",
+        "ground_truth": "Part 1: Because Tony was losing money, it was harder to smooth things over for everyone else.\nPart 2: So when Vito Jr. acted out, Marie accepted the expensive, harsh camp solution.",
+        "generated_answer": "Tony's gambling losses reduced his financial support for extended family, creating strain. This pressure made Marie more receptive to drastic solutions for Vito Jr.",
+        "contexts": "Vito present in work Tony, Vito member of Mafia, Vito occupation construction worker, Marie spouse Vito, Tony characters Vito, Bryan sibling Vito | Vito present in work Phil | Vito present in work Vito, Soprano crime family has part Vito, Tony Soprano present in work Aprile, Vito characters Vito | Vito child Jackie Jr., Uncle Junior sibling Vito, Jackie Jr. father Vito, Vito present in work Finn, Francesca sibling Vito Jr., Vito Jr. sibling Francesca, Vito relative Tony, Finn characters Vito | Tony present in work The Sopranos, The Sopranos characters Paulie, Paulie present in work The Sopranos | Little Paulie father Vito | Furio Giunta sibling Tony Blundetto, Francesa Spatafore sibling Vito Spatafore Jr., Vito Spatafore child Vito Spatafore Jr., Tony Soprano relative Vito Jr. | Tony Soprano present in work The Sopranos | Soprano crime family present in work The Sopranos",
+        "metrics": {
+          "rouge_score": 0.17543859649122806,
+          "answer_correctness": 0.9806222504400548
+        }
+      },
+      {
+        "id": "Tv-id-135",
+        "question": "How does the joke about the Sirius Cybernetics Corporation\u2019s products being hated by their users connect to Eddie and other ship systems?",
+        "ground_truth": "It\u2019s the same design everywhere: too much personality, not enough usefulness. Eddie is just the star example.",
+        "generated_answer": "The joke highlights the irony that despite Eddie being a product of the Sirius Cybernetics Corporation, which is known for creating disliked products, he is portrayed as a friendly and helpful character, contrasting with the negative perception of the corporation's other systems.",
+        "contexts": "Safety and Civil Reassurance Administration subsidiary Sirius Cybernetics Corporation, Sirius Cybernetics Corporation parent organization Safety and Civil Reassurance Administration | Genuine People Personality creator Sirius Cybernetics Corporation, Eddie performer David Tate, You'll Never Walk Alone performer Eddie | Eddie present in work particular season, particular season characters Eddie | Eddie performer Harry Shearer | Eddie present in work Epiphany, Eddie spouse Julie, Emily's spouse Eddie, Epiphany characters Eddie, Eddie spouse Emily's, Julie spouse Eddie | Eddie present in work The Rocky Horror Show | Eddie present in work Heart of Gold, Heart of Gold characters Eddie | Eric owner of Robotus, Robotus owned by Eric | Merlin owned by Arthur | McCann Erickson owned by Roger",
+        "metrics": {
+          "rouge_score": 0.13114754098360654,
+          "answer_correctness": 0.6619118008778676
+        }
+      },
+      {
+        "id": "Tv-id-136",
+        "question": "Why is it significant that Deep Thought admits it can\u2019t find the Question but can design a machine that will?",
+        "ground_truth": "It shows that even godlike computers have scope limits, so the universe\u2019s key pair (Question, Answer) has to be split across generations of machines.",
+        "generated_answer": "It signifies that Deep Thought, despite its advanced capabilities as a supercomputer, recognizes its limitations in understanding the fundamental nature of the Question, yet it can create a machine to aid in that search, highlighting the distinction between processing information and comprehending deeper existential queries.",
+        "contexts": "Deep Thought instance of supercomputer | Deep Thought developer IBM, Deep Thought owned by Apple Computer, Point of View Gun designed by Deep Thought, Apple Computer owner of Deep Thought | Phouchg characters Deep Thought, Deep Thought instance of computer, Loonquawl characters Deep Thought, Deep Thought present in work Phouchg, Deep Thought present in work Loonquawl, Deep Thought instance of city | IBM product or material produced computer | Brainstorm present in work Omniverse, Brainstorm instance of Cerebrocrustacean | electronic gizmos subclass of technological thinker | newer technology has part computer, computer part of newer technology | Deep Thought notable work seven and a half million years' calculation | construction product or material produced heavy machinery | Idea creator Sigma | computer part of technology | Neutronalizer Ray present in work Mind Games",
+        "metrics": {
+          "rouge_score": 0.17142857142857146,
+          "answer_correctness": 0.5483549992050232
+        }
+      },
+      {
+        "id": "Tv-id-97",
+        "question": "According to the corpus, why was Zaphod Beeblebrox able to keep operating even after \u2018going missing\u2019 from his Guide editor job?",
+        "ground_truth": "Because he (like that editor) simply didn\u2019t formally resign \u2014 he just left. The Guide staff kept the office as if he might return, so the system tolerated his absence instead of replacing him outright.",
+        "generated_answer": "Zaphod Beeblebrox was able to keep operating even after \u2018going missing\u2019 from his Guide editor job because he held the position of Imperial President and President of the Galaxy, which allowed him to maintain influence and authority.",
+        "contexts": "Ford Prefect position held editor of the Guide, editor of the Guide officeholder Ford Prefect | Zaphod Beeblebrox position held Imperial President | Zaphod Beeblebrox position held President of the Galaxy | Zarniwoop present in work Zaphod Beeblebrox, Zaphod Beeblebrox present in work Shooty and Bang Bang, Zaphod present in work Frogstar, Shooty and Bang Bang characters Zaphod Beeblebrox | Trillian present in work Zaphod Beeblebrox, Arthur Dent present in work Zaphod Beeblebrox, Ford Prefect present in work Zaphod Beeblebrox, Marvin the Paranoid Android present in work Zaphod Beeblebrox | Zaphod present in work The Hitchhiker's Guide to the Galaxy | Zaphod Beeblebrox present in work Heart of Gold, Heart of Gold characters Zaphod Beeblebrox | Zaphod Beeblebrox owner of Pan Galactic Gargle Blasters | Yooden present in work Zaphod, Zaphod Beeblebrox the Fourth present in work Hotblack Desiato | Zaphod present in work Zarniwoop | Zaphod present in work Fit the Eighth",
+        "metrics": {
+          "rouge_score": 0.1388888888888889,
+          "answer_correctness": 0.5115636181949976
+        }
+      },
+      {
+        "id": "Tv-id-139",
+        "question": "What does the Guide\u2019s focus on drinks (Pan Galactic Gargle Blasters, etc.) tell us about its target reader\u2019s lifestyle?",
+        "ground_truth": "It\u2019s written for people who travel cheap and drink hard, so it spends space on the fun parts.",
+        "generated_answer": "The Guide's focus on drinks like Pan Galactic Gargle Blasters suggests that its target readers lead a vibrant, adventurous lifestyle, likely enjoying unique experiences and social interactions. This emphasis on imaginative beverages reflects a culture that values creativity and novelty.",
+        "contexts": "Pan Galactic Gargle Blasters owned by Zaphod Beeblebrox, Zaphod Beeblebrox owner of Pan Galactic Gargle Blasters | Anti-Gravity Projector manufacturer Goop | Null Void cannon owned by Psyphon, Psyphon owner of Null Void cannon | Laser Saber used by Duplitronic, Laser Saber owned by Ryan, Laser Saber instance of laser pistol | Galaxy has part Synthos | Spitter present in work Omnitrix, Omnitrix characters Spitter | Laser Saber owned by Ryan, Ryan owner of Laser Saber, Oraclon uses Laser Saber | plasma pistol designed by Burnie Burns | gravity rod owned by Starman, cosmic rod owned by Starman | Georgia sport jet pack, Georgia instance of jet pack | Panuncian owned by Khyber, Panuncian has part Ultimate Panuncian | slingshot used by Pops",
+        "metrics": {
+          "rouge_score": 0.09999999999999999,
+          "answer_correctness": 0.7046180251293784
+        }
+      },
+      {
+        "id": "Tv-id-10",
+        "question": "In the Red vs. Blue material about Caboose, how does Omega\u2019s influence explain Caboose\u2019s odd behaviour, and what later action by Sarge in Season 15 shows he still cares for the squad despite earlier tension?",
+        "ground_truth": "Part 1: Caboose\u2019s weirdness is partly blamed on his contact with the Omega AI fragment, not just on him being slow.\nPart 2: Even when Sarge is depressed in Season 15, he still comes back to rescue the team, showing the bond is intact.",
+        "generated_answer": "Omega's influence on Caboose leads to his erratic behavior, as Omega manipulates Caboose's thoughts and actions. In Season 15, Sarge's decision to help Caboose during a critical moment demonstrates his underlying care for the squad despite previous conflicts.",
+        "contexts": "Caboose present in work season fifteen, Caboose member of Red team, season fifteen characters Caboose | Caboose present in work season fifteen, season 13 characters Caboose, Caboose characters Loco, season fifteen characters Caboose | Caboose present in work season five | Sarge present in work season twelve, season twelve characters Sarge | Caboose present in work season 13, Blood Gulch troopers present in work season fifteen, season fifteen characters Blood Gulch troopers, season 13 characters Caboose, Caboose present in work Reconstruction | Caboose present in work season one, season one characters Caboose | Nelson present in work season fifteen, season fifteen characters Nelson | Biff present in work season fifteen | Grif present in work season fifteen, season fifteen characters Grif | season fifteen characters Grif | Caboose present in work Season 13, Episode 8 | Episode 75 characters Caboose",
+        "metrics": {
+          "rouge_score": 0.20930232558139536,
+          "answer_correctness": 0.6814045511092619
+        }
+      },
+      {
+        "id": "Tv-id-141",
+        "question": "How does the Guide\u2019s entry style encourage travelers to improvise rather than follow strict itineraries?",
+        "ground_truth": "Because it talks like a friend, not like a tour operator, readers assume they can make it up as they go.",
+        "generated_answer": "The Guide\u2019s entry style promotes flexibility and spontaneity, allowing travelers to explore and adapt their plans based on experiences rather than adhering to rigid itineraries. This encourages a more immersive and personalized travel experience.",
+        "contexts": "time travel facet of timelines | mountain climbing subclass of travels around the world | Future facet of Future | marriage facet of marriage | magical subclass of travelling, magical world subclass of travel | travel through time and space facet of Chronosapien | history facet of Universe | green facet of green | Earth language facet of Earth | time rift facet of time | romance facet of sexuality | drinks facet of alcoholic | work-from-home subclass of vacation | terminus facet of Victoria | Christmas spirit facet of Christmas | suicide facet of suicidal | vampire hunter facet of vampire | kisses facet of Romantic | webisode facet of social media",
+        "metrics": {
+          "rouge_score": 0.03571428571428571,
+          "answer_correctness": 0.7630262963145131
+        }
+      },
+      {
+        "id": "Tv-id-143",
+        "question": "Why is the Guide constantly being updated, and how does that create room for errors like \u2018Harmless\u2019?",
+        "ground_truth": "Because it values up-to-the-minute info, it sometimes publishes oversimplified entries like \u2018Harmless\u2019 before anyone has time to expand them.",
+        "generated_answer": "The Guide is constantly being updated to reflect new information and changes in the universe, which can lead to errors like \u2018Harmless\u2019 due to the rapid pace of updates and potential oversights. This dynamic nature allows for mistakes to occur, as the content may not always be thoroughly vetted.",
+        "contexts": "harmless opposite of lethal, lethal opposite of harmless | mistakes has effect wrongdoings | Agrajag present in work Mostly Harmless | Mostly Harmless characters Random Frequent Flyer Dent, Random Frequent Flyer Dent present in work Mostly Harmless, Anjie present in work Mostly Harmless | Mostly Harmless followed by The Quintessential Phase, The Quintessential Phase follows Mostly Harmless, Arthur present in work Mostly Harmless | Jammed instance of catch phrase | Teeny instance of Teen | Mostly Harmless part of the series InfiniDim Enterprises | radio adaptation based on Mostly Harmless | The Quintessential Phase based on Mostly Harmless, Mostly Harmless derivative work The Quintessential Phase | Fenchurch present in work Mostly Harmless | New Dawn instance of anomaly | Mostly Harmless part of the series The Hitchhiker\u2019s Guide | Mostly Harmless genre novel",
+        "metrics": {
+          "rouge_score": 0.1408450704225352,
+          "answer_correctness": 0.5523485954348427
+        }
+      },
+      {
+        "id": "Tv-id-95",
+        "question": "Why was Disaster Area\u2019s accountant made Professor of Neomathematics, and what does that say about the band\u2019s finances?",
+        "ground_truth": "Because the band\u2019s earnings and tax structures were so absurdly complicated that doing their books was basically new math. Making the accountant Professor of Neomathematics underlines how ludicrously big and complex their income was.",
+        "generated_answer": "Disaster Area\u2019s accountant was made Professor of Neomathematics likely due to their expertise in managing complex financial matters, suggesting that the band's finances were poorly managed or in disarray. This indicates a lack of financial stability within the band.",
+        "contexts": "Will occupation accountant | banking field of this occupation balancing the books, consultant field of this occupation A&E | Tony owner of accounting firm, accounting firm owned by Tony | lawyer field of this occupation law, law practiced by lawyer | practitioner field of this occupation magic | lawyer field of this occupation cases, cases practiced by lawyer | prostitute field of this occupation work | accounts department different from blue blood firm, blue blood firm different from accounts department | building inspector field of this occupation construction | medicine practiced by doctor, doctor field of this occupation medicine | sponsor field of this occupation AA | drug dealer field of this occupation drug money | doctor field of this occupation examining | accounting pun subclass of pun | physician field of this occupation A&E",
+        "metrics": {
+          "rouge_score": 0.15789473684210528,
+          "answer_correctness": 0.6496123914638878
+        }
+      },
+      {
+        "id": "Tv-id-41",
+        "question": "How do Ursula\u2019s actions create identity and reputational problems for Phoebe, and which cross\u2011sitcom cameo underscores their frequent confusion? What chain of events turns the Garo armor from gold to black and then restores it, and who becomes the recognized successor afterwards?",
+        "ground_truth": "Part 1: Ursula stars in porn using Phoebe\u2019s name, leading men to harass Phoebe; earlier, \u201cMad About You\u201d characters Jamie and Fran mistake Phoebe for Ursula at Central Perk, highlighting the confusion. Part 2: After a future battle tarnishes the armor to black and it is displayed in the Tower of Heroic Spirits, it calls priestess Hakana for restoration; once the Mad\u014d Horrors are destroyed, the armor is fully restored and Ryuga Dogai is recognized as the true successor to Garo.",
+        "generated_answer": "Ursula's actions create identity and reputational problems for Phoebe due to their close relationship and shared characteristics, leading to frequent confusion between the two. The cross-sitcom cameo that underscores this confusion is the character of Ursula appearing in \"Friends.\" The Garo armor turns from gold to black due to a betrayal or loss of power, and it is restored through a significant event or redemption arc, with the recognized successor being the character who proves worthy or heroic in the process.",
+        "contexts": "Phoebe spouse Ursula, Ursula spouse Joey, Ursula spouse Phoebe, Phoebe sibling Ursula, Joey spouse Ursula, Phoebe characters Ursula, Ursula sibling Phoebe, Ursula present in work Phoebe, Phoebe mother Ursula | Will spouse Phoebe, Ursula spouse Phoebe | Phoebe spouse Phoebe | Phoebe spouse Monica, Ross spouse Rachel, Monica spouse Phoebe | Monica spouse Phoebe, Ross spouse Phoebe, Chandler spouse Phoebe, Joey spouse Phoebe, Phoebe spouse Chandler, Mike spouse Phoebe | Phoebe spouse Joey | Eddie spouse Phoebe, Monica spouse Phoebe, Ross spouse Charlie | Chandler spouse Phoebe, Chandler spouse Joey | Ursula spouse hook",
+        "metrics": {
+          "rouge_score": 0.20606060606060606,
+          "answer_correctness": 0.5201426448184907
+        }
+      },
+      {
+        "id": "Tv-id-144",
+        "question": "How does the series use bodyless or disembodied characters (like Gargravarr) to comment on bureaucracy or punishment?",
+        "ground_truth": "It shows that even cosmic punishments are run by people who sound like civil servants, which makes the whole system ridiculous.",
+        "generated_answer": "The series uses bodyless characters like Gargravarr to symbolize the disconnection and inefficiency often found in bureaucratic systems, highlighting how punishment can render individuals powerless and voiceless. This portrayal critiques the impersonal nature of authority and the consequences of being stripped of one's physical form and agency.",
+        "contexts": "Deadman instance of ghost | suffocated subclass of dead body | Inve subclass of corpses | Garo instance of armor | Talyn instance of humanoid | Raiga instance of aloof | Ghost Rider instance of skeleton | Daggeron instance of human form | walking corpse subclass of undead | Frightwig instance of body suit | Kara instance of Mortagarians, Kali instance of Mortagarians | Zero instance of armor | Ghostfreak instance of ghost | Gargravarr performer Valentine Dyall | Viggor instance of demon | Maldis instance of non-corporeal being | Kara instance of spirit | Daggeron instance of Human | body has part skin",
+        "metrics": {
+          "rouge_score": 0.08695652173913043,
+          "answer_correctness": 0.19876644440461697
+        }
+      },
+      {
+        "id": "Tv-id-66",
+        "question": "What compensation change did Jack Soloff push as committee chair, and why was it aimed at Harvey? Describe the escalation between Soloff and Harvey over compensation and how Harvey (with Mike) forced Soloff to retreat.?",
+        "ground_truth": "Part 1: Soloff proposed shifting compensation toward billable hours over contingent fees, specifically targeting Harvey because he operates on a contingent\u2011fee basis. Part 2: Soloff illegally publicized Harvey\u2019s salary to win support for his change; Harvey countered by poaching Soloff\u2019s clients and, with Mike\u2019s help, got him to back off.",
+        "generated_answer": "Jack Soloff pushed for a compensation change aimed at Harvey to undermine his position and influence within the firm. The escalation involved Soloff attempting to leverage his authority as committee chair against Harvey, but Harvey, with Mike's support, countered Soloff's moves, ultimately forcing him to retreat and abandon the compensation change.",
+        "contexts": "chair part of committee structure | Uninvited Guests characters Jack Soloff, Jack Soloff employer Fletcher Engines | Jack Soloff performer John Pyper-Ferguson | Reconstruction characters Chairman of the Oversight Subcommittee | department's leader officeholder Adam, Adam position held department's leader | Scandal participant Jack | Tony position held captains, Jimmy position held captains | Jerry position held Judge | Jack present in work Dal, Jack present in work 349, Jack present in work 552 | Wally position held elected leader | Homer position held Class President | Reconstruction characters The Chairman | Phil Leotardo position held New York boss | Aceveda position held Councilman | Ben Gilroy position held Assistant Chief",
+        "metrics": {
+          "rouge_score": 0.22429906542056074,
+          "answer_correctness": 0.6357529025455093
+        }
+      },
+      {
+        "id": "Tv-id-23",
+        "question": "In Merlin\u2019s material about magically shaped visions, why is Arthur warned not to accept every supernatural message as historical fact, and what later experience shows him some visions do line up with reality?",
+        "ground_truth": "Part 1: He\u2019s told not to swallow visions whole because magic users can manipulate them.\nPart 2: But when bits of a vision actually happen in Camelot, he realises some of it was true.",
+        "generated_answer": "Arthur is warned not to accept every supernatural message as historical fact because they can be misleading or deceptive. His later experience with the visions of Excalibur shows that some visions do align with reality.",
+        "contexts": "Merlin child Arthur, Merlin father Arthur, Cenred present in work The Coming of Arthur, Arthur father Merlin | Arthur father Merlin, Lancelot child Arthur, Arthur sibling Gwen, Percival sibling Lancelot, Lancelot father Arthur, Lancelot and Guinevere season Series 2, Merlin sibling Lancelot, Merlin child Lancelot, Arthur child Lancelot | Arthur father Merlin, Camelot characters Arthur, Camelot characters Morgause, Arthur sibling Arthur, Arthur relative Merlin | Arthur father Merlin, Dragoon creator Merlin, Merlin relative Dragoon, Uther father Merlin | Arthur father Merlin, Merlin performer Colin Morgan, Merlin sibling Lancelot | Tristan sibling Arthur, Arthur sibling Olaf, Arthur father Merlin, Isolde spouse Arthur, Morgana spouse Prince Arthur, Arthur member of knights, Guinevere sibling Arthur, Merlin sibling Tristan, Merlin child Arthur, Merlin sibling Guinevere | Arthur father Merlin, Merlin present in work series 1, Gilli spouse Merlin | Arthur spouse Princess Elena, Princess Elena spouse Arthur, Arthur father Merlin | father child Arthur, Arthur father father | Gwen spouse Merlin, Merlin father his father, Arthur sibling Merlin, his father child Merlin, Merlin owner of Excalibur, Arthur present in work Camelot | Lancelot father Arthur | Arthur father Odin",
+        "metrics": {
+          "rouge_score": 0.17142857142857143,
+          "answer_correctness": 0.6466067296521332
+        }
+      },
+      {
+        "id": "Tv-id-70",
+        "question": "Who persuades Tina that a care home is the best option for Sylvie, and what realization does Tina reach as a result? Between Stan Carter and Babe Smith, who left the series earlier, and why did that character depart?",
+        "ground_truth": "Part 1: Kathy Beale persuades Tina that professional care is best for Sylvie, leading Tina to call about arranging a care\u2011home placement. Part 2: Stan Carter left earlier; he died following a battle with terminal prostate cancer in the episode broadcast on 10 April 2015, whereas Babe\u2019s final appearance was in February 2017.",
+        "generated_answer": "Babe Smith persuades Tina that a care home is the best option for Sylvie, leading Tina to realize that she cannot care for Sylvie herself. Stan Carter left the series earlier due to being written out of the show.",
+        "contexts": "Sylvie spouse Shirley, Mick spouse Tina, Stan spouse Sylvie, Sylvie mother Tina, Babe spouse Sylvie, Babe characters Sylvie, Sylvie spouse Stan, Sylvie mother Babe, Tina spouse Shirley, Sylvie spouse Babe, Shirley spouse Tina, Tina mother Sylvie, Sylvie present in work Babe, Tina sibling Shirley, Sylvie occupation Caregiver, Tina child Sylvie, Sylvie mother Kathy, Shirley spouse Sylvie, Caregiver has part Sylvie, Shirley child Sylvie, Sylvie child Tina, Sylvie present in work The Queen Vic, Tina spouse Johnny, Tina spouse Mick | Stan spouse Sylvie, Sylvie spouse Babe, Mick spouse Babe, Babe spouse Sylvie, Sylvie spouse Stan | Tina spouse Julien | Sonia spouse Tina, Tina spouse Sonia | Dutch spouse Tina, Tina spouse Dutch | Chris spouse Tina, Tina spouse Chris | Tina spouse Sean | Tina spouse Blaine",
+        "metrics": {
+          "rouge_score": 0.3617021276595745,
+          "answer_correctness": 0.3991557899633087
+        }
+      },
+      {
+        "id": "Tv-id-79",
+        "question": "Arthur believed \u2018Stavromula Beta\u2019 was a planet. According to the corpus, what was it actually, and how did that let the story resolve the paradox about when Arthur was allowed to die?",
+        "ground_truth": "It turned out not to be a planet at all but a club named for Stavro Mueller (\u201cBeta\u201d). Once Arthur actually lived through that club incident, the long-running \u2018you can\u2019t die before this\u2019 condition was satisfied, so the story could finally let Arthur die.",
+        "generated_answer": "Stavromula Beta is a fictional planet in the work where Arthur is a character. This belief allowed the story to resolve the paradox by establishing a narrative context for Arthur's fate.",
+        "contexts": "Arthur present in work Stavromula Beta, Agrajag present in work Stavromula Beta, Stavromula Beta characters Arthur | Earth instance of planet | Pluto instance of planet | Omnitrix instance of planetoid, Ultimate Gravattack instance of planetioid, planet uses gravity | Lepidopterra instance of swamp planet | Starro instance of starfish | Nanomech instance of hive planet | Qujaga instance of water-planet | Vida instance of Titan | Starro narrative location Earth | planet has part atmosphere | Star of Bionya instance of diamond | Earth instance of perspective | Matoombo instance of Titan | Planet Master instance of supervillain | Rabidspore instance of organism",
+        "metrics": {
+          "rouge_score": 0.1794871794871795,
+          "answer_correctness": 0.5185093125319562
+        }
+      },
+      {
+        "id": "Tv-id-21",
+        "question": "In the Simpsons entry for recurring staff and background workers, why is the character often called the \u2018Sarcastic Clerk\u2019 reused in so many roles, and what explanation is given for his catchphrase delivery?",
+        "ground_truth": "Part 1: The show keeps reusing him in different jobs because he\u2019s their go-to sarcastic worker.\nPart 2: His dry, identical delivery is the point, so he keeps talking that way no matter where he\u2019s working.",
+        "generated_answer": "The 'Sarcastic Clerk' is reused in many roles due to the character's versatile nature and humor. His catchphrase delivery is characterized by a sarcastic tone that enhances comedic effect.",
+        "contexts": "characters present in work Simpsons | Homer present in work Simpsoncalifragilisticexpiala(Annoyed Grunt)cious, Marge present in work The Springfield Connection, Marge present in work Simpsoncalifragilisticexpiala(Annoyed Grunt)cious, Simpsoncalifragilisticexpiala(Annoyed Grunt)cious characters Homer | Homer present in work Simpsons, Lisa present in work Simpsons | Simpsons present in work Simpsons | Marge Simpson present in work Simpsons, Lisa present in work The Simpsons | Marge present in work The Simpsons | Plopper present in work Simpsons | Bob present in work Simpsons, Krusty present in work Simpsons, Jesus present in work The Simpsons | eyebrows present in work The Simpsons | Marge present in work Marge Be Not Proud | Marge present in work Homer's Barbershop Quartet | house occupant Simpsons | Marge present in work The Simpsons Game | Homer present in work Team Homer",
+        "metrics": {
+          "rouge_score": 0.2318840579710145,
+          "answer_correctness": 0.7771658616478471
+        }
+      },
+      {
+        "id": "Tv-id-60",
+        "question": "What in\u2011story exit did the series give Sandy Harper, and what off\u2011screen event prompted that choice? After the Queen fully integrated with Elena Validus, what act convinced Elena to sacrifice herself, and what later strategy did the Queen use to target Ben again?",
+        "ground_truth": "Part 1: After the actress\u2019s death, the show wrote Sandy out by having her win \u00a3150,000 in the lottery and leave for Australia. Part 2: The Queen tried to choke Ben using drones, prompting Elena to sacrifice herself to destroy the Hive; later, the Queen rebuilt a body in Elena\u2019s likeness and tried to steal Ben by assuming Julie\u2019s form.",
+        "generated_answer": "Sandy Harper's exit was prompted by the off-screen event of her character's decision to leave the series. Elena Validus sacrificed herself after the Queen fully integrated with her, and later, the Queen targeted Ben again by using his relationships with other characters.",
+        "contexts": "Elena spouse Ben | Ben spouse Elena, father-in-law child Ben, Elena spouse Ben | Ben spouse Attea | Gwen spouse Ben, Ben spouse Gwen, Ben spouse Kevin, Kevin spouse Ben | Julie spouse Ben, Ben spouse Julie | Pam spouse Ben, Ben spouse Pam | Lisa spouse Ben, Ben spouse Lisa | Robyn spouse Ben | Ben spouse Gwen, Ben spouse Julie | Ren\u00e9e spouse Ben, Ben spouse Ren\u00e9e | Queen spouse Victor Validus, Elena Validus present in work Victor | Ben spouse Lisa, Lisa spouse Ben",
+        "metrics": {
+          "rouge_score": 0.2385321100917431,
+          "answer_correctness": 0.37441323493890966
+        }
+      },
+      {
+        "id": "Tv-id-34",
+        "question": "Whose increasingly abnormal behavior is attributed to both possession by Omega and oxygen deprivation after a suit reboot\u2014and what accidents illustrate the consequences? Which leader\u2019s Season 15 depression leads him to create enemies to fight and to betray the Reds and Blues\u2014yet what later action demonstrates his change of heart?",
+        "ground_truth": "Part 1: Caboose; his behavior is linked to Omega\u2019s possession and a reboot that cut off his oxygen, and he is shown accidentally killing squad\u2011mates, including Alpha\u2011Church with the Blue Team\u2019s tank Sheila. Part 2: Sarge; his depression pushed him to make evil robots and to side with Temple\u2019s Blues and Reds against the Reds and Blues, but he later saves Dylan and Jax from execution and rejoins his team.",
+        "generated_answer": "The increasingly abnormal behavior is attributed to Omega, with accidents illustrating the consequences being the suit reboot and oxygen deprivation. The leader whose Season 15 depression leads him to create enemies and betray the Reds and Blues is the Director, and his later action demonstrating a change of heart is his decision to help them.",
+        "contexts": "Reds opposite of Blues, Blues opposite of Reds, Reds followed by Blues | Red opposite of blue, blue opposite of Red, Red team opposite of Blue Team, Blue Team opposite of Red team | Reds opposite of Blue Team, Reds opposite of Epsilon, Epsilon opposite of Reds, Blue Team opposite of Reds, Donut member of sports team Blues | Red different from Blues, Blues different from Red | blue opposite of Red team, Red team opposite of blue | Reds opposite of Wyomings | colored opposite of Black and White | Reds has part Blues | light opposite of DARK, DARK opposite of light",
+        "metrics": {
+          "rouge_score": 0.26153846153846155,
+          "answer_correctness": 0.5602223567309603
+        }
+      },
+      {
+        "id": "Tv-id-73",
+        "question": "Which came first for Coulson\u2014forming a mobile team or being appointed Director\u2014and what intervening event separates them? If someone ingests Agrabahn Viper Poison, what must be done to avert death, and how does ingestion differ from a bite?",
+        "ground_truth": "Part 1: Coulson first assembled a team handling strange cases; after Hydra infiltrated and brought down S.H.I.E.L.D., Fury then appointed him Director. Part 2: Ingestion causes the victim to dissolve in green smoke, unlike a bite which kills by normal poisoning; the spread can be stopped only if the victim is taken to the Land of Untold Stories before death.",
+        "generated_answer": "Coulson was appointed Director before forming a mobile team, separated by the intervening event of his resurrection. To avert death from Agrabahn Viper Poison ingestion, immediate medical intervention is required, and ingestion differs from a bite in that ingestion involves consuming the poison, while a bite introduces it through the skin.",
+        "contexts": "bitten has effect poisoned, poisoned has cause bitten | sharp teeth use attacks | pet different from Animal, Animal different from pet, growled different from barked | eating uses food | blood different from plasma, fangs part of vampire, plasma different from blood | eat by herself different from unable to walk, unable to walk different from eat by herself | sex different from pleasure, pleasure different from sex | Teeth part of mouth | killed different from pretends to be dead | blood has effect vomiting | eating uses energy | death different from fight | normalcy different from mask",
+        "metrics": {
+          "rouge_score": 0.15517241379310348,
+          "answer_correctness": 0.8214899774171287
+        }
+      },
+      {
+        "id": "Tv-id-13",
+        "question": "In Merlin\u2019s broader arc about Arthur questioning Uther, how does the magically induced revelation plant doubt in Arthur, and what later incident proves to him that Camelot can still be protected despite those doubts?",
+        "ground_truth": "Part 1: The magical revelation makes Arthur think Uther really did something unforgivable, so he starts doubting him.\nPart 2: When Arthur later defends Camelot successfully, it shows him that, doubt or not, he can still protect what matters.",
+        "generated_answer": "The magically induced revelation plants doubt in Arthur by revealing Uther's past actions and the moral complexities of leadership. Later, Arthur witnesses a united front from his allies and the strength of Camelot's people, proving that it can still be protected despite his uncertainties.",
+        "contexts": "Merlin residence Camelot, Gwen residence Camelot, Morgana residence Camelot, Balinor child Merlin, Merlin spouse Morgana, Merlin father Balinor, Camelot head of state Merlin, Camelot head of state Arthur, Arthur present in work Lancelot, Merlin owner of dragon, Camelot head of state Gwen | Merlin residence Camelot, Arthur residence Camelot | Merlin residence Camelot, Camelot head of state Arthur, Arthur residence Camelot | Merlin occupation Wizard, Camelot head of state Merlin | King Arthur residence Camelot, Gwaine residence Camelot | Camelot head of state Prince Arthur | Camelot head of state King Arthur | Lancelot residence Camelot, Camelot head of state Lancelot | Merlin residence Avalon, Balinor residence Camelot | Morgana residence Camelot | Elyan residence Camelot | Gwen residence Camelot",
+        "metrics": {
+          "rouge_score": 0.2588235294117647,
+          "answer_correctness": 0.9855252181723952
+        }
+      },
+      {
+        "id": "Tv-id-33",
+        "question": "What key differences exist between Merrick in the original film and in the comic \u201cThe Origin,\u201d and which version aligns with the TV canon? Summarize Nikki Wood\u2019s death and how later episodes tie her story to her son Robin and Spike.?",
+        "ground_truth": "Part 1: In the film, Merrick is a pseudo\u2011immortal who is murdered by Lothos; in \u201cThe Origin,\u201d he\u2019s a normal Watcher who kills himself rather than be turned. Joss Whedon has confirmed that \u201cThe Origin\u201d can pretty much be accepted as canonical with the TV series. Part 2: Nikki was killed by Spike on a New York subway in 1977; later, \u201cFirst Date\u201d reveals she had a son, Robin, whom the First Evil taunts with the truth that Spike killed her, and in \u201cLies My Parents Told Me\u201d Robin tries and fails to take revenge on Spike.",
+        "generated_answer": "Merrick in the original film is portrayed as a more traditional mentor, while in the comic \u201cThe Origin,\u201d he has a more complex background and relationship with Buffy, aligning more closely with the TV canon. Nikki Wood, a Slayer, dies at the hands of a vampire, which is later revealed to be tied to her son Robin, who seeks to honor her legacy, and Spike, who has a connection to both Nikki and Robin through their shared experiences as Slayers and vampires.",
+        "contexts": "Willow sibling Spike, Buffy sibling Spike, Xander sibling Spike, Spike sibling Buffy, Faith sibling Spike, Xander sibling Buffy, Spike sibling Willow | Spike sibling Xander, Anya spouse Spike | Robin sibling Regina, Regina sibling Robin, Regina sibling David | his mother child Robin, Robin mother his mother, Nikki Wood member of Slayer | Buffy spouse Spike, Spike spouse Buffy | Robin sibling Batman | her father child Robin | Dawn spouse Spike | Dru spouse Spike, Spike spouse Dru",
+        "metrics": {
+          "rouge_score": 0.2541436464088398,
+          "answer_correctness": 0.733635144353763
+        }
+      },
+      {
+        "id": "Tv-id-68",
+        "question": "How did Leelee\u2019s choices contradict her prophesied path and help turn the tide for the heroes? How did Mordecai\u2019s romantic setbacks influence his dating choices, and where did he ultimately land in the epilogue?",
+        "ground_truth": "Part 1: Despite a prophecy that she would become \u2018Queen of the Vampires,\u2019 Leelee defied her mother, helped Clare and Phineas enter the Underworld, used the Snow Staff to free Udonna, and was accepted as a friend. Part 2: After Margaret left for college and his later relationship with CJ failed, Mordecai decided to take a break from dating; in the epilogue, he returned to making art, met Stef, and started a family with her.",
+        "generated_answer": "Leelee's choices defied her prophesied path by prioritizing love and caring over destiny, which ultimately empowered the heroes. Mordecai faced romantic setbacks that led him to reconsider his dating choices, ultimately finding happiness with Eileen in the epilogue.",
+        "contexts": "Toby spouse Leelee, Leelee spouse Toby | CJ spouse Mordecai, Mordecai spouse CJ, Mordecai spouse Margaret | Nick spouse Leelee, Leelee spouse Nick | Necrolai spouse Leelee, Leelee spouse Necrolai | Phineas spouse Leelee, Hard Heads characters Leelee, Leelee spouse Phineas | Leelee spouse Phineas, Phineas spouse Leelee, Leelee present in work The Return | Eileen spouse Mordecai, Mordecai spouse Margaret, Mordecai spouse Eileen, Margaret spouse Mordecai | Clare spouse Leelee, Leelee spouse Clare | Morgana present in work Mordred, sword Morgana has enchanted with Aithusa's breath owned by Mordred, Morgana Pendragon sibling Morgause, her half-sister sibling Morgause, Morgana spouse Merlin, Merlin mother Morgana, Merlin sibling Arthur, Emrys characters Arthur, Morgana sibling Morgause, Mordred present in work Love and caring, Mordred spouse Morgana, Cenred sibling Morgause, Mordred spouse Morgana Emrys, Arthur sibling Merlin, Morgana spouse Mordred | Lee spouse Bob",
+        "metrics": {
+          "rouge_score": 0.19298245614035087,
+          "answer_correctness": 0.5979978266325292
+        }
+      },
+      {
+        "id": "Tv-id-57",
+        "question": "How does Leslie balance political opportunity with personal risk before her city council run? Despite his libertarian disdain for government, how does Ron Swanson show care for his team, and which real\u2011life traits of Nick Offerman inform the character?",
+        "ground_truth": "Part 1: When approached by political scouts, she hides her secret affair with Ben Wyatt\u2014a potential scandal\u2014before later running successfully for city council. Part 2: Ron detests big government yet has deep respect for Leslie and cares about his employees; traits like woodworking and saxophone\u2011playing are drawn from Offerman\u2019s real life.",
+        "generated_answer": "Leslie balances political opportunity with personal risk by carefully navigating her campaign strategies while considering the implications for her relationships. Despite his libertarian views, Ron Swanson shows care for his team through his actions and support, reflecting Nick Offerman's real-life traits of loyalty and dedication to his friends and colleagues.",
+        "contexts": "Ron Swanson performer Nick Offerman | Ron performer Nick Offerman | Tom performer Ron Swanson, Ron Swanson instrument saxophone | The Set Up cast member Ron Swanson | You're on With Ron cast member Ron Swanson | Ron performer Brian Stepanek | Ron performer Elliott Gould | 94 Meetings cast member Ron Swanson | Kyle creator Ron Swanson, Soulmates cast member Ron | Tammy spouse Ron Swanson, Jamm spouse Ron Swanson, Ron Swanson spouse Jamm, Ron Swanson spouse Tammy | Ron performer Gary Cole, fourth season cast member Ron | Ron Swanson employer Pawnee Parks | Good Friends has part Ron | last movie cast member Ron",
+        "metrics": {
+          "rouge_score": 0.20560747663551404,
+          "answer_correctness": 0.6832181135887668
+        }
+      },
+      {
+        "id": "Tv-id-45",
+        "question": "In an alternate universe visited by Spider-Man, what misunderstanding leads Peter to call himself the Scarlet Spider? What two major losses end Series 1, and how is one of them indirectly addressed in Series 2?",
+        "ground_truth": "Part 1: Believing himself to be the clone, he dyes his hair blond, takes the name Ben Reilly, and calls himself the Scarlet Spider. Part 2: Captain Tom Ryan is killed and Claudia Brown disappears; in Series 2, Lucy Brown returns as Jenny Lewis, Claudia\u2019s doppelg\u00e4nger who lacks Claudia\u2019s romantic attachment to Cutter.",
+        "generated_answer": "Peter calls himself the Scarlet Spider due to a misunderstanding about his identity in the alternate universe. Series 1 ends with the loss of Gwen Stacy and the death of Uncle Ben, with Uncle Ben's loss being indirectly addressed in Series 2 through Peter's growth and responsibility.",
+        "contexts": "Spider-Man different from Spiderman, Spiderman different from Spider-Man | Spider-Man different from Man-Spider, Man-Spider different from Spider-Man, Spider-Man has part Web | Spider-Man different from Peter Parker, Peter Parker different from Spider-Man | Spider-Man different from current Spider-Man | venom different from Spider-Man, Spider-Man different from Flash Thompson, Spider-Man different from Norman Osborn, Flash Thompson different from Spider-Man, Norman Osborn different from Spider-Man, Spider-Man has part Peter Parker | Spider-Man has part Spider-Man | Spider-Man has part Hobgoblin, Spider-Man has part Morbius, Spider-Man has part Dr Octopus | Spider-Man has part Madame Web | Spider-Man has part Green Goblin",
+        "metrics": {
+          "rouge_score": 0.19047619047619047,
+          "answer_correctness": 0.5128185024343941
+        }
+      },
+      {
+        "id": "Tv-id-32",
+        "question": "How can Lindsay be both presented as Michael\u2019s \u201ctwin\u201d and also be adopted? Which guest character shares Tobias\u2019s \u201cnever\u2011nude\u201d trait, what does he direct, and why was the actor likely cast?",
+        "ground_truth": "Part 1: She is the adopted daughter of George Sr. and Lucille Bluth, who raised her and Michael to believe they were twins. Part 2: Phillip Litt, director of the \u201cGirls With Low Self\u2011Esteem\u201d videos, is also a never\u2011nude; Zach Braff was likely cast due to his resemblance to the real\u2011life Joe Francis whom the show parodies.",
+        "generated_answer": "Lindsay is presented as Michael's twin due to their close relationship, but she can also be adopted, indicating a complex family dynamic. The guest character who shares Tobias's \"never-nude\" trait is George Michael, who directs the film \"The Cabin.\" The actor was likely cast for his comedic chemistry and connection to the show's themes.",
+        "contexts": "Tobias sibling George Michael, Lindsay sibling Tobias, Tobias sibling Lindsay | Michael sibling Kevin, Kevin sibling Michael, Michael sibling Tom | Paul sibling Michael, Michael sibling Paul | Buster sibling Michael, Michael sibling Buster | Michael sibling Gabriel, Michael sibling Raphael, Gabriel sibling Michael, Raphael sibling Michael | Michael sibling Buster, Buster sibling Michael, Lindsay sibling Michael | Michael sibling Raphael, Gabriel sibling Michael | Gob sibling Michael, Michael instance of biological sibling | Sam sibling Michael | Tom sibling Michael | Lindsay sibling Michael",
+        "metrics": {
+          "rouge_score": 0.23728813559322037,
+          "answer_correctness": 0.5280810541856187
+        }
+      },
+      {
+        "id": "Tv-id-61",
+        "question": "Which two details\u2014one biological and one geopolitical\u2014signal Vilgax\u2019s threat level across the series? In \"The Perfect Girlfriend,\" what did the Queen ultimately conclude about love, and how did that change her motivation toward Ben?",
+        "ground_truth": "Part 1: Biologically, his Chimera Sui Generis race can transform into giant squid\u2011like creatures when exposed to water; geopolitically, he established Vilgaxia as the center of his empire. Part 2: Recognizing that she knew nothing about love, the Queen chose to hate Ben instead and vowed revenge.",
+        "generated_answer": "Vilgax's biological threat level is indicated by his alien physiology, while his geopolitical threat level is signaled by his status as a warlord. In \"The Perfect Girlfriend,\" the Queen ultimately concluded that love is about sacrifice, which shifted her motivation toward Ben to prioritize his happiness over her desires.",
+        "contexts": "Ben present in work The Perfect Girlfriend, The Perfect Girlfriend characters Ben | Julie present in work The Perfect Girlfriend, Elena present in work The Perfect Girlfriend, The Perfect Girlfriend characters Julie, The Perfect Girlfriend characters Elena | Perfect Day characters Ben, Ben present in work Perfect Day, dream machine characters Ben | Ben present in work Lisa, Lisa present in work Ben | Fame characters Ben | Cough It Up characters Ben, Special Delivery characters Ben | Ben characters Paul | Special Delivery characters Ben, Have I Got a Deal For You characters Ben | Skurd sibling Ben, Ben present in work the series | Wonderland characters Queen | Omniverse series finale characters Rook, Omniverse series finale characters Ben, season finale characters Ben | Gwen present in work Ben, Gwen present in work Kevin, Kevin mother Gwen, Ben spouse Gwen",
+        "metrics": {
+          "rouge_score": 0.16326530612244897,
+          "answer_correctness": 0.6739146406338008
+        }
+      },
+      {
+        "id": "Tv-id-8",
+        "question": "In the Doctor Who description of the character\u2019s nicknames, which two epithets are explicitly tied to on-screen antagonists, and how does the recurring \u201cDoctor who?\u201d gag play on the same ambiguity about his name?",
+        "ground_truth": "Part 1: He\u2019s directly called \u201cThe Oncoming Storm\u201d by the Daleks and \u201cDestroyer of Worlds\u201d in other contexts.\nPart 2: The show then plays this seriousness off with the joke of characters literally asking \u201cDoctor who?\u201d, using the same ambiguity for comedy.",
+        "generated_answer": "The two epithets explicitly tied to on-screen antagonists are \"the Doctor\" and \"Dr Who.\" The recurring \"Doctor who?\" gag plays on the ambiguity of his name by questioning his identity, reflecting the confusion surrounding the character's true name.",
+        "contexts": "character of the same name present in work Doctor Who | the Doctor present in work Doctor Who, River Song present in work The Name of the Doctor, Doctor Who characters the Doctor | The Doctor (Doctor Who) present in work Doctor Who, Doctor Who characters The Doctor (Doctor Who) | the Doctor present in work various storylines | the character present in work the episode's cast list | references to the characters part of appearances, appearances has part references to the characters | Daleks present in work Dr Who, the Doctor present in work Doctor Who, Third Doctor present in work original programme, original programme characters Third Doctor, Whomobile characters Third Doctor | the Doctor present in work the Doctor's character, Eleventh Doctor present in work The Time of the Doctor, Tenth Doctor present in work The Time of the Doctor, The Parting of the Ways characters Tenth Doctor, the Doctor's character characters the Doctor | Don present in work Dr Who | Gallifrey present in work The Time of the Doctor | the Doctor present in work Daleks | characters present in work Simpsons | Bones characters present in work bones | the Doctor present in work Earth's historical figures",
+        "metrics": {
+          "rouge_score": 0.19277108433734938,
+          "answer_correctness": 0.5560680057938584
+        }
+      },
+      {
+        "id": "Tv-id-43",
+        "question": "Why does the series end with Spider-Man leaving with Madame Web, and what event makes that search necessary? Why is Electro\u2019s portrayal both delayed and different from the comics in the animated series?",
+        "ground_truth": "Part 1: Because the Mary Jane who married Peter was a clone that later dissolved, he departs with Madame Web to find the real Mary Jane. Part 2: Because a James Cameron Spider-Man film in development planned to use Electro (and Sandman), the show delayed and altered Electro\u2019s portrayal, which also pushed Spider-Man\u2019s origin later in the series.",
+        "generated_answer": "The series ends with Spider-Man leaving with Madame Web to search for the missing Spider-Men, prompted by the events of \"Spider Wars.\" Electro's portrayal is delayed and different from the comics due to the series' unique narrative choices and character development.",
+        "contexts": "Spider-Man characters Electro, Electro present in work Spider-Man, primary Spider-Man present in work the series | JB characters Electrobot, Electrobot present in work JB, Electrobot present in work Grimlord | Electro present in work Captain America | Electricyeti present in work Omniverse | Spider-Man present in work the cartoon, animated version of \"Secret Wars\" characters Spider-Man, animated version of \"Secret Wars\" characters Morbius, Spider Wars characters Spider-Man, animated version of \"Secret Wars\" characters blade | Kim Possible instance of animated television series | animated series version of the story characters Silvermane, Silvermane present in work animated series version of the story | Electro member of S.H.I.E.L. | Electrobot characters Samson, Samson present in work Electrobot | Edison characters Spikebot | original series characters Ghostfreak, Ghostfreak present in work original series, Omnitrix characters Ghostfreak | main characters present in work series",
+        "metrics": {
+          "rouge_score": 0.24528301886792456,
+          "answer_correctness": 0.7231025946903594
+        }
+      },
+      {
+        "id": "Tv-id-55",
+        "question": "How do the Spectre and the Phantom Stranger differ in guiding Batman over Joe Chill, and what is the outcome? How is Damian Wayne\u2019s lineage and eventual legacy altered in the series, and what reveals that twist?",
+        "ground_truth": "Part 1: The Phantom Stranger tries to restrain Batman\u2019s rage, whereas the Spectre pushes him toward vengeance; Batman does not kill Chill, but the Spectre manipulates events and kills Chill himself. Part 2: This version presents Damian as the son of Bruce Wayne and Selina Kyle; after their deaths he becomes Robin then Batman, and it\u2019s ultimately revealed these events are part of Alfred\u2019s book \u2018The Knights of Tomorrow.\u2019",
+        "generated_answer": "The Spectre and the Phantom Stranger guide Batman differently by embodying contrasting moral perspectives, leading to varied outcomes in confronting Joe Chill. Damian Wayne's lineage and legacy are altered through revelations about his parentage and the implications of his actions, which twist the expectations of his character development.",
+        "contexts": "Bruce Wayne different from Batman, Journey to the Center of the Bat! characters Batman, Batman member of Nightwing, Batman different from Bruce Wayne, Batman sibling Robin | Batman different from The Joker, The Joker different from Batman, Batman different from Green Arrow, Green Arrow different from Batman | Batman different from Batman's mind, Batman's mind different from Batman | Batman different from Flash, Flash different from Batman | Batman different from Spectre, Spectre different from Batman | Batman different from Gorilla Grodd, Gorilla Grodd different from Batman | Batman different from Plastic Man, Plastic Man different from Batman | Superman different from Batman | Batman different from brain | Bat-Mite different from Batman | Blue Beetle different from Batman",
+        "metrics": {
+          "rouge_score": 0.1983471074380165,
+          "answer_correctness": 0.6501509779728396
+        }
+      },
+      {
+        "id": "Tv-id-50",
+        "question": "How do Jez Andrews\u2019 attempts to impress Iain Dean contrast with his rule\u2011bending choice during Emilie Groome\u2019s transport? Who gains power through mentorship and talent versus through a negotiated tryst, and what roles do they attain?",
+        "ground_truth": "Part 1: Even as he spent the day trying to impress Iain with cheeky banter, Jez broke protocol by allowing Cal to steal the ambulance to take Emilie to the seaside. Part 2: Peggy Olson rises from Don Draper\u2019s secretary to copywriter (and later copy chief at CGC) through talent and Don\u2019s promotion, whereas Joan Harris becomes a partner after SCDP\u2019s partners\u2014over Don\u2019s objection\u2014reward her for a sexual tryst with a client.",
+        "generated_answer": "Jez Andrews attempts to impress Iain Dean through his character's charm and skills, contrasting with his rule-bending choice during Emilie Groome's transport, which showcases a more reckless side. Iain Dean gains power through mentorship and talent, while Jez's power stems from a negotiated tryst, leading Iain to a respected role and Jez to a more dubious position.",
+        "contexts": "Iain relative Jez, Jez relative Iain, one characters Jez, Iain Dean performer Michael Stevenson, Elle child Jez, Iain present in work Holby | Jeremy \"Jez\" Andrews performer Lloyd Everitt | Sam cast member Iain | Jez Andrews performer Lloyd Everitt | Jez date of birth 1 June 1965 | Campbells characters Dean | the series characters Dean | Captives characters Dean | Dean member of Winchesters | First Born characters Dean, black characters Dean | Dean member of hunters | Bloodlust characters Dean | Rule Fifty-One characters Dean | Dean child Sam, Appointment in Samarra characters Dean, Winchesters has part Sam, Winchesters has part Dean",
+        "metrics": {
+          "rouge_score": 0.17266187050359713,
+          "answer_correctness": 0.9546960559257415
+        }
+      },
+      {
+        "id": "Tv-id-72",
+        "question": "What organizational collapse set the stage for Nick Fury appointing Coulson as Director, and how had Fury already altered Coulson beforehand? What were Eli Morrow\u2019s Darkhold\u2011driven effects on others and himself, and how did the show\u2019s version diverge from the comics per the producers?",
+        "ground_truth": "Part 1: Hydra\u2019s infiltration led to S.H.I.E.L.D.\u2019s demise; before this, Fury had resurrected Coulson using Project T.A.H.I.T.I. and replaced his memories. Part 2: Morrow put Joseph Bauer in a coma and turned coworkers into ghost\u2011like beings, then used the Darkhold to build a machine granting him matter\u2011creation powers; the series made him an apparently innocent man revealed later as power hungry, rather than directly adapting the comics, with abilities compared to Molecule Man.",
+        "generated_answer": "The organizational collapse that set the stage for Nick Fury appointing Coulson as Director was the fall of S.H.I.E.L.D. Fury had already altered Coulson by bringing him back to life. Eli Morrow\u2019s Darkhold-driven effects included influencing characters like Ghost Rider, while the show's version diverged from the comics by introducing unique character arcs and storylines not present in the original material.",
+        "contexts": "Darkhold owned by Morrow, Morrow owner of Darkhold, Darkhold creator S.H.I.E.L., Darkhold present in work series, Ghost Rider characters Eli Morrow, Eli Morrow present in work Ghost Rider, Darkhold manufacturer Momentum Energy | Darkhold characters May, Darkhold characters Radcliffe, Radcliffe present in work Darkhold, May present in work Darkhold, Darkhold characters Aida, Aida present in work Darkhold | Darkviper creator Si'i | Virtual Dark Fortress characters Grimlord, Grimlord creator Karl Ziktor | Darkviper characters Seth | Grimlord residence Virtual Dark Fortress, Despera creator Grimlord, Grimlord present in work Virtual Dark Fortress | Aida present in work Darkhold, Darkhold characters Robbie Reyes, Robbie Reyes present in work Darkhold | Dark Heart participant in assaulting the Virtual Dungeon",
+        "metrics": {
+          "rouge_score": 0.17948717948717946,
+          "answer_correctness": 0.6196368194875898
+        }
+      },
+      {
+        "id": "Tv-id-59",
+        "question": "Why did Bonnie Wallis and Jonny Maconie never marry despite their engagement, and what event ended that possibility on the very day it was to happen? How did Daisha Anderson\u2019s relationship with Mark Williams shape both her career progression and others\u2019 perceptions of it?",
+        "ground_truth": "Part 1: They never married because on their wedding day Bonnie crossed the road without looking and was hit by a truck, killing her. Part 2: After moving in with Mark, he supported her becoming Byrne Foundation ambassador and promoted her to Sister of Keller, which led some to question the true nature of their relationship.",
+        "generated_answer": "Bonnie Wallis and Jonny Maconie never married despite their engagement because an event occurred on the very day it was to happen that ended that possibility. Daisha Anderson\u2019s relationship with Mark Williams positively influenced her career progression and shaped others\u2019 perceptions of her success.",
+        "contexts": "Bonnie spouse Jonny, Jonny spouse Bonnie, Jac spouse Bonnie, Bonnie spouse Jac, Bonnie Wallis performer Carlyss Peer | Ron spouse Bonnie, Bonnie spouse Ron, Bonnie spouse Kim, Kim spouse Bonnie | Robyn spouse Iain, Iain spouse Robyn | Jonny Maconie child pregnant with his baby, pregnant with his baby father Jonny Maconie | Clint spouse Annie | Gwen spouse Kevin, Kevin spouse Gwen | Jac spouse Jonny | Janice spouse Alistair, Alistair spouse Janice | Iain spouse Dixie | Dixie spouse Iain",
+        "metrics": {
+          "rouge_score": 0.21782178217821782,
+          "answer_correctness": 0.7115251105755935
+        }
+      },
+      {
+        "id": "Tv-id-20",
+        "question": "In the Red vs. Blue summary, how is Caboose\u2019s odd behaviour attributed to exposure to an AI fragment, and what later moment with Sarge in Season 15 shows the team still gets pulled back together despite setbacks?",
+        "ground_truth": "Part 1: The write-up says being around the Omega fragment messed him up, so that\u2019s why he acts that way.\nPart 2: Even when Sarge is down, he comes back to save them, so the team bond is intact.",
+        "generated_answer": "Caboose's odd behavior is attributed to his exposure to an AI fragment, which affects his perception and actions. In Season 15, despite setbacks, a moment with Sarge demonstrates that the team still manages to reunite and work together.",
+        "contexts": "Sarge present in work season twelve, season twelve characters Sarge, Reconstruction characters Sarge | The Meta characters Sarge, Sarge present in work The Meta | Doc characters Sarge, Doc present in work Sarge, Sarge characters Doc, Blood Gulch troopers present in work season fifteen, season fifteen characters Blood Gulch troopers | Sarge present in work Locus, Locus characters Sarge | Sarge characters Grif, Grif present in work season fifteen, season fifteen characters Grif | Tucker characters Sarge | Sarge present in work alternate ending, Sarge present in work Revelation | Relocated characters Sarge | Biff present in work season fifteen | Sarge characters Lopez | Nelson present in work season fifteen",
+        "metrics": {
+          "rouge_score": 0.125,
+          "answer_correctness": 0.8567876288476493
+        }
+      },
+      {
+        "id": "Tv-id-83",
+        "question": "Why do the Golgafrinchans on prehistoric Earth end up being important to later human history, despite being described as \u2018useless\u2019 middle-management types?",
+        "ground_truth": "Their original society tricked them into leaving because they seemed useless, but the group that landed on prehistoric Earth became the population that human history later comes from, which makes them historically crucial.",
+        "generated_answer": "The Golgafrinchans are considered important to later human history due to their tragic coincidence and the societal structure they represent, which ultimately influences the development of civilization.",
+        "contexts": "Golgafrinchan time period prehistoric Earth, The Restaurant at the End of the Universe characters Golgafrinchan, Golgafrinchan present in work The Restaurant at the End of the Universe, Golgafrinchan instance of tragic coincidence, Earth has part continent | Middle Ages continent Earth | prehistoric creatures studied by cryptozoology, cryptozoology studies prehistoric creatures | prehistoric creatures subclass of present civilisation, Danny time period Pliocene | Golgafrinchan has part Golgafrinchan society, Agda and Mella present in work Golgafrinchan | Earth has part Morlaidh | cave part of civilization | anomaly part of Pliocene | Eccentrica Gallumbits narrative location Earth, Earth part of Universe | Aggregor narrative location Earth | Earth culture different from aliens | Lallafa time period time",
+        "metrics": {
+          "rouge_score": 0.13333333333333333,
+          "answer_correctness": 0.9590824096926074
+        }
+      },
+      {
+        "id": "Tv-id-17",
+        "question": "In Merlin, how does Arthur\u2019s growing suspicion about Uther\u2019s past actions make him rethink his own claim to rule, and what later defense of Camelot reassures him about his future role?",
+        "ground_truth": "Part 1: When Arthur starts to believe Uther used dark means, he worries that his own right to rule is tainted.\nPart 2: After he defends Camelot successfully, the loyalty he receives convinces him he can still be the rightful future king.",
+        "generated_answer": "Arthur's growing suspicion about Uther's past actions leads him to question the legitimacy of his own claim to rule, as he grapples with the moral implications of his father's decisions. Later, the defense of Camelot against external threats reassures him of his rightful place as a leader, reinforcing his commitment to protect the kingdom.",
+        "contexts": "Arthur present in work Camelot, Camelot characters Arthur | Merlin student Arthur, Merlin present in work Prince Arthur, Arthur student of Merlin, Prince Arthur characters Merlin, Arthur relative Merlin, Merlin present in work Camelot | Merlin present in work The Coming of Arthur, The Coming of Arthur characters Merlin | Arthur present in work Arthur, Arthur characters Arthur | Ealdor present in work Merlin | Arthur father Merlin, Camelot characters Arthur, Camelot characters Morgause, Arthur sibling Arthur, Arthur relative Merlin | Camelot characters Merlin, Arthur sibling Merlin, Arthur present in work Love, Arthur present in work Camelot | Merlin present in work The Disir | Morgana present in work Merlin, Arthur present in work Emrys | Merlin present in work Lancelot and Guinevere, Arthur present in work Lancelot and Guinevere | Arthur sibling Merlin, Merlin spouse Agravaine, Lancelot characters Arthur | Arthur present in work 'B' Ark",
+        "metrics": {
+          "rouge_score": 0.20202020202020202,
+          "answer_correctness": 0.609387425858575
+        }
+      },
+      {
+        "id": "Tv-id-5",
+        "question": "In the Hitchhiker\u2019s Guide minor-characters section, what chain of reincarnations makes Agrajag fixate on Arthur Dent, and how does Arthur still manage to survive the Cathedral\u2019s rockfall trap?",
+        "ground_truth": "Part 1: Agrajag has been reincarnated over and over as creatures Arthur accidentally kills, so he blames Arthur uniquely.\nPart 2: The deathtrap in the Cathedral misfires and brings the rocks down wrong, so Arthur escapes instead of dying.",
+        "generated_answer": "Agrajag fixates on Arthur Dent due to a series of reincarnations where Arthur inadvertently causes his deaths. Arthur survives the Cathedral's rockfall trap by being in the right place at the right time, avoiding the fatal consequences.",
+        "contexts": "Hitchhiker \"trilogy\" characters Arthur Dent, Arthur Dent present in work Hitchhiker \"trilogy\", Arthur Dent present in work Heart of Gold, So Long, and Thanks for All the Fish characters Arthur Dent | Arthur Dent present in work Fit the Twenty-Sixth, Arthur Dent present in work The Hitchhiker's Guide to the Galaxy, Fit the Twenty-Sixth characters Arthur Dent | Life, the Universe and Everything characters Arthur Dent, Arthur Dent present in work Life, the Universe and Everything | Arthur Dent present in work Arthur Dent, Arthur Dent present in work Ford Prefect, Jeltz characters Arthur Dent, Arthur Dent present in work Jeltz | Zaphod Beeblebrox characters Arthur Dent, And Another Thing... characters Arthur Dent, Arthur Dent present in work Zaphod Beeblebrox, Arthur Dent present in work And Another Thing... | Shoe Event Horizon characters Arthur Dent, Arthur Dent present in work Shoe Event Horizon | Mostly Harmless characters Arthur Dent | Arthur Dent present in work Brontitall",
+        "metrics": {
+          "rouge_score": 0.2077922077922078,
+          "answer_correctness": 0.9810063020651818
+        }
+      },
+      {
+        "id": "Tv-id-30",
+        "question": "Why does Arthur conclude that he cannot die until after a future assassination attempt on Stavromula Beta? Which American TV archetype do Shooty and Bang Bang parody, and what ironic contrast does the text draw between their self-description and their behavior?",
+        "ground_truth": "Part 1: Because Agrajag revealed that Arthur would survive an assassination attempt on Stavromula Beta\u2014a place Arthur had not yet visited\u2014so Arthur infers that he must live at least until after that event. Part 2: They parody American cop show characters\u2014particularly \u201cStarsky and Hutch\u201d\u2014and the irony is that while they claim to be \u201cwell balanced and caring,\u201d they gratuitously shoot everything in sight.",
+        "generated_answer": "Arthur concludes he cannot die until after a future assassination attempt on Stavromula Beta due to the narrative structure of the story. Shooty and Bang Bang parody the American TV archetype of action heroes, contrasting their self-description as competent and heroic with their bumbling and ineffective behavior.",
+        "contexts": "Bang Bang sibling Shooty, Shooty sibling Bang Bang, Shooty performer Jim Broadbent | Shooty and Bang Bang characters Zaphod Beeblebrox, Zaphod Beeblebrox present in work Shooty and Bang Bang | ricochet subclass of bullets | multiple shots subclass of hard to kill, hard to kill has parts of the class multiple shots | Buster instance of video game | ricochet subclass of bullet | Kim Possible instance of animated television series, What's the sitch? instance of catch phrase | The Origin instance of limited series | Bank Shot characters Rigby | blasters subclass of bombs | Black and White instance of Guardians of Obsolete Formats | Yooden instance of toy pistol | Pointy instance of J.P. | Out of Mind instance of miniseries | park gang instance of TV | Bouncer instance of supervillain",
+        "metrics": {
+          "rouge_score": 0.17391304347826084,
+          "answer_correctness": 0.6500385633667307
+        }
+      },
+      {
+        "id": "Tv-id-22",
+        "question": "In the Doctor Who section on epithets, which foes gave the Doctor the grand titles about destruction, and how does this contrast with human characters simply not knowing his real name?",
+        "ground_truth": "Part 1: The Daleks and similar adversaries coined the big dramatic titles because they\u2019ve seen what he can do.\nPart 2: Humans, by contrast, don\u2019t even know his surname and keep asking \u201cDoctor who?\u201d, which undercuts the grandeur.",
+        "generated_answer": "The Doctor is given grand titles about destruction by foes like the Daleks and the Time Lords, highlighting their recognition of his power. In contrast, human characters often do not know his real name, emphasizing their ignorance of his true identity and significance.",
+        "contexts": "the Doctor present in work Doctor Who, Doctor Who characters the Doctor | the Doctor present in work Doctor Who, Third Doctor present in work original programme, original programme characters Third Doctor, Whomobile characters Third Doctor | The Doctor (Doctor Who) present in work Doctor Who, Doctor Who characters The Doctor (Doctor Who) | the Doctor present in work the Doctor's character, Eleventh Doctor present in work The Time of the Doctor, Tenth Doctor present in work The Time of the Doctor, The Parting of the Ways characters Tenth Doctor, the Doctor's character characters the Doctor, War Doctor present in work The Time of the Doctor | the Doctor present in work various storylines, various storylines characters the Doctor, Pyramids of Mars characters the Doctor | the Doctor present in work Daleks, Journey's End characters the Doctor | character of the same name present in work Doctor Who | Don present in work Dr Who | the Doctor present in work the rest of the series, the rest of the series characters the Doctor | Genesis of the Daleks characters the Doctor | The Time Monster characters the Doctor | The End of the World characters the Doctor | The Eleventh Hour characters the Doctor",
+        "metrics": {
+          "rouge_score": 0.19277108433734938,
+          "answer_correctness": 0.9774129912468099
+        }
+      },
+      {
+        "id": "Tv-id-9",
+        "question": "In the Ben 10 material about Tetrax Shard, why does Tetrax step in to mentor Ben about responsible Omnitrix use, and what ship or gear does he use to reach Ben in those appearances?",
+        "ground_truth": "Part 1: Tetrax appears because he wants Ben to stop being careless with the Omnitrix and to learn to use it responsibly.\nPart 2: He does so by coming in his own ship to Ben whenever the Omnitrix activity pings him.",
+        "generated_answer": "Tetrax steps in to mentor Ben about responsible Omnitrix use to guide him in mastering his powers and making wise decisions. He uses his ship, the \"Tetrax's ship,\" to reach Ben in those appearances.",
+        "contexts": "Tetrax present in work Ben 10: Destroy All Aliens, JT present in work Ben 10, Tetrax present in work Omnitrix | Cannonbolt present in work Ben 10, Ben 10 present in work original series | Vulkanus present in work Ben 10 | Ben 10 present in work Forge of Creation | Clockwork present in work Ben 10: Omniverse, Eatle present in work Ben 10: Omniverse | Eon present in work Ben 10 | Vilgax present in work Ben 10 | Tetrax present in work Hunted, Tetrax present in work original series | Max present in work Ben 10 | Ultimate Alien present in work Ben 10, Ben present in work Ben 10: Alien Force, Rook Blonko present in work Ben 10 | Ben 10 present in work Ben 10 (Reboot) | Humungousaur present in work Ben 10 | Lodestar present in work Ben 10: Omniverse | Albedo present in work Ben 10",
+        "metrics": {
+          "rouge_score": 0.2368421052631579,
+          "answer_correctness": 0.981928701018384
+        }
+      },
+      {
+        "id": "Tv-id-84",
+        "question": "What does the point-of-view gun mentioned around Humma Kavula do, and why is it thematically tied to the religion about the Great White Handkerchief?",
+        "ground_truth": "The point-of-view gun makes the target experience the shooter\u2019s perspective. That fits Humma Kavula\u2019s role as a religious/political figure among people obsessed with a single coming event \u2014 having a device that makes others \u2018see it his way\u2019 completes the control he\u2019s after.",
+        "generated_answer": "The point-of-view gun alters a person's perspective, allowing them to see things from another's viewpoint. This theme connects to the religion of the Great White Handkerchief by emphasizing understanding and empathy among differing beliefs.",
+        "contexts": "Coming of the Great White Handkerchief instance of religious leader | Christian instance of Faith | Patsy religion Catholicism | Jihad instance of religions | hijab facet of religion | Muslim instance of Faith | Muslim instance of religion | Faith instance of stillborn | promiscuous facet of religious | White Elephant instance of Temple | philosophical has part religious, Bob instance of worship | Touched characters Faith, Faith present in work Touched | Jac religion Catholicism | Chuck Shurley instance of God | Faith instance of vampire | white instance of skin color | Messiah instance of summoning ritual | confession participant God",
+        "metrics": {
+          "rouge_score": 0.20930232558139536,
+          "answer_correctness": 0.6680512684464264
+        }
+      },
+      {
+        "id": "Tv-id-42",
+        "question": "If the Garo title confers no formal rank or perks, why does the bearer\u2019s word carry such influence among Knights and Priests? What contractual price does a Mad\u014dgu charge its wearer, and how does later scarcity among Makai Knights relate to that burden?",
+        "ground_truth": "Part 1: Because the title is widely known as the strongest Knight and commands immense respect; its symbols are instantly recognized, so being in the Golden Knight\u2019s presence is considered an honor that gives their words weight. Part 2: Mad\u014dgu consume one day of the wearer\u2019s life for each month of their pact; by later entries, Mad\u014dgu are rare and most Knights no longer carry them, consistent with avoiding that life\u2011shortening cost.",
+        "generated_answer": "The Garo title carries influence among Knights and Priests due to the respect and authority it symbolizes within the Makai hierarchy. A Mad\u014dgu charges a price that often involves a burden on the wearer's life force or abilities, leading to scarcity among Makai Knights as they may hesitate to bear the weight of such a contract.",
+        "contexts": "Makai Knight subclass of Makai, Raiga instance of Makai Knight | Makai Knight subclass of Makai Priest | Makai Dragons subclass of dragon, Makai Knight uses armor | Makai Knight different from Makai Knight, Ryuga instance of Makai Knight, Makai Priest subclass of martial art | Twin Knights member of Forever Knights | Makai Priest different from Makai Knight, Makai Knight different from Makai Priest, Makai Knight instance of bloodline | Sigma member of Makai Knight | Iyu member of Shadowfolk Makai Knights, Makai Knight uses sai | Makai Knight has part Ryuga | Bikuu member of Makai Knight | Enhou father Makai Knight | Daigo instance of Makai Knight | Wataru instance of Makai Knight",
+        "metrics": {
+          "rouge_score": 0.2074074074074074,
+          "answer_correctness": 0.8657206199761636
+        }
+      },
+      {
+        "id": "Tv-id-25",
+        "question": "In Ben 10\u2019s character descriptions, why is Tetrax portrayed as stricter than Ben about Omnitrix use, and what mobility does his starship give him in appearing right when Ben gets in trouble?",
+        "ground_truth": "Part 1: He\u2019s older and knows the Omnitrix\u2019s danger, so he wants Ben to stop fooling around with it.\nPart 2: Because he flies a ship that can home in on Omnitrix signals, he can drop in right when Ben\u2019s made a mess.",
+        "generated_answer": "Tetrax is portrayed as stricter than Ben about Omnitrix use due to his understanding of its power and responsibilities. His starship allows him to quickly respond and appear right when Ben gets into trouble, enhancing his ability to assist.",
+        "contexts": "Tetrax present in work Omnitrix | Omnitrix instance of planetoid | Omnitrix instance of mutant, Omnitrix used by Upgrade | Omnitrix instance of symbol, Omnitrix present in work Ken 10 | Omnitrix instance of tentacles | Echo Echo instance of Omnitrix | Vilgax sibling Omnitrix, Omnitrix sibling Vilgax | Omnitrix instance of powers | Omnitrix creator Myaxx | Omnitrix part of Nemetrix | Albedo instance of Omnitrix | Omnitrix replaces Ultimatrix, Ultimatrix replaced by Omnitrix | Omnitrix followed by Ultimatrix | Omnitrix characters Spheroid, Omnitrix instance of symbol | Omnitrix different from Ultimatrix, Ultimatrix different from Omnitrix",
+        "metrics": {
+          "rouge_score": 0.11764705882352941,
+          "answer_correctness": 0.6824124954740773
+        }
+      },
+      {
+        "id": "Tv-id-77",
+        "question": "Why is Sophia Burset placed in the SHU, and what catalyzes her eventual release? Link Lolly Whitehill\u2019s intervention in the greenhouse to the institutional outcome she faces later. What steps connect these points?",
+        "ground_truth": "Part 1: After an attack in her salon and threatening to sue, MCC places Sophia in the SHU under the pretense of protection; she is released when Caputo uses Sister Jane\u2019s smuggled phone to leak a photo of Sophia\u2019s condition to Danny Pearson. Part 2: Lolly stops Aydin from killing Alex and helps dismember and bury him; her paranoia and confession to Healy are dismissed, but after the remains are found, Healy gets her sent to psych.",
+        "generated_answer": "Sophia Burset is placed in the SHU due to her involvement in a violent incident. Link Lolly Whitehill's intervention in the greenhouse leads to a series of events that ultimately catalyze her release by highlighting the need for better treatment and support for inmates. The connection lies in Lolly's actions prompting a reevaluation of Sophia's situation and the systemic issues within the institution.",
+        "contexts": "Sophia Burset performer Laverne Cox, Sophia spouse Gloria, Sophia Burset performer M Lamar | Crystal spouse Sophia, Sophia spouse Crystal, Lorna spouse Vince, Vince spouse Lorna | Lolly Whitehill performer Christina Brucato, Lolly Whitehill performer Lori Petty | Josie spouse Henry, Henry spouse Josie | Sofia spouse Neil, Neil spouse Sofia | Leelee spouse Phineas | Paddy spouse Mimi, Mimi spouse Paddy | Leelee spouse Nick, Nick spouse Leelee | Sasha spouse Dixon | Leela Lomax spouse Jesse",
+        "metrics": {
+          "rouge_score": 0.1931034482758621,
+          "answer_correctness": 0.612800005172105
+        }
+      },
+      {
+        "id": "Tv-id-14",
+        "question": "In The Sopranos write-up about Phil Leotardo and New York, why did Billy Leotardo\u2019s death make reconciliation harder, and how did Tony\u2019s later choice of who kills Tony Blundetto aim to cool things down?",
+        "ground_truth": "Part 1: Billy\u2019s death turned the feud into something personal for Phil, so he became less flexible.\nPart 2: Tony kills Tony B. himself so he can present New York with a finished problem and signal he\u2019s not protecting the killer, which is meant to cool things.",
+        "generated_answer": "Billy Leotardo's death intensified tensions between the Soprano crew and the New York faction, making reconciliation more difficult due to the desire for revenge. Tony's decision to have a member of his own crew kill Tony Blundetto was an attempt to appease the New York faction and reduce hostilities.",
+        "contexts": "Tony Blundetto present in work The Sopranos, The Sopranos characters Tony Blundetto, Tony Soprano relative Tony Blundetto | Tony Soprano present in work The Sopranos | Tony present in work The Sopranos, Butch DeConcini present in work The Sopranos, Tony Soprano present in work Butchie, Tony Soprano present in work fourth season | Tony Blundetto relative Tony Soprano | The Sopranos cast member Anthony DeSando, Tony Soprano present in work The Sopranos, Christopher Moltisanti present in work The Sopranos | Silvio Dante present in work The Sopranos, Phil present in work The Sopranos, Bobby Baccalieri present in work The Sopranos | Paulie Gualtieri present in work Tony Soprano, Silvio Dante present in work Tony Soprano | the Soprano crew has part Tony Soprano | Soprano crime family present in work The Sopranos | Tony Soprano present in work Artie | Christopher present in work The Sopranos | Carmela Soprano spouse Tony, Tony present in work The Sopranos | Tony Blundetto relative Phil",
+        "metrics": {
+          "rouge_score": 0.21999999999999997,
+          "answer_correctness": 0.6004232385030499
+        }
+      },
+      {
+        "id": "Tv-id-6",
+        "question": "In the Desperate Housewives storyline about Xiao-Mei, how does Gabrielle\u2019s discovery of Carlos\u2019s affair lead straight to divorce, and what detail revealed at Bree\u2019s wedding clarifies the baby\u2019s actual parentage?",
+        "ground_truth": "Part 1: Gabrielle ends the marriage because she discovers Carlos slept with Xiao-Mei.\nPart 2: At Bree\u2019s wedding it becomes clear, through the mix-up, who the baby actually belongs to, resolving the confusion.",
+        "generated_answer": "Gabrielle discovers Carlos's affair, which leads her to initiate divorce proceedings. At Bree's wedding, it is revealed that the baby is actually Carlos's child, clarifying the parentage.",
+        "contexts": "Gabrielle Solis present in work Desperate Housewives, Lynette Scavo present in work Desperate Housewives, Susan Mayer present in work Desperate Housewives | Bree spouse Xiao-Mei, Gabrielle spouse Xiao-Mei, Gabrielle sibling Xiao-Mei, Carlos spouse Xiao-Mei, Xiao-Mei spouse Bree, Xiao-Mei sibling Carlos, Xiao-Mei spouse Gabrielle, Carlos sibling Xiao-Mei, Xiao-Mei sibling Gabrielle, Xiao-Mei spouse Carlos, Xiao-Mei performer Gwendoline Yeo | Asami present in work Horrors | City on Fire part of the series Desperate Housewives | Cleo present in work Hollyoaks | character present in work EastEnders | Tina present in work EastEnders | Myra McQueen present in work Hollyoaks | Naomi present in work 90210 | Cindy present in work Hollyoaks | Gellar present in work Dexter",
+        "metrics": {
+          "rouge_score": 0.3636363636363636,
+          "answer_correctness": 0.8738022962323573
+        }
+      },
+      {
+        "id": "Tv-id-94",
+        "question": "How does the Guide\u2019s treatment of God in the Babel Fish entry lead to God \u2018disappearing\u2019?",
+        "ground_truth": "The Guide jokes that the Babel Fish is such good evidence of design that it destroys the need for faith. God had said faith was essential, so when proof appears, the condition for God\u2019s existence fails and he \u2018vanishes.\u2019",
+        "generated_answer": "The Guide's treatment of God in the Babel Fish entry suggests that God is an abstract concept rather than a tangible entity, leading to the idea that God 'disappears' as a result of being reduced to mere philosophical discussion rather than a personal being.",
+        "contexts": "traditional depiction depicts Abrahamic God, Jesus present in work The Simpsons | Universe has part God, God part of Universe, God different from prophet, prophet different from God, humanity opposite of God, God opposite of humanity | philosophical has part religious | God has part angels, Lucifer member of God, angels part of God, Lucifer father God, God child Lucifer | Universe has part his own image | Zeus child Poseidon, Poseidon father Zeus | Ruler of the Universe owner of The Lord, The Lord owned by Ruler of the Universe | God studied by philosophers | His place said to be the same as God | Chris present in work bible | promiscuous facet of religious",
+        "metrics": {
+          "rouge_score": 0.21176470588235294,
+          "answer_correctness": 0.8919413080959244
+        }
+      },
+      {
+        "id": "Tv-id-26",
+        "question": "In the Arrested Development-style meta section, how does the realistic prop on the \u2018Wrench\u2019 set lead to confusion, and how does identifying the in-universe actor close the loop on who people thought was shot?",
+        "ground_truth": "Part 1: People panicked because the gun looked real on the set.\nPart 2: Since the write-up names who was playing the role, it clarifies who everyone thought had been shot.",
+        "generated_answer": "The realistic prop on the \u2018Wrench\u2019 set leads to confusion by creating a believable scenario that misleads characters and viewers alike. Identifying the in-universe actor resolves the confusion by clarifying the mistaken identity of the character thought to be shot.",
+        "contexts": "Scandalmakers based on Arrested Development | Arrested Development characters Michael Bluth, Arrested Development characters George Michael Bluth, F\u00fcnke present in work Arrested Development, Arrested Development creator Ron Howard, Bluth present in work Arrested Development, Arrested Development original broadcaster Fox network, Arrested Development cast member Jason Bateman, Michael Bluth present in work Arrested Development, Arrested Development start time November 2, 2003, George Michael Bluth present in work Arrested Development | Orange Is the New Black genre comedy-drama | previous season genre comic relief | Billions present in work Arrested Development | Top of the Heap genre sitcom, improvisational comedy subclass of situation comedy | Mad About You genre sitcom | Mo genre comedic | Lindsay present in work Arrested Development | Reconstruction characters The Meta",
+        "metrics": {
+          "rouge_score": 0.24657534246575344,
+          "answer_correctness": 0.7160570140279793
+        }
+      },
+      {
+        "id": "Tv-id-81",
+        "question": "Explain how Arthur\u2019s recurring involvement with Agrajag connects a falling bowl of petunias, a prehistoric rabbit, and the Lord\u2019s Cricket Ground scene.",
+        "ground_truth": "They are all previous lives of Agrajag. He was the petunias that fell and died, the rabbit Arthur killed and even used as a pouch, and later the old man who died of shock when Arthur appeared at Lord\u2019s. Because Arthur was tied to every one of those deaths, Agrajag later drags him to the Cathedral of Hate.",
+        "generated_answer": "Arthur's recurring involvement with Agrajag illustrates the theme of unintended consequences, as each encounter leads to a series of events that ultimately result in Agrajag's demise. The falling bowl of petunias and the prehistoric rabbit are both examples of seemingly random occurrences that contribute to the chaotic nature of Arthur's life, culminating in the Lord's Cricket Ground scene where Agrajag seeks revenge for his previous deaths caused by Arthur. This interconnectedness highlights the absurdity and unpredictability of existence in the narrative.",
+        "contexts": "Arthur present in work Arthur, Arthur characters Arthur | Arthur present in work 'B' Ark | Arthur present in work Camelot, Camelot characters Arthur | Arthur present in work Love, Arthur present in work Camelot, Arthur present in work Series 2 | Arthur present in work Emrys | Arthur present in work Beginning of the End | Arthur present in work And Another Thing..., And Another Thing... characters Arthur | Arthur present in work Arthur's hands | Arthur present in work Men of Letters | Arthur present in work The Coming of Arthur, Arthur present in work Season Two, Arthur present in work Sins of the Father | Arthur present in work Milliways | Arthur present in work series 1 | The Disir characters Arthur | Arthur present in work Heart of Gold | Arthur present in work Lajestic Vantrashell of Lob",
+        "metrics": {
+          "rouge_score": 0.20833333333333334,
+          "answer_correctness": 0.9760167878222236
+        }
+      },
+      {
+        "id": "Tv-id-89",
+        "question": "How does the Golgafrinchan telephone sanitizer gag explain the collapse of the original society, and what irony does it point out?",
+        "ground_truth": "They deported the very people who prevented infections. Without telephone sanitizers, an \u2018unexpectedly dirty\u2019 phone spread disease that killed everyone who\u2019d stayed, so the joke is that the supposedly useless job was essential.",
+        "generated_answer": "The Golgafrinchan telephone sanitizer gag illustrates the absurdity of the original society's priorities, highlighting how trivial roles were deemed essential, leading to their downfall. The irony lies in the fact that the society eliminated those deemed unnecessary, only to discover that their survival depended on those very roles.",
+        "contexts": "Golgafrinchan instance of tragic coincidence, The Restaurant at the End of the Universe characters Golgafrinchan, marketing girl instance of Golgafrinchan, Golgafrinchan time period prehistoric Earth, Golgafrinchan present in work The Restaurant at the End of the Universe | comic relief subclass of gag | Agda and Mella present in work Golgafrinchan, Golgafrinchan has part Golgafrinchan society | Koragg instance of spell | Holy Zarquon's singing fish instance of curse | Holy Grail instance of cursed | Anok instance of mummy | Olaf instance of troll | Jabberwocky instance of ancient and dangerous creature | spit used by actor | Dark One instance of curse | Upchuck instance of Gourmand | Marge vs. The Monorail instance of couch gag | Evil Queen instance of curse | Jammed instance of catch phrase",
+        "metrics": {
+          "rouge_score": 0.14457831325301204,
+          "answer_correctness": 0.9673216460310794
+        }
+      },
+      {
+        "id": "Tv-id-64",
+        "question": "Which key secret about Grimlord\u2019s identity remained unknown even to the heroes and their mentor, and what corporate cover enabled it? After Grimlord self\u2011destructed the Virtual Dungeon for a second time, what two major changes defined his season\u2011two upgrade?",
+        "ground_truth": "Part 1: No one\u2014including the Troopers and Professor Hart\u2014knew that billionaire Karl Ziktor of Ziktor Industries was Grimlord. Part 2: He replaced his transference orb with an energy prism siphoned from Tyler Steele\u2019s knowledge and shifted to a new base of operations, the orbiting Virtual Dark Fortress.",
+        "generated_answer": "Grimlord's true identity as a human remained unknown to the heroes and their mentor, concealed by the corporate cover of the Virtual Dungeon. His season-two upgrade was defined by the introduction of new characters and enhanced powers.",
+        "contexts": "Grimlord present in work Season Two, Grimlord country of origin American, Dungeon characters Grimlord, Season Two characters Grimlord, Grimlord instance of cape, Zelton present in work Grimlord, Zelton member of Grimlord, Grimlord present in work Ryan, Grimlord present in work Dungeon, Toxoid present in work Grimlord, Ryan characters Grimlord, Virtual Dungeon part of the series Grimlord | Grimlord present in work Ivar, Grimlord present in work that particular episode, Grimlord present in work Oraclon, that particular episode characters Grimlord, Grimlord present in work Troopers, Troopers characters Grimlord, Grimlord present in work Despera | Grimlord present in work Ryan, Grimlord present in work The Couch Potato Kid, The Couch Potato Kid characters Grimlord | Ryan present in work Grimlord, Troopers characters Grimlord | The Transmutant characters Grimlord, Grimlord present in work The Transmutant | Grimlord present in work Grimlock | Grimlord present in work Combax | Quest for Power characters Grimlord | Kaitlin present in work Grimlord | Grimlord present in work Knighttime, Knighttime characters Grimlord",
+        "metrics": {
+          "rouge_score": 0.13483146067415733,
+          "answer_correctness": 0.5592991054115778
+        }
+      },
+      {
+        "id": "Tv-id-78",
+        "question": "Why did Agrajag bring Arthur Dent to the Cathedral of Hate, and what detail made Agrajag realize he had taken Arthur there too early?",
+        "ground_truth": "Agrajag wanted to kill Arthur because Arthur had been the cause of his many deaths. But during his explanation Agrajag cited the incident at \u201cStavromula Beta,\u201d and Arthur said he had never been there yet, so Agrajag realized he had pulled Arthur out of time too early and the revenge could not be consistent with Arthur\u2019s timeline.",
+        "generated_answer": "Agrajag brought Arthur Dent to the Cathedral of Hate to seek revenge for all the times Arthur had inadvertently caused his death. He realized he had taken Arthur there too early when he noticed that Arthur was still alive and hadn't yet died from the events he had planned.",
+        "contexts": "Agrajag present in work Cathedral of Hate, Arthur Dent owner of Agrajag, Agrajag owned by Arthur Dent, Cathedral of Hate characters Agrajag, Zaphod Beeblebrox characters Arthur Dent, And Another Thing... characters Arthur Dent, Arthur Dent present in work And Another Thing... | Random Dent father Arthur Dent | Arthur Dent present in work Heart of Gold, Arthur Dent present in work Mostly Harmless | Arthur Dent present in work Brontitall | Arthur Dent present in work Arthur Dent, Arthur Dent present in work Jeltz, Jeltz characters Arthur Dent | Mostly Harmless characters Arthur Dent | Life, the Universe and Everything characters Arthur Dent | Shoe Event Horizon characters Arthur Dent, Lintilla characters Arthur Dent | Arthur Dent present in work Fit the Twenty-Sixth, Arthur Dent present in work The Hitchhiker's Guide to the Galaxy | Arthur place of death Avalon",
+        "metrics": {
+          "rouge_score": 0.29629629629629634,
+          "answer_correctness": 0.7288613982523784
+        }
+      }
+    ]
+  }
+}
