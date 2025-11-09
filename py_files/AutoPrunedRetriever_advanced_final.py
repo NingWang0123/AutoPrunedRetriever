@@ -4483,23 +4483,23 @@ class AutoPrunedRetriver:
 
             batch_chunks = all_chunks[i:i+batch_size]
 
-            if self.chunking_use == 'llm':
-                fact_cb = get_code_book_paralleled_ver(batch_chunks,
-                    type='facts',
-                    rule="Store factual statements.",
-                    batch_size=1,
-                    parser_choice=self.chunking_use,
-                    api=self.chunking_api,)
+            # if self.chunking_use == 'llm':
+            #     fact_cb = get_code_book_paralleled_ver(batch_chunks,
+            #         type='facts',
+            #         rule="Store factual statements.",
+            #         batch_size=1,
+            #         parser_choice=self.chunking_use,
+            #         api=self.chunking_api,)
             
-            else:
-                fact_cb = get_code_book(
-                    batch_chunks,
-                    type='facts',
-                    rule="Store factual statements.",
-                    batch_size=1,
-                    parser_choice=self.chunking_use,
-                    api=self.chunking_api,
-                )
+            # else:
+            fact_cb = get_code_book(
+                batch_chunks,
+                type='facts',
+                rule="Store factual statements.",
+                batch_size=1,
+                parser_choice=self.chunking_use,
+                api=self.chunking_api,
+            )
 
             print(f'batch {batch_num} codebook is generated')
 
