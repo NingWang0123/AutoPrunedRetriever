@@ -5,7 +5,6 @@ import numpy as np
 from sentence_transformers import SentenceTransformer
 from collections import Counter
 import re
-from dpo_compressrag_v2 import answer_with_auto_strategy
 
 ### all the reward func takes the pred and the gold_answer (ground truth), output reward value
 
