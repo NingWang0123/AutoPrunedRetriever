@@ -34,9 +34,35 @@ We use the same **LLM Judge** from the official
 to ensure APR is evaluated under identical metrics and scoring rules.
 
 ### 1. Download the Evaluation Pipeline
-```
 
+```
 mkdir -p py_files
 git -C py_files clone https://github.com/GraphRAG-Bench/GraphRAG-Benchmark.git
+```
 
+### 2. Prepare Model Output Files
+
+Place all APR prediction files under:
+
+```
+configs/outputs/<dataset>/<run_name>.json
+```
+
+Each file must follow the GraphRAG-Bench format:
+
+```json
+{
+  "id": "Q-1",
+  "question": "...",
+  "predicted_answer": "...",
+  "reference_answer": "..."
+}
+```
+
+### 3. Run Evaluation
+
+```
+python py_files/GraphRAG-Benchmark/Evaluation/generation_eval.py \
+    --config configs/outputs/<dataset>/<run_name>.json \
+    --embedding_model BAAI/bge-large-en-v1.5
 ```
