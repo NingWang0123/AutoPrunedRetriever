@@ -2,7 +2,6 @@ from typing import List, Tuple, Dict
 import numpy as np
 import pandas as pd
 import torch
-from langchain_community.embeddings import HuggingFaceEmbeddings
 
 def decode_question(question, codebook_main, fmt='words'):
     """
