@@ -20,7 +20,6 @@ from graph_generator.rebel_large import triplet_parser
 from graph_generator.llm_parser import triplet_parser_llm,TOKEN_STATS  
 import time
 from sentence_embed_overlap import get_unique_or_overlap_by_sentence_embedded
-import gensim.downloader as api
 from functools import partial
 import copy
 from optimize_combine_storage import ann_feat_combine,ann_merge_questions_answer_gated
