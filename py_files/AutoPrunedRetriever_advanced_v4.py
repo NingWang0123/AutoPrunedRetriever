@@ -6,7 +6,6 @@ from typing import List, Tuple, Dict, Optional,Iterable,Any,Callable, Set, Union
 import itertools
 from collections import defaultdict
 import numpy as np
-from gensim.models import KeyedVectors
 import numpy as np
 import re
 from langchain.embeddings.base import Embeddings
@@ -20,7 +19,6 @@ from textwrap import dedent
 from graph_generator.rebel_large import triplet_parser
 import time
 from sentence_embed_overlap import get_unique_or_overlap_by_sentence_embedded
-import gensim.downloader as api
 from functools import partial
 import copy
 from optimize_combine_storage import ann_feat_combine,ann_merge_questions_answer_gated
