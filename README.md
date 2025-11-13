@@ -1,4 +1,4 @@
-# relational_graph_llm
+# AutoPrunedRetriever
 
 Suggested Python: 3.10.12
 
