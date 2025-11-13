@@ -19,5 +19,6 @@ source venv_rgl/bin/activate
 
 pip install -r req.txt
 
-python py_files/workflow.py 
+$env:CHUNKING_API   = "" # your api key
+make run CONFIG=configs/tv_cr_llm.yaml
 ```
