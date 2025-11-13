@@ -6,7 +6,6 @@ from typing import List, Tuple, Dict, Optional,Iterable,Any,Callable, Set, Union
 import itertools
 from collections import defaultdict
 import numpy as np
-from gensim.models import KeyedVectors
 import numpy as np
 import re
 from langchain.embeddings.base import Embeddings
