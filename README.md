@@ -1,5 +1,7 @@
 # AutoPrunedRetriever
 
+[![View Workflow](https://img.shields.io/badge/View%20Workflow-PDF-blue)](./Workflow.pdf)
+
 Suggested Python: 3.10.12
 
 ## Reproducibility Steps
