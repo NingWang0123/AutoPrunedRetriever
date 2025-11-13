@@ -1,15 +1,51 @@
-from CompressRag_rl_v1 import CompressRag_rl,decode_questions, get_context
-from WordEmb import WordAvgEmbeddings, Word2VecEmbeddings
-from langchain.embeddings.base import Embeddings
-from langchain_community.embeddings import HuggingFaceEmbeddings
-import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM
 import re, os
 from typing import List, Tuple
 import time
 import openai
 import tiktoken
 from pathlib import Path
+
+def get_context(final_merged_json):
+    def _triples_to_words(triples, cb):
+        E, R = cb["e"], cb["r"]
+        return [[E[h], R[r], E[t]] for (h, r, t) in triples]
+    
+    def _decode_block(block, cb):
+        if not block:
+            return []
+        if isinstance(block[0], (list, tuple)) and len(block[0]) == 3 and all(isinstance(x, int) for x in block[0]):
+            return _triples_to_words(block, cb)
+        if isinstance(block[0], int):
+            edges = cb.get("edges([e,r,e])", cb.get("edge_matrix"))
+            triples = [edges[i] for i in block]
+            return _triples_to_words(triples, cb)
+        if isinstance(block[0], (list, tuple)) and isinstance(block[0][0], str):
+            return block
+        return []
+
+    def _linearize_triples_block(triples, sep=", ", end=""):
+        if not triples:
+            return "None."
+        return sep.join(f"{h} {r} {t}{end}" for h, r, t in triples)
+
+    def _extract_txt(keys):
+        for k in keys:
+            groups = final_merged_json.get(k, [])
+            if groups:
+                all_words = []
+                for g in groups:
+                    words = _decode_block(g, final_merged_json)
+                    if words:
+                        all_words.append(_linearize_triples_block(words))
+                return " | ".join(all_words) if all_words else "None."
+        return "None."
+
+    q_txt  = _extract_txt(["questions([[e,r,e], ...])"])
+    gk_txt = _extract_txt(["given knowledge([[e,r,e], ...])"])
+    st_txt = _extract_txt(["start thinking with([[e,r,e], ...])"])
+    ft_txt = _extract_txt(["facts([[e,r,e], ...])"])  
+
+    return q_txt, gk_txt, st_txt, ft_txt
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
@@ -624,123 +660,4 @@ class OpenAILLM:
         else:
             print("----------ANS:",ans_clean)
             return ans_clean
-
-if __name__ == "__main__":
-    #word_emb = WordAvgEmbeddings(model_path="gensim-data/glove-wiki-gigaword-100/glove-wiki-gigaword-100.model")
-
-    word_emb = Word2VecEmbeddings(model_name="word2vec-google-news-300")
-    sentence_emb = HuggingFaceEmbeddings(model_name="BAAI/bge-base-en")
-
-
-    include_thinking = True
-
-    llm_provider = "deepseek"  
-
-    if llm_provider == "deepseek":
-        api_llm = DeepSeekLLM(
-            include_thinkings=include_thinking,                 
-            model_name="deepseek-chat",  
-            max_new_tokens=256,
-            temperature=0.2,
-            top_p=0.9,
-            use_cache=True,
-            # api_key="your-deepseek-api-key",  # 可选，不填会从环境变量或deepseek_key.txt读取
-            # base_url="https://api.deepseek.com/v1",  # DeepSeek API地址
-        )
-    else:
-        api_llm = OpenAILLM(  # 这个现在是OpenAI兼容的
-            include_thinkings=include_thinking,                 
-            model_name="gpt-4o-mini",  # 或者 "gpt-3.5-turbo", "gpt-4o" 等
-            max_new_tokens=256,
-            temperature=0.2,
-            top_p=0.9,
-            use_cache=True,
-            api_key="your-openai-api-key",  # 可选，不填会从环境变量或openai_key.txt读取
-            # base_url="https://api.openai.com/v1",  # 可选，使用其他兼容服务
-        )
-
-    import json
-    with open("meta_codebook.json", "r") as f:
-        ini = json.load(f)
-
-    rag = CompressRag_rl(
-        ini_meta_codebook = ini,
-        sentence_emb=sentence_emb,
-        word_emb=word_emb,
-        llm=api_llm,    
-        thinkings_choice='overlap',  
-        answers_choice='unique'       
-    )
-
-    rag.top_k = 5
-    rag.top_m = 2
-    rag.question_batch_size = 2
-    rag.questions_db_batch_size = 16
-
-
-    import json
-    import numpy as np
-    from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
-    from rouge_score import rouge_scorer
-
-    def to_serializable(obj):
-        if isinstance(obj, np.ndarray):
-            return obj.tolist()   # ndarray -> list
-        if isinstance(obj, (np.int32, np.int64)):
-            return int(obj)       # numpy int -> int
-        if isinstance(obj, (np.float32, np.float64)):
-            return float(obj)     # numpy float -> float
-        raise TypeError(f"Type {type(obj)} not serializable")
-
-
-    def run_eval_case(question, reference_answer, facts_json_path, rag, work_mode="normal", llm_metrics=True, warm_start="coarse", websearch=None):
-        if work_mode == "dpo":
-            result = rag.run_work_flow_for_dpo(question, facts_json_path=facts_json_path, warm_start=warm_start)
-        else:
-            result = rag.run_work_flow(question, facts_json_path=facts_json_path, warm_start=warm_start, websearch=websearch)
-        if isinstance(result, tuple):
-            gen_text = result[0]
-        else:
-            gen_text = str(result)
-
-        from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
-        from rouge_score import rouge_scorer
-        smooth = SmoothingFunction().method1
-        scorer = rouge_scorer.RougeScorer(["rouge1", "rouge2", "rougeL"], use_stemmer=True)
-        bleu = sentence_bleu([reference_answer.split()], gen_text.split(), smoothing_function=smooth)
-        scores = scorer.score(reference_answer, gen_text)
-        rouge1 = scores["rouge1"].fmeasure
-        rouge2 = scores["rouge2"].fmeasure
-        rougeL = scores["rougeL"].fmeasure
-
-        if rag.llm.metrics_runs and isinstance(rag.llm.metrics_runs[-1], dict):
-            last_metrics = list(rag.llm.metrics_runs[-1].values())[0]
-            last_metrics["BLEU"] = bleu
-            last_metrics["ROUGE-1"] = rouge1
-            last_metrics["ROUGE-2"] = rouge2
-            last_metrics["ROUGE-L"] = rougeL
-        if llm_metrics:
-            print(rag.llm.metrics_runs)
-        print(result)
-        print(f'BLEU: {bleu:.4f}, ROUGE-1: {rouge1:.4f}, ROUGE-2: {rouge2:.4f}, ROUGE-L: {rougeL:.4f}')
-        return gen_text, bleu, rouge1, rouge2, rougeL
-
-
-
-    # DATA_PATH     = "context/medical_questions.json"
-    # DATA_SLICE    = 2
-
-    # with open(DATA_PATH, "r", encoding="utf-8") as f:
-    #     raw_data = json.load(f)
-
-    # raw_data = raw_data[:DATA_SLICE]
-    # print(f"[INFO] Loaded {len(raw_data)} samples for answering)")
-    # questions = [item["question"] for item in raw_data if "question" in item]
-    # answers = [item["answer"] if "answer" in item else "" for item in raw_data if "question" in item]
-    # i = 0
-    # for q, ref in zip(questions, answers):
-    #     run_eval_case(q, ref, ["context/novel copy.json", "context/medical_sub.json"], rag, work_mode="normal", websearch= True)
-    #     i += 1
-        #with open(f"meta_codebook_{i}.json", "w", encoding="utf-8") as f:
-        #    json.dump(rag.meta_codebook, f, ensure_ascii=False, indent=2, default=to_serializable)
 
