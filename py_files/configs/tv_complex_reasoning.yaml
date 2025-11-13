@@ -7,7 +7,7 @@ dataset: tv
 # input templates
 corpus_file: data/corpus/tv_corpus.json
 # quest is from local
-quest_file: data/tv_QnA_modified.json
+quest_file: data/tv_questions.json
 
 # runner/processing knobs
 chunking_use: rebel
