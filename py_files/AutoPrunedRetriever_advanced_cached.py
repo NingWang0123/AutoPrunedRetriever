@@ -19,7 +19,6 @@ from textwrap import dedent
 from graph_generator.rebel_large import triplet_parser
 import time
 from sentence_embed_overlap import get_unique_or_overlap_by_sentence_embedded
-import gensim.downloader as api
 from WordEmb import Word2VecEmbeddings, WordAvgEmbeddings
 from functools import partial
 import copy
