@@ -21,6 +21,22 @@ source venv_rgl/bin/activate
 
 pip install -r req.txt
 
+cd/py_files
+
 $env:CHUNKING_API   = "" # your api key
 make run CONFIG=configs/tv_cr_llm.yaml
+```
+
+## 🧪 Evaluation
+
+We use the same **LLM Judge** from the official  
+[GraphRAG-Benchmark](https://github.com/GraphRAG-Bench/GraphRAG-Benchmark)  
+to ensure APR is evaluated under identical metrics and scoring rules.
+
+### 1. Download the Evaluation Pipeline
+```
+
+mkdir -p py_files
+git -C py_files clone https://github.com/GraphRAG-Bench/GraphRAG-Benchmark.git
+
 ```
