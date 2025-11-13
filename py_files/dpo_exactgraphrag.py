@@ -4,12 +4,10 @@ from typing import List, Tuple, Dict, Optional, Callable,Any
 from contextlib import contextmanager
 import math, random, numpy as np
 import torch, torch.nn as nn, torch.nn.functional as F
-from CompressRag_rl_v2 import CompressRag_rl,WordAvgEmbeddings, get_context,merging_codebook
 from langchain_community.embeddings import HuggingFaceEmbeddings
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import re, os
-from test_for_compressrag import Phi4MiniReasoningLLM
 import sys, json, pickle
 import asyncio,inspect
 from sentence_transformers import SentenceTransformer
@@ -567,7 +565,7 @@ def select_ans_th(policy: StrategyPolicy2Head, cr, q: str, feature_dim: int = 38
     return (ANSWERS_CHOICES[ai], THINKINGS_CHOICES[ti], FACTS_CHOICES[fi])
 
 def answer_with_auto_strategy(
-    cr: CompressRag_rl,
+    cr: None,
     policy: StrategyPolicy2Head,
     q: str,
     reward_fn: Callable[[str, Optional[str]], float] = None,

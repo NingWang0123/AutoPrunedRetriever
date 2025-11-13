@@ -21,7 +21,7 @@ from dpo_exactgraphrag import (
     default_reward, answer_with_auto_strategy,save_pref_examples,load_pref_examples,ANSWERS_CHOICES,THINKINGS_CHOICES,FACTS_CHOICES
 )
 
-from llm_api import OpenAILLM ,Word2VecEmbeddings
+from llm_api import OpenAILLM 
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings
 from langchain_openai import ChatOpenAI
 # from evaluation_func_graphrag import compute_answer_correctness
