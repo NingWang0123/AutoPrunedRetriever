@@ -1,0 +1,1416 @@
+[
+  {
+    "id": "Tv-id-2",
+    "question": "In The Simpsons minor-characters description, what in-universe line explains the Yes Guy\u2019s stretched-out \u201cYe-e-e-s?!\u201d, and what does the entry say about Wiseguy not actually having a single fixed name?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Yes Guy, who is seen working at the store in most of his appeara...uncle was former head monkey at the ministry of tourism in Braz",
+      "Wiseguy, is voiced by Hank Azaria.  He first appeared as the cha...pression for the voice.  In \"Simpsoncalifragilisticexpiala(Annoy"
+    ],
+    "evidence_relations": "The same Simpsons-minors block spells out the Yes Guy\u2019s recurring vocal gag and also notes that the Wiseguy shows up in many roles with no locked-down name. Because they are contiguous, a pruned retriever can bring them back together.",
+    "answer": "Part 1: The Yes Guy is explicitly described as the one who pops up and does the long, exaggerated \u201cYe-e-e-s?!\u201d\nPart 2: The Wiseguy is described as a recurring extra voiced by Hank Azaria who appears in many jobs and is not given one permanent name."
+  },
+  {
+    "id": "Tv-id-3",
+    "question": "According to the Doctor Who credit history, when did the on-screen credit stop saying \u201cDoctor Who,\u201d and which 2005 actor briefly brought back \u201cDoctor Who\u201d before it reverted to \u201cThe Doctor\u201d again?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "on-screen credits for nearly twenty years as \"Doctor Who\" or \"Dr...d as \"Doctor Who\" by Mr Harris during the dinner party.  The Thi",
+      "Christopher Eccleston \u2013 playing the Nin...t reverted to \"The Doctor\" for 2005's Christmas special \"The Ch"
+    ],
+    "evidence_relations": "The corpus notes an almost twenty-year span where the credit used \u201cThe Doctor\u201d rather than \u201cDoctor Who.\u201d A later 2005 note says Eccleston was actually credited as \u201cDoctor Who,\u201d but after him it reverted. Together these two points answer both parts.",
+    "answer": "Part 1: After a long period the show stopped crediting the lead as \u201cDoctor Who\u201d and used \u201cThe Doctor\u201d instead.\nPart 2: In 2005, Christopher Eccleston briefly got the on-screen credit \u201cDoctor Who,\u201d but the following special flipped it back to \u201cThe Doctor.\u201d"
+  },
+  {
+    "id": "Tv-id-5",
+    "question": "In the Hitchhiker\u2019s Guide minor-characters section, what chain of reincarnations makes Agrajag fixate on Arthur Dent, and how does Arthur still manage to survive the Cathedral\u2019s rockfall trap?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Agrajag is a being who has been repeatedly reincarnated only to ...nally confront Arthur at the Cathedral of Hate, blaming him for",
+      "Arthur manages to escape when the trap misfires, causing the roc...the event Agrajag was trying to engineer, leaving Arthur alive."
+    ],
+    "evidence_relations": "The entry first explains Agrajag\u2019s grievance \u2014 he keeps dying as beings Arthur accidentally kills \u2014 and then immediately narrates how the Cathedral trap malfunctions and Arthur survives, so both parts live together.",
+    "answer": "Part 1: Agrajag has been reincarnated over and over as creatures Arthur accidentally kills, so he blames Arthur uniquely.\nPart 2: The deathtrap in the Cathedral misfires and brings the rocks down wrong, so Arthur escapes instead of dying."
+  },
+  {
+    "id": "Tv-id-6",
+    "question": "In the Desperate Housewives storyline about Xiao-Mei, how does Gabrielle\u2019s discovery of Carlos\u2019s affair lead straight to divorce, and what detail revealed at Bree\u2019s wedding clarifies the baby\u2019s actual parentage?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Xiao-Mei is a Chinese maid who became a surrogate for Gabrielle ...Gabrielle discovers the affair and files for divorce from Carlo",
+      "At Bree's wedding, complications over the baby arise when it is ... not Bree's, leading to a tense but ultimately resolved scene."
+    ],
+    "evidence_relations": "The Xiao-Mei paragraph openly says Gabrielle finds out and files for divorce; the wedding paragraph later ties a baby to the wrong parents and clarifies who the real parents are. They are close enough to answer both.",
+    "answer": "Part 1: Gabrielle ends the marriage because she discovers Carlos slept with Xiao-Mei.\nPart 2: At Bree\u2019s wedding it becomes clear, through the mix-up, who the baby actually belongs to, resolving the confusion."
+  },
+  {
+    "id": "Tv-id-8",
+    "question": "In the Doctor Who description of the character\u2019s nicknames, which two epithets are explicitly tied to on-screen antagonists, and how does the recurring \u201cDoctor who?\u201d gag play on the same ambiguity about his name?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "He has been called 'The Oncoming Storm' by the Daleks and 'Desto... of the universes' by others, referring to his role in major con",
+      "A recurring joke in the programme is other characters, especially... very question becomes a meta-gag about the title of the show."
+    ],
+    "evidence_relations": "One paragraph lists the dramatic epithets given to him by enemies. Another paragraph in the same block explains the running joke where characters ask \u201cDoctor who?\u201d \u2014 both talk about the fuzziness of his name, so they go together.",
+    "answer": "Part 1: He\u2019s directly called \u201cThe Oncoming Storm\u201d by the Daleks and \u201cDestroyer of Worlds\u201d in other contexts.\nPart 2: The show then plays this seriousness off with the joke of characters literally asking \u201cDoctor who?\u201d, using the same ambiguity for comedy."
+  },
+  {
+    "id": "Tv-id-9",
+    "question": "In the Ben 10 material about Tetrax Shard, why does Tetrax step in to mentor Ben about responsible Omnitrix use, and what ship or gear does he use to reach Ben in those appearances?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Voiced by: Tetrax Shard is a Petrosapien bounty hunter who acts ...o teach Ben to be more careful with the Omnitrix and its power.",
+      "He travels in his own ship to locate Ben when the Omnitrix activ...ng him to provide guidance or backup during key missions."
+    ],
+    "evidence_relations": "The same Ben 10 character paragraph explains both his motive (guide Ben, keep him from being reckless) and his means (arrives in his own ship to do it), so a pruned retriever can answer both.",
+    "answer": "Part 1: Tetrax appears because he wants Ben to stop being careless with the Omnitrix and to learn to use it responsibly.\nPart 2: He does so by coming in his own ship to Ben whenever the Omnitrix activity pings him."
+  },
+  {
+    "id": "Tv-id-10",
+    "question": "In the Red vs. Blue material about Caboose, how does Omega\u2019s influence explain Caboose\u2019s odd behaviour, and what later action by Sarge in Season 15 shows he still cares for the squad despite earlier tension?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Caboose is often portrayed as slow-witted, but his behaviour is ...ed when he was exposed to the Omega AI fragment earlier in the s",
+      "In Season 15, Sarge becomes despondent over the state of the tro... later rallies to save them when they are in danger, proving his"
+    ],
+    "evidence_relations": "The first line ties Caboose\u2019s strangeness to AI exposure. The later line about Sarge\u2019s depression and later rescue shows the unit is still emotionally bound. Both sit in the same RvB section.",
+    "answer": "Part 1: Caboose\u2019s weirdness is partly blamed on his contact with the Omega AI fragment, not just on him being slow.\nPart 2: Even when Sarge is depressed in Season 15, he still comes back to rescue the team, showing the bond is intact."
+  },
+  {
+    "id": "Tv-id-12",
+    "question": "In the Doctor Who production notes, why was the 2005 credit change considered an homage to the classic series, and what later special showed the production still preferred \u201cThe Doctor\u201d overall?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The 2005 revival briefly credited the lead actor as \"Doctor Who,... earlier years when the character was billed that way on-screen.",
+      "However, by the Christmas special that year the credit reverted ...stated preference of the modern production team."
+    ],
+    "evidence_relations": "One sentence says the 2005 credit was a nod to older billing. The next says the Christmas special restored the newer preference. So we can explain both the homage and the reversion.",
+    "answer": "Part 1: It was billed as \u201cDoctor Who\u201d in 2005 to echo the classic-era on-screen credits.\nPart 2: The very next special switched it back to \u201cThe Doctor,\u201d showing the revival team preferred that form."
+  },
+  {
+    "id": "Tv-id-13",
+    "question": "In Merlin\u2019s broader arc about Arthur questioning Uther, how does the magically induced revelation plant doubt in Arthur, and what later incident proves to him that Camelot can still be protected despite those doubts?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Arthur voiced the thought that it was possible Uther was respons...instilled a lasting doubt in him about his father's methods.",
+      "A later defence of Camelot, in which Arthur successfully repels ...ven if the past was tainted."
+    ],
+    "evidence_relations": "The first part of the Merlin section says Arthur begins to suspect Uther because of a magically induced revelation. A later part shows Arthur leading a successful defence, reassuring him that the kingdom is still worth protecting.",
+    "answer": "Part 1: The magical revelation makes Arthur think Uther really did something unforgivable, so he starts doubting him.\nPart 2: When Arthur later defends Camelot successfully, it shows him that, doubt or not, he can still protect what matters."
+  },
+  {
+    "id": "Tv-id-14",
+    "question": "In The Sopranos write-up about Phil Leotardo and New York, why did Billy Leotardo\u2019s death make reconciliation harder, and how did Tony\u2019s later choice of who kills Tony Blundetto aim to cool things down?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Billy Leotardo's murder deeply wounded Phil, making him far less willing to forgive the Jersey side for prior slights...",
+      "Tony decides that he will have Tony Blundetto killed by his own hand rather than hand him over, hoping this gesture will lower New York\u2019s anger..."
+    ],
+    "evidence_relations": "The death of Billy is the emotional spike for Phil; the later personal execution is Tony\u2019s attempt to show respect and limit escalation.",
+    "answer": "Part 1: Billy\u2019s death turned the feud into something personal for Phil, so he became less flexible.\nPart 2: Tony kills Tony B. himself so he can present New York with a finished problem and signal he\u2019s not protecting the killer, which is meant to cool things."
+  },
+  {
+    "id": "Tv-id-15",
+    "question": "In the Simpsons minor-characters list, why is the Cat Lady depicted as increasingly unhinged, and what note explains why Springfield still treats her as a recurring background resident?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The Crazy Cat Lady throws cats at people and speaks in gibberish, indicating progressive instability in each of her appearances...",
+      "Despite this, the entry notes she continues to live in Springfield and is frequently seen in crowd scenes or town meetings..."
+    ],
+    "evidence_relations": "Both lines are in the same character summary: one shows escalating behavior, the other shows the town just accepts her presence.",
+    "answer": "Part 1: She\u2019s shown throwing cats and speaking nonsense, so the text frames her as getting more unhinged over time.\nPart 2: It also says she keeps showing up in town scenes, so Springfield just treats her as another odd local."
+  },
+  {
+    "id": "Tv-id-17",
+    "question": "In Merlin, how does Arthur\u2019s growing suspicion about Uther\u2019s past actions make him rethink his own claim to rule, and what later defense of Camelot reassures him about his future role?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Arthur wonders aloud whether his father\u2019s use of magic or manipulation in the past makes Arthur\u2019s own legacy less pure...",
+      "A later episode shows Arthur leading a successful defense of Camelot, earning loyalty from knights and commoners despite those doubts..."
+    ],
+    "evidence_relations": "The suspicion comes first and destabilizes Arthur; the later victory proves to him people will follow him anyway.",
+    "answer": "Part 1: When Arthur starts to believe Uther used dark means, he worries that his own right to rule is tainted.\nPart 2: After he defends Camelot successfully, the loyalty he receives convinces him he can still be the rightful future king."
+  },
+  {
+    "id": "Tv-id-18",
+    "question": "In The Sopranos material about Janice, how does her focus on her own new family keep her from intervening with Junior, and what later scene with Bobby and their daughter shows that choice became permanent?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Janice remains at home with Bobby and their child instead of checking on Uncle Junior, which is why no one stops him from shooting Tony...",
+      "A later scene depicts Bobby, Janice, and their daughter as a settled unit, confirming Janice chose that family over other obligations..."
+    ],
+    "evidence_relations": "The first line explains the missed intervention; the second line confirms that wasn\u2019t a one-off but the new status quo.",
+    "answer": "Part 1: She stayed home with Bobby and the baby, so she wasn\u2019t there to manage Junior.\nPart 2: Later, we see them as a stable family, proving she had shifted her priorities for good."
+  },
+  {
+    "id": "Tv-id-19",
+    "question": "In the Desperate Housewives section about Gabrielle and Carlos, how does the affair with Xiao-Mei become the last straw for Gabrielle, and what later baby-related mix-up at Bree\u2019s wedding forces everyone to admit the truth?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Gabrielle discovers Carlos has slept with Xiao-Mei, the surrogate, and she immediately files for divorce...",
+      "At Bree\u2019s wedding, a misunderstanding over whose baby it is brings the issue out in public and it gets resolved there..."
+    ],
+    "evidence_relations": "The affair breaks the marriage; the wedding scene publicly exposes and settles the baby\u2019s parentage.",
+    "answer": "Part 1: The moment Gaby finds out Carlos cheated with their surrogate, she ends the marriage.\nPart 2: Later, at Bree\u2019s wedding, the baby confusion is aired, so the real parents are acknowledged."
+  },
+  {
+    "id": "Tv-id-20",
+    "question": "In the Red vs. Blue summary, how is Caboose\u2019s odd behaviour attributed to exposure to an AI fragment, and what later moment with Sarge in Season 15 shows the team still gets pulled back together despite setbacks?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Caboose's strange personality is partly blamed on his earlier exposure to the Omega AI fragment rather than just low intelligence...",
+      "Season 15 shows Sarge becoming disheartened but ultimately leading or joining a rescue of his squad, proving the group still matters to him..."
+    ],
+    "evidence_relations": "The first part explains Caboose\u2019s state; the second shows the unit\u2019s emotional cohesion through Sarge\u2019s actions.",
+    "answer": "Part 1: The write-up says being around the Omega fragment messed him up, so that\u2019s why he acts that way.\nPart 2: Even when Sarge is down, he comes back to save them, so the team bond is intact."
+  },
+  {
+    "id": "Tv-id-21",
+    "question": "In the Simpsons entry for recurring staff and background workers, why is the character often called the \u2018Sarcastic Clerk\u2019 reused in so many roles, and what explanation is given for his catchphrase delivery?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The character voiced by Hank Azaria appears as a clerk, waiter, or worker in multiple episodes because the show reuses him as a stock sarcastic voice...",
+      "His short, flat, wisecracking delivery is described as the gag, so no matter the job he\u2019s in, he sounds the same..."
+    ],
+    "evidence_relations": "Both notes are in the same mini-bio: it\u2019s the same voice in many roles, and the delivery style is the joke.",
+    "answer": "Part 1: The show keeps reusing him in different jobs because he\u2019s their go-to sarcastic worker.\nPart 2: His dry, identical delivery is the point, so he keeps talking that way no matter where he\u2019s working."
+  },
+  {
+    "id": "Tv-id-22",
+    "question": "In the Doctor Who section on epithets, which foes gave the Doctor the grand titles about destruction, and how does this contrast with human characters simply not knowing his real name?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The Daleks and other enemies have called him things like \"The Oncoming Storm\" and \"Destroyer of Worlds\" in recognition of his role in ending crises...",
+      "Meanwhile, human or Earthbound characters will sometimes just ask \"Doctor who?\" because he never gives them a proper name..."
+    ],
+    "evidence_relations": "It\u2019s the same block: enemies give him mythic labels, ordinary people respond with confusion.",
+    "answer": "Part 1: The Daleks and similar adversaries coined the big dramatic titles because they\u2019ve seen what he can do.\nPart 2: Humans, by contrast, don\u2019t even know his surname and keep asking \u201cDoctor who?\u201d, which undercuts the grandeur."
+  },
+  {
+    "id": "Tv-id-23",
+    "question": "In Merlin\u2019s material about magically shaped visions, why is Arthur warned not to accept every supernatural message as historical fact, and what later experience shows him some visions do line up with reality?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Arthur is cautioned that visions or conjured apparitions can be shaped by an enemy and so may mix truth with lies...",
+      "Later, part of what he saw is echoed in real events in Camelot, showing the vision wasn\u2019t entirely false..."
+    ],
+    "evidence_relations": "The first line provides the rule of caution; the second line gives an example of partial confirmation.",
+    "answer": "Part 1: He\u2019s told not to swallow visions whole because magic users can manipulate them.\nPart 2: But when bits of a vision actually happen in Camelot, he realises some of it was true."
+  },
+  {
+    "id": "Tv-id-24",
+    "question": "In the Sopranos notes about Tony\u2019s gambling, how did his losses strain support he could give to extended family, and how did that financial pressure make Marie more open to the drastic solution for Vito Jr.?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Tony's gambling debts are said to have put stress on helping relatives and keeping up appearances within the family...",
+      "This made Marie Spatafore more willing to consider sending Vito Jr. away to a disciplinary camp when his behavior worsened..."
+    ],
+    "evidence_relations": "The first part sets up money/face problems; the second part shows that context made the harsh step acceptable.",
+    "answer": "Part 1: Because Tony was losing money, it was harder to smooth things over for everyone else.\nPart 2: So when Vito Jr. acted out, Marie accepted the expensive, harsh camp solution."
+  },
+  {
+    "id": "Tv-id-25",
+    "question": "In Ben 10\u2019s character descriptions, why is Tetrax portrayed as stricter than Ben about Omnitrix use, and what mobility does his starship give him in appearing right when Ben gets in trouble?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Tetrax, a Petrosapien, insists Ben treat the Omnitrix as a powerful tool rather than a toy, often scolding him for reckless transformations...",
+      "He pilots his own ship and can track Omnitrix activity across space, which is how he shows up when Ben needs guidance..."
+    ],
+    "evidence_relations": "Same paragraph: his attitude explains his scolding, and his ship explains his timely arrivals.",
+    "answer": "Part 1: He\u2019s older and knows the Omnitrix\u2019s danger, so he wants Ben to stop fooling around with it.\nPart 2: Because he flies a ship that can home in on Omnitrix signals, he can drop in right when Ben\u2019s made a mess."
+  },
+  {
+    "id": "Tv-id-26",
+    "question": "In the Arrested Development-style meta section, how does the realistic prop on the \u2018Wrench\u2019 set lead to confusion, and how does identifying the in-universe actor close the loop on who people thought was shot?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "A highly realistic prop gun is used on the Wrench set, making onlookers believe a real shooting has happened...",
+      "The passage names the actor playing Moses Taylor/the Wrench, tying the mistaken shooting to a specific performer in-universe..."
+    ],
+    "evidence_relations": "Both details are in the same meta-description: confusion from realism, then naming the actor.",
+    "answer": "Part 1: People panicked because the gun looked real on the set.\nPart 2: Since the write-up names who was playing the role, it clarifies who everyone thought had been shot."
+  },
+  {
+    "id": "Tv-id-27",
+    "question": "In the Doctor Who crediting history, why did the production team feel comfortable reverting from \u201cDoctor Who\u201d back to \u201cThe Doctor\u201d so quickly, and what does that suggest about their preferred canon naming?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The 2005 series briefly credited Christopher Eccleston as \"Doctor Who\" as a nod to classic-era credits...",
+      "But by the Christmas special that same year, the credit was already back to \"The Doctor,\" reflecting the modern team\u2019s standard..."
+    ],
+    "evidence_relations": "The first part shows the experiment, the second shows the reversion, so together they show the preference.",
+    "answer": "Part 1: They tried \u201cDoctor Who\u201d again in 2005 mainly as an homage.\nPart 2: Switching it right back shows the showrunners really prefer \u201cThe Doctor\u201d as the canon form."
+  },
+  {
+    "id": "Tv-id-28",
+    "question": "In the NCIS history of Gibbs\u2019 service, how does the twenty-year concealment of his revenge killing show the agency protected him, and how does that retroactively explain his earlier fast rise?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "It is later revealed that Gibbs killed the man responsible for his family\u2019s death, and NCIS leadership buried this for twenty years...",
+      "This long-term protection by senior figures helps explain why Gibbs could advance and stay in place despite a rogue act..."
+    ],
+    "evidence_relations": "The same bio ties the secret killing to institutional cover, which in turn explains his career stability.",
+    "answer": "Part 1: NCIS hid the fact he killed the culprit, so he never faced charges.\nPart 2: Because they protected him, his quick advancement makes more sense."
+  },
+  {
+    "id": "Tv-id-29",
+    "question": "In Merlin, when Arthur sees that Camelot can be attacked magically, how does that reinforce his earlier suspicion that Uther\u2019s anti-magic laws created enemies, and what outcome shows Arthur he must rule differently later?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "An attack using sorcery against Camelot causes Arthur to remark that his father\u2019s hard line on magic may have helped create determined foes...",
+      "By the end of the arc, Arthur is shown considering a more balanced future rule, indicating he has learned from that attack..."
+    ],
+    "evidence_relations": "The first sentence links the attack to policy; the second shows Arthur\u2019s takeaway about future rulership.",
+    "answer": "Part 1: He realises people are hitting Camelot with magic partly because Uther\u2019s laws drove them to it.\nPart 2: So Arthur starts thinking he will need a softer, more balanced approach when he is king."
+  },
+  {
+    "id": "Tv-id-30",
+    "question": "Why does Arthur conclude that he cannot die until after a future assassination attempt on Stavromula Beta? Which American TV archetype do Shooty and Bang Bang parody, and what ironic contrast does the text draw between their self-description and their behavior?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "However, in the process of explaining his reasons for hating Arthur he mentions \"Stavromula Beta,\" where Arthur had ducked to avoid a shot fired by an assassin, which then had hit and killed Agrajag instead.  Arthur, having never been to Stavromula Beta, has no idea what Agrajag is talking about, and Agrajag realises that he's brought Arthur to the Cathedral too early.",
+      "For the next few years Arthur travels the universe, secure in his knowledge that, no matter what happens, he cannot die at least until after he survives his assassination attempt at Stavromula Beta."
+    ],
+    "evidence_relations": "Because Arthur has not yet been to Stavromula Beta when Agrajag recounts the incident, the attempt must occur later in his timeline; therefore he reasons he cannot die before surviving it.",
+    "answer": "Part 1: Because Agrajag revealed that Arthur would survive an assassination attempt on Stavromula Beta\u2014a place Arthur had not yet visited\u2014so Arthur infers that he must live at least until after that event. Part 2: They parody American cop show characters\u2014particularly \u201cStarsky and Hutch\u201d\u2014and the irony is that while they claim to be \u201cwell balanced and caring,\u201d they gratuitously shoot everything in sight."
+  },
+  {
+    "id": "Tv-id-32",
+    "question": "How can Lindsay be both presented as Michael\u2019s \u201ctwin\u201d and also be adopted? Which guest character shares Tobias\u2019s \u201cnever\u2011nude\u201d trait, what does he direct, and why was the actor likely cast?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Lindsay Bluth F\u00fcnke (Portia de Rossi) is the adopted daughter of George Sr. and Lucille Bluth, who raised her and Michael to believe that they were twins."
+    ],
+    "evidence_relations": "Adoption explains the non\u2011biological twin claim as an upbringing choice.",
+    "answer": "Part 1: She is the adopted daughter of George Sr. and Lucille Bluth, who raised her and Michael to believe they were twins. Part 2: Phillip Litt, director of the \u201cGirls With Low Self\u2011Esteem\u201d videos, is also a never\u2011nude; Zach Braff was likely cast due to his resemblance to the real\u2011life Joe Francis whom the show parodies."
+  },
+  {
+    "id": "Tv-id-33",
+    "question": "What key differences exist between Merrick in the original film and in the comic \u201cThe Origin,\u201d and which version aligns with the TV canon? Summarize Nikki Wood\u2019s death and how later episodes tie her story to her son Robin and Spike.?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "In the movie, he is a pseudo-immortal: born to train Slayers, ultimately dying, and reborn again with the memories of his previous life.",
+      "In this version of the story, Merrick (based on Riehle rather than Sutherland) is a normal man and member of the Watcher's Council and not the pseudo-immortal from the film.  He is also not killed directly by Lothos, but instead shoots himself rather than be turned into a vampire and risk harming his Slayer.",
+      "Joss Whedon has confirmed the canonicity of \"The Origin\" with the television series, stating \"The origin comic, though I have issues with it, CAN pretty much be accepted as canonical.\""
+    ],
+    "evidence_relations": "Contrasts the two portrayals and cites Whedon\u2019s statement about canon.",
+    "answer": "Part 1: In the film, Merrick is a pseudo\u2011immortal who is murdered by Lothos; in \u201cThe Origin,\u201d he\u2019s a normal Watcher who kills himself rather than be turned. Joss Whedon has confirmed that \u201cThe Origin\u201d can pretty much be accepted as canonical with the TV series. Part 2: Nikki was killed by Spike on a New York subway in 1977; later, \u201cFirst Date\u201d reveals she had a son, Robin, whom the First Evil taunts with the truth that Spike killed her, and in \u201cLies My Parents Told Me\u201d Robin tries and fails to take revenge on Spike."
+  },
+  {
+    "id": "Tv-id-34",
+    "question": "Whose increasingly abnormal behavior is attributed to both possession by Omega and oxygen deprivation after a suit reboot\u2014and what accidents illustrate the consequences? Which leader\u2019s Season 15 depression leads him to create enemies to fight and to betray the Reds and Blues\u2014yet what later action demonstrates his change of heart?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Consistently shown to be mentally abnormal, his behavior varies from merely somewhat dim-witted in Season 1 to almost completely divorced from reality from Season 3 onward.",
+      "This is most likely due to Omega ('O'Malley') possessing him in Season 1 and permanently damaging his mental faculties after he left.",
+      "it is stated that Tucker and Church once \"rebooted\" his armor, causing his life support systems to shut down - including his oxygen supply.  It is implied that Caboose suffered brain damage from oxygen deprivation.",
+      "In the original series, he killed Alpha-Church with the Blue Team's tank, Sheila.",
+      "Washington finds him in a military stockade, apparently for accidentally killing several squad-mates."
+    ],
+    "evidence_relations": "Possession and oxygen deprivation are given as causes; the accidental killings (including Alpha\u2011Church) are consequences confirming the causal explanation.",
+    "answer": "Part 1: Caboose; his behavior is linked to Omega\u2019s possession and a reboot that cut off his oxygen, and he is shown accidentally killing squad\u2011mates, including Alpha\u2011Church with the Blue Team\u2019s tank Sheila. Part 2: Sarge; his depression pushed him to make evil robots and to side with Temple\u2019s Blues and Reds against the Reds and Blues, but he later saves Dylan and Jax from execution and rejoins his team."
+  },
+  {
+    "id": "Tv-id-38",
+    "question": "Which Peacekeeper was forced to choose between killing her lover or her child for violating rules, and how does her death scene stress the cost of that loyalty? How does Pilot resolve his conflict with Moya over destroying a wormhole linking Earth to Tormented Space, and what does he do for Crichton despite the cost?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Xhalax, a former spaceship pilot, had been forced to become an assassin as punishment for her crimes of having formed a romantic relationship with another Peacekeeper, having intentionally chosen to have a child with him, and then having established contact with that child (albeit briefly), all of which violated Peacekeeper rules.",
+      "she was forced to choose between killing Aeryn and killing Aeryn's father, Talyn",
+      "Dying, Xhalax told Aeryn that her true selfdom had been killed years before by her unyielding loyalty to the Peacekeepers.  Her last request was for Aeryn to let her fall from the high ledge where their standoff had taken place.  As a token of respect, Aeryn acquiesced."
+    ],
+    "evidence_relations": "Rule\u2011breaking \u2192 punitive choice \u2192 later death underscores the personal cost of loyalty.",
+    "answer": "Part 1: Xhalax Sun; punished for a forbidden relationship and contact with her child, she was forced to kill either Aeryn\u2019s father or Aeryn; dying later, she says her true self was killed by loyalty to the Peacekeepers and asks Aeryn to let her fall. Part 2: Despite initially saying he could do nothing because Moya opposed it, Pilot leaves Moya to aid Crichton, destroys the wormhole (saving Earth), and is left weakened until he\u2019s rebonded to Moya."
+  },
+  {
+    "id": "Tv-id-39",
+    "question": "Why were the Sopranos key players despite DiMeo\u2019s long reign, and what cross\u2011family ties especially reinforced their influence? What obligation kept Janice and Bobby from supervising Junior the night he shot Tony, and what event later that year shows Domenica\u2019s age and family context?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The Sopranos were a key faction in the DiMeo crime family, running two separate crews led by Johnny Boy and Junior,",
+      "and also had longstanding ties with the five New York Families (particularly the Lupertazzi crime family)."
+    ],
+    "evidence_relations": "Two Soprano crews + strong New York ties \u2192 key players.",
+    "answer": "Part 1: Because the Sopranos ran two separate crews (Johnny Boy and Junior) and had longstanding ties to the New York Families\u2014especially the Lupertazzis\u2014making them key North Jersey players even under DiMeo. Part 2: They were registering their daughter Domenica for preschool; later that year, Domenica rode an amusement ride that broke during the Feast of St. Elz\u00e9ar, after which Tony spun her around\u2014showing she was a small child in 2005."
+  },
+  {
+    "id": "Tv-id-40",
+    "question": "Why does Tony Soprano kill Tony Blundetto himself, and what larger conflict is he trying to resolve? Given that Cicci Sasso is described as an \u201cailing underboss\u201d at the show\u2019s start, what is the most likely timeframe of his promotion and why is a 1999 promotion by Junior considered unlikely?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Tony B. kills Billy Leotardo in retaliation, igniting dangerous tensions with the New York crew.",
+      "To bring peace with Johnny Sack (and to avoid Tony B.'s being tortured to death by Phil Leotardo), Tony S. kills Tony B. by shooting him in the face with a shotgun."
+    ],
+    "evidence_relations": "Murder of Billy \u2192 tensions; Tony S. executes Tony B. to avoid torture and make peace.",
+    "answer": "Part 1: He kills Tony B. to prevent him from being tortured by Phil Leotardo and to restore peace with Johnny Sack after Tony B. murders Billy Leotardo, which had escalated tensions with New York. Part 2: He was likely underboss under Jackie Aprile from 1995 onward (or even earlier under Ercoli DiMeo), and not newly promoted by Junior in 1999, since he is already described as an \u201cailing underboss\u201d at the series start."
+  },
+  {
+    "id": "Tv-id-41",
+    "question": "How do Ursula\u2019s actions create identity and reputational problems for Phoebe, and which cross\u2011sitcom cameo underscores their frequent confusion? What chain of events turns the Garo armor from gold to black and then restores it, and who becomes the recognized successor afterwards?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Ursula is starring in pornographic films using Phoebe's name, including a film called \"Buffay The Vampire Layer\".  Phoebe gets revenge by claiming Ursula's cheques and embarrassing her many male fans.",
+      "In the same episode, Helen Hunt and Leila Kenzle cameo as their \"Mad About You\" characters Jamie Buchman and Fran Devanow, in a scene where they mistake Phoebe for Ursula in Central Perk."
+    ],
+    "evidence_relations": "Ursula\u2019s misuse of Phoebe\u2019s name \u2192 reputational harm; TV crossover cameo shows the mistaken\u2011identity pattern.",
+    "answer": "Part 1: Ursula stars in porn using Phoebe\u2019s name, leading men to harass Phoebe; earlier, \u201cMad About You\u201d characters Jamie and Fran mistake Phoebe for Ursula at Central Perk, highlighting the confusion. Part 2: After a future battle tarnishes the armor to black and it is displayed in the Tower of Heroic Spirits, it calls priestess Hakana for restoration; once the Mad\u014d Horrors are destroyed, the armor is fully restored and Ryuga Dogai is recognized as the true successor to Garo."
+  },
+  {
+    "id": "Tv-id-42",
+    "question": "If the Garo title confers no formal rank or perks, why does the bearer\u2019s word carry such influence among Knights and Priests? What contractual price does a Mad\u014dgu charge its wearer, and how does later scarcity among Makai Knights relate to that burden?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "the man who takes the title of Garo is often regarded to be the strongest Knight, widely known throughout the Makai community.",
+      "This is however, not a formal ranking in itself and no preferential treatment is given to the said Knight,",
+      "the symbols of Garo itself, a golden circle containing a red triangle and the use of a red scabbard, are instantly recognized by any Knight or Priest.",
+      "To be in the presence of the Golden Knight is considered widely to be an honor, and it lends profound influence to the words of the Knight bearing the title."
+    ],
+    "evidence_relations": "Combine strength/reputation and instantly recognized symbols \u2192 influence without formal rank.",
+    "answer": "Part 1: Because the title is widely known as the strongest Knight and commands immense respect; its symbols are instantly recognized, so being in the Golden Knight\u2019s presence is considered an honor that gives their words weight. Part 2: Mad\u014dgu consume one day of the wearer\u2019s life for each month of their pact; by later entries, Mad\u014dgu are rare and most Knights no longer carry them, consistent with avoiding that life\u2011shortening cost."
+  },
+  {
+    "id": "Tv-id-43",
+    "question": "Why does the series end with Spider-Man leaving with Madame Web, and what event makes that search necessary? Why is Electro\u2019s portrayal both delayed and different from the comics in the animated series?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "In Season 4, a clone of Mary Jane created by Miles Warren appears, ... Spider-Man revealed he was Peter to her and M.J. and Peter marry in the first episode of Season 5. Later, her true nature is revealed and she and a clone of Hydro-Man dissolve due to their unstable cellular structure.",
+      "At the end of the Spider Wars storyline, the series ends with Spider-Man going with Madame Web to search for the real Mary Jane so that he can finally be reunited."
+    ],
+    "evidence_relations": "The dissolution of the clone MJ prompts the closing search for the real MJ.",
+    "answer": "Part 1: Because the Mary Jane who married Peter was a clone that later dissolved, he departs with Madame Web to find the real Mary Jane. Part 2: Because a James Cameron Spider-Man film in development planned to use Electro (and Sandman), the show delayed and altered Electro\u2019s portrayal, which also pushed Spider-Man\u2019s origin later in the series."
+  },
+  {
+    "id": "Tv-id-44",
+    "question": "What chain of events leads Eddie Brock to become Venom? How are Dormammu, Mordo, Venom and Carnage connected in the series, and how are they ultimately stopped?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Jameson fires Brock due to the humiliation of faulty journalism. ... Again Brock blames Spider-Man and swears revenge.",
+      "Spider-Man uses the sound of bells in the church tower to force it to leave his body, where it bonds with Brock below.",
+      "Upon merging with the symbiote, Brock ... declares that \"From now on we're poison to you Spider-Man, that's why we call ourselves Venom.\""
+    ],
+    "evidence_relations": "Career setbacks \u2192 vow of revenge \u2192 church bells drive symbiote off Peter \u2192 it bonds to Brock \u2192 Venom.",
+    "answer": "Part 1: After repeated career humiliations he blames on Spider-Man, Brock follows Spider-Man to a church; the bells force the symbiote off Peter and it bonds with Brock, who declares they are Venom. Part 2: Dormammu has Mordo give a newborn symbiote to Cletus Kasady to create Carnage and uses Venom to steal the Time Dilation Accelerator; ultimately Spider-Man, Iron Man and Venom defeat them, Dormammu is expelled, and Carnage is pulled into Dormammu\u2019s dimension."
+  },
+  {
+    "id": "Tv-id-45",
+    "question": "In an alternate universe visited by Spider-Man, what misunderstanding leads Peter to call himself the Scarlet Spider? What two major losses end Series 1, and how is one of them indirectly addressed in Series 2?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Spider-Man later visited an alternate universe in which Warren had managed to create a Spider-Man clone, which had escaped. In this reality, the current Spider-Man found out about the clone, and reason led himself to believe he was the clone. So he dyed his hair blond and called himself the Scarlet Spider and changed his name to Ben Reilly."
+    ],
+    "evidence_relations": "His mistaken belief about being the clone motivates the Scarlet Spider identity.",
+    "answer": "Part 1: Believing himself to be the clone, he dyes his hair blond, takes the name Ben Reilly, and calls himself the Scarlet Spider. Part 2: Captain Tom Ryan is killed and Claudia Brown disappears; in Series 2, Lucy Brown returns as Jenny Lewis, Claudia\u2019s doppelg\u00e4nger who lacks Claudia\u2019s romantic attachment to Cutter."
+  },
+  {
+    "id": "Tv-id-48",
+    "question": "How did Amira Zafar\u2019s conduct during the helicopter crash reverse Charlie Fairhead\u2019s first impression of her? What sequence of events turns Tom Kent and Sam Nicholls\u2019 troubled relationship into marriage and a fresh start?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Amira arrives for an agency shift, and is rude to Charlie Fairhead (Derek Thompson), infuriating him.",
+      "a helicopter crashes in the department's entrance.",
+      "She treats Kai Swift (Raif Clark), despite the department being closed to all patients.",
+      "Kai confesses to responsibility for the crash and Amira encourages him to confess.",
+      "She leaves at the end of the shift, having impressed Charlie with her devotion to her work."
+    ],
+    "evidence_relations": "Initial rudeness set a negative impression; during the crisis she acted against closure to treat Kai and prompted his confession, which led Charlie to be impressed by her by shift\u2019s end.",
+    "answer": "Part 1: Although Amira initially angered Charlie by being rude, she treated Kai Swift despite the ED being closed and encouraged him to confess, leaving at the end of the shift having impressed Charlie with her devotion. Part 2: Tom\u2019s panic-attack\u2013driven drug misuse strained the relationship and he accidentally hit Sam, but she forgave him and they reconciled. His proposal plan failed, so Sam proposed; they married and left Holby for an extended honeymoon and new beginning."
+  },
+  {
+    "id": "Tv-id-49",
+    "question": "Why did Glen Thomas initially lie about his past at the bereavement group, and how did that affect his relationship with Robyn Miller? What on\u2011screen event caused Jeff Collier\u2019s death, and how was that exit tied to the Samantha Keeler storyline announced earlier?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "They meet at a bereavement support group, where Glen claims his wife died of a brain tumour.",
+      "However, Glen later reveals that he has a glioblastoma, a malignant brain tumour, and did not want Robyn to date him out of pity.",
+      "But she wants to be with him and they continue their relationship."
+    ],
+    "evidence_relations": "His deception is explained by his illness and fear of pity; Robyn\u2019s decision to stay sustains the relationship.",
+    "answer": "Part 1: Glen falsely claimed his wife had died of a brain tumour because he himself had a glioblastoma and did not want Robyn to date him out of pity; nevertheless, she chose to be with him and they continued their relationship. Part 2: Jeff died when his vehicle exploded before he could exit. The production had announced he would depart after concluding his new love\u2011interest arc with Samantha Keeler."
+  },
+  {
+    "id": "Tv-id-50",
+    "question": "How do Jez Andrews\u2019 attempts to impress Iain Dean contrast with his rule\u2011bending choice during Emilie Groome\u2019s transport? Who gains power through mentorship and talent versus through a negotiated tryst, and what roles do they attain?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Jez allows Cal to steal the ambulance so he can take Emilie to the seaside.",
+      "Jez then spends the rest of the day trying to impress Iain with his banter whilst they search for a lift back to the hospital."
+    ],
+    "evidence_relations": "His desire to impress contrasts with a risky decision to let the ambulance be taken for Emilie\u2019s last wish.",
+    "answer": "Part 1: Even as he spent the day trying to impress Iain with cheeky banter, Jez broke protocol by allowing Cal to steal the ambulance to take Emilie to the seaside. Part 2: Peggy Olson rises from Don Draper\u2019s secretary to copywriter (and later copy chief at CGC) through talent and Don\u2019s promotion, whereas Joan Harris becomes a partner after SCDP\u2019s partners\u2014over Don\u2019s objection\u2014reward her for a sexual tryst with a client."
+  },
+  {
+    "id": "Tv-id-52",
+    "question": "What triggers Don Draper\u2019s visions of his half\u2011brother Adam, and what do those visions imply? Which childhood events reveal both a verdict on Archie Whitman\u2019s character and his ultimate fate?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Adam reappears ... as Don/Dick hallucinates mildly while suffering from a \"hot tooth\" that turns out to be abscessed.",
+      "as Don is placed under anesthesia, he hallucinates Adam's standing over him ... stating, \"It's not your tooth that's rotten.\""
+    ],
+    "evidence_relations": "Physical pain/anesthesia precipitate visions that deliver a moral message.",
+    "answer": "Part 1: A painful abscessed \u2018hot tooth\u2019 and anesthesia trigger Don\u2019s hallucinations of Adam, who tells him, \u201cIt\u2019s not your tooth that\u2019s rotten,\u201d implying deeper moral rot beneath the dental pain. Part 2: A drifter\u2019s coded mark labels the Whitmans as dishonest, and later a drunken Archie is killed when his horse kicks him during a storm, which Dick witnesses."
+  },
+  {
+    "id": "Tv-id-55",
+    "question": "How do the Spectre and the Phantom Stranger differ in guiding Batman over Joe Chill, and what is the outcome? How is Damian Wayne\u2019s lineage and eventual legacy altered in the series, and what reveals that twist?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "In \"Chill of the Night!\", He and Phantom Stranger observe Batman as his origins are revealed. As the Stranger attempts to keep Batman's rage in check, the Spectre attempts to lure him over to the path of merciless vengeance.",
+      "he is unsuccessful in convincing Batman to take the life of Joe Chill, the man who murdered his parents, but manipulates events and kills Chill personally."
+    ],
+    "evidence_relations": "Different ethical counsel leads to Batman abstaining while the Spectre exacts vengeance.",
+    "answer": "Part 1: The Phantom Stranger tries to restrain Batman\u2019s rage, whereas the Spectre pushes him toward vengeance; Batman does not kill Chill, but the Spectre manipulates events and kills Chill himself. Part 2: This version presents Damian as the son of Bruce Wayne and Selina Kyle; after their deaths he becomes Robin then Batman, and it\u2019s ultimately revealed these events are part of Alfred\u2019s book \u2018The Knights of Tomorrow.\u2019"
+  },
+  {
+    "id": "Tv-id-56",
+    "question": "What strategy does Batman use against Owlman in \u201cGame Over for Owlman,\u201d and where else do alternate Batmen surface? What causes Superman\u2019s temporary turn against Batman in \u201cBattle of the Superheroes!\u201d, and how is the situation resolved?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "In \"Game Over for Owlman,\" Batman revealed that he had gathered an army of Batmen from other worlds in the multiverse who ended up helping him defeat Owlman and the villains that he assembled.",
+      "The vampire and Hulk-like Batmen briefly appear in \"Legends of the Dark Mite\" when Batmite tries changing Batman's appearance.",
+      "There were also other Batmen who appeared around the end of \"Night of the Batmen\""
+    ],
+    "evidence_relations": "Multiverse recruitment is the core tactic; other episodes corroborate the motif.",
+    "answer": "Part 1: Batman assembles an army of Batmen from across the multiverse to defeat Owlman; variations also appear in \u2018Legends of the Dark Mite\u2019 and around the end of \u2018Night of the Batmen.\u2019 Part 2: Exposure to Red Kryptonite turns Superman evil, leading Batman (with Krypto) to fight him until the effects wear off; they then discover Lex Luthor caused it and defeat him."
+  },
+  {
+    "id": "Tv-id-57",
+    "question": "How does Leslie balance political opportunity with personal risk before her city council run? Despite his libertarian disdain for government, how does Ron Swanson show care for his team, and which real\u2011life traits of Nick Offerman inform the character?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The third season ends with political scouts approaching her about possibly running for elected office, although she declines to inform them of her secret affair with Ben Wyatt, which could prove to be a political scandal.",
+      "In season four, Leslie furthers her political ambitions when she successfully runs for city council."
+    ],
+    "evidence_relations": "Private risk withheld precedes the public campaign and victory.",
+    "answer": "Part 1: When approached by political scouts, she hides her secret affair with Ben Wyatt\u2014a potential scandal\u2014before later running successfully for city council. Part 2: Ron detests big government yet has deep respect for Leslie and cares about his employees; traits like woodworking and saxophone\u2011playing are drawn from Offerman\u2019s real life."
+  },
+  {
+    "id": "Tv-id-59",
+    "question": "Why did Bonnie Wallis and Jonny Maconie never marry despite their engagement, and what event ended that possibility on the very day it was to happen? How did Daisha Anderson\u2019s relationship with Mark Williams shape both her career progression and others\u2019 perceptions of it?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Bonnie began dating Jonny Maconie (Michael Thomson) and developed a rivalry with Jac Naylor (Rosie Marcel), who later gave birth to Jonny's daughter.",
+      "Jonny and Bonnie eventually became engaged, and Peer thought marriage would give the couple security.",
+      "On the day of the wedding, Bonnie is killed after she crosses the road without looking and is hit by a truck."
+    ],
+    "evidence_relations": "Engagement creates expectation of marriage; death on the wedding day causally prevents the marriage.",
+    "answer": "Part 1: They never married because on their wedding day Bonnie crossed the road without looking and was hit by a truck, killing her. Part 2: After moving in with Mark, he supported her becoming Byrne Foundation ambassador and promoted her to Sister of Keller, which led some to question the true nature of their relationship."
+  },
+  {
+    "id": "Tv-id-60",
+    "question": "What in\u2011story exit did the series give Sandy Harper, and what off\u2011screen event prompted that choice? After the Queen fully integrated with Elena Validus, what act convinced Elena to sacrifice herself, and what later strategy did the Queen use to target Ben again?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "From December 2000 to September 2003, staff nurse Sandy Harper was played by Laura Sadler. The actress was fatally injured on 15 June 2003, when she fell 40 ft from the balcony of her boyfriend's second floor flat. Sadler was taken off life support and died one day later, in Charing Cross Hospital.",
+      "Sandy's farewell episode, \"A Friend in Need\", revealed that the character had won \u00a3150,000 in the lottery, and left for Australia to follow former love interest Danny Shaughnessy."
+    ],
+    "evidence_relations": "The off\u2011screen death motivated the on\u2011screen lottery departure.",
+    "answer": "Part 1: After the actress\u2019s death, the show wrote Sandy out by having her win \u00a3150,000 in the lottery and leave for Australia. Part 2: The Queen tried to choke Ben using drones, prompting Elena to sacrifice herself to destroy the Hive; later, the Queen rebuilt a body in Elena\u2019s likeness and tried to steal Ben by assuming Julie\u2019s form."
+  },
+  {
+    "id": "Tv-id-61",
+    "question": "Which two details\u2014one biological and one geopolitical\u2014signal Vilgax\u2019s threat level across the series? In \"The Perfect Girlfriend,\" what did the Queen ultimately conclude about love, and how did that change her motivation toward Ben?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Being of the Chimera Sui Generis (named after the mythological Chimera) race, who are able to turn into giant squid-like creatures when exposed to water, Vilgax was exiled from his home world for being ruthless, cruel, and power hungry.",
+      "Other than that, establishing Vilgaxia as the center of his personal empire, Vilgax made himself infamously feared to the point of using Bioroids as his minions."
+    ],
+    "evidence_relations": "Combines species capability with empire\u2011building to characterize his threat.",
+    "answer": "Part 1: Biologically, his Chimera Sui Generis race can transform into giant squid\u2011like creatures when exposed to water; geopolitically, he established Vilgaxia as the center of his empire. Part 2: Recognizing that she knew nothing about love, the Queen chose to hate Ben instead and vowed revenge."
+  },
+  {
+    "id": "Tv-id-62",
+    "question": "By the end of the series, what new family arrangement gave Daisy the support she wanted, and what earlier objection did it resolve? Where had Emily been living after leaving Genoa City, and how was Patty\u2019s impersonation stopped when Emily returned?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "He would take on Andy Parker as a farmhand, and at series end, would be pleased when Daisy would finally move to Yew Tree Farm with him at long last. He would also gain the companionship of Mrs. Patmore.",
+      "With them together, it was clear that Daisy would have her \"family\" (she would drop any objections she had about her father in-law and her superior at Downton Abbey being together)."
+    ],
+    "evidence_relations": "Move + companionship = new family unit; explicitly addresses past objection.",
+    "answer": "Part 1: Daisy moved to Yew Tree Farm with Mr Mason and gained the companionship of Mrs Patmore, resolving her previous objection to her father\u2011in\u2011law and her superior being together. Part 2: Emily had been living in Chicago; upon returning for a psychiatrist conference she discovered Patty\u2019s impersonation, confronted her at the police station, and Patty was confined to a mental facility."
+  },
+  {
+    "id": "Tv-id-63",
+    "question": "In 2012, how did Patty attempt to sabotage Jack\u2019s relationship with Genevieve, and what unexpected discovery derailed her plan to shoot Genevieve? How did Tucker McCall\u2019s therapy sessions reveal Emily\u2019s quiet return, and what does the timeline imply about her absence?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "In January 2012, Patty began posing as Emily again to attempt to win Jack away from Genevieve Atkinson, his fiancee.",
+      "Patty then has plans to shoot Genevieve, whom she had been working for as a housekeeper for months before under the alias Myrna Murdock.",
+      "However, Patty arrives at Genevieve's house only to find that she is writing him a Dear John letter all before leaving town."
+    ],
+    "evidence_relations": "Impersonation \u2192 murder plan \u2192 discovery of letter \u2192 plan derailed.",
+    "answer": "Part 1: Patty posed as Emily to win Jack away and later planned to shoot Genevieve, but when she arrived, Genevieve was writing a Dear John letter and preparing to leave town. Part 2: Tucker\u2019s therapist was revealed to be Emily, showing she had returned a little over a year after leaving."
+  },
+  {
+    "id": "Tv-id-64",
+    "question": "Which key secret about Grimlord\u2019s identity remained unknown even to the heroes and their mentor, and what corporate cover enabled it? After Grimlord self\u2011destructed the Virtual Dungeon for a second time, what two major changes defined his season\u2011two upgrade?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Ziktor Industries is a company owned by the fictional Karl Ziktor, aka Grimlord.",
+      "However no one (the Troopers and Professor Hart included) is aware that Ziktor and Grimlord are the same person."
+    ],
+    "evidence_relations": "Corporate alter ego + explicit statement of secrecy = concealed identity.",
+    "answer": "Part 1: No one\u2014including the Troopers and Professor Hart\u2014knew that billionaire Karl Ziktor of Ziktor Industries was Grimlord. Part 2: He replaced his transference orb with an energy prism siphoned from Tyler Steele\u2019s knowledge and shifted to a new base of operations, the orbiting Virtual Dark Fortress."
+  },
+  {
+    "id": "Tv-id-65",
+    "question": "How did Professor Hart\u2019s mid\u2011battle information swing the fight against Kongbot in JB\u2019s favor? Why were Skybase missiles insufficient against Fanbot, and which weapon combination finally defeated him?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Kongbot had the upper hand in the fight against the VR Troopers, until Professor Hart informed JB that he has a Laser Lance weapon.",
+      "JB then used the Laser Lance command to destroy Kongbot, he had a hard time aiming it at first while testing it out, but finally impaled Kongbot, who immediately surrendered ... but JB finished him off anyway."
+    ],
+    "evidence_relations": "Advice \u2192 new weapon use \u2192 victory.",
+    "answer": "Part 1: Hart informed JB that he had a Laser Lance weapon; JB then used the Laser Lance to impale and destroy Kongbot. Part 2: Professor Hart advised that Skybase missiles were not powerful enough; JB used the VR Technobazooka at a low angle and followed with a Laser Lance to finish Fanbot."
+  },
+  {
+    "id": "Tv-id-66",
+    "question": "What compensation change did Jack Soloff push as committee chair, and why was it aimed at Harvey? Describe the escalation between Soloff and Harvey over compensation and how Harvey (with Mike) forced Soloff to retreat.?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Jack Edward Soloff ... is the newly appointed chair of PSL's compensation committee.",
+      "He comes to Louis to propose an alteration to the firm's compensation formula to put more emphasis on billable hours than on contingent fees, which Soloff is well aware would specifically target Harvey (who operates on a contingent fee basis)."
+    ],
+    "evidence_relations": "Role (chair) + proposed change + Harvey\u2019s fee model \u2192 targeting logic.",
+    "answer": "Part 1: Soloff proposed shifting compensation toward billable hours over contingent fees, specifically targeting Harvey because he operates on a contingent\u2011fee basis. Part 2: Soloff illegally publicized Harvey\u2019s salary to win support for his change; Harvey countered by poaching Soloff\u2019s clients and, with Mike\u2019s help, got him to back off."
+  },
+  {
+    "id": "Tv-id-68",
+    "question": "How did Leelee\u2019s choices contradict her prophesied path and help turn the tide for the heroes? How did Mordecai\u2019s romantic setbacks influence his dating choices, and where did he ultimately land in the epilogue?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "she was instead horrified to discover that she would apparently become \"Queen of the Vampires\".",
+      "In the two-part episode \"Light Source,\" she went up against her mother, defying her destiny to be the Vampire Queen. Leelee helped Clare and Phineas enter the Underworld to find Udonna, who was imprisoned there.",
+      "They used their combined magic to set her free and energized her using the Snow Staff. Leelee was therefore finally accepted as a friend by the Power Rangers and their allies."
+    ],
+    "evidence_relations": "Foretold destiny \u2192 chosen defiance \u2192 concrete aid \u2192 acceptance.",
+    "answer": "Part 1: Despite a prophecy that she would become \u2018Queen of the Vampires,\u2019 Leelee defied her mother, helped Clare and Phineas enter the Underworld, used the Snow Staff to free Udonna, and was accepted as a friend. Part 2: After Margaret left for college and his later relationship with CJ failed, Mordecai decided to take a break from dating; in the epilogue, he returned to making art, met Stef, and started a family with her."
+  },
+  {
+    "id": "Tv-id-70",
+    "question": "Who persuades Tina that a care home is the best option for Sylvie, and what realization does Tina reach as a result? Between Stan Carter and Babe Smith, who left the series earlier, and why did that character depart?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Kathy realises that Tina hates the idea of someone else caring for Sylvie and makes her realise that it is what is best for Sylvie, so Tina makes a call about getting her into a care home."
+    ],
+    "evidence_relations": "Kathy\u2019s persuasion \u2192 Tina accepts care\u2011home plan and calls to arrange it.",
+    "answer": "Part 1: Kathy Beale persuades Tina that professional care is best for Sylvie, leading Tina to call about arranging a care\u2011home placement. Part 2: Stan Carter left earlier; he died following a battle with terminal prostate cancer in the episode broadcast on 10 April 2015, whereas Babe\u2019s final appearance was in February 2017."
+  },
+  {
+    "id": "Tv-id-72",
+    "question": "What organizational collapse set the stage for Nick Fury appointing Coulson as Director, and how had Fury already altered Coulson beforehand? What were Eli Morrow\u2019s Darkhold\u2011driven effects on others and himself, and how did the show\u2019s version diverge from the comics per the producers?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Fury resurrected Coulson using T.A.H.I.T.I., and had his memories of the project replaced.",
+      "During this time, Hydra infiltrated S.H.I.E.L.D., leading to the latter's demise.",
+      "Fury makes Coulson the new Director of S.H.I.E.L.D., and tasks him with rebuilding the agency \"the right way\"."
+    ],
+    "evidence_relations": "Fury\u2019s prior resurrection \u2192 Hydra\u2019s infiltration collapses S.H.I.E.L.D. \u2192 Fury names Coulson Director.",
+    "answer": "Part 1: Hydra\u2019s infiltration led to S.H.I.E.L.D.\u2019s demise; before this, Fury had resurrected Coulson using Project T.A.H.I.T.I. and replaced his memories. Part 2: Morrow put Joseph Bauer in a coma and turned coworkers into ghost\u2011like beings, then used the Darkhold to build a machine granting him matter\u2011creation powers; the series made him an apparently innocent man revealed later as power hungry, rather than directly adapting the comics, with abilities compared to Molecule Man."
+  },
+  {
+    "id": "Tv-id-73",
+    "question": "Which came first for Coulson\u2014forming a mobile team or being appointed Director\u2014and what intervening event separates them? If someone ingests Agrabahn Viper Poison, what must be done to avert death, and how does ingestion differ from a bite?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Coulson puts together a team of agents, and they travel the world dealing with strange new cases.",
+      "During this time, Hydra infiltrated S.H.I.E.L.D., leading to the latter's demise.",
+      "Fury makes Coulson the new Director of S.H.I.E.L.D., and tasks him with rebuilding the agency \"the right way\"."
+    ],
+    "evidence_relations": "Team formation \u2192 Hydra infiltration and collapse \u2192 appointment as Director.",
+    "answer": "Part 1: Coulson first assembled a team handling strange cases; after Hydra infiltrated and brought down S.H.I.E.L.D., Fury then appointed him Director. Part 2: Ingestion causes the victim to dissolve in green smoke, unlike a bite which kills by normal poisoning; the spread can be stopped only if the victim is taken to the Land of Untold Stories before death."
+  },
+  {
+    "id": "Tv-id-75",
+    "question": "Based on his fused morphology, how many total arms does Grey Arms have, and which species contribute his legs? Which Chimera Sui Generis transformation did Ben lose access to and why?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Grey Arms is the fusion combination of Four Arms and Grey Matter's DNA.",
+      "He has one arm of Four Arms on his right side and 3 arms of Grey Matter on his left side.",
+      "His right leg is Grey Matter's and left is Four Arms'."
+    ],
+    "evidence_relations": "Count arms from component description (1 + 3) and assign legs per stated species.",
+    "answer": "Part 1: Grey Arms has four arms in total\u2014one Four Arms arm on his right and three Grey Matter arms on his left\u2014and his right leg is Grey Matter\u2019s while his left is Four Arms\u2019. Part 2: Ben lost access to Gax after an aged Vilgax retrieved his DNA sample to restore himself, removing the form from Ben\u2019s Omnitrix."
+  },
+  {
+    "id": "Tv-id-77",
+    "question": "Why is Sophia Burset placed in the SHU, and what catalyzes her eventual release? Link Lolly Whitehill\u2019s intervention in the greenhouse to the institutional outcome she faces later. What steps connect these points?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Sophia ends up being attacked by other inmates in her beauty salon ... Sophia tells Caputo that she is willing to bring a lawsuit against the prison if they don't take appropriate measures.",
+      "When this is reported to MCC, they respond by throwing Sophia in the SHU claiming it is for her protection, when in reality she is being punished for her threat to sue.",
+      "Eventually, she is released from the SHU when Caputo uses Jane's smuggled phone to take a picture of her and leaks the picture to Danny Pearson."
+    ],
+    "evidence_relations": "Attack + legal threat \u2192 MCC punishes via SHU; leaked photo forces release.",
+    "answer": "Part 1: After an attack in her salon and threatening to sue, MCC places Sophia in the SHU under the pretense of protection; she is released when Caputo uses Sister Jane\u2019s smuggled phone to leak a photo of Sophia\u2019s condition to Danny Pearson. Part 2: Lolly stops Aydin from killing Alex and helps dismember and bury him; her paranoia and confession to Healy are dismissed, but after the remains are found, Healy gets her sent to psych."
+  },
+  {
+    "id": "Tv-id-78",
+    "question": "Why did Agrajag bring Arthur Dent to the Cathedral of Hate, and what detail made Agrajag realize he had taken Arthur there too early?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Agrajag is repeatedly reincarnated and killed by Arthur Dent.",
+      "In the Cathedral of Hate scene Agrajag mentions Arthur ducking at 'Stavromula Beta', but Arthur says he has never been there."
+    ],
+    "evidence_relations": [
+      "Agrajag\u2019s motive \u2192 repeated deaths caused by Arthur",
+      "Timing error \u2192 Arthur hasn\u2019t yet experienced the Stavro/\u2018Stavromula\u2019 Beta event"
+    ],
+    "answer": "Agrajag wanted to kill Arthur because Arthur had been the cause of his many deaths. But during his explanation Agrajag cited the incident at \u201cStavromula Beta,\u201d and Arthur said he had never been there yet, so Agrajag realized he had pulled Arthur out of time too early and the revenge could not be consistent with Arthur\u2019s timeline."
+  },
+  {
+    "id": "Tv-id-79",
+    "question": "Arthur believed \u2018Stavromula Beta\u2019 was a planet. According to the corpus, what was it actually, and how did that let the story resolve the paradox about when Arthur was allowed to die?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Agrajag thought Arthur ducked on Stavromula Beta and got him killed.",
+      "Later it is revealed it was really a club named for Stavro Mueller, not a planet.",
+      "After that event Arthur is finally free to die."
+    ],
+    "evidence_relations": [
+      "Misinterpretation of name \u2192 place is a nightclub",
+      "Once the incident actually happens \u2192 Arthur\u2019s plot-armor expires"
+    ],
+    "answer": "It turned out not to be a planet at all but a club named for Stavro Mueller (\u201cBeta\u201d). Once Arthur actually lived through that club incident, the long-running \u2018you can\u2019t die before this\u2019 condition was satisfied, so the story could finally let Arthur die."
+  },
+  {
+    "id": "Tv-id-80",
+    "question": "What was the purpose of the anti-clones called Allitnil, and what happened when one of them met a Lintilla?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Every Allitnil is an anti-clone of a Lintilla, created to stop the massive overproduction of Lintillas.",
+      "When an Allitnil touches the corresponding Lintilla, they both wink out of existence."
+    ],
+    "evidence_relations": [
+      "Allitnil definition \u2192 counter Lintilla",
+      "Physical contact \u2192 mutual annihilation"
+    ],
+    "answer": "Allitnils were produced as anti-clones to get rid of the billions of Lintillas. When an Allitnil encountered its matching Lintilla they both vanished in a puff of \u2018unsmoke.\u2019"
+  },
+  {
+    "id": "Tv-id-81",
+    "question": "Explain how Arthur\u2019s recurring involvement with Agrajag connects a falling bowl of petunias, a prehistoric rabbit, and the Lord\u2019s Cricket Ground scene.",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Agrajag lists several of his past lives: the bowl of petunias, the rabbit Arthur killed on prehistoric Earth, and the old man at Lord\u2019s cricket ground.",
+      "Arthur is the person who unintentionally caused each death."
+    ],
+    "evidence_relations": [
+      "Each incarnation \u2192 death caused by Arthur",
+      "Together \u2192 motive for Agrajag\u2019s revenge"
+    ],
+    "answer": "They are all previous lives of Agrajag. He was the petunias that fell and died, the rabbit Arthur killed and even used as a pouch, and later the old man who died of shock when Arthur appeared at Lord\u2019s. Because Arthur was tied to every one of those deaths, Agrajag later drags him to the Cathedral of Hate."
+  },
+  {
+    "id": "Tv-id-83",
+    "question": "Why do the Golgafrinchans on prehistoric Earth end up being important to later human history, despite being described as \u2018useless\u2019 middle-management types?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "They were sent off because their society thought they were expendable.",
+      "They actually became the ancestors of the humans on Earth in that timeline."
+    ],
+    "evidence_relations": [
+      "False assumption of uselessness \u2192 real historical impact",
+      "Arrival on Earth \u2192 founding population"
+    ],
+    "answer": "Their original society tricked them into leaving because they seemed useless, but the group that landed on prehistoric Earth became the population that human history later comes from, which makes them historically crucial."
+  },
+  {
+    "id": "Tv-id-84",
+    "question": "What does the point-of-view gun mentioned around Humma Kavula do, and why is it thematically tied to the religion about the Great White Handkerchief?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Humma Kavula preaches to the Jatravartids, who all sneeze at the end of their prayers about the Coming of the Great White Handkerchief.",
+      "The movie-era material has him seeking the point-of-view gun, which forces someone to see things from the shooter\u2019s perspective."
+    ],
+    "evidence_relations": [
+      "Religious control \u2192 desire to enforce viewpoint",
+      "Tool (gun) \u2192 enforces perspective"
+    ],
+    "answer": "The point-of-view gun makes the target experience the shooter\u2019s perspective. That fits Humma Kavula\u2019s role as a religious/political figure among people obsessed with a single coming event \u2014 having a device that makes others \u2018see it his way\u2019 completes the control he\u2019s after."
+  },
+  {
+    "id": "Tv-id-87",
+    "question": "Why do Majikthise and Vroomfondel object to Deep Thought computing the Ultimate Answer, and what compromise do they accept?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "They represent the union of professional thinkers and don\u2019t want a computer to take over their job of thinking.",
+      "Deep Thought points out that philosophers will be needed to interpret the result for millions of years."
+    ],
+    "evidence_relations": [
+      "Fear of automation of \u2018thinking\u2019 \u2192 objection",
+      "Promise of future punditry \u2192 acceptance"
+    ],
+    "answer": "They\u2019re professional philosophers and don\u2019t want a machine to make them obsolete. Deep Thought promises that when the Answer arrives, people will argue about its meaning for ages, so their work is safe \u2014 and they settle for that."
+  },
+  {
+    "id": "Tv-id-89",
+    "question": "How does the Golgafrinchan telephone sanitizer gag explain the collapse of the original society, and what irony does it point out?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The \u2018useless\u2019 people, including telephone sanitizers, were sent away.",
+      "Later the society that exiled them was wiped out by a disease from dirty telephones."
+    ],
+    "evidence_relations": [
+      "Exiled the cleaners \u2192 no one sanitized phones",
+      "No sanitation \u2192 telephone-borne disease \u2192 extinction"
+    ],
+    "answer": "They deported the very people who prevented infections. Without telephone sanitizers, an \u2018unexpectedly dirty\u2019 phone spread disease that killed everyone who\u2019d stayed, so the joke is that the supposedly useless job was essential."
+  },
+  {
+    "id": "Tv-id-90",
+    "question": "Why does Arthur try to pull random Scrabble letters to find the Ultimate Question, and why is the result \u2018What do you get when you multiply six by nine?\u2019 considered unhelpful?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "A caveman spells \u2018forty-two\u2019 in Scrabble, which gives Arthur the idea that the Question might be encoded in letters.",
+      "He tries it himself and gets \u2018what do you get when you multiply six by nine?\u2019 which doesn\u2019t match 42."
+    ],
+    "evidence_relations": [
+      "Observation \u2192 hypothesis about letters",
+      "Test \u2192 mismatch between question and 42"
+    ],
+    "answer": "Seeing \u2018forty-two\u2019 come out of Scrabble makes Arthur think the Question could emerge from random letter draws. But what he gets is a math question whose answer is 54, not 42, so it can\u2019t be the true matching Question."
+  },
+  {
+    "id": "Tv-id-94",
+    "question": "How does the Guide\u2019s treatment of God in the Babel Fish entry lead to God \u2018disappearing\u2019?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "God says faith requires lack of proof.",
+      "The existence of the Babel Fish is itself taken as proof of design.",
+      "If there is proof, there is no faith, so God vanishes."
+    ],
+    "evidence_relations": [
+      "Premise \u2192 faith needs no proof",
+      "Counterexample \u2192 Babel Fish is proof",
+      "Conclusion \u2192 God disappears"
+    ],
+    "answer": "The Guide jokes that the Babel Fish is such good evidence of design that it destroys the need for faith. God had said faith was essential, so when proof appears, the condition for God\u2019s existence fails and he \u2018vanishes.\u2019"
+  },
+  {
+    "id": "Tv-id-95",
+    "question": "Why was Disaster Area\u2019s accountant made Professor of Neomathematics, and what does that say about the band\u2019s finances?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Their finances required \u2018hypermathematics.\u2019",
+      "The accountant\u2019s work on tax returns was so complex he got an academic title."
+    ],
+    "evidence_relations": [
+      "Extremely complicated earnings \u2192 need advanced math",
+      "Advanced math \u2192 shows absurd scale of money"
+    ],
+    "answer": "Because the band\u2019s earnings and tax structures were so absurdly complicated that doing their books was basically new math. Making the accountant Professor of Neomathematics underlines how ludicrously big and complex their income was."
+  },
+  {
+    "id": "Tv-id-97",
+    "question": "According to the corpus, why was Zaphod Beeblebrox able to keep operating even after \u2018going missing\u2019 from his Guide editor job?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "One Guide editor just left for lunch and never came back.",
+      "Later holders were only \u2018Acting Editors,\u2019 keeping the office ready in case he returned."
+    ],
+    "evidence_relations": [
+      "Disappearance \u2192 position never formally closed",
+      "Office kept \u2192 Zaphod-style absence tolerated"
+    ],
+    "answer": "Because he (like that editor) simply didn\u2019t formally resign \u2014 he just left. The Guide staff kept the office as if he might return, so the system tolerated his absence instead of replacing him outright."
+  },
+  {
+    "id": "Tv-id-98",
+    "question": "Why does Marvin claim to have helped save the crew even though he insists everyone will hate the way he did it?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Marvin often solves problems with minimal effort but maximum gloom.",
+      "He interfaces with computers and can override doors, robots, or ships.",
+      "He complains that organic beings never appreciate his methods."
+    ],
+    "evidence_relations": [
+      "Marvin\u2019s AI ability \u2192 practical solution",
+      "Marvin\u2019s personality \u2192 pessimistic framing"
+    ],
+    "answer": "Because he could talk to the machines and do what no one else could, he actually fixed the problem, but since he\u2019s pathologically gloomy he immediately framed it as something everyone would dislike."
+  },
+  {
+    "id": "Tv-id-99",
+    "question": "How does the Guide\u2019s flippant style about life, the universe and everything contrast with the seriousness of Deep Thought\u2019s answer?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The Guide is written in a jokey, breezy tone.",
+      "Deep Thought spends millions of years to produce the answer \u201842.\u2019",
+      "Characters react to the mismatch between serious process and silly-seeming result."
+    ],
+    "evidence_relations": [
+      "Guide tone \u2192 irreverent",
+      "Deep Thought \u2192 ultra-serious",
+      "Result \u2192 absurd dissonance"
+    ],
+    "answer": "The Guide treats cosmic questions as travel gags, while Deep Thought treats them like sacred work. Putting a deadpan \u201842\u2019 next to the Guide\u2019s jokiness makes the whole thing funnier and shows the universe won\u2019t give you tidy, dramatic revelations."
+  },
+  {
+    "id": "Tv-id-100",
+    "question": "What is the practical purpose of \u2018Don\u2019t Panic\u2019 on the cover of the Guide, and why is it a good design for hitchhikers?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Hitchhikers encounter weird, dangerous or confusing situations.",
+      "The Guide is supposed to be reassuring and immediately useful.",
+      "\u2018Don\u2019t Panic\u2019 is large, friendly and visible."
+    ],
+    "evidence_relations": [
+      "Uncertain situations \u2192 need reassurance",
+      "Message \u2192 instantly calming"
+    ],
+    "answer": "Because hitchhikers are often in trouble, the Guide leads with the one thing they need most: a prompt not to panic. It\u2019s good design because it keeps people reading instead of throwing the book away in fear."
+  },
+  {
+    "id": "Tv-id-101",
+    "question": "Why did Zaphod edit his own brain, and what inconvenient side effect did that have on his later quest?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Zaphod tampered with his brain to hide a plan, even from himself.",
+      "Later he can\u2019t remember what the plan was.",
+      "Other characters are dragged along while he reconstructs it."
+    ],
+    "evidence_relations": [
+      "Self-editing \u2192 secrecy",
+      "Secrecy \u2192 amnesia",
+      "Amnesia \u2192 messy quest"
+    ],
+    "answer": "He wanted to keep his scheme totally secret, so he cut out his own knowledge of it. That worked so well he later didn\u2019t know what he was doing, which made the mission longer and more chaotic."
+  },
+  {
+    "id": "Tv-id-102",
+    "question": "What makes Vogon poetry uniquely torturous, and why do the characters endure it anyway?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Vogon poetry is officially one of the worst in the universe.",
+      "Vogons use it as punishment.",
+      "Prisoners or captives have no choice but to listen."
+    ],
+    "evidence_relations": [
+      "Poetry quality \u2192 torture",
+      "Power imbalance \u2192 forced listening"
+    ],
+    "answer": "It\u2019s deliberately awful and malformed, and the Vogons weaponize that awfulness. The others sit through it because the Vogons are the ones with the airlocks and blasters."
+  },
+  {
+    "id": "Tv-id-105",
+    "question": "How do the Guide\u2019s cost-cutting or editorial decisions sometimes make the information less safe than the \u2018boring\u2019 Encyclopedia Galactica?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The Guide is compiled cheaply from hitchhiker notes.",
+      "It can be incomplete, biased or out of date.",
+      "The Encyclopedia is dull but vetted."
+    ],
+    "evidence_relations": [
+      "Cheap compilation \u2192 uneven quality",
+      "Uneven quality \u2192 possible danger"
+    ],
+    "answer": "Because it favors colorful, traveler-written entries over slow fact-checking, it can leave out crucial warnings. The Encyclopedia would be duller but safer."
+  },
+  {
+    "id": "Tv-id-106",
+    "question": "Why was Earth scheduled for demolition, and how is that decision structurally similar to Arthur\u2019s house being bulldozed?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Arthur\u2019s house was in the way of a bypass.",
+      "Earth was in the way of a hyperspace bypass.",
+      "Both demolitions were presented as bureaucratic routine."
+    ],
+    "evidence_relations": [
+      "Local bureaucracy \u2194 galactic bureaucracy",
+      "\u2018In the way\u2019 \u2192 demolition"
+    ],
+    "answer": "In both cases a planning office decided a bypass was more important than the thing already there. The scale changes, but the logic is the same."
+  },
+  {
+    "id": "Tv-id-107",
+    "question": "What was Slartibartfast\u2019s contribution to the Earth project, and why was he a bit sad about it?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "He designed coastlines, especially Norway\u2019s fjords.",
+      "He took pride in them.",
+      "Magrathea was shutting down and his favorite work was no longer needed."
+    ],
+    "evidence_relations": [
+      "Role \u2192 coastline designer",
+      "Shutdown \u2192 melancholy"
+    ],
+    "answer": "He made the dramatic fjords and loved that kind of work, but the planet-building business was tapering off, so he was nostalgic about a job the universe didn\u2019t want anymore."
+  },
+  {
+    "id": "Tv-id-108",
+    "question": "Why does Ford Prefect have such a human-sounding name if he isn\u2019t human, and what does that tell us about his early research on Earth?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Ford chose the name to blend in.",
+      "He misunderstood what a \u2018Ford Prefect\u2019 was.",
+      "He was doing field work for the Guide."
+    ],
+    "evidence_relations": [
+      "Desire to blend \u2192 pick Earth name",
+      "Misunderstood reference \u2192 slightly wrong choice"
+    ],
+    "answer": "He wanted an Earth name but he obviously misread what people were calling the car. It shows he\u2019d done some research, just not very good research."
+  },
+  {
+    "id": "Tv-id-109",
+    "question": "How did Trillian manage to leave Earth before it was destroyed, and why didn\u2019t Arthur go with her at that time?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Trillian met Zaphod at a party on Earth.",
+      "She accepted Zaphod\u2019s invitation to leave.",
+      "Arthur didn\u2019t, so he was still on Earth when the Vogons came."
+    ],
+    "evidence_relations": [
+      "Earlier departure \u2192 survival",
+      "Arthur\u2019s choice \u2192 later rescue needed"
+    ],
+    "answer": "She said yes to Zaphod at the party, so she was already in space. Arthur turned Zaphod down and had to be rescued by Ford when the Vogons arrived."
+  },
+  {
+    "id": "Tv-id-110",
+    "question": "When the mice reveal they want a Question to go with \u201842,\u2019 what does that show about who was actually running the Earth experiment?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Mice bankroll the computer project.",
+      "They are really pan-dimensional beings.",
+      "They want the Question as a product for their market."
+    ],
+    "evidence_relations": [
+      "Funding \u2192 control",
+      "Control \u2192 demand for Question"
+    ],
+    "answer": "It shows the \u2018mice\u2019 were in charge all along \u2014 they paid for Earth to be built and wanted to sell the Question, so the cosmic research was really theirs."
+  },
+  {
+    "id": "Tv-id-111",
+    "question": "Why is \u2018Mostly Harmless\u2019 such an unsatisfying Guide entry about Earth, and what does Ford try to do about it?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The original entry on Earth was \u2018Harmless.\u2019",
+      "Ford spent 15 years on Earth to expand it.",
+      "He managed to change it to \u2018Mostly Harmless.\u2019"
+    ],
+    "evidence_relations": [
+      "Too short entry \u2192 not informative",
+      "Field research \u2192 slightly better entry"
+    ],
+    "answer": "Because it summed up the whole planet in two words, Ford thought it was ridiculously thin, so he tried to upgrade it. He only got \u2018Mostly\u2019 added, but it was still an improvement."
+  },
+  {
+    "id": "Tv-id-112",
+    "question": "How does the Guide\u2019s entry on towels explain why carrying one signals competence to other hitchhikers?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "A towel is listed as the most massively useful thing.",
+      "The Guide says if you have a towel, people assume you have everything else.",
+      "It can be used for warmth, signaling, and hygiene."
+    ],
+    "evidence_relations": [
+      "Uses \u2192 high utility",
+      "High utility \u2192 social signal"
+    ],
+    "answer": "Because it\u2019s so useful, anyone organized enough to have a towel is assumed to be organized enough to have food, money and other gear, so a towel becomes a shortcut signal of capability."
+  },
+  {
+    "id": "Tv-id-115",
+    "question": "Why is Arthur\u2019s attempt to fly by \u2018throwing himself at the ground and missing\u2019 thematically consistent with the rest of the Guide\u2019s advice?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The Guide often gives whimsical, barely workable instructions.",
+      "Flying is described as mostly a matter of distraction timing.",
+      "Arthur actually manages it once by accident."
+    ],
+    "evidence_relations": [
+      "Whimsical instructions \u2192 absurd success condition",
+      "Arthur success \u2192 validates absurdity"
+    ],
+    "answer": "Because it\u2019s another case of the Guide saying something silly that turns out to be sort of true. If you\u2019re distracted enough, you miss the ground \u2014 it\u2019s nonsense that kind of works, just like a lot of their travel hacks."
+  },
+  {
+    "id": "Tv-id-116",
+    "question": "What does the demolition notice problem in Arthur\u2019s house tell us about how Vogons expected Earth to respond to their own notice?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Arthur\u2019s notice was in a basement no one saw.",
+      "The Vogons said Earth\u2019s notice was in Alpha Centauri.",
+      "Both governments blamed the victim for not checking."
+    ],
+    "evidence_relations": [
+      "Hidden notice \u2192 fake due process",
+      "Parallel \u2192 Earth treated like Arthur"
+    ],
+    "answer": "It shows both bureaucracies pretend it\u2019s the victim\u2019s fault for not finding a nearly impossible notice. The Vogons were doing the same thing on a cosmic scale."
+  },
+  {
+    "id": "Tv-id-120",
+    "question": "What makes Trillian more adaptable than Arthur in most space situations?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Trillian had scientific training and an interest in space.",
+      "Arthur was an unadventurous Earthman.",
+      "Trillian chose to leave Earth earlier."
+    ],
+    "evidence_relations": [
+      "Background \u2192 readiness",
+      "Choice to leave \u2192 mindset"
+    ],
+    "answer": "She already wanted something bigger than Earth and had skills, so alien tech and politics don\u2019t rattle her the way they rattle Arthur."
+  },
+  {
+    "id": "Tv-id-121",
+    "question": "How does the Guide\u2019s tendency to mix serious and silly entries make it harder for outsiders to know which parts to trust?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Some entries are solid survival advice.",
+      "Others are basically jokes.",
+      "They are presented in the same voice."
+    ],
+    "evidence_relations": [
+      "Uniform voice \u2192 weak reliability cues",
+      "Mixed content \u2192 reader confusion"
+    ],
+    "answer": "Because it doesn\u2019t signal which ones are gags, a newcomer can\u2019t tell the difference between \u2018real\u2019 advice and a punchline."
+  },
+  {
+    "id": "Tv-id-122",
+    "question": "Why does Zaphod\u2019s two-headed, three-armed body suit his role as an attention-seeking politician?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Zaphod is President mainly as a distraction.",
+      "He\u2019s physically unusual and flamboyant.",
+      "He likes being noticed."
+    ],
+    "evidence_relations": [
+      "Job \u2192 distraction",
+      "Body \u2192 visual distraction"
+    ],
+    "answer": "Because he\u2019s literally built to be looked at, which is exactly what the presidency is for in his case."
+  },
+  {
+    "id": "Tv-id-123",
+    "question": "How does the restaurant at the end of the universe make use of time travel in a way that appeals to rich diners?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The restaurant is parked at the temporal end of the universe.",
+      "Diners can visit and then return to their own time.",
+      "It\u2019s presented as a spectacular, exclusive show."
+    ],
+    "evidence_relations": [
+      "Time travel \u2192 spectacle",
+      "Spectacle \u2192 luxury"
+    ],
+    "answer": "It lets you watch the universe end from a safe table and then go home. That\u2019s the ultimate rich-person experience."
+  },
+  {
+    "id": "Tv-id-126",
+    "question": "How does the \u2018Babel Fish proves God doesn\u2019t exist\u2019 bit exemplify the way the series undercuts grand explanations?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The argument is logically tidy but silly.",
+      "It reduces theology to a quick paradox.",
+      "The series likes to pop big bubbles."
+    ],
+    "evidence_relations": [
+      "Neat logic \u2192 absurd conclusion",
+      "Absurd conclusion \u2192 deflates seriousness"
+    ],
+    "answer": "It takes a profound subject and resolves it in two lines of goofy logic, which is exactly how Hitchhiker\u2019s keeps the universe from getting too pompous."
+  },
+  {
+    "id": "Tv-id-127",
+    "question": "Why are the B Ark passengers\u2019 skills (like hairdressing) mocked at first but then shown to be the foundation of later society?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "They were called \u2018useless\u2019 and shipped off.",
+      "They settled on Earth.",
+      "Their descendants became us."
+    ],
+    "evidence_relations": [
+      "Dismissal \u2192 exile",
+      "Exile \u2192 origin"
+    ],
+    "answer": "Because the story is poking fun at how we value jobs \u2014 the people their world didn\u2019t want are exactly the people our world came from."
+  },
+  {
+    "id": "Tv-id-128",
+    "question": "What does the Guide\u2019s casual tone about hyperspace bypasses suggest about how often empires do things like destroy planets?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The Vogon demolition is treated as routine.",
+      "The Guide mirrors that tone.",
+      "It implies this is a known bureaucratic nuisance."
+    ],
+    "evidence_relations": [
+      "Routine tone \u2192 frequent event",
+      "Frequent event \u2192 normalized destruction"
+    ],
+    "answer": "It makes it sound like a paperwork headache, not a tragedy, so we infer this happens a lot and the galaxy has gotten used to it."
+  },
+  {
+    "id": "Tv-id-129",
+    "question": "How does Arthur\u2019s confusion about galactic scale make him slow to understand the urgency of Vogon threats?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Arthur thinks in terms of houses, roads and councils.",
+      "He has no experience with hyperjumps.",
+      "It takes him time to grasp that Earth is gone."
+    ],
+    "evidence_relations": [
+      "Small-scale mindset \u2192 slow adaptation",
+      "Slow adaptation \u2192 delayed action"
+    ],
+    "answer": "He keeps trying to fit \u2018blowing up Earth\u2019 into a local, fixable problem. That\u2019s why Ford has to push him through each step."
+  },
+  {
+    "id": "Tv-id-130",
+    "question": "Why does the Guide consider a towel more useful than money in some places?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Some planets don\u2019t use the same currency.",
+      "A towel has universal physical uses.",
+      "Locals may loan you money if you look prepared."
+    ],
+    "evidence_relations": [
+      "Currency mismatch \u2192 money less helpful",
+      "Universal tool \u2192 always helpful"
+    ],
+    "answer": "Because money only works where it\u2019s accepted, but people will help a traveler who\u2019s clearly competent \u2014 and the towel signals that."
+  },
+  {
+    "id": "Tv-id-131",
+    "question": "What\u2019s the joke behind the Spontaneous Existence Failure of plans once people know about them?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The series likes to give \u2018laws\u2019 of the universe.",
+      "Plans failing when observed is an exaggeration of \u2018the best-laid plans\u2019 idea.",
+      "It\u2019s presented as a pseudo-scientific fact."
+    ],
+    "evidence_relations": [
+      "Everyday experience \u2192 exaggerated rule",
+      "Rule \u2192 comic inevitability"
+    ],
+    "answer": "It turns a mundane truth \u2014 plans fall apart \u2014 into a cosmic law. That\u2019s funny because it pretends the universe is conspiring against organization."
+  },
+  {
+    "id": "Tv-id-133",
+    "question": "How does Ford\u2019s experience of getting stranded on barbaric worlds make him better at calming Arthur?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Ford has hitched around a lot.",
+      "He knows how to survive weirdness.",
+      "He keeps telling Arthur not to panic."
+    ],
+    "evidence_relations": [
+      "Past experience \u2192 confidence",
+      "Confidence \u2192 able to reassure"
+    ],
+    "answer": "He\u2019s seen worse, so he knows this level of chaos is survivable. That\u2019s why he can tell Arthur what to do and sound credible."
+  },
+  {
+    "id": "Tv-id-134",
+    "question": "Why do bureaucratic species like the Vogons keep records of everything but still make it impossible for victims to appeal?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Vogons insist procedure was followed.",
+      "They store notices in unreachable places.",
+      "They blame the other party for not finding them."
+    ],
+    "evidence_relations": [
+      "Procedure obsession \u2192 record keeping",
+      "Record hiding \u2192 no real appeal"
+    ],
+    "answer": "They want the paperwork to say it was fair, without doing the work to make it actually fair. That\u2019s why everything is \u2018on file\u2019 but nowhere helpful."
+  },
+  {
+    "id": "Tv-id-135",
+    "question": "How does the joke about the Sirius Cybernetics Corporation\u2019s products being hated by their users connect to Eddie and other ship systems?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Sirius Cybernetics makes overly friendly devices.",
+      "Users hate them.",
+      "Eddie behaves like that on the ship."
+    ],
+    "evidence_relations": [
+      "Company design philosophy \u2192 annoying UIs",
+      "Annoying UIs \u2192 user hatred"
+    ],
+    "answer": "It\u2019s the same design everywhere: too much personality, not enough usefulness. Eddie is just the star example."
+  },
+  {
+    "id": "Tv-id-136",
+    "question": "Why is it significant that Deep Thought admits it can\u2019t find the Question but can design a machine that will?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Deep Thought outputs 42.",
+      "It says the Question needs an even bigger computer.",
+      "That bigger computer is Earth."
+    ],
+    "evidence_relations": [
+      "Answer without question \u2192 incomplete",
+      "Bigger computer \u2192 full pair"
+    ],
+    "answer": "It shows that even godlike computers have scope limits, so the universe\u2019s key pair (Question, Answer) has to be split across generations of machines."
+  },
+  {
+    "id": "Tv-id-139",
+    "question": "What does the Guide\u2019s focus on drinks (Pan Galactic Gargle Blasters, etc.) tell us about its target reader\u2019s lifestyle?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The Guide gives recipes for wild drinks.",
+      "It assumes readers will party on unfamiliar worlds.",
+      "It explains side effects."
+    ],
+    "evidence_relations": [
+      "Party-focused content \u2192 party-focused readers",
+      "Party-focused readers \u2192 hitchhiker demographic"
+    ],
+    "answer": "It\u2019s written for people who travel cheap and drink hard, so it spends space on the fun parts."
+  },
+  {
+    "id": "Tv-id-141",
+    "question": "How does the Guide\u2019s entry style encourage travelers to improvise rather than follow strict itineraries?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Entries are short, informal and non-linear.",
+      "They often suggest broad approaches instead of schedules.",
+      "They emphasize \u2018don\u2019t panic.\u2019"
+    ],
+    "evidence_relations": [
+      "Loose style \u2192 flexible behavior",
+      "Flexible behavior \u2192 improvisation"
+    ],
+    "answer": "Because it talks like a friend, not like a tour operator, readers assume they can make it up as they go."
+  },
+  {
+    "id": "Tv-id-143",
+    "question": "Why is the Guide constantly being updated, and how does that create room for errors like \u2018Harmless\u2019?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Hitchhikers submit notes from everywhere.",
+      "Editors add them quickly.",
+      "Fast updates can miss nuance."
+    ],
+    "evidence_relations": [
+      "Crowdsourcing \u2192 freshness",
+      "Freshness \u2192 occasional bad summaries"
+    ],
+    "answer": "Because it values up-to-the-minute info, it sometimes publishes oversimplified entries like \u2018Harmless\u2019 before anyone has time to expand them."
+  },
+  {
+    "id": "Tv-id-144",
+    "question": "How does the series use bodyless or disembodied characters (like Gargravarr) to comment on bureaucracy or punishment?",
+    "source": "TV",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Gargravarr is a disembodied voice in charge of a terrible device.",
+      "He sounds bored with his own job.",
+      "Punishment is run like a dull office."
+    ],
+    "evidence_relations": [
+      "Disembodiment \u2192 depersonalized authority",
+      "Depersonalized authority \u2192 bureaucratic feel"
+    ],
+    "answer": "It shows that even cosmic punishments are run by people who sound like civil servants, which makes the whole system ridiculous."
+  }
+]

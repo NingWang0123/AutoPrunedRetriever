@@ -1,0 +1,1418 @@
+[
+  {
+    "id": "STEM-76c09119",
+    "source": "STEM",
+    "question": "How does the evolutionary lineage of the brown bear, 'Ursus arctos', reflect its nomenclature, and what implications does this have for understanding its origins?",
+    "answer": "The name 'Ursus arctos' reflects its lineage as it derives from the Latin and Greek words for 'bear', linking it to its evolutionary ancestor 'Ursus etruscus', suggesting that the nomenclature encapsulates its evolutionary history from Asia.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The scientific name of the brown bear, \"Ursus arctos\", comes from the Latin \"ursus\", meaning \"bear\", and \u0386\u03c1\u03ba\u03c4\u03bf\u03c2 \"arctos\", from the Greek word for bear.",
+      "Brown bears are thought to have evolved from \"Ursus etruscus\" in Asia."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-1b285674",
+    "source": "STEM",
+    "question": "How did the migration patterns of brown bears impact their competitive relationship with cave bears during the Pleistocene in the British Isles?",
+    "answer": "The migration of brown bears into Alaska 100,000 years ago and their subsequent southward movement 13,000 years ago likely allowed them to establish populations that outcompeted cave bears in the British Isles, where their remains are commonly found.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Brown bear remains from the Pleistocene period are common in the British Isles, where it is thought they might have outcompeted cave bears (\"Ursus spelaeus\").",
+      "The species entered Alaska 100,000 years ago, though they did not move south until 13,000 years ago."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-027a3d4a",
+    "source": "STEM",
+    "question": "How does the complexity of identifying brown bear subspecies impact the genetic studies on their relatedness?",
+    "answer": "The complexity arises because the presence of hundreds of obsolete subspecies, as documented by Hall (1981), can lead to confusion in genetic studies, making it more challenging to accurately assess genetic distance and relationships among bears.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Most genetic studies report on how closely related the bears are (or their Genetic distance).",
+      "There are hundreds of obsolete brown bear subspecies, each with its own name, and this can become confusing; Hall (1981) lists 86 different types and even as many as 90 have been proposed."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-d78a0766",
+    "source": "STEM",
+    "question": "How does the genetic divergence timeline of polar bears from brown bears support the classification of brown bears as a paraspecies of polar bears?",
+    "answer": "The estimated divergence of polar bears from brown bears ranges from 400,000 to 70,000 years ago, with recent analyses suggesting a split between 250,000 and 130,000 years ago, indicating a close evolutionary relationship that supports the classification of brown bears as a paraspecies of polar bears under certain definitions.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The point at which the polar bear diverged from the brown bear is unclear with estimations based on genetics and fossils ranging from 400,000 to 70,000 years ago, but most recent analysis has indicated that the polar split somewhere between 250,000 and 130,000 years ago.",
+      "Under some definitions, the brown bear can be construed as the paraspecies for the polar bear."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-cc1fc8b0",
+    "source": "STEM",
+    "question": "How does the typical coloration of grizzly bears influence their adaptation to winter conditions, particularly in northern subspecies?",
+    "answer": "The grizzly bear's typical coloration, with brownish-black hairs at the base and whitish-cream tips, aids in camouflage, which is crucial for hunting during winter. Additionally, the thick and long winter fur provides insulation, allowing them to survive colder temperatures, especially in northern regions.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The common name grizzly stems from their typical coloration, with the hairs on their back usually being brownish-black at the base and whitish-cream at the tips, giving them their distinctive \"grizzled\" color.",
+      "The winter fur is very thick and long, especially in northern subspecies, and can reach 11 to at the withers."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-99569f72",
+    "source": "STEM",
+    "question": "How do the characteristics of winter hairs and summer fur reflect the adaptive strategies of animals in response to seasonal changes in their environment?",
+    "answer": "The thin yet rough winter hairs provide insulation against cold, while the shorter and sparser summer fur allows for cooling, demonstrating an adaptive strategy to maintain body temperature across seasonal variations.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The winter hairs are thin, yet rough to the touch.",
+      "The summer fur is much shorter and sparser, and its length and density varies geographically."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-2700f811",
+    "source": "STEM",
+    "question": "How do the differences in claw structure between black bears and brown bears affect their climbing abilities, and what implications does this have for their behavior in their natural habitats?",
+    "answer": "The sharp claws of black bears enable them to climb trees effectively, while the blunt claws and excessive weight of adult brown bears typically prevent them from doing so. This difference in climbing ability influences their behavior, as black bears may seek refuge in trees from predators or foraging, while brown bears are more grounded and rely on other strategies for safety and food.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The claws are blunt, while those of a black bear are sharp.",
+      "Due to their claw structure, in addition to their excessive weight, adult brown bears cannot typically climb trees as can both species of black bear, although in rare cases adult female brown bears have been seen in trees."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-c6c95589",
+    "source": "STEM",
+    "question": "How does the physical structure of Kodiak bears' hindfeet relate to their foraging and den construction behaviors, particularly in the context of their muscular shoulder hump?",
+    "answer": "The large size of Kodiak bears' hindfeet, which can measure up to 46 cm, provides stability and support for their weight when digging, a behavior enhanced by the muscular shoulder hump that allows for greater force during these activities. This adaptation is crucial for both foraging and constructing dens prior to hibernation.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "In large coastal or Kodiak bear males, the hindfoot may measure up to 40 cm in length, 28.5 cm in width, while outsized Kodiak bears having had confirmed measurements of up to 46 cm along their rear foot.",
+      "Brown bears are the only extant bears with a hump at the top of their shoulder, which are made entirely of muscle, this feature having developed presumably for imparting more force in digging, which is habitual during foraging for most bears of the species and also used heavily in den construction prior to hibernation."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-425d7d3e",
+    "source": "STEM",
+    "question": "How does the structure of the adult skull relate to its overall proportions and potential implications for brain capacity?",
+    "answer": "The massive, heavily built concave structure of the adult skull, which is large in proportion to the body, along with the high, steeply rising forehead, suggests an adaptation for accommodating a larger brain, potentially enhancing cognitive abilities.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Adults have massive, heavily built concave skulls, which are large in proportion to the body.",
+      "The forehead is high and rises steeply."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-e4bed40d",
+    "source": "STEM",
+    "question": "How do the differences in skull projection development between male and female bears influence the evolutionary adaptations of the species when compared to Asian black bears?",
+    "answer": "The more developed skull projections in male bears, comprising up to 40\u201341% of the skull's length, may provide advantages in male-male combat and mating displays, while the lesser development in females, along with the less pronounced projections in Asian black bears, suggests a divergence in evolutionary pressures and adaptations between the species.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The projections of the skull are well developed when compared to those of Asian black bears (\"Ursus thibetanus\"): the latter have sagittal crests not exceeding more than 19\u201320% of the total length of the skull, while the former have sagittal crests comprising up to 40\u201341% of the skull's length.",
+      "Skull projections are more weakly developed in females than in males."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-ac50443d",
+    "source": "STEM",
+    "question": "How does the geographical variation in skull dimensions relate to the structural characteristics of the braincase in different populations?",
+    "answer": "The relatively small and elongated braincase may adapt to varying skull dimensions across geographical regions, suggesting that environmental factors influence cranial morphology.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The braincase is relatively small and elongated.",
+      "There is a great deal of geographical variation in the skull, and presents itself chiefly in dimensions."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-f9ca80ac",
+    "source": "STEM",
+    "question": "What implications does the early loss of the first three molars in the lower jaw have on the overall dental structure, considering that they usually leave no trace of the alveolus in the jaw?",
+    "answer": "The early loss of the first three molars weakens the dental structure of the lower jaw, as these molars are crucial for maintaining the integrity and function of the alveolar bone, which ultimately may lead to further dental complications due to the lack of support.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "It is usually lost at an early age, leaving no trace of the alveolus in the jaw.",
+      "The first three molars of the lower jaw are very weak, and are often lost at an early age."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-0fdf051d",
+    "source": "STEM",
+    "question": "How does the skull morphology of brown bears and sloth bears reflect their respective foraging behaviors and ecological adaptations?",
+    "answer": "Brown bears have the broadest skull among extant bears, which may aid in their generalist foraging, while sloth bears possess a proportionately longer skull adapted for foraging on insects, indicating a specialization in their ecological niche.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Brown bears have the broadest skull of any extant ursine bear, only the afforementioned most herbivorous living bears exceed them in relative breadth of the skull.",
+      "Another extant ursine bear, the sloth bear (\"Melursus ursinus\"), has a proportionately longer skull than the brown bear and can match the skull length of even large brown bear races, presumably as an aid for foraging heavily on insect colonies for which a long muzzle is helpful as an evolved feature in several unrelated mammalian groups."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-5c755e96",
+    "source": "STEM",
+    "question": "How does the variability in the size of brown bears across different populations relate to their classification as distinct races, and what implications does this have for understanding their adaptability in various environments?",
+    "answer": "The variability in the size of brown bears reflects their adaptation to different environments, as the size depends on the specific population, indicating that distinct races can evolve unique physical characteristics to optimize survival in their habitats.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The size of brown bears is the most variable of modern bears.",
+      "The typical size depends upon which population it is from, and most accepted races vary widely in size."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-b3b6e3bc",
+    "source": "STEM",
+    "question": "How does seasonal variation in weight and sexual dimorphism collectively influence the reproductive strategies of brown bears?",
+    "answer": "Male brown bears, being 30% larger on average, may have a competitive advantage during mating seasons due to their size, which is further influenced by their weight fluctuations; they weigh the least in spring after hibernation and the most in late fall when preparing for hibernation, potentially affecting their mating success and reproductive opportunities.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "This is in part due to sexual dimorphism, as male brown bears average at least 30% larger in most races.",
+      "Individual bears also vary in size seasonally, weighing the least in spring due to lack of foraging during hibernation, and the most in late fall, after a period of hyperphagia to put on additional weight to prepare for hibernation."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-5db0a742",
+    "source": "STEM",
+    "question": "How does the weight comparison between interior brown bears and coastal races reflect on the understanding of bear populations worldwide?",
+    "answer": "Interior brown bears weigh around 180 kg for males and 135 kg for females, comparable to an average Southern African lion, while coastal races can weigh about twice as much. This highlights the variability in bear populations globally, with an average male weight of 217 kg and females at 152 kg, suggesting that environmental factors and subspecies differences significantly influence size.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Interior brown bears are generally smaller than is often perceived, being around the same weight as an average Southern African lion (Kalahari, Katanga or Transvaal lion), at an estimate average of 180 kg in males and 135 kg in females, whereas adults of the coastal races weigh about twice as much.",
+      "The average weight of adult male bears from 19 populations, from around the world and various subspecies (including both large and small bodied subspecies), was found to 217 kg while adult females from 24 populations were found to average 152 kg ."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-2514696e",
+    "source": "STEM",
+    "question": "How does the geographic diversity of bear populations affect their average weight, considering the variations observed in regions such as the Yukon Delta, interior British Columbia, Jasper National Park, and southern Europe?",
+    "answer": "The geographic diversity influences food availability and climate conditions, which in turn affects the bears' growth and fat accumulation, leading to varying average weights across these regions.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Bears from the Yukon Delta, interior British Columbia, Jasper National Park and southern Europe (i.e.",
+      "Spain, the Balkans) can weigh from 55 to on average."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-0e72edcd",
+    "source": "STEM",
+    "question": "How does the size variability of grizzly bears in different regions illustrate the impact of environmental factors on their physical development?",
+    "answer": "Grizzlies from interior Alaska exhibit significantly larger sizes due to the abundant food resources available in that region, evidenced by males weighing nearly three times more than the smallest grizzlies from Alberta's Jasper National Park, which may have less favorable environmental conditions.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The grizzly is especially variable in size, as grizzlies from the largest populations, i.e.",
+      "interior Alaska, with the heaviest weights recorded in Nelchina, Alaska, nearly three times heavier in males than the smallest grizzlies from Alberta, Canada's Jasper National Park."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-a95073eb",
+    "source": "STEM",
+    "question": "What factors contribute to the significant difference in average body weights of grizzly bears between Nelchina and Jasper, and how does habitat quality play a role in this discrepancy?",
+    "answer": "The average body weight difference is primarily due to the sub-optimal foraging habitat in Jasper, which requires grizzlies to range widely and leads to sparse feeding. In contrast, the ideal feeding conditions in the tundra and prairie environments of Nelchina allow bears to achieve greater body weights.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Between the sexes, the grizzlies of Nelchina average around 207 kg , whereas the Jasper grizzlies averaged about 74 kg .",
+      "The enclosed taiga habitat of Jasper presumably is sub-optimal foraging habitat for grizzlies, requiring them to range widely and feed sparsely, thus reducing body weights and putting bears at risk of starvation, while in surfaces areas in the tundra and prairie are apparently ideal for feeding."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-17682ede",
+    "source": "STEM",
+    "question": "How does the body size of grizzly bears relate to the availability of food across different regions in Alberta, and what might explain the presence of an unusually large male in the Northwest Territories?",
+    "answer": "Grizzly bears in sub-Arctic regions, such as from the Brooks Range to the Mackenzie Mountains, exhibit a gradual reduction in body size due to decreased food availability. However, the presence of a large male grizzly bear weighing 320 kg in the Northwest Territories suggests that despite the overall trend, localized conditions may allow for larger individuals when food sources are sufficient.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Even elsewhere in the Alberta province, weights averaging more than twice those of Jasper grizzlies have been recorded.",
+      "A gradual diminishment in body size is noted in grizzly bears from the sub-Arctic zone, from the Brooks Range to the Mackenzie Mountains, presumably because food becomes much sparser in such regions, although perhaps the most northerly recorded grizzly bears ever, in the Northwest Territories, was a large and healthy male weighing 320 kg , more than twice as much as an average male weighs near the Arctic Circle."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-686ae657",
+    "source": "STEM",
+    "question": "How does the average shoulder height of adult bears in Yellowstone compare to the standing height of typical brown bears, and what implications might this have for their behavior and interactions in different environments?",
+    "answer": "The average shoulder height of adult bears in Yellowstone is 95.2 cm, while standing on hindlegs, typical brown bears can reach heights of up to 1.83 m. This significant height difference suggests that while bears in Yellowstone are relatively shorter on all fours, their ability to stand tall may influence their social interactions and territorial displays in various habitats.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Adult shoulder height averaged 95.2 cm in Yellowstone (for any bear measured five or more years old) and a median of 98.5 cm (for adults only 10 or more years old) in Slovakia.",
+      "Standing on its hindlegs, a posture only assumed occasionally, typically sized brown bears can reportedly range from 1.83 to in standing height."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-d08c6c1d",
+    "source": "STEM",
+    "question": "What factors might contribute to the exceptionally large sizes of inland bear specimens reported in North America and Europe, particularly in relation to their recorded weights in comparison to average male bears in those regions?",
+    "answer": "The exceptionally large sizes of inland bear specimens may be attributed to factors such as abundant food sources and favorable environmental conditions in their habitats, which allow them to reach weights significantly above the average for male bears; for example, grizzlies from Yellowstone and Washington state weighing around 500 kg and eastern European bears weighing up to 400 kg.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Exceptionally large inland specimens have been reported in several parts of North America, Europe, Russia and even Hokkaido.",
+      "The largest recorded grizzlies from Yellowstone and Washington state both weighed approximately 500 kg and eastern European bears have been weighed in Slovakia and Bulgaria of up to 400 kg , about double the average weight for male bears in these regions."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-78a4a3bb",
+    "source": "STEM",
+    "question": "What factors contribute to the observed increase in bear size from western to eastern Eurasia, particularly regarding the mature male bears in regions like Arkhangelsk Oblast and Bashkortostan?",
+    "answer": "The geographical gradient from west to east in Eurasia leads to larger bear sizes, with environmental factors and available resources in eastern Russia allowing mature male bears to commonly exceed 300 kg.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "In Eurasia, the size of bears roughly increases from the west to the east, with the largest bears there native to eastern Russia.",
+      "Even in the nominate subspecies size increases in the eastern limits, with mature male bears in Arkhangelsk Oblast and Bashkortostan commonly exceeding 300 kg ."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-4fa25720",
+    "source": "STEM",
+    "question": "How do the characteristics of the Ussuri brown bear relate to the intermediate size of other bear populations in Russia, and what implications might this have for understanding bear biodiversity in the region?",
+    "answer": "The Ussuri brown bear, like the grizzly and Eurasian brown bear, represents a specific population that may reflect the intermediate size of other bear species in Russia. This suggests that similar environmental conditions may influence bear size and diversity in the region, indicating a complex interplay between habitat, genetics, and ecological factors.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Other bears of intermediate size may occur in inland races of Russia.",
+      "Much like the grizzly and Eurasian brown bear, populations of the Ussuri brown bear (\"U."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-e6646790",
+    "source": "STEM",
+    "question": "How does the size variation between the lasiotus and the East Siberian brown bear influence their ecological roles and interactions within their respective habitats?",
+    "answer": "The size variation between lasiotus and the East Siberian brown bear likely leads to different predatory behaviors and resource competition, affecting their ecological roles and interactions with other species in their habitats.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "lasiotus\") and the East Siberian brown bear (\"U.",
+      "collaris\") may vary widely in size."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-a942765e",
+    "source": "STEM",
+    "question": "How does the size of adult male bears from certain races compare to that of Kodiak bears, and what implications does this have for understanding the size variations among different bear populations?",
+    "answer": "Adult male bears from certain races can match Kodiak bears in size, indicating that East Siberian brown bears and mainland Ussuri brown bears, which average about the same size as large grizzly populations, contribute to the overall size variability among bear species.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "In some cases, the big adult males of these races may have matched the Kodiak bear in size.",
+      "East Siberian brown bears from outside the sub-Arctic and mainland Ussuri brown bears average about the same size as the largest-bodied populations of grizzly bear, i.e."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-6521e67e",
+    "source": "STEM",
+    "question": "What factors contribute to the reduced size of brown bears in Hokkaido compared to those in central Siberia and the Chukchi Peninsula?",
+    "answer": "The reduced size of brown bears in Hokkaido is likely due to the enclosed mixed forest habitat, which may limit food availability and resources, similar to the diminished size seen in east Siberian brown bears from Yakutia, where adult males average around 145 kg, indicating environmental factors play a crucial role in their size.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "This is due presumably to the enclosed mixed forest habitat of Hokkaido.",
+      "A similarly diminished size has been reported in east Siberian brown bears from Yakutia, as even adult males average around 145 kg , thus about 40% less than the average weight of male bears of this race from central Siberia and the Chukchi Peninsula."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-3af0e418",
+    "source": "STEM",
+    "question": "How does the average weight of the Himalayan race ('U. isabellinus') in Pakistan influence its ecological role compared to other subspecies?",
+    "answer": "The average weight of females (70 kg) and males (135 kg) of the Himalayan race indicates a significant size that likely impacts its predatory behavior and energy requirements, thereby influencing its ecological interactions and competition with smaller subspecies.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The Himalayan race (\"U.",
+      "isabellinus\") is another rival for smallest subspecies, in Pakistan this race averages about 70 kg in females and 135 kg in males."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-1c3486c3",
+    "source": "STEM",
+    "question": "How does the size and weight of Himalayan brown bears compare to those of the Gobi Desert population, and what implications does this have for understanding bear subspecies classification?",
+    "answer": "Himalayan brown bear females average 1.4 m in head-and-body length, while Gobi Desert brown bears, despite not being distinctly classified as a subspecies, weigh similarly to Himalayan bears and are heavier than Jasper National Park grizzlies. This suggests that the Gobi population may share characteristics with Himalayan bears, challenging the current subspecies classification.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Himalayan brown bear females were cited with an average head-and-body length of merely 1.4 m .",
+      "Brown bears of the compact Gobi Desert population, which is not usually listed as a distinct subspecies in recent decades, weigh around 90 to between the sexes so are similar in weight to bears from the Himalayas and even heavier than grizzlies from Jasper National Park."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-8f7aae2b",
+    "source": "STEM",
+    "question": "How does the size of the Gobi bear relate to its habitat preferences, and what implications does this have for its classification among brown bears?",
+    "answer": "The Gobi bear's small size, measuring as little as 1 m in head-and-body length, suggests that it has adapted to the harsh conditions of barren ground habitats, which may limit food availability and influence its overall growth. This size classification as the smallest known brown bear indicates a unique evolutionary adaptation to its environment.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "However, the Gobi bear has been reported to measure as small as 1 m in head-and-body length, which if accurate would make them the smallest known brown bear in linear dimensions.",
+      "These smallest brown bear races are characteristically found in \"barren ground\" type habitats, i.e."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-f437db0a",
+    "source": "STEM",
+    "question": "How do the environmental adaptations of bears from different regions, such as the Syrian and Gobi races, compare to those of the Kodiak bear in terms of habitat and size?",
+    "answer": "Bears from the Syrian and Gobi races adapt to sub-desert and arid alpine meadows, indicating their ability to survive in harsher, drier environments, while the Kodiak bear, being the largest subspecies, thrives in more temperate regions, reflecting a different set of environmental adaptations.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "sub-desert in bears from the Syrian and Gobi races and arid alpine meadow in Himalayan bears.",
+      "The largest subspecies are the Kodiak bear (\"U."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-ff0281b6",
+    "source": "STEM",
+    "question": "How does the classification of the coastal brown bear as 'questionably distinct' from other bear species, such as the extinct California grizzly, reflect the complexities in bear taxonomy and conservation efforts?",
+    "answer": "The classification of the coastal brown bear as 'questionably distinct' suggests that there is ambiguity in its genetic and morphological differentiation from other bear species, including the extinct California grizzly. This ambiguity complicates conservation efforts because it raises questions about the conservation status and management strategies needed for these species, highlighting the need for further research in bear taxonomy.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "middendorffi\") and the questionably distinct peninsular or coastal brown bear (\"U.",
+      "Also the extinct California grizzly (\"U."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-cf2ddc67",
+    "source": "STEM",
+    "question": "How do the physical dimensions and average body weights of Kodiak bears relate to their adaptations for survival in their natural habitat?",
+    "answer": "The large total length (2.44 m) and shoulder height (1.33 m) of Kodiak bears, combined with their average male body mass of 357 kg, suggest adaptations for strength and dominance in foraging and territorial behavior, which are crucial for survival in the competitive environments of Kodiak Island and coastal Alaska.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "According to Guinness Records the average male Kodiak bear is 2.44 m in total length (head-to-tail) and has a shoulder height of 1.33 m .",
+      "When averaged between their spring low and fall high weights from both localities, males from Kodiak island and coastal Alaska weighed from 312 to with a mean body mass of 357 kg while the same figures in females were 202 to with a mean body mass of 224 kg ."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-5d870385",
+    "source": "STEM",
+    "question": "What factors may have contributed to the observed reduction in body size of the Kamchatka brown bear compared to the historical records of old males reaching significant mass, and how does this relate to its classification among Russian bear races?",
+    "answer": "The reduction in body size of the Kamchatka brown bear likely results from environmental changes and possibly declining food availability, contrasting with historical data showing old males reaching sizes comparable to Kodiak bears, thus impacting its status as the largest among Russian bear races.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "In the Kamchatka brown bear in past decades, old males have been known to reach body mass of 500 - by fall, putting the race well within Kodiak bear sizes and leading it to be considered the largest of the extant Russian races.",
+      "However, a diminishment in body size of \"U.a."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-b6bac89b",
+    "source": "STEM",
+    "question": "What impact might the historical overhunting of the Kamchatka brown bears have on their weight trends observed in recent decades?",
+    "answer": "The overhunting likely led to a decline in bear populations, affecting genetic diversity and potentially contributing to the observed increase in average weights of mature male bears to 350 pounds by 2005, as healthier populations may exhibit improved growth rates.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "berigianus\" has been noted, mostly likely in correlation with overhunting.",
+      "In the 1960s and 1970s, most adult Kamchatka brown bears weighed merely between 150 and , however mean weights of mature male bears has been reported as averaging 350 to in 2005."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-3f162e66",
+    "source": "STEM",
+    "question": "Considering the distribution of brown bears and their populations, what implications might the largest populations in Russia and the United States have on conservation efforts and habitat management in other countries where brown bears are present?",
+    "answer": "The large populations of brown bears in Russia and the United States suggest that these countries have more stable habitats and effective conservation measures, which could serve as models for other countries. This could lead to increased conservation efforts in places like Canada and European nations, where populations are smaller and potentially more vulnerable.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The largest populations are in Russia with 120,000, the United States with 32,500, and Canada with around 25,000.",
+      "The brown bear currently occurs in the countries of Afghanistan, Albania, Andorra (recently reoccupied), Armenia, Azerbaijan, Belarus, Bhutan (possibly extinct), Bosnia and Herzegovina, Bulgaria, Canada, China, Croatia, Czech Republic (possibly only vagrants), Estonia, Finland, France, Georgia, Greece, India, Iran, Iraq, Italy, Japan, Kazakhstan, Kyrgyzstan, Latvia (extinct before World War II; possibly vagrants from Estonia or Russia after World War II), Republic of Macedonia, Mongolia, Montenegro, Nepal, North Korea, Norway, Pakistan, Poland, Romania, Russia, Serbia, Slovakia, Slovenia, Spain, Sweden, Tajikistan, Turkey, Turkmenistan, Ukraine, the United States, and Uzbekistan."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-4e26ae6d",
+    "source": "STEM",
+    "question": "How does the historical range of the brown bear in North America influence its current ecological role as the grizzly bear?",
+    "answer": "The historical wide range of the brown bear allowed it to adapt to various environments, influencing its current role as a top predator and keystone species in North American ecosystems.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The brown bear is usually called the grizzly bear in North America.",
+      "It once ranged throughout much of the continent."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-29668a96",
+    "source": "STEM",
+    "question": "How do the current distribution limits of the brown bear in North America relate to its significant habitat loss in the lower 48 states?",
+    "answer": "The brown bear's current distribution limits in North America, primarily in Nunavut and parts of Saskatchewan and Manitoba, indicate a shift towards less populated and less developed areas due to the 98% habitat loss in the lower 48 states, which has forced them to retreat to these more remote regions.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "They reach their current eastern limits of their distribution in North America in a majority of Nunavut, northeastern Saskatchewan and northern Manitoba, where they range as far east as the west coast of the Hudson Bay from around Rankin Inlet south to Southern Indian Lake.",
+      "The brown bear has lost 98% of its habitat in the lower 48 states."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-3c13dcba",
+    "source": "STEM",
+    "question": "How does the distribution of the brown bear population in the United States influence conservation efforts in the lower 48 states?",
+    "answer": "The concentration of about 95% of the brown bear population in Alaska suggests that conservation efforts in the lower 48 states must focus on gradual repopulation strategies, particularly along the Rockies and western Great Plains, to maintain genetic diversity and support population recovery.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "About 95% of the brown bear population in the United States is in Alaska, though in the lower 48 states, they are repopulating gradually but steadily along the Rockies and the western Great Plains.",
+      "The Alaskan population is estimated at 32,000 individuals."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-f701da87",
+    "source": "STEM",
+    "question": "How does the isolation of grizzly bear populations across the five ecosystems in the contiguous United States impact their genetic diversity and long-term survival?",
+    "answer": "The isolation of grizzly bear populations prevents genetic flow between ecosystems, leading to low genetic diversity, which can negatively affect their long-term survival and adaptability to environmental changes.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "These five ecosystems combine for a total of a maximum 1,729 wild grizzlies still persisting in the contiguous United States.",
+      "Unfortunately, these populations are isolated from each other, inhibiting any genetic flow between ecosystems and creating low genetic diversity in remaining populations which can have negative long-time effects."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-8a6266fd",
+    "source": "STEM",
+    "question": "How does the historical distribution of grizzly bears in eastern North America relate to their current isolation and survival challenges in the contiguous United States?",
+    "answer": "The historical presence of grizzly bears in eastern North America, as indicated by fossil records from Kentucky and the Ungava Peninsula, contrasts sharply with their current isolation in the contiguous United States, which poses significant threats to their survival due to reduced genetic diversity and habitat fragmentation.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "This isolation poses one of the greatest threats to the future survival of the grizzly bear in the contiguous United States.",
+      "Although there is no record of their existence in the United States east of the Rocky Mountain and Great Plain regions in human history, fossil records from Kentucky and the Ungava Peninsula do in fact show that grizzly bears once roamed in eastern North America."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-a4654f94",
+    "source": "STEM",
+    "question": "Given that none of the brown bears were seen since 1960 prior and that there are 14,000 brown bears in ten fragmented populations in Europe, what can be inferred about the conservation status and population dynamics of brown bears in this region?",
+    "answer": "The lack of sightings since 1960 suggests a significant decline or potential local extinction in some areas, while the presence of 14,000 brown bears in fragmented populations indicates that, despite historical challenges, some populations have managed to survive and possibly thrive in Europe.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "None had been seen since 1960 prior.",
+      "In Europe, there are 14,000\u00a0brown bears in ten fragmented populations."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-7bee46ff",
+    "source": "STEM",
+    "question": "How does the extinction status of brown bears in the British Isles correlate with their population threats in France and Spain, considering their geographical limits in Western Europe?",
+    "answer": "The extinction of brown bears in the British Isles highlights their vulnerability, which is mirrored by their extreme threat status in France and Spain, where they reach their western limits, indicating that habitat loss and human impact are critical factors affecting their survival across these regions.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "They are extinct in the British Isles, extremely threatened in France and Spain, and in trouble over most of Central Europe.",
+      "Brown bears reach their western limits in Spain."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-05bfd4ac",
+    "source": "STEM",
+    "question": "How did the decision to allow the hunting of 175 bears in 2017 reflect the complex interplay between bear population dynamics and human-wildlife interactions in Romania?",
+    "answer": "The decision to hunt 175 bears in 2017 was influenced by both an increasing bear population and changes in animal behavior due to habitat destruction, which resulted in more frequent human-bear conflicts. This reflects the tension between conservation efforts and the need to manage wildlife interactions for community safety.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Despite the relatively large size of the country's bear population, the species\u2019 numbers there were declining alarmingly due to overhunting before Romania's EU membership (which also depended on the protection of the brown bear in the country).",
+      "In July 2017 the Romanian Ministry of Environment released an order for the hunting of 175 bears that year because of either increasing bear population or changes in animal behavior because of destruction of habitat by deforestation causing an increase in attacks on humans and damage caused by bears to local communities."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-8526ca10",
+    "source": "STEM",
+    "question": "Considering the estimated populations of brown bears in the Carpathian Mountains, how might the smaller populations in Ukraine, Slovakia, and Poland influence the overall conservation strategies for the total estimated population of about 8,000 bears?",
+    "answer": "The smaller populations in Ukraine (200 bears) and Slovakia (100 bears) suggest localized conservation needs, which are critical for maintaining genetic diversity and preventing inbreeding within the total estimated population of 8,000 bears. Thus, targeted conservation strategies may be necessary to address the unique challenges faced by these smaller populations to ensure the sustainability of the overall population.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "There is also a smaller brown bear population in the Carpathian Mountains in Ukraine (estimated at about 200 in 2005), Slovakia and Poland (estimated at about 100 in 2009 in the latter country).",
+      "The total Carpathian population is estimated at about 8,000."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-3e00c3ff",
+    "source": "STEM",
+    "question": "How does the geographic distribution of the brown bear in the region influence the genetic diversity of the small bear population in the Slovenian Alps?",
+    "answer": "The small group of bears in the Slovenian Alps is genetically connected to the larger Dinaric-Pindos population, which is distributed across various regions from Georgia to Kyrgyzstan. This broader distribution allows for gene flow and genetic diversity, which can benefit the isolated Slovenian population through potential interbreeding opportunities.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The small group of bears living in the Slovenian Alps is connected to the larger Dinaric-Pindos population.",
+      "In this part of the world, the brown bear occurs from Georgia, Armenia and Azerbaijan southbound spottily through Turkey, northernmost Iraq, western and northern Iran, thence discontinuously in northeastern Kazakhstan, southeastern Uzbekistan and north to Kyrgyzstan."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-7322467d",
+    "source": "STEM",
+    "question": "How does the small and fragmented population of species in northern Iran, as noted in 2015, contribute to their risk of genetic isolation?",
+    "answer": "The small and fragmented populations in northern Iran, occupying only limited segments of their former range, increase their vulnerability to genetic isolation by reducing gene flow and promoting inbreeding, which can lead to a decline in genetic diversity.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The populations in these countries are generally very small and fragmented, thus at high risk of genetic isolation, and they occupy only small segments of their former range here.",
+      "At least 20-30 were present in northern Iran as of 2015."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-79819aae",
+    "source": "STEM",
+    "question": "Considering the population estimates of brown bears in Hokkaido and the absence of sightings in the Atlas Mountains, what implications can be drawn about the habitat preferences and conservation status of these bears in eastern Asia versus North Africa?",
+    "answer": "The high population of brown bears in Hokkaido suggests a suitable habitat and effective conservation efforts, while the lack of sightings in the Atlas Mountains indicates that brown bears may not thrive in that environment, possibly due to habitat loss or ecological differences.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Hokkaido has the largest number of non-Russian brown bears in eastern Asia with about 2,000\u20133,000 animals, although, in 2015, the Biodiversity Division of the Hokkaido government estimated the population as being as high as 10,600.",
+      "Many people hold the belief some brown bears may be present in the Atlas Mountains of Morocco but there have been none sighted in the last century."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-71a0248f",
+    "source": "STEM",
+    "question": "How did the introduction of imported bears by the Romans potentially influence the current distribution and diversity of bear populations in Africa?",
+    "answer": "The Romans' introduction of bears from Spain led to the establishment of a population in Africa, which may have contributed to the genetic diversity of bear species in the region, although their persistence today is uncertain.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "In addition to the native Atlas bear the Romans apparently imported bears from Spain for spectacles with some escaping and founding a population in Africa, though it is doubtful that they still persist today.",
+      "This species inhabits the broadest range of habitats of any living bear species."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-e82b0bf3",
+    "source": "STEM",
+    "question": "How does the altitudinal adaptability of brown bears influence their habitat preferences and behavior in different environments?",
+    "answer": "Brown bears' ability to thrive from sea level to 5000 m indicates a high level of adaptability, which may allow them to exploit diverse habitats. However, their preference for semiopen country with scattered vegetation suggests that while they can occupy a range of altitudes, they favor environments that provide resting spots during the day, demonstrating a balance between adaptability and habitat preference.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "They seem to have no altitudinal preferences and have been recorded from sea-level to an elevation of 5000 m (the latter in the Himalayas).",
+      "In most of their range, brown bears generally seems to prefer semiopen country, with a scattering of vegetation that can allow them a resting spot during the day."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-d83d4254",
+    "source": "STEM",
+    "question": "How do the differing habitats of bears in the Middle East and the Himalayas illustrate the adaptability of bear species to varying environmental conditions?",
+    "answer": "Bears in the Middle East, such as Syrian bears, adapt to sparser, desert-like steppe habitats, while those in the Himalayas thrive in alpine meadows, demonstrating their ability to survive in diverse environments despite geographical and ecological differences.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "In this part of the world, bears may be found in steppe, which is sparser and more desert-like than grassland habitats in North America that occur at similar latitudes, and some bears may live out their lives even in desert edge, such as those that live in the Middle East (Syrian bears) and the rare Gobi bear which is native only to the Chinese-Mongolian desert of its name and isolated from other populations.",
+      "Alpine meadows are the typical habitat in the Himalayan and Tibetan populations of brown bear."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-9a012d2f",
+    "source": "STEM",
+    "question": "How do historical hunting practices contribute to the current conservation status of bear species, particularly in relation to the American black bear and its subspecies?",
+    "answer": "Historical hunting practices led to the extinction of several bear subspecies, such as the Californian and North African subspecies, while the American black bear remains unthreatened due to successful conservation efforts, highlighting the impact of human activities on species survival.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "As of 2012, this and the American black bear are the only bear species not classified as threatened by the IUCN.",
+      "However, the Californian, North African (Atlas bear), and Mexican subspecies, as well as brown bear populations in the Pacific Northwest were hunted to extinction in the nineteenth and twentieth centuries, and many of the southern Asian subspecies are highly endangered."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-50715fbb",
+    "source": "STEM",
+    "question": "How do the conservation statuses of the Syrian brown bear and the Himalayan brown bear illustrate the impact of habitat loss and human activity on bear populations?",
+    "answer": "The Syrian brown bear has been extirpated from over half of its historic range, indicating severe habitat loss, while the Himalayan brown bear, critically endangered and occupying only 2% of its former range, is further threatened by poaching, showcasing how both habitat destruction and human exploitation contribute to their declining populations.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The Syrian brown bear (\"Ursus arctos syriacus\") is very rare and it has been extirpated from more than half of its historic range.",
+      "One of the smallest-bodied subspecies, the Himalayan brown bear, is critically endangered, occupying only 2% of its former range and threatened by uncontrolled poaching for its parts."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-372a7715",
+    "source": "STEM",
+    "question": "Considering the critically low population of the Marsican brown bear in central Italy and the extensive list of countries where the brown bear is extinct, what implications might this have for conservation efforts in Italy and surrounding regions?",
+    "answer": "The critically low population of the Marsican brown bear indicates a high risk of extinction, necessitating targeted conservation efforts in Italy. Additionally, the extinction of brown bears in many neighboring countries suggests that regional habitat loss and human activity may similarly threaten remaining populations, highlighting the need for cross-border conservation strategies.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The Marsican brown bear in central Italy is believed to have a population of just 30 to 40 bears.",
+      "The brown bear is extinct in: Algeria, Belgium, Denmark, Egypt; Germany; Hungary; Ireland, Israel; Jordan, Lebanon; Liechtenstein; Lithuania, Luxembourg, Mexico; Moldova; Monaco, Morocco; Netherlands; Portugal; San Marino; Switzerland; Syria, Tunisia, United Kingdom, Vatican and possibly extinct in Bhutan."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-7fdbbd72",
+    "source": "STEM",
+    "question": "How does the level of human contact in a bear's habitat influence its activity patterns, particularly in relation to age and disturbance levels?",
+    "answer": "Bears in areas with greater human contact are more likely to be nocturnal, while yearling and newly independent bears tend to be diurnal. Conversely, adult bears in low-disturbance areas exhibit more crepuscular activity, indicating that habitat disturbance and human proximity affect their daily activity patterns.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "<ref name=\"Brown / Grizzly Bear Facts\"> </ref> Studies have shown that activity throughout the range can occur at nearly any time of night or day, with bears who dwell in areas with more extensive human contact being more likely to be fully nocturnal.",
+      "Furthermore, yearling and newly independent bears are more likely to be active diurnally and many adult bears in low-disturbance areas are largely crepuscular."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-2580b016",
+    "source": "STEM",
+    "question": "How do the seasonal weight gain and denning behavior of brown bears relate to their survival strategy during winter months?",
+    "answer": "Brown bears double their weight by accumulating fat in preparation for winter, which provides energy during their lethargic state when they rely on stored fat. Meanwhile, their preference for denning in protected spots helps shield them from harsh winter conditions, enhancing their chances of survival despite not being full hibernators.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "In summer through autumn, a brown bear can double its weight from the spring, gaining up to 180 kg of fat, on which it relies to make it through winter, when it becomes very lethargic.",
+      "Although they are not full hibernators and can be woken easily, both sexes like to den in a protected spot during the winter months."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-34187eb0",
+    "source": "STEM",
+    "question": "How do the advanced cognitive abilities demonstrated by the species in using tools relate to their social behavior when gathering in groups at food sources?",
+    "answer": "The ability to use tools, such as a barnacle-covered rock to scratch their neck, indicates advanced cognitive skills that may enhance their survival in solitary conditions. When they gather at food sources, these cognitive abilities allow them to navigate social hierarchies effectively, ensuring access to resources based on age and size.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "using a barnacle-covered rock to scratch its neck), which requires advanced cognitive abilities.",
+      "This species is mostly solitary, although bears may gather in large numbers at major food sources (e.g., moth colonies, open garbage dumps or rivers holding spawning salmon) and form social hierarchies based on age and size."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-45cc4367",
+    "source": "STEM",
+    "question": "How do the combat behaviors of bears, including their striking and biting techniques, relate to the variety of sounds they produce in different contexts as described in Gary Brown's 'Great Bear Almanac'?",
+    "answer": "The combat behaviors, such as striking with paws and biting, may be influenced by the sounds bears produce, which can serve to communicate aggression or establish dominance in different combat situations, reflecting their social dynamics.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "During combat, bears use their paws to strike their opponents in the chest or shoulders and bite the head or neck.",
+      "In his \"Great Bear Almanac\", Gary Brown lists 11 different sounds bears produce in 9 different contexts."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-4620b023",
+    "source": "STEM",
+    "question": "How does the non-territorial behavior of brown bears influence their social interactions, particularly when competing for resources?",
+    "answer": "The non-territorial nature of brown bears allows multiple adults to coexist in the same area without conflict, except when competing for limited resources like fertile females or food, which can lead to aggressive interactions.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Brown bears usually occur over vast home ranges, however they are not highly territorial.",
+      "Several adult bears often roam freely over the same vicinity without issue unless rights to a fertile female or food sources are being contested."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-a7052ad5",
+    "source": "STEM",
+    "question": "How does female philopatry influence mitochondrial DNA variation among brown bear populations across different geographic regions, particularly in relation to their mating season timing?",
+    "answer": "Female philopatry leads to strong mtDNA differences among brown bear populations because females remain in their natal areas, thereby preserving regional genetic traits. The mating season timing, which shifts later in northern populations, is also affected by local environmental conditions, further influencing genetic diversity and adaptation.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Notably, this contrasts with genetic signals from female-inherited mitochondrial DNA (mtDNA), where brown bears of different geographic regions typically show strong differences in their mtDNA, a result of female philopatry.",
+      "The mating season is from mid-May to early July, shifting later the further north the bears are found."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-8d35c243",
+    "source": "STEM",
+    "question": "How does the mating behavior of brown bears reflect their reproductive strategy and impact their sexual interest outside of mating periods?",
+    "answer": "Brown bears' serial monogamy, where they stay with a mate for a short duration, indicates a reproductive strategy that maximizes mating opportunities within a limited time frame. This behavior results in a lack of sexual interest between adult males and females outside of these mating periods, suggesting that their reproductive efforts are highly focused and time-sensitive.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Being serially monogamous, brown bears remain with the same mate from a couple of days to a couple of weeks.",
+      "Outside of this narrow time frame, adult male and female brown bears show no sexual interest in each other."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-2fe135fc",
+    "source": "STEM",
+    "question": "How do the urine markings of a female in oestrus influence genetic diversity within a litter of cubs?",
+    "answer": "The urine markings attract multiple males, leading to mating with different partners, which results in genetic diversity as shown by paternity tests indicating that up to 29% of cubs in a litter are fathered by two to three different males.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The urine markings of a female in oestrus can attract several males via scent.",
+      "Paternity DNA tests have shown that up to 29% of cubs in a litter will be from two to three different males."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-dff30299",
+    "source": "STEM",
+    "question": "How does the maternal investment in cub rearing, combined with the delayed implantation process, affect the reproductive success of the species?",
+    "answer": "The absence of male involvement in cub rearing allows females to focus resources on nurturing the young, while delayed implantation ensures that the timing of birth aligns with optimal environmental conditions, enhancing the chances of cub survival.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Males take no part in raising their cubs \u2013 parenting is left entirely to the females.",
+      "Through the process of delayed implantation, a female's fertilized egg divides and floats freely in the uterus for six months."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-78704089",
+    "source": "STEM",
+    "question": "How does maternal weight gain influence the reproductive success of bears, particularly in relation to litter size?",
+    "answer": "If a mother bear does not gain enough weight to survive through the winter, the embryo will not implant and will be reabsorbed, potentially reducing the number of cubs she could have, since average litters are 1-3 but can occasionally reach up to six under optimal conditions.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "If the mother does not gain enough weight to survive through the winter, the embryo does not implant and is reabsorbed into the body.",
+      "There have been cases of bears with as many as six cubs, although the average litter size is 1-3, with more than four being considered uncommon."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-577f1c94",
+    "source": "STEM",
+    "question": "How does the dependency of cubs on their mother influence their development and foraging behavior during this stage?",
+    "answer": "The cubs' dependency on their mother fosters a close bond, which is crucial for their survival as they weigh 7 to 10 pounds and begin to develop the skills needed to follow her over long distances and forage for solid food.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "At this time, the cubs weigh 7 to and have developed enough to follow her over long distances and begin to forage for solid food.",
+      "The cubs are fully dependent on the mother and a close bond is formed."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-497256c6",
+    "source": "STEM",
+    "question": "How does the dependency stage of cubs relate to the brain size of female brown bears in terms of survival techniques and social behavior?",
+    "answer": "The dependency stage allows cubs to learn vital survival techniques, which is facilitated by the relatively large brains of female brown bears, indicating that larger brain size is crucial for teaching behaviors that enhance survival in both solitary and communal settings.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "During the dependency stage, the cubs learn (rather than inherit as instincts from birth) survival techniques, such as which foods have the highest nutritional value and where to obtain them; how to hunt, fish, and defend themselves; and where to den.",
+      "Increased brain size in large carnivores has been positively linked to whether a given species is solitary, as is the brown bear, or raises their offspring communally, thus female brown bears have relatively large, well-developed brains presumably key in teaching behavior."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-9e8ed7a4",
+    "source": "STEM",
+    "question": "What factors might explain the differences in lifespan between wild and captive brown bears, particularly in relation to their gender and environment?",
+    "answer": "The differences in lifespan can be attributed to factors such as environmental stressors in the wild versus the controlled conditions in captivity, as well as potential genetic factors, with females in captivity reaching nearly 40 years and males possibly living up to 50 years, compared to 37 years for the oldest wild brown bear.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The oldest wild brown bear on record was nearly 37 years old.",
+      "The oldest recorded female in captivity was nearly 40 years old, while males in captivity have been verified to live up to 47 years, with one captive male possibly attaining 50 years of age."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-74ca9ad9",
+    "source": "STEM",
+    "question": "How do the differences in survival rates between male and female grizzly bears in the wild relate to the overall mortality rates observed in hunted populations compared to protected areas?",
+    "answer": "Female grizzly bears have a greater annual survival rate than males in wild populations, which may contribute to their demographic stability. In contrast, the higher mortality rate of 38% in hunted populations, compared to the 10% in protected areas, suggests that hunting significantly impacts bear survival across genders, potentially exacerbating the disparity in lifespan and survival rates between male and female bears.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "While male bears potentially live longer in captivity, female grizzly bears have a greater annual survival rate than males within wild populations per a study done in the Greater Yellowstone Ecosystem.",
+      "Annual mortality for bears of any age is estimated at around 10% in most protected areas; however, the average annual mortality rate rises to an estimated 38% in hunted populations."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-ad34cd72",
+    "source": "STEM",
+    "question": "What factors might contribute to the high mortality rates among cubs, given that 13% to 44% die within their first year in well-protected areas and 75-100% mortality is common among any given year's cubs?",
+    "answer": "The high mortality rates among cubs can be attributed to a combination of environmental stressors, inadequate maternal care, and predation pressures, which persist even in protected areas, leading to both significant early mortality and high annual mortality rates.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Around 13% to 44% of cubs die within their first year even in well-protected areas.",
+      "Mortality rates of 75-100% among the cubs of any given year are not uncommon."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-e877fc21",
+    "source": "STEM",
+    "question": "What implications can be drawn about the survival of brown bear cubs in relation to human impact on their populations, considering their mortality rates during early development?",
+    "answer": "The annual mortality rate of brown bear cubs decreases to 10-15% by their second and third years, indicating that maternal care significantly enhances their survival. However, since humans remain the leading cause of mortality even in protected areas, this suggests that despite improved survival rates, human activities continue to pose a critical threat to their long-term population stability.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "By the second and third years of their lives, the annual mortality rate among cubs in the care of their mothers drops to 10-15%.",
+      "Even in populations living in protected areas, humans are still the leading cause of mortality for brown bears."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-d02c035f",
+    "source": "STEM",
+    "question": "How do the low reproduction rates and high mortality factors, such as hunting and automobile collisions, impact the brown bear population sustainability?",
+    "answer": "The low reproduction rates of brown bears mean that even moderate hunting, which is considered excessive by biologists, further decreases their population. Additionally, significant mortality from automobile collisions exacerbates the decline, making population sustainability increasingly challenging.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Even where hunting is legally permitted most biologists feel that the numbers hunted are excessive considering the low reproduction rate and sparse distribution of the species.",
+      "Brown bears are also killed in collisions with automobiles, which is a significant cause of mortality in the United States and Europe."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-4c417f63",
+    "source": "STEM",
+    "question": "How does the dietary flexibility of certain bear species influence their survival in varying ecosystems, particularly in relation to their preference for abundant and easily obtainable food sources?",
+    "answer": "The dietary flexibility of certain bear species allows them to exploit a wide range of food sources, which enhances their survival by enabling them to adapt to different ecosystems. Their preference for food that is abundant and easily obtained further supports their ability to thrive in diverse environments, as they can quickly capitalize on available resources.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Certainly no other animal in their given ecosystems, short perhaps of other bear species and humans, can claim to feed on as broad a range of dietary opportunities.",
+      "Food that is both abundant and easily obtained is preferred."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-0a01378a",
+    "source": "STEM",
+    "question": "How does the evolution of jaw structure in certain species reflect their dietary habits and the availability of food resources in their respective environments?",
+    "answer": "The evolution of jaw structure is directly influenced by dietary habits, as species adapt their jaws to efficiently consume available food resources, which vary across different environments based on opportunity.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Their jaw structure has evolved to fit their dietary habits.",
+      "Their diet varies enormously throughout their differing areas based on opportunity."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-eaee3515",
+    "source": "STEM",
+    "question": "How does the seasonal variation in available food resources influence the dietary habits of brown bears throughout the year?",
+    "answer": "In spring, brown bears rely heavily on winter-provided carrion, grasses, shoots, sedges, and forbs, while in summer and early autumn, the availability of fruits, particularly berries, becomes increasingly significant, indicating a shift in dietary preferences in response to seasonal food availability.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "In spring, winter-provided carrion, grasses, shoots, sedges and forbs are the dietary mainstays for brown bears from almost every part of their distribution.",
+      "Fruits, including berries, become increasingly important during summer and early autumn."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-9cddc44a",
+    "source": "STEM",
+    "question": "How does the dietary variability between grizzly bear populations in Yellowstone and Glacier National Parks potentially influence their reliance on roots and bulbs during autumn?",
+    "answer": "The higher meat consumption in Yellowstone (51%) compared to Glacier (11%) suggests that Yellowstone bears may rely less on roots and bulbs when fruit crops are poor, whereas Glacier bears, with lower meat intake, would depend more on these food sources in autumn.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Roots and bulbs become critical in autumn for some inland bear populations if fruit crops are poor.",
+      "The dietary variability is illustrated in the western United States, as meat made up 51% of the average year-around diet for grizzly bears from Yellowstone National Park while it made up only 11% of the year-around diet for grizzlies from Glacier National Park a few hundred miles to the north."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-161b35c6",
+    "source": "STEM",
+    "question": "How does the dietary preference of brown bears influence their ecological role within their habitat?",
+    "answer": "Brown bears, deriving up to 90% of their energy from plant matter such as berries, grasses, and fungi, play a crucial role in seed dispersal and maintaining plant diversity in their ecosystem.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Despite their reputation, most brown bears are not highly carnivorous, as they derive up to 90% of their dietary food energy from vegetable matter.",
+      "Brown bears often feed on a variety of plant life, including berries, grasses, flowers, acorns (\"Quercus\" ssp.)  and pine cones as well as mosses and fungi such as mushrooms."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-cabf5221",
+    "source": "STEM",
+    "question": "How does the diversity of plant species in diets correlate with the prevalence of herbivorous eating habits in warmer temperate regions of Eurasia?",
+    "answer": "The presence of over 200 identified plant species in their foods supports the argument that diets in warmer temperate parts of Eurasia are predominantly herbivorous, as more than 90% of their diet may consist of plant-based sources.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "In total, over 200 plant species have been identified in their foods.",
+      "Arguably the most herbivorous diets have come from the warmer temperate parts of Eurasia as more than 90% of the diet may be herbivorous."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-106c2799",
+    "source": "STEM",
+    "question": "How might the geographical distribution of certain regions influence the dietary habits of grizzly bears, particularly in relation to their reliance on plant-based versus animal-based food sources?",
+    "answer": "The geographical diversity of regions such as the Balkans and the Himalayas, which feature varied climates and ecosystems, likely affects the availability of plant-based food sources for grizzly bears. Consequently, in inland areas of North America, where the diet is predominantly plant-based, the abundance of vegetation may lead bears to rely less on animal meat, while in regions with less vegetation, they may depend more on animal sources.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "These include countries and regions such as Spain, Slovakia, most of the Balkans including Greece, Turkey, the Himalayas, and presumably the Middle East.",
+      "In many inland portions of North America, the diet of grizzly bears is between 80 and 90% plant-based but animal meat can be much more important in some areas."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-2d720ce5",
+    "source": "STEM",
+    "question": "What implications does the limited access of brown bears to hard masts have on their dietary protein sources compared to black bears?",
+    "answer": "Brown bears, having restricted access to hard masts due to their climbing limitations, rely more on corms and bulbs as protein sources, while black bears can access a wider range of hard masts, enhancing their protein intake.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Corms and bulbs are important when available as they are one of the greater sources of protein in plant life as are hard masts such as acorns.",
+      "Brown bears are restricted in their access to hard masts compared to black bears because of the limited climbing abilities of grown bears and therefore are confined largely to masts fallen to the ground, pirated from other creatures or within a reach of about 3 m that the bears can stretch to with their paws extended and standing on their hindlegs."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-0c83f65f",
+    "source": "STEM",
+    "question": "How do the availability of hard masts in regions like Hokkaido, Italy, and Spain relate to the dietary habits of species such as the American red squirrel in the Rocky Mountain region?",
+    "answer": "The abundance of hard masts in regions like Hokkaido, Italy, and Spain may influence the dietary patterns of species like the American red squirrel in the Rocky Mountain region, as they rely on caching and raiding food sources such as Whitebark pine nuts, which are critical for their survival during late summer and fall.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Hard masts can become the most important food (although consumed mainly in late summer and fall) where available in large quantities such as on Hokkaido, Italy and Spain.",
+      "One of the most important foods in the Rocky Mountain region of the United States is the Whitebark pine nut (\"Pinus albicaulis\"), which is attained perhaps a majority of the time by raiding the once abundant caches of American red squirrels (\"Tamiasciurus hudsonicus\") rather than direct foraging."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-e20224b9",
+    "source": "STEM",
+    "question": "How does the consumption of a variety of fruits in late summer and fall impact the survival of brown bears during their hibernation cycle?",
+    "answer": "The high-energy fruits consumed by brown bears in late summer and fall provide essential nutrients that are critical for building fat reserves, which are necessary for survival throughout the hibernation period.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Fruits and berries are indispensable for brown bears in most areas as a high-energy food stuff for bears which is necessary to survive the hibernation cycle.",
+      "The variety of fruits consumed is high, with most of the well-known, wild fruiting plants in temperate North America and Eurasia attracting brown bears in late summer and fall."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-b2370361",
+    "source": "STEM",
+    "question": "How does the dietary preference of brown bears for social insects influence their foraging behavior and ecological role in their habitat?",
+    "answer": "Brown bears prefer to consume social insects from colonial nests due to the greater food quantity available, which influences their foraging behavior to include tearing apart rotten logs and turning over rocks to find individual invertebrates, thereby impacting nutrient cycling and predator-prey dynamics in their ecosystem.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Brown bears will also commonly consume animal matter, which in summer and autumn may regularly be in the form of insects, larvae and grubs, including beehives.",
+      "Most insects eaten are of the highly social variety found in colonial nests, which provide a likely greater quantity of food, although they will also tear apart rotten logs on the forest floor, turn over rocks or simply dig in soft earth in attempts to consume individual invertebrates such as bugs, beetles and earthworms."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-2522af38",
+    "source": "STEM",
+    "question": "How do the dietary preferences of bears in Katmai National Park and Hokkaido contribute to their nutritional intake in different seasons, and what implications does this have for their energy levels prior to fishing season?",
+    "answer": "In Katmai National Park, bears dig for soft-shell and Pacific razor clams in spring, providing a nutritious energy source before fish are available. In Hokkaido, the crayfish offers a protein-rich supplement, enhancing their dietary energy. Together, these foods ensure bears maintain high energy levels as they transition from foraging plants to fishing.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "In Alaska's Katmai National Park and Preserve, bears along the beaches of estuaries regularly dig through the sand for soft-shell clam (\"Mya arenaria\") and Pacific razor clam (\"Siliqua patula\"), providing a more nutritious source of dietary energy in spring than plant life before fish become available there.",
+      "The zarigani (\"Cambaroides japonicus\"), a type of crayfish, of Hokkaido is also an important, protein-rich dietary supplement for bears there."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-2a37157e",
+    "source": "STEM",
+    "question": "How do the characteristics of Chinook and masu salmon influence their ecological roles in their respective habitats?",
+    "answer": "Chinook salmon (Oncorhynchus tshawytscha) are known for their large size and migratory behavior, contributing significantly to nutrient cycling in freshwater ecosystems, while masu salmon (Oncorhynchus masou) are typically smaller and more resident, impacting local food webs through their spawning and feeding patterns.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "kisutch\"), Chinook (\"O.",
+      "tshawytscha\"), masu (\"O."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-66f933e5",
+    "source": "STEM",
+    "question": "How does the presence of both masou and chum salmon in the same ecosystem affect their survival strategies and ecological interactions?",
+    "answer": "The coexistence of masou and chum salmon leads to competition for resources such as food and spawning grounds, which may drive adaptations in their behavior and reproductive strategies to ensure survival.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "masou\") and chum salmon (\"O.",
+      "keta\") are also taken."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-0139abe5",
+    "source": "STEM",
+    "question": "How does the abundance of alternative food sources on Kodiak Island potentially influence the fishing behavior of bears?",
+    "answer": "The high availability of alternate food sources, such as berry crops and ungulates, may reduce the bears' reliance on fishing, allowing them to diversify their diet and adapt their foraging strategies based on resource availability.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "On Kodiak island, it appears the availability of alternate food sources is high, as berry crops are often profuse, marine organisms often wash up and ungulates both wild and domesticated are available.",
+      "The fishing techniques of bears are well-documented."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-dcf870af",
+    "source": "STEM",
+    "question": "How does the behavior of Brown bears at spawning sites impact the ecosystem, particularly in relation to scavengers?",
+    "answer": "Brown bears selectively consume the most nutritious parts of salmon during spawning, leaving the carcasses for scavengers like red foxes, bald eagles, common ravens, and gulls, thus providing a food source for these species and influencing the overall food web dynamics.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "While they may eat almost all the parts of the fish, bears at the peak of spawning, when there is usually a glut of fish to feed on, may eat only the most nutritious parts of the salmon (including the eggs and head) and then indifferently leave the rest of the carcass to scavengers, which can include red foxes (\"Vulpes vulpes\"), bald eagles (\"Haliaeetus leucocephalus\"), common ravens (\"Corvus corax\") and gulls.",
+      "Despite their normally solitary habits, Brown bears will gather rather closely in numbers at good spawning sites."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-5b1b5cfe",
+    "source": "STEM",
+    "question": "How do the aggressive behaviors of male brown bears influence the foraging strategies of female brown bears, particularly in relation to fishing spots?",
+    "answer": "Male brown bears, being the largest and most powerful, secure the most fruitful fishing spots and may fight over these rights, which forces female brown bears to choose sub-optimal fishing locations to avoid potential threats to their cubs from aggressive males.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The largest and most powerful males claim the most fruitful fishing spots and bears (especially males) will sometimes fight over the rights to a prime fishing spot.",
+      "Despite their aggressive defensive abilities, female brown bears usually select sub-optimal fishing spots to avoid male bears that could potentially threaten their cubs."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-64d78692",
+    "source": "STEM",
+    "question": "How does the relationship between grizzly bears and cutthroat trout in the Rockies exemplify the interdependence of species within an ecosystem?",
+    "answer": "The grizzly bear relies on the cutthroat trout (Oncorhynchus clarki) as a food source, illustrating a predator-prey relationship that underscores the balance of the ecosystem around Yellowstone, where both species interact and influence each other's populations.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "One other key relationship occurs between brown bears and \"Oncorhynchus\" species occurs with the grizzly bear and the cutthroat trout (\"O.",
+      "clarki\") in the Rockies such as around Yellowstone."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-f26c3692",
+    "source": "STEM",
+    "question": "How does the specialized predatory behavior of the now extinct California grizzly bear influence our understanding of predator-prey dynamics among bear species and their primary food sources?",
+    "answer": "The specialized predation of the California grizzly bear on rainbow trout indicates a unique ecological niche, suggesting that certain bear species may adapt to specific prey relationships, while the rarity of predation on fish by brown bears highlights the limited overlap in dietary habits among bear species.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "The now extinct California grizzly bear was also a fairly specialized \"Onocorhynchus\" predator in California's mountain streams and rivers, principally of rainbow trout (\"O.",
+      "Outside of Pacific-based salmonids, predatory relationships between brown bears and fish are uncommon."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-bf306b4b",
+    "source": "STEM",
+    "question": "How does the predation behavior of brown bears on specific fish species in sub-Arctic Canada and Siberia relate to their overall activity as predators in freshwater ecosystems?",
+    "answer": "Brown bears predominantly prey on broad whitefish and longnose suckers in Canada, and northern pike and grayling in Siberia; however, their overall predation activity is limited as they are not particularly active predators beyond salmon, indicating a selective predation strategy rather than a generalist approach.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Predation on broad whitefish (\"Coregonus nasus\") and longnose suckers (\"Catostomus catostomus\") has been reported in sub-Arctic Canada and northern pike (\"Esox lucius\") and grayling (\"Thymallus thymallus\") in Siberia, plus other older records of brown bears hunting miscellaneous freshwater fish in Eurasia.",
+      "Beyond the regular predation of salmon, most brown bears are not particularly active predators."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-0a9ee45d",
+    "source": "STEM",
+    "question": "How does the dietary preference of brown bears for smaller mammals influence their ecological role in the habitat they occupy?",
+    "answer": "Brown bears primarily consuming small mammals like rodents, which make up about half of their diet, suggests they play a significant role in controlling these populations and influencing the dynamics of smaller mammal species within their ecosystem.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "A perhaps surprisingly high balance of mammalian foods consists of rodents or similar smallish mammals, as about half of the species consumed by brown bears weigh less than 10 kg on average.",
+      "These may include hares (\"Lepus\" ssp.) , pikas (\"Ochotona\" ssp.)  marmots (\"Marmota\" ssp.) , ground squirrels, chipmunks, mice, rats, lemmings and voles."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-c3297cfa",
+    "source": "STEM",
+    "question": "How do the foraging behaviors of brown bears influence their dietary habits concerning small mammals and their caches?",
+    "answer": "Brown bears utilize their digging abilities to locate and access small mammals in subterranean burrows, enabling them to consume both the animals and their stored food caches, as evidenced by recorded instances of grizzly bears attacking voles and northern pocket gophers.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Due to their propensity for digging, brown bears are able to smell out active subterranean burrows of these small mammals and either wait quietly or furiously dig away until the animals are either displaced and lunged at or are cornered in their burrows.",
+      "Not only do they consume the small mammals, but they also feed on their caches, as has been recorded in grizzly bears attacking voles and northern pocket gophers (\"Thomomys talpoides\")."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-cd9a60ac",
+    "source": "STEM",
+    "question": "How does the timing of ground squirrel hunting in September and October influence the dietary patterns of grizzly bears in Denali National Park?",
+    "answer": "The timing of ground squirrel hunting in September and October coincides with the period when these rodents are more vulnerable due to early snow, making them easier targets for hunters. As Arctic ground squirrels constitute about 8% of the grizzly bears' year-round diet, successful hunting during this time increases the availability of a critical protein source for the bears.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Ground squirrel hunting is most successful in September and October, when early snow may impede the rodents\u2019 rocky escape routes.",
+      "In Denali National Park, Arctic ground squirrels represent about 8% of the year-round diet of grizzly bears and are the most consistent source of animal protein for grizzlies there."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-04198167",
+    "source": "STEM",
+    "question": "How do seasonal changes and environmental conditions influence the availability of carrion as a food source for ungulates?",
+    "answer": "In spring, as winter snow and ice conditions lead to starvation and increase ungulate mortality, carrion becomes more available, serving as an important food source during this period.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "In many cases, this important food source is obtained as carrion.",
+      "Carrion is mostly eaten in spring, when winter snow and ice conditions (including snow-slides) and starvation claim many ungulate lives."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-8401400c",
+    "source": "STEM",
+    "question": "How do the behaviors of brown bears in thawing carcasses and their predation attempts reveal their adaptability in hunting strategies?",
+    "answer": "Brown bears demonstrate adaptability by using their weight to thaw solidly frozen carcasses for consumption, indicating their ability to exploit available resources. Simultaneously, their often clumsy and half-hearted pursuit of ungulates shows a less efficient hunting strategy, suggesting they are opportunistic feeders that may rely on easier prey rather than consistently successful predation.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "As carcasses are often solidly frozen when encountered, brown bears may sit on them to thaw them sufficiently for consumption.",
+      "While perhaps a majority of bears of the species will charge at ungulates at some point in their lives, many predation attempts start with the bear clumsily and half-heartedly pursuing the prey, and end with the prey escaping alive."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-eb3895c4",
+    "source": "STEM",
+    "question": "How do the hunting techniques of bears illustrate their method of immobilizing prey before consumption, and what implications does this have for the survival of young animals in their habitat?",
+    "answer": "Bears utilize techniques such as grabbing the rib cage and delivering a fatal bite to immobilize prey, which is particularly effective against young animals that can be pinned to the ground. This predatory behavior highlights the vulnerability of juvenile animals, impacting their survival rates in the wild.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Prey is usually killed when the bear grabs the rib cage over the back and delivers a bite to the back of the head, neck, face or nose.",
+      "The bear may also pin its prey (usually young) to the ground and then immediately tear and eat it alive."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-13e84b3b",
+    "source": "STEM",
+    "question": "How do the hunting strategies of brown bears illustrate the relationship between animal behavior and survival of the fittest within their ecosystem?",
+    "answer": "Brown bears employ charging tactics to reveal slower, more vulnerable individuals in herds, and they also utilize scent to ambush young animals, demonstrating that their hunting strategies are adapted to maximize their success in capturing prey and ensuring their survival.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "To pick out young or infirm individuals, bears will charge at herds so the slower-moving and more vulnerable individuals will be made apparent.",
+      "Brown bears may also ambush young animals by finding them via scent."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-828f9a21",
+    "source": "STEM",
+    "question": "How do the physical capabilities of ungulates influence their vulnerability to predation throughout different life stages, particularly in relation to their developmental progression and physical disadvantages?",
+    "answer": "Young ungulates are particularly vulnerable to predators shortly after birth due to their undeveloped legs, making them unable to run quickly. However, even after developing running abilities, they can still be pursued by predators well into summer or fall. Conversely, adult ungulates are more likely to be attacked when they exhibit some form of physical disadvantage, highlighting that physical capabilities and disadvantages play a crucial role in their vulnerability to predation at different life stages.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Despite being characterized as a danger primarily to young, spring neonatal ungulates in the first couple of days of life, when they have undeveloped legs and cannot run at full speed, young ungulates may be pursued well into summer or fall after they have developed running abilities.",
+      "Most attacks on adult ungulates occur when the prey has some variety of physical disadvantage."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-1b8f5662",
+    "source": "STEM",
+    "question": "How do the physical adaptations of brown bears and the environmental conditions at riverbeds influence their hunting success against large prey like moose?",
+    "answer": "Brown bears' broad paws enable them to traverse icy and snowy terrains, allowing them to effectively pursue moose, which struggle on encrusted snow. Similarly, at riverbeds, the muddy or slippery conditions hinder the moose's ability to escape, increasing the bears' chances of a successful hunt.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "When emerging from hibernation, brown bears, whose broad paws allow them to walk over most ice and snow, may pursue large prey such as moose, whose hooves cannot support them on encrusted snow.",
+      "Similarly, predatory attacks on large prey sometimes occur at riverbeds, when it is more difficult for the prey specimen to run away due to muddy or slippery soil."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-67820bc6",
+    "source": "STEM",
+    "question": "How does the hunting behavior of brown bears towards large ungulate prey, such as moose and bison, relate to their typical dietary preferences, and what implications does this have for their ecological role?",
+    "answer": "Brown bears primarily target deer as their leading ungulate prey due to size and accessibility; however, when confronting larger prey like moose and bison, they utilize their powerful forearms to kill, indicating a versatile hunting strategy that allows them to adapt to varying food availability and maintain their role as apex predators in their ecosystem.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "On rare occasions, most importantly when confronting unusually large, fully-grown and dangerous prey, bears kill them by hitting with their powerful forearms, which can break the necks and backs of large creatures such as adult moose and adult bison.",
+      "The leading ungulate prey for brown bears is normally deer."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-4b42379c",
+    "source": "STEM",
+    "question": "How do the preferences of brown bears for larger prey species influence their foraging behavior and ecological impact in their habitats?",
+    "answer": "Brown bears prefer larger prey like elk, moose, and caribou due to their abundance and the larger nutritional yield per carcass. This preference influences their foraging behavior by leading them to areas where these species are found, which can affect the population dynamics of these prey species and the overall ecosystem balance.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Up to a dozen species have been eaten by brown bears but the main prey species are the larger species they encounter: elk (\"Cervus canadensis\"), moose (\"Alces alces\") and caribou (\"Rangifer tarandus\").",
+      "Larger deer are preferred because they tend to be less agile and swift than small or medium-sized deer (although a caribou can handily outpace a grizzly bear in the open), they are found in large quantities in several areas inhabited by brown bears and provide a larger meal per carcass."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-4073a391",
+    "source": "STEM",
+    "question": "How do the solitary habits of moose and the predatory behavior of the brown bear influence the dynamics of their interactions in wooded areas?",
+    "answer": "Moose prefer wooded areas due to their solitary habits, making them easier targets for the brown bear, which, despite a diminished reputation, remains a dangerous solitary predator of moose in these environments.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Moose may be preferred where found in large numbers because of their solitary habits and tendency to dwell in wooded areas, both of which makes them easier to ambush.",
+      "Despite its diminished reputation as a predator, the brown bear is the most dangerous solitary predator of moose, with only packs of wolves a more regular predator; even Siberian tigers take other prey, primarily (elk and boar), in areas where they co-exist with the giant deer."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-3f7e84c2",
+    "source": "STEM",
+    "question": "How does the dietary behavior of brown bears in northeastern Norway reflect their risk management strategies when hunting moose?",
+    "answer": "Brown bears in northeastern Norway manage hunting risks by primarily targeting young yearling moose and sickly adults, as these selections minimize confrontation risks with larger, healthier moose that can fight back. This strategy is evidenced by the high presence of moose in their diet, where moose account for up to 70% of their dietary energy, allowing bears to capitalize on vulnerable individuals while avoiding direct conflicts.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Brown bears normally avoid the potential risks of hunting large deer, which can potentially fight back but usually escape bears by running, by picking out young calves or sickly adults from deer herds.",
+      "In northeastern Norway, it was found that moose were the most important single food item (present in up to 45% of scats and locally comprising more than 70% of the bear's dietary energy) for local brown bears and several local bears appear to be specialized moose hunters, most often picking off sickly yearling moose and pregnant but healthy cows."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-7d4fbdab",
+    "source": "STEM",
+    "question": "How do the characteristics of different bovid species influence the hunting strategies employed by bears?",
+    "answer": "Bears tend to hunt smaller, agile bovid species randomly due to their vulnerability, particularly when young or sickly, while larger species pose a threat if aware of the bear's presence, leading to a more cautious approach in hunting them.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "As many as 20 species of bovids are also potential prey, including various sheep, goats, antelope, bison (\"Bison\" ssp.)  and muskoxen (\"Ovibos moschatus\").",
+      "Bovids are mostly taken in random encounters when bears come across a vulnerable, usually young or sickly individual, as smaller species are extremely agile (and often live in rocky environments) and larger varieties are potentially dangerous, especially if aware of the bear's presence."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-cb7f2239",
+    "source": "STEM",
+    "question": "How does the nesting behavior of geese and sea ducks in the lower Arctic Circle contribute to their vulnerability to predation by large birds of prey?",
+    "answer": "The nesting behavior of geese and sea ducks in shallow water and on the ground makes them more accessible to large birds of prey, such as sea eagles and gyrfalcons, which can exploit these easily accessible nests for food.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Most recorded avian prey have consisted of geese and sea ducks nesting in the lower Arctic Circle, followed by coveys of galliforms, as these birds place their nests in shallow water and on the ground as well as raise their chicks in such areas, so are relatively more vulnerable.",
+      "Large birds of prey including sea eagles, gyrfalcons (\"Falco rusticolus\") and golden eagles (\"Aquila chrysaetos\") are sometimes exploited as prey if nesting in rock formations accessible on foot and eagles and falcons may furiously dive at bears near their nests."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-6980ff8d",
+    "source": "STEM",
+    "question": "How does the habitat of reptiles and amphibians influence their role as prey in ecosystems compared to bears living near human settlements?",
+    "answer": "Reptiles and amphibians, inhabiting cooler temperate areas, are rarely preyed upon, indicating a limited role in food webs, while bears, when in proximity to humans, may prey on domestic animals, showcasing a significant shift in dietary habits due to environmental pressures.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Due to their inhabitance of cooler temperate areas, reptiles and amphibians are rarely a food source and have been verified as prey only in a few cases: frogs in the Italian Alps, rat snakes in Hokkaido, grass lizards in the Amur territory and tortoises in Greece.",
+      "When forced to live in close proximity with humans and their domesticated animals, bears may potentially predate any type of domestic animal."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-c88abebd",
+    "source": "STEM",
+    "question": "What implications does the method of exploiting domestic cattle as prey have on the ethical considerations of animal treatment in farming practices?",
+    "answer": "The method of exploiting domestic cattle as prey, which involves biting them on vulnerable areas and subsequently opening their abdominal cavity for consumption, raises ethical concerns regarding the welfare of these animals and the humane treatment standards in farming practices.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Among domestic and farm animals, domestic cattle (\"Bos primigenius taurus\") are sometimes exploited as prey.",
+      "Cattle are bitten on the neck, back or head and then the abdominal cavity is opened for eating."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-234deccc",
+    "source": "STEM",
+    "question": "How do the dietary habits of brown bears in Norway influence the economic impact on local farmers regarding sheep populations?",
+    "answer": "The high dietary reliance of brown bears on adult sheep leads to significant predation, resulting in stock losses for local farmers, who may receive partial compensation for the sheep killed by bears rather than merely scavenged.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "In Norway, free-ranging domestic sheep (\"Ovis aries\") are numerous and the local brown bears derive 65\u201387% of their dietary energy in late summer from sheep.",
+      "Because of the aforementioned vulnerability, examination of Norwegian sheep remains suggest many of the sheep consumed there are adults that were killed by the bears rather than merely scavenged, and thus some local farmers received partial compensation for their stock losses."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-dab88999",
+    "source": "STEM",
+    "question": "How does the absence of free-ranging sheep in northern Sweden influence the dietary habits of brown bears in the region, particularly in relation to their opportunistic hunting behavior towards other livestock?",
+    "answer": "The absence of free-ranging sheep leads brown bears in northern Sweden to rely predominantly on natural food sources, which may increase their opportunistic hunting of other livestock like goats, pigs, and chickens when available.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "In nearby northern Sweden, free-ranging sheep are not present and the bear derive their food predominantly from natural sources.",
+      "Horses (\"Equus ferus caballus\"), goats (\"Capra aegagrus hircus\"), pigs (\"Sus scrofa domesticus\"), chickens (\"Gallus gallus domesticus\") and dogs (\"Canis lupus familaris\") may be opportunistically killed in several parts of the brown bear's range as well."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-6a5fa151",
+    "source": "STEM",
+    "question": "How do the dietary habits of humans and domestic bees illustrate the interconnectedness of agricultural practices and natural ecosystems?",
+    "answer": "Humans cultivate various plants and fruits, such as corn and apples, which are also consumed by domestic bees, highlighting the symbiotic relationship where agricultural practices support bee populations that, in turn, can enhance pollination and crop yields.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Plants and fruit farmed by humans are readily consumed as well, including corn (\"Zea mays \"), wheat (\"Triticum\" spp.) , apple (\"Malus pumila\"), sorghum (\"Sorghum\" ssp.) , melons and any form of berries.",
+      "They will also feed at domestic bee farms, readily consuming both honey and the contents of the honey bee (\"Apis mellifera\") colony."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-8c9b4993",
+    "source": "STEM",
+    "question": "How does the size and behavior of brown bears influence their interactions with other predators when feeding on carrion, and what implications does this have for their safety, particularly for cubs?",
+    "answer": "Brown bears use their size to intimidate other predators from carrion, reducing competition for food. Their formidable size and aggressive nature make predation by other species rare, thus ensuring that even cubs are often safe due to their protective mothers.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "While feeding on carrion, brown bears use their size to intimidate other predators, such as wolves, cougars (\"Puma concolor\"), tigers (\"Panthera tigris\") and black bears from their kills.",
+      "Owing to their formidable size and aggressive disposition, predation by wild animals outside of their own species is rare for brown bears of any age, even cubs are often safe due to their watchful mother."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-cdc03559",
+    "source": "STEM",
+    "question": "Considering the recorded encounters between bears and tigers, how does the behavior of bears seeking out tigers after hibernation influence the dynamics of their confrontations and the outcomes observed?",
+    "answer": "Bears seeking tigers to steal kills may increase the frequency of encounters, leading to more confrontations where 50% result in bear fatalities, thus reflecting a potential risk for bears but also illustrating a competitive dynamic that can result in varied outcomes such as mutual survival despite injuries.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Of 44 recorded encounters between the two predators, 20 resulted in confrontations; in 50% of these, the bears in general (not necessarily brown bears) were killed, in 27% the tigers were killed, and 23% of the cases ended with both animals surviving and parting ways despite injuries sustained in the conflict.",
+      "Some bears emerging from hibernation seek out tigers in order to steal their kills."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-c96f5816",
+    "source": "STEM",
+    "question": "How do the interactions between wolves and brown bears at carrion sites illustrate the balance of competition and coexistence in Katmai National Park?",
+    "answer": "Despite the potential for competition, wolves can displace brown bears at carrion sites, yet most confrontations between the two species end without bloodshed, indicating a complex balance of animosity and coexistence.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "On the contrary, in Katmai National Park and Preserve, wolves, even lone wolves, may manage to displace brown bears at carrion sites.",
+      "Despite the high animosity between the two species, most confrontations at kill sites or large carcasses end without bloodshed on either side."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-fb0457a9",
+    "source": "STEM",
+    "question": "What implications do the interactions between wolves and brown bears at carcasses suggest about their predator hierarchy and survival strategies in their shared ecosystem?",
+    "answer": "The rare tolerance between wolves and brown bears at carcasses indicates that while they are competitors, their interactions may reflect a complex predator hierarchy where the presence of a larger predator can deter wolves from aggression, suggesting adaptive survival strategies to minimize conflict and maximize resource utilization.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Though conflict over carcasses is common, on rare occasions the two predators tolerate each other on the same kill.",
+      "To date, there are only a few cases of fully-grown wolves being killed by brown bears and none of wolves killing healthy adult brown bears."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-19d54061",
+    "source": "STEM",
+    "question": "How does the interaction between grizzly bears and cougars affect the dietary energy dynamics of cougars in their shared habitat?",
+    "answer": "Grizzly bears displace cougars from their kills, leading to cougars losing up to a third of their dietary energy, which can impact their survival and hunting efficiency, while cougars occasionally kill bear cubs, indicating a complex predator-prey relationship.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "In some areas, the grizzly bear also regularly displaces cougars (\"Puma concolor\") from their kills with some estimates showing cougars locally lose up to a third of their dietary energy to grizzly bears.",
+      "Cougars kill small bear cubs on rare occasions, but there was one report of a bear killing a cougar of unknown age and condition between 1993 and 1996."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-47288389",
+    "source": "STEM",
+    "question": "How does the presence of the Eurasian lynx influence the ecological dynamics of kleptoparasitism among brown bears and their interactions with leopards and snow leopards in Eurasia?",
+    "answer": "The Eurasian lynx, being a habitual victim of kleptoparasitism by brown bears, indicates a competitive dynamic where brown bears may rely on lynx for food opportunities. This relationship suggests that as lynx populations fluctuate, the availability of resources for brown bears may also be affected, potentially impacting their interactions with leopards and snow leopards in shared habitats, as resource competition could intensify.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "Eurasian lynx (\"Lynx lynx\"), the largest type of lynx and the only one to regularly take large prey, is similarly an habitual victim of kleptoparasitism to brown bears throughout Eurasia.",
+      "Brown bears also co-exist with leopards (\"Panthera pardus\") (in very small remnant wild parts of the Middle East, Jammu and Kashmir, northeastern China and Primorsky Krai) and snow leopards (\"Panthera uncia\"), in several areas of northern central Asia and the Tibetan Plateau)."
+    ],
+    "evidence_relations": []
+  },
+  {
+    "id": "STEM-484ad7ba",
+    "source": "STEM",
+    "question": "How do the behaviors of wolverines in relation to grizzly bears illustrate the balance between aggression and caution in predator-prey dynamics?",
+    "answer": "Wolverines display aggressive behavior by fending off grizzly bears that are significantly larger, demonstrating their tenacity. However, they also exhibit caution by attempting to avoid encounters with grizzlies, especially in Denali National Park, indicating an awareness of the risks involved in confrontation.",
+    "question_type": "Complex Reasoning",
+    "evidence": [
+      "On the contrary, wolverines (\"Gulo gulo\") are known to have been persistent enough to fend off a grizzly bear as much as ten times their weight from a kill.",
+      "In some rare cases, wolverines have lost their lives to grizzly bears, and wolverines in Denali National Park will reportedly try to avoid encounters with grizzlies."
+    ],
+    "evidence_relations": []
+  }
+]
