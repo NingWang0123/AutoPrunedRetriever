@@ -7,7 +7,7 @@ dataset: stem
 # input templates
 corpus_file: ../data/corpus/stem_corpus.json
 # quest is from local
-quest_file: ../data/stem_QnA_modified.json
+quest_file: ../data/stem_question.json
 
 # runner/processing knobs
 chunking_use: rebel
