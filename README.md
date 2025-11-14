@@ -20,6 +20,7 @@ python3 -m venv venv_rgl
 source venv_rgl/bin/activate
 
 pip install -r requirements.txt
+pip install torch==2.9.1
 
 cd/py_files
 
