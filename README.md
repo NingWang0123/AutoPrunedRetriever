@@ -112,8 +112,8 @@ Each file must follow the GraphRAG-Bench format:
 {
   "id": "Q-1",
   "question": "...",
-  "predicted_answer": "...",
-  "reference_answer": "..."
+  "generated_answer": "...",
+  "ground_truth": "..."
 }
 ```
 
