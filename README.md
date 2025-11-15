@@ -131,6 +131,7 @@ Each file must follow the GraphRAG-Bench format:
 
 ```
 python py_files/GraphRAG-Benchmark/Evaluation/generation_eval.py \
-    --config configs/outputs/<dataset>/<run_name>.json \
+    --mode API \
+    --data_file configs/outputs/<dataset>/<run_name>.json
     --embedding_model BAAI/bge-large-en-v1.5
 ```
