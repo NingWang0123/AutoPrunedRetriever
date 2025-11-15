@@ -93,10 +93,10 @@ mkdir -p py_files
 git -C py_files clone https://github.com/GraphRAG-Bench/GraphRAG-Benchmark.git
 ```
 
-cd py_files/GraphRAG-Benchmark
-
 #### Fix imports in main evaluation scripts
 ```bash
+cd py_files/GraphRAG-Benchmark
+
 sed -i 's/from Evaluation\.metrics import/from metrics import/g' Evaluation/generation_eval.py
 sed -i 's/from Evaluation\.llm import/from llm import/g' Evaluation/generation_eval.py
 sed -i 's/from Evaluation\.metrics import/from metrics import/g' Evaluation/retrieval_eval.py
