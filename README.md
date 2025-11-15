@@ -58,13 +58,6 @@ pip install --index-url https://download.pytorch.org/whl/cu121 torch==2.9.1
 pip install --index-url https://download.pytorch.org/whl/cu121 torch==2.9.1
 ```
 
-### 5) Get GraphRAG-Benchmark under `py_files/` (for evaluation only)
-
-```bash
-mkdir -p py_files
-git -C py_files clone https://github.com/GraphRAG-Bench/GraphRAG-Benchmark.git
-```
-
 ### 6) Set API key for chunking
 
 #### macOS / Linux (bash/zsh)
