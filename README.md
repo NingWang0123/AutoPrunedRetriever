@@ -70,13 +70,15 @@ git -C py_files clone https://github.com/GraphRAG-Bench/GraphRAG-Benchmark.git
 #### macOS / Linux (bash/zsh)
 
 ```bash
-export CHUNKING_API=""   # your api key
+export CHUNKING_API=""   # your api key for building graphs (only for LLM version)
+export OPENAI_API_KEY="" # your api key for answering questions
 ```
 
 #### Windows (PowerShell)
 
 ```powershell
-$env:CHUNKING_API = ""   # your api key
+$env:CHUNKING_API = ""   # your api key for building graphs (only for LLM version)
+$env:OPENAI_API_KEY="" # your api key for answering questions
 ```
 
 ### 7) Run
