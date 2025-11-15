@@ -65,7 +65,7 @@ mkdir -p py_files
 git -C py_files clone https://github.com/GraphRAG-Bench/GraphRAG-Benchmark.git
 ```
 
-### 6) (Optional) Set API key for chunking
+### 6) Set API key for chunking
 
 #### macOS / Linux (bash/zsh)
 
