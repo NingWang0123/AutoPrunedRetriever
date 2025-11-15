@@ -93,6 +93,17 @@ mkdir -p py_files
 git -C py_files clone https://github.com/GraphRAG-Bench/GraphRAG-Benchmark.git
 ```
 
+cd py_files/GraphRAG-Benchmark
+
+# Fix imports in main evaluation scripts
+sed -i 's/from Evaluation\.metrics import/from metrics import/g' Evaluation/generation_eval.py
+sed -i 's/from Evaluation\.llm import/from llm import/g' Evaluation/generation_eval.py
+sed -i 's/from Evaluation\.metrics import/from metrics import/g' Evaluation/retrieval_eval.py
+sed -i 's/from Evaluation\.llm import/from llm import/g' Evaluation/retrieval_eval.py
+
+# Fix imports inside metrics submodules
+find Evaluation/metrics/ -name "*.py" -exec sed -i 's/from Evaluation\.metrics\.utils import/from .utils import/g' {} \;
+
 ### 2. Prepare Model Output Files
 
 Place all APR prediction files under:
