@@ -1,6 +1,6 @@
 <h1 align="center">AutoPrunedRetriever</h1>
 <p align="center">
-    <img src="https://github.com/NingWang0123/AutoPrunedRetriever/blob/main/py_files/img/octopus_pruned.png" width="55%" style="max-width: 300px;">
+    <img src="https://github.com/NingWang0123/AutoPrunedRetriever/blob/main/py_files/img/octopus_pruned.png" width="45%" style="max-width: 300px;">
 </p>
 
 [![View Workflow](https://img.shields.io/badge/View%20Workflow-PDF-blue)](./Workflow.pdf)
