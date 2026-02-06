@@ -139,7 +139,7 @@ python py_files/GraphRAG-Benchmark/Evaluation/generation_eval.py \
     --embedding_model BAAI/bge-large-en-v1.5
 ```
 
-### Citation
+## Citation
 
 If you find this work useful, please cite our paper:
 
