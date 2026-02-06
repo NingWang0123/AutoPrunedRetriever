@@ -138,3 +138,20 @@ python py_files/GraphRAG-Benchmark/Evaluation/generation_eval.py \
     --data_file configs/outputs/<dataset>/<run_name>.json
     --embedding_model BAAI/bge-large-en-v1.5
 ```
+
+### Citation
+
+If you find this work useful, please cite our paper:
+
+```bibtex
+@misc{wang2026pruningminimalreasoninggraphs,
+      title={Pruning Minimal Reasoning Graphs for Efficient Retrieval-Augmented Generation}, 
+      author={Ning Wang and Kuanyan Zhu and Daniel Yuehwoon Yee and Yitang Gao and Shiying Huang and Zirun Xu and Sainyam Galhotra},
+      year={2026},
+      eprint={2602.04926},
+      archivePrefix={arXiv},
+      primaryClass={cs.DB},
+      url={https://arxiv.org/abs/2602.04926}, 
+}
+```
+
