@@ -39,9 +39,56 @@ def _hashed_char_ngrams(s: str, dims: int = 384, n: int = 3) -> np.ndarray:
     return v / norm if norm else v
 
 
-# _ENCODER = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
-# _ENCODER = SentenceTransformer("BAAI/bge-base-en")
-_ENCODER = SentenceTransformer("BAAI/bge-large-en-v1.5")
+# _ENCODER_NAME = "sentence-transformers/all-MiniLM-L6-v2"
+# _ENCODER_NAME = "BAAI/bge-base-en"
+_ENCODER_NAME = "BAAI/bge-large-en-v1.5"
+_ENCODER = None
+
+
+def set_encoder(encoder) -> None:
+    """Inject a shared encoder to avoid redundant model loads."""
+    global _ENCODER
+    if isinstance(encoder, str):
+        _ENCODER = SentenceTransformer(encoder)
+    else:
+        _ENCODER = encoder
+
+
+def _get_encoder():
+    global _ENCODER
+    if _ENCODER is None:
+        _ENCODER = SentenceTransformer(_ENCODER_NAME)
+    return _ENCODER
+
+
+def _encode_query_with_encoder(encoder, q: str):
+    """Support SentenceTransformer or LangChain HF embeddings."""
+    if encoder is None:
+        return None
+
+    # Unwrap common internal attrs if a wrapper is passed (e.g., LangChain)
+    for attr in ("client", "_client", "model", "_model"):
+        if hasattr(encoder, attr):
+            cand = getattr(encoder, attr)
+            if cand is not None and hasattr(cand, "encode"):
+                encoder = cand
+                break
+
+    if hasattr(encoder, "encode"):
+        vec = encoder.encode([q], convert_to_numpy=True, normalize_embeddings=True)
+        return vec[0]
+
+    if hasattr(encoder, "embed_documents"):
+        vec = np.asarray(encoder.embed_documents([q])[0], dtype=np.float32)
+        norm = np.linalg.norm(vec)
+        return vec / norm if norm else vec
+
+    if hasattr(encoder, "_embed_text"):
+        vec = np.asarray(encoder._embed_text(q), dtype=np.float32)
+        norm = np.linalg.norm(vec)
+        return vec / norm if norm else vec
+
+    return None
 
 
 def featurize_query(q: str, dims: int = 384) -> np.ndarray:
@@ -51,11 +98,14 @@ def featurize_query(q: str, dims: int = 384) -> np.ndarray:
     otherwise falls back to hashed n-grams.
     """
     try:
-        vec = _ENCODER.encode([q], convert_to_numpy=True, normalize_embeddings=True)
-        return vec[0]   # shape (D,)
+        encoder = _ENCODER if _ENCODER is not None else _get_encoder()
+        vec = _encode_query_with_encoder(encoder, q)
+        if vec is not None:
+            return vec  # shape (D,)
     except Exception:
-        # fallback to hashed n-grams if encoder fails
-        return _hashed_char_ngrams(q, dims=dims, n=3)
+        pass
+    # fallback to hashed n-grams if encoder fails
+    return _hashed_char_ngrams(q, dims=dims, n=3)
     
 
 def featurize_state(cr) -> np.ndarray:

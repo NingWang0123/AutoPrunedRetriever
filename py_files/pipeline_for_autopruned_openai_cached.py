@@ -10,15 +10,14 @@ import pandas as pd
 from tqdm import tqdm
 import copy
 from huggingface_hub import hf_hub_download
-from langchain_community.embeddings import HuggingFaceEmbeddings
-
 from AutoPrunedRetriever_advanced_cached import (
-    ExactGraphRag_rl, merging_codebook
+    ExactGraphRag_rl, merging_codebook, word_emb as shared_word_emb
 )
 
 from dpo_exactgraphrag import (    
     make_preference_dataset_2head, train_dpo_2head,make_preference_dataset_2head_using_llm,
-    default_reward, answer_with_auto_strategy,save_pref_examples,load_pref_examples,ANSWERS_CHOICES,THINKINGS_CHOICES,FACTS_CHOICES
+    default_reward, answer_with_auto_strategy,save_pref_examples,load_pref_examples,ANSWERS_CHOICES,THINKINGS_CHOICES,FACTS_CHOICES,
+    set_encoder
 )
 
 from llm_api import OpenAILLM ,Word2VecEmbeddings
@@ -27,7 +26,6 @@ from langchain_openai import ChatOpenAI
 # from evaluation_func_graphrag import compute_answer_correctness
 import reward_func_dpo
 from functools import partial
-from sentence_transformers import SentenceTransformer
 import sys
 
 # ---------------------------------------------------------------------
@@ -50,12 +48,10 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
                           ini_meta_json = Path("meta_codebook.json") ,saved_examples_name = "sbert_pref_examples_medical.json",
                           reward_func = None,reward_func_mode = 'non_llm',final_json_path = "results/compressrag_medical_data_test.json"):
     print("» Initialising embeddings & LLM …")
-    word_emb = HuggingFaceEmbeddings(
-        model_name="BAAI/bge-large-en-v1.5"
-    )
-    sent_emb = HuggingFaceEmbeddings(
-        model_name="BAAI/bge-large-en-v1.5"
-    )
+    # reuse the shared embedding instance to avoid repeated loads
+    word_emb = shared_word_emb
+    sent_emb = shared_word_emb
+    set_encoder(word_emb)
     api_llm = OpenAILLM(  
         include_thinkings=True,                 
         model_name="gpt-4o-mini",  

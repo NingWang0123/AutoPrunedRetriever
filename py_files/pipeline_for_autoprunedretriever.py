@@ -8,13 +8,8 @@ import numpy as np
 from tqdm import tqdm
 from huggingface_hub import hf_hub_download
 
-# Embeddings / LLM wrappers
-from langchain_community.embeddings import HuggingFaceEmbeddings
-# from langchain_community.embeddings import HuggingFaceBgeEmbeddings  # not used
-# from langchain_openai import ChatOpenAI  # not used
-
 # Your project modules
-from AutoPrunedRetriever_advanced_final import AutoPrunedRetriver
+from AutoPrunedRetriever_advanced_final import AutoPrunedRetriver, word_emb as shared_word_emb
 from dpo_exactgraphrag import (
     make_preference_dataset_2head,
     train_dpo_2head,
@@ -26,6 +21,7 @@ from dpo_exactgraphrag import (
     ANSWERS_CHOICES,
     THINKINGS_CHOICES,
     FACTS_CHOICES,
+    set_encoder,
 )
 import reward_func_dpo
 
@@ -131,9 +127,9 @@ def compress_rag_workflow(
     subchunk_mode = 'chars'
 ):
     print("» Initialising embeddings & LLM …")
-    # You can share the same model for word/sentence; keeping your original two for parity.
-    word_emb = HuggingFaceEmbeddings(model_name="BAAI/bge-large-en-v1.5")
-    sent_emb = HuggingFaceEmbeddings(model_name="BAAI/bge-large-en-v1.5")
+    word_emb = shared_word_emb
+    sent_emb = shared_word_emb
+    set_encoder(word_emb)
 
     # Your OpenAI wrapper; expects key via llm_api (already resolved with env fallback in main)
     from llm_api import OpenAILLM
