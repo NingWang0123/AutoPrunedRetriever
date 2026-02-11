@@ -21,7 +21,7 @@ from dpo_exactgraphrag import (
     default_reward, answer_with_auto_strategy,save_pref_examples,load_pref_examples,ANSWERS_CHOICES,THINKINGS_CHOICES,FACTS_CHOICES
 )
 
-from llm_api import OpenAILLM ,Word2VecEmbeddings
+from llm_api import OpenAILLM
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings
 from langchain_openai import ChatOpenAI
 # from evaluation_func_graphrag import compute_answer_correctness
@@ -35,7 +35,7 @@ import sys
 # ---------------------------------------------------------------------
 REPO_ID      = "GraphRAG-Bench/GraphRAG-Bench"
 CORPUS_FILE  = "GraphRAG-Benchmark/Datasets/Corpus/medical.json"
-QUEST_FILE   = "Datasets/Questions/medical_questions.json"
+QUEST_FILE   = "GraphRAG-Benchmark/Datasets/Questions/medical_questions.json"
 
 SEED_N       = 1    # first 30 rows → bootstrap + DPO train, numbers must be divided by 2. (n%2=0)
 TEST_N       = 1     # next 20 rows  → evaluation
@@ -107,7 +107,8 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
     # 2) Load benchmark Q-A-E data
     # ---------------------------------------------------------------------
     print("» Loading benchmark questions / answers / evidence …")
-    q_fp = hf_hub_download(REPO_ID, QUEST_FILE, repo_type="dataset")
+    q_fp = Path(QUEST_FILE)
+    print(f"» Using local questions file: {q_fp}")
     qrows = json.load(open(q_fp, encoding="utf-8"))
 
     row_lookup  = {r["question"].strip(): r for r in qrows}
@@ -132,6 +133,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
     # ---------------------------------------------------------------------
     # only load if we do not have ini_meta 
     if not pre_loaded_meta:
+        print(f"» Using local corpus file: {CORPUS_FILE}")
         # corpus file is the facts
         cr.load_and_merge_facts(
             CORPUS_FILE,
