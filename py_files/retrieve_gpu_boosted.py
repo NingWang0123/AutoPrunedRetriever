@@ -8,8 +8,16 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 # ======================================================
 # Global defaults / knobs
 # ======================================================
-_DEFAULT_DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-_DEFAULT_DTYPE  = torch.float16 if torch.cuda.is_available() else torch.float32
+def _resolve_default_device() -> torch.device:
+    if torch.cuda.is_available():
+        return torch.device("cuda")
+    # Prefer MPS on Apple Silicon if available
+    if hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+        return torch.device("mps")
+    return torch.device("cpu")
+
+_DEFAULT_DEVICE = _resolve_default_device()
+_DEFAULT_DTYPE  = torch.float16 if _DEFAULT_DEVICE.type == "cuda" else torch.float32
 
 # Better matmul perf on Ampere+ (safe no-op on older)
 try:
@@ -65,6 +73,9 @@ def decode_question(question, codebook_main, fmt='words'):
 def _autocast_ctx(device: torch.device, use_amp: bool, amp_dtype: Optional[torch.dtype]):
     if device.type == "cuda":
         return torch.amp.autocast(device_type="cuda", enabled=use_amp, dtype=amp_dtype)
+    # MPS autocast can be fragile across PyTorch versions; keep it off by default
+    if device.type == "mps":
+        return nullcontext()
     if device.type == "cpu":
         return torch.amp.autocast(device_type="cpu", enabled=False)
     return nullcontext()
@@ -286,9 +297,13 @@ def _segment_amax_1d(values: torch.Tensor, seg_ids: torch.Tensor, nseg: int) -> 
 
     # Preferred fast path (PyTorch ≥1.13): scatter_reduce_
     if hasattr(out, "scatter_reduce_"):
-        # include_self=True so that segments with no elements keep -inf
-        out.scatter_reduce_(dim=0, index=seg_ids, src=values, reduce="amax", include_self=True)
-        return out
+        try:
+            # include_self=True so that segments with no elements keep -inf
+            out.scatter_reduce_(dim=0, index=seg_ids, src=values, reduce="amax", include_self=True)
+            return out
+        except Exception:
+            # fall through to the portable path
+            pass
 
     # Fallback (older PyTorch): do a stable sort + segmented max on CPU/GPU
     # NOTE: This path is slower but correct; only used on very old versions.

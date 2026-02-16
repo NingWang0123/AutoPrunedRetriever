@@ -8,6 +8,7 @@ from collections import defaultdict
 import numpy as np
 import numpy as np
 import re
+import torch
 from langchain.embeddings.base import Embeddings
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
@@ -28,7 +29,14 @@ from rouge_score import rouge_scorer
 from test_continous_chunk import embed_triples_as_sentences,segment_by_centroid_sim,merge_chunks_by_boundary 
 from math import ceil
 from concurrent.futures import ThreadPoolExecutor, as_completed
-# from retrieve_gpu_boosted import coarse_filter_optimized_gpu_ver
+try:
+    from retrieve_gpu_boosted import coarse_filter_optimized_gpu_ver
+    _GPU_RETRIEVAL_AVAILABLE = True
+    _GPU_RETRIEVAL_IMPORT_ERR = None
+except Exception as _e:
+    coarse_filter_optimized_gpu_ver = None
+    _GPU_RETRIEVAL_AVAILABLE = False
+    _GPU_RETRIEVAL_IMPORT_ERR = _e
 
 Triplet = Tuple[str, str, str]
 
@@ -3919,6 +3927,9 @@ class AutoPrunedRetriver:
         semantic_overlap_sim = 0.9,
         chunking_use = 'rebel',
         chunking_api = None,
+        use_gpu_retrieval: Optional[bool] = None,
+        gpu_use_amp: bool = True,
+        gpu_device: Optional[Union[str, torch.device]] = None,
     ):
         """
         thinkings_choice and answers_choice must be one of 'overlap','unique','not_include'
@@ -3939,6 +3950,24 @@ class AutoPrunedRetriver:
         # Embeddings
         self.sentence_emb = sentence_emb 
         self.word_emb = word_emb 
+
+        # GPU retrieval settings (optional)
+        if use_gpu_retrieval is None:
+            has_gpu = torch.cuda.is_available() or (hasattr(torch.backends, "mps") and torch.backends.mps.is_available())
+            self.use_gpu_retrieval = bool(_GPU_RETRIEVAL_AVAILABLE and has_gpu)
+        else:
+            self.use_gpu_retrieval = bool(use_gpu_retrieval)
+
+        if gpu_device is None:
+            if torch.cuda.is_available():
+                self.gpu_device = torch.device("cuda")
+            elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+                self.gpu_device = torch.device("mps")
+            else:
+                self.gpu_device = torch.device("cpu")
+        else:
+            self.gpu_device = gpu_device if isinstance(gpu_device, torch.device) else torch.device(gpu_device)
+        self.gpu_use_amp = bool(gpu_use_amp)
 
         #coarse filter params
         self.top_k = top_k
@@ -4525,18 +4554,45 @@ class AutoPrunedRetriver:
         # due to almost empty prev answer database, give adapted m
         adapted_m = min(max(1,int(0.1*len(self.meta_codebook['answers_lst']))),self.top_m)
 
-        if len(self.meta_codebook['answers_lst'])>0:
+        use_gpu = bool(self.use_gpu_retrieval and _GPU_RETRIEVAL_AVAILABLE)
+        if self.use_gpu_retrieval and not _GPU_RETRIEVAL_AVAILABLE:
+            print(f"[warn] GPU retrieval requested but unavailable: {_GPU_RETRIEVAL_IMPORT_ERR}")
 
-            top_m_results = coarse_filter_optimized(
-                            questions_edges_index,
-                            self.meta_codebook,
-                            self.sentence_emb,                 # ← move before defaults
-                            self.top_k,                             # word-embedding candidates
-                            self.question_batch_size,               # query batch size
-                            self.questions_db_batch_size,           # DB batch size
-                            adapted_m,                             # sentence-embedding rerank
-                            self.custom_linearizer,
-                            'questions')
+        if use_gpu:
+            # GPU path needs embeddings present in codebook
+            _ensure_embeddings_in_codebook(self.meta_codebook, dim_fallback=64)
+
+        if len(self.meta_codebook['answers_lst'])>0:
+            if use_gpu:
+                try:
+                    top_m_results = coarse_filter_optimized_gpu_ver(
+                        questions_edges_index,
+                        self.meta_codebook,
+                        self.sentence_emb,
+                        top_k=self.top_k,
+                        question_batch_size=None,
+                        questions_db_batch_size=None,
+                        top_m=adapted_m,
+                        custom_linearizer=self.custom_linearizer,
+                        target='questions',
+                        device=self.gpu_device,
+                        use_amp=self.gpu_use_amp,
+                    )
+                except Exception as e:
+                    print(f"[warn] GPU retrieval failed (answers), falling back to CPU: {e}")
+                    use_gpu = False
+
+            if not use_gpu:
+                top_m_results = coarse_filter_optimized(
+                                questions_edges_index,
+                                self.meta_codebook,
+                                self.sentence_emb,                 # ← move before defaults
+                                self.top_k,                             # word-embedding candidates
+                                self.question_batch_size,               # query batch size
+                                self.questions_db_batch_size,           # DB batch size
+                                adapted_m,                             # sentence-embedding rerank
+                                self.custom_linearizer,
+                                'questions')
             
             all_answers,all_q_indices = get_all_results_entire_chunk(top_m_results,self.meta_codebook,'answers')
 
@@ -4544,17 +4600,36 @@ class AutoPrunedRetriver:
             all_answers = []
             all_q_indices = []
         
+        if use_gpu:
+            try:
+                top_m_results_for_facts = coarse_filter_optimized_gpu_ver(
+                                            questions_edges_index,
+                                            self.meta_codebook,
+                                            self.sentence_emb,                 # ← move before defaults
+                                            top_k=self.top_k,                             # word-embedding candidates
+                                            question_batch_size=None,               # query batch size
+                                            questions_db_batch_size=None,           # DB batch size
+                                            top_m=self.top_m,                             # sentence-embedding rerank
+                                            custom_linearizer=self.custom_linearizer,
+                                            target='facts',
+                                            device=self.gpu_device,
+                                            use_amp=self.gpu_use_amp,
+                                        )
+            except Exception as e:
+                print(f"[warn] GPU retrieval failed (facts), falling back to CPU: {e}")
+                use_gpu = False
 
-        top_m_results_for_facts = coarse_filter_optimized(
-                                    questions_edges_index,
-                                    self.meta_codebook,
-                                    self.sentence_emb,                 # ← move before defaults
-                                    self.top_k,                             # word-embedding candidates
-                                    self.question_batch_size,               # query batch size
-                                    self.questions_db_batch_size,           # DB batch size
-                                    self.top_m,                             # sentence-embedding rerank
-                                    self.custom_linearizer,
-                                    'facts')
+        if not use_gpu:
+            top_m_results_for_facts = coarse_filter_optimized(
+                                        questions_edges_index,
+                                        self.meta_codebook,
+                                        self.sentence_emb,                 # ← move before defaults
+                                        self.top_k,                             # word-embedding candidates
+                                        self.question_batch_size,               # query batch size
+                                        self.questions_db_batch_size,           # DB batch size
+                                        self.top_m,                             # sentence-embedding rerank
+                                        self.custom_linearizer,
+                                        'facts')
         
         all_facts,_ = get_all_results(top_m_results_for_facts,self.meta_codebook) 
         print('all_facts',all_facts)

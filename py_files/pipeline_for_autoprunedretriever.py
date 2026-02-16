@@ -378,8 +378,12 @@ if __name__ == "__main__":
 
     # -------- Inputs (config-relative + HF fallback) --------
     REPO_ID = cfg.get("repo_id", None)  # allow null => local-only
-    CORPUS_SPEC = cfg.get("corpus_file", "GraphRAG-Benchmark/Datasets/Corpus/medical.json")
-    QUEST_SPEC = cfg.get("quest_file", "Datasets/Questions/medical_questions.json")
+    # format input templates with dataset/chunking_use
+    def _fmt(s: str) -> str:
+        return s.format(dataset=dataset, chunking_use=chunking_use)
+
+    CORPUS_SPEC = _fmt(cfg.get("corpus_file", "GraphRAG-Benchmark/Datasets/Corpus/medical.json"))
+    QUEST_SPEC = _fmt(cfg.get("quest_file", "Datasets/Questions/medical_questions.json"))
 
     CORPUS_FILE = str(resolve_path_or_hf(REPO_ID, CORPUS_SPEC, cfg_path=cfg_path)[0])
     QUEST_FILE = str(resolve_path_or_hf(REPO_ID, QUEST_SPEC, cfg_path=cfg_path)[0])
@@ -398,9 +402,6 @@ if __name__ == "__main__":
 
     # -------- Outputs (resolved relative to config; dirs created later) --------
     # --- format templated output paths from YAML ---
-    def _fmt(s: str) -> str:
-        return s.format(dataset=dataset, chunking_use=chunking_use)
-
     ini_meta_json_raw       = _fmt(cfg.get("ini_meta_json", "meta_codebook.json"))
     saved_examples_name_raw = _fmt(cfg.get("saved_examples_name", "pref_examples.json"))
     final_json_path_raw     = _fmt(cfg.get("final_json_path", "results/out.json"))
