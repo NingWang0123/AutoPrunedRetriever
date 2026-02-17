@@ -1,6 +1,8 @@
 import asyncio
 import os, json, re, random
+import argparse
 from pathlib import Path
+from glob import glob
 from typing import List, Dict, Tuple, Optional
 import json
 import pathlib
@@ -29,6 +31,78 @@ from functools import partial
 import sys
 
 # ---------------------------------------------------------------------
+# Helpers: robust path handling + HF fallback + env fallbacks
+# ---------------------------------------------------------------------
+
+def _resolve_rel_to_config(cfg_path: Optional[str], p: Optional[str]) -> Optional[Path]:
+    """Resolve a path relative to the config file location (if provided)."""
+    if not p:
+        return None
+    P = Path(p)
+    if P.is_absolute():
+        return P
+    base = Path(cfg_path).resolve().parent if cfg_path else Path.cwd()
+    return (base / P).resolve()
+
+
+def resolve_path_or_hf(repo_id: Optional[str], file_or_glob: str, cfg_path: Optional[str] = None) -> List[Path]:
+    """
+    Returns concrete local Paths:
+      1) Try local (file or glob), resolved relative to cfg file dir if provided.
+      2) Else if repo_id is set AND 'file_or_glob' is a single path (no wildcards),
+         download via hf_hub_download(repo_type='dataset').
+      3) Else raise.
+    """
+    local_candidate = _resolve_rel_to_config(cfg_path, file_or_glob)
+    matches: List[Path] = []
+    if local_candidate:
+        if local_candidate.is_file():
+            matches = [local_candidate]
+        else:
+            mg = glob(str(local_candidate))
+            matches = [Path(m).resolve() for m in mg if Path(m).is_file()]
+    if matches:
+        return matches
+
+    if repo_id and not any(sym in file_or_glob for sym in "*?[]"):
+        # HF dataset path
+        p = hf_hub_download(repo_id, file_or_glob, repo_type="dataset")
+        return [Path(p).resolve()]
+
+    raise FileNotFoundError(f"No local file(s) matched '{file_or_glob}' and no HF repo_id provided.")
+
+
+def ensure_parent(path_like) -> Path:
+    """Create parent directory for a file path if missing."""
+    p = Path(path_like)
+    p.parent.mkdir(parents=True, exist_ok=True)
+    return p
+
+
+def _maybe_from_env(v, env_key: Optional[str]):
+    """Config/CLI > env (if key provided) > None."""
+    return v if v not in (None, "", []) else (os.getenv(env_key) if env_key else None)
+
+
+def _load_config(path: str) -> dict:
+    import yaml
+    with open(path, "r", encoding="utf-8") as f:
+        if path.endswith((".yml", ".yaml")):
+            return yaml.safe_load(f)
+        return json.load(f)
+
+
+def load_questions_any(repo_id: Optional[str], quest_spec: str, cfg_path: Optional[str] = None) -> List[dict]:
+    """Load questions from JSON or JSONL (local or HF dataset)."""
+    paths = resolve_path_or_hf(repo_id, quest_spec, cfg_path)
+    if len(paths) != 1:
+        raise ValueError(f"Expected exactly one questions file, got: {paths}")
+    p = paths[0]
+    if p.suffix.lower() == ".jsonl":
+        return [json.loads(line) for line in p.read_text(encoding="utf-8").splitlines() if line.strip()]
+    return json.loads(p.read_text(encoding="utf-8"))
+
+# ---------------------------------------------------------------------
 # 0) Paths / constants
 # ---------------------------------------------------------------------
 REPO_ID      = "GraphRAG-Bench/GraphRAG-Bench"
@@ -46,7 +120,8 @@ TOPK_CTX     = 5
 def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
                           top_m,top_k,combine_ent_sim,q_combine_sim,aft_combine_sim,semantic_overlap_sim,  # all the params can be optimized
                           ini_meta_json = Path("meta_codebook.json") ,saved_examples_name = "sbert_pref_examples_medical.json",
-                          reward_func = None,reward_func_mode = 'non_llm',final_json_path = "results/compressrag_medical_data_test.json"):
+                          reward_func = None,reward_func_mode = 'non_llm',final_json_path = "results/compressrag_medical_data_test.json",
+                          llm_api: Optional[str] = None, cfg_path: Optional[str] = None):
     print("» Initialising embeddings & LLM …")
     # reuse the shared embedding instance to avoid repeated loads
     word_emb = shared_word_emb
@@ -59,14 +134,18 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
         temperature=0.2,
         top_p=0.9,
         use_cache=True,
-        api_key="",  
+        api_key=llm_api,  
         # base_url="https://api.openai.com/v1",
     )
 
 
+    # Normalize IO path types
+    ini_meta_json = Path(ini_meta_json) if ini_meta_json else None
+    saved_examples_name = Path(saved_examples_name) if saved_examples_name else None
+    final_json_path = Path(final_json_path) if final_json_path else None
+
     if ini_meta_json:
         pre_loaded_meta = False
-
         if ini_meta_json.is_file():
             try:
                 with ini_meta_json.open("r", encoding="utf-8") as f:
@@ -103,8 +182,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
     # 2) Load benchmark Q-A-E data
     # ---------------------------------------------------------------------
     print("» Loading benchmark questions / answers / evidence …")
-    q_fp = hf_hub_download(REPO_ID, QUEST_FILE, repo_type="dataset")
-    qrows = json.load(open(q_fp, encoding="utf-8"))
+    qrows = load_questions_any(REPO_ID, QUEST_FILE, cfg_path=cfg_path)
 
     row_lookup  = {r["question"].strip(): r for r in qrows}
     gold_lookup = {q: r["answer"]        for q, r in row_lookup.items()}
@@ -139,19 +217,6 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
             subchunk_batch =1000
         )
         cr._facts_preloaded = True
-        # cr.top_m = 5          # sentence-embedding rerank top-m
-
-        print(cr.meta_codebook)
-
-        print('===============================================================')
-        print('===============================================================')
-        print('===============================================================')
-
-        print("len(cr.meta_codebook[facts_lst])",len(cr.meta_codebook["facts_lst"]))
-
-        print('===============================================================')
-        print('===============================================================')
-        print('===============================================================')
 
         def make_json_safe(obj):
             """Recursively convert numpy arrays into lists."""
@@ -163,23 +228,13 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
                 return [make_json_safe(v) for v in obj]
             return obj
 
-        with open("meta_codebook_new2.json", "w") as f:
-            json.dump(make_json_safe(cr.meta_codebook), f, indent=2)
-
-        print('===============================================================')
-        print('===============================================================')
-        print('===============================================================')
-
-        print("after changed len(cr.meta_codebook[facts_lst])",len(cr.meta_codebook["facts_lst"]))
-
-        print('===============================================================')
-        print('===============================================================')
-        print('===============================================================')
-
+        if ini_meta_json:
+            ensure_parent(ini_meta_json)
+            ini_meta_json.write_text(json.dumps(make_json_safe(cr.meta_codebook), indent=2), encoding="utf-8")
 
         print(f"[DEBUG] after facts-merge: |E|={len(cr.meta_codebook['e'])} "
-            f"|R|={len(cr.meta_codebook['r'])} "
-            f"|edges|={len(cr.meta_codebook['edge_matrix'])}")
+              f"|R|={len(cr.meta_codebook['r'])} "
+              f"|edges|={len(cr.meta_codebook['edge_matrix'])}")
         
 
     print('ensuring cached ver has the edge_matrix_embedding')
@@ -196,8 +251,8 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
 
     # # using llm one to replace the old one
     # # using answer_correctness from graph rag benchmark
-    if os.path.exists(saved_examples_name):
-        pref_ds = load_pref_examples(saved_examples_name)
+    if saved_examples_name and saved_examples_name.exists():
+        pref_ds = load_pref_examples(str(saved_examples_name))
         print(f"loaded {len(pref_ds)} cached preference examples")
 
     else:
@@ -238,7 +293,9 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
                     feature_dim = 1024
                 )
                 print(f"   generated {len(pref_ds)} preference examples")
-                save_pref_examples(saved_examples_name, pref_ds)
+                if saved_examples_name:
+                    ensure_parent(saved_examples_name)
+                    save_pref_examples(str(saved_examples_name), pref_ds)
                 return pref_ds
             
             pref_ds = asyncio.run(build_or_load_pref_ds())
@@ -259,6 +316,9 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
                     FACTS_CHOICES = FACTS_CHOICES
 
                 )
+            if saved_examples_name:
+                ensure_parent(saved_examples_name)
+                save_pref_examples(str(saved_examples_name), pref_ds)
             
 
     # throw away the store info from qa
@@ -365,7 +425,7 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
                 print(f'{total_q_left} q left')
 
         # --- merge metrics + rows ---
-        Path(out_path).parent.mkdir(parents=True, exist_ok=True)
+        ensure_parent(out_path)
         metrics_by_q = {m["question"]: m for m in run_metrics}
         merged_results = []
         for row in rows:
@@ -387,23 +447,77 @@ def compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N,
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Run DPO pipeline with a config file.")
+    parser.add_argument("--config", "-c", required=True, help="Path to YAML/JSON config")
+    parser.add_argument("--llm_api", default=None, help="Override LLM API key (else config or OPENAI_API_KEY)")
+    parser.add_argument("--chunking_api", default=None, help="Override Chunking API key (else config or CHUNKING_API)")
+    args = parser.parse_args()
 
-    aft_combine_sim = 0.93
-    top_m = 15
+    cfg_path = args.config
+    cfg = _load_config(args.config)
 
-    reward_func = reward_func_dpo.reward_sbert_inclusive
+    # --- read knobs first ---
+    dataset      = cfg.get("dataset", "tv")
+    chunking_use = cfg.get("chunking_use", "rebel")
 
-    SEED_N       = 1    # change to 20 for training
-    TEST_N       = 1200     # change to 980 for rest
+    # -------- Inputs (config-relative + HF fallback) --------
+    REPO_ID = cfg.get("repo_id", None)  # allow null => local-only
+    def _fmt(s: str) -> str:
+        return s.format(dataset=dataset, chunking_use=chunking_use)
 
-    
+    CORPUS_SPEC = _fmt(cfg.get("corpus_file", "GraphRAG-Benchmark/Datasets/Corpus/medical.json"))
+    QUEST_SPEC  = _fmt(cfg.get("quest_file",  "Datasets/Questions/medical_questions.json"))
 
-    # change v number to v number +1 if want to recreate
+    CORPUS_FILE = str(resolve_path_or_hf(REPO_ID, CORPUS_SPEC, cfg_path=cfg_path)[0])
+    QUEST_FILE  = str(resolve_path_or_hf(REPO_ID, QUEST_SPEC,  cfg_path=cfg_path)[0])
 
-    compress_rag_workflow(REPO_ID,CORPUS_FILE,QUEST_FILE,SEED_N,TEST_N, 
-                            top_m,top_m*10,aft_combine_sim,aft_combine_sim,aft_combine_sim,0.93,
-                            Path("meta_codebook_new2.json") ,f"pref_examples_medical_exact_openai_v3.json",reward_func,
-                            reward_func_mode = 'non_llm',final_json_path = f"results/compressrag_medical_data_openai_test_new_v3_for_aprv3.json")
+    # -------- Hyper-params / knobs --------
+    SEED_N = int(cfg.get("seed_n", 20))
+    TEST_N = int(cfg.get("test_n", 2042))
 
-    # df.to_csv('results/result_sbertinclusive_new_embed_for_exactgraphrag.csv')
-# python pipeline_for_autopruned_openai_cached.py
+    top_m = int(cfg.get("top_m", 20))
+    top_k = int(cfg.get("top_k", top_m * 10))
+    combine_ent_sim = float(cfg.get("combine_ent_sim", 0.93))
+    q_combine_sim = float(cfg.get("q_combine_sim", 0.93))
+    aft_combine_sim = float(cfg.get("aft_combine_sim", 0.93))
+    semantic_overlap_sim = float(cfg.get("semantic_overlap_sim", 0.93))
+
+    # -------- Outputs (resolved relative to config; dirs created later) --------
+    ini_meta_json_raw       = _fmt(cfg.get("ini_meta_json", "meta_codebook.json"))
+    saved_examples_name_raw = _fmt(cfg.get("saved_examples_name", "pref_examples.json"))
+    final_json_path_raw     = _fmt(cfg.get("final_json_path", "results/out.json"))
+
+    ini_meta_json       = _resolve_rel_to_config(cfg_path, ini_meta_json_raw)
+    saved_examples_name = _resolve_rel_to_config(cfg_path, saved_examples_name_raw)
+    final_json_path     = _resolve_rel_to_config(cfg_path, final_json_path_raw)
+
+    # -------- Rewards --------
+    reward_func_name = cfg.get("reward_func", "reward_sbert_inclusive")
+    reward_func = getattr(reward_func_dpo, reward_func_name)
+    reward_func_mode = cfg.get("reward_func_mode", "non_llm")
+
+    # -------- Keys: CLI > config > ENV --------
+    llm_api_cfg = cfg.get("llm_api", None)
+    llm_api = args.llm_api or _maybe_from_env(llm_api_cfg, "OPENAI_API_KEY")
+
+    # -------- Run --------
+    compress_rag_workflow(
+        REPO_ID=REPO_ID,
+        CORPUS_FILE=CORPUS_FILE,
+        QUEST_FILE=QUEST_FILE,
+        SEED_N=SEED_N,
+        TEST_N=TEST_N,
+        top_m=top_m,
+        top_k=top_k,
+        combine_ent_sim=combine_ent_sim,
+        q_combine_sim=q_combine_sim,
+        aft_combine_sim=aft_combine_sim,
+        semantic_overlap_sim=semantic_overlap_sim,
+        ini_meta_json=ini_meta_json,
+        saved_examples_name=saved_examples_name,
+        reward_func=reward_func,
+        reward_func_mode=reward_func_mode,
+        final_json_path=final_json_path,
+        llm_api=llm_api,
+        cfg_path=cfg_path,
+    )
