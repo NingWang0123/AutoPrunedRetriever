@@ -1,2 +1,10 @@
 __pycache__/
 *.py[cod]
+*.egg-info/
+venv*/
+.env
+*.key
+openai_key.txt
+deepseek_key.txt
+outputs/
+*.DS_Store

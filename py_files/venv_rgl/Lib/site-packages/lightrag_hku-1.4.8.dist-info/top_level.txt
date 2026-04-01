@@ -1,2 +1,0 @@
-lightrag
-lightrag_webui

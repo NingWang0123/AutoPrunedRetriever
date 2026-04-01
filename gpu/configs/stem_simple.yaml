@@ -1,0 +1,18 @@
+dataset: stem
+corpus_file: ../data/corpus/stem_corpus.json
+quest_file: ../data/stem_question.json
+
+chunking_use: llm
+subchunk_mode: tokens
+
+ini_meta_json: outputs/stem/meta_codebook_llm.json
+final_json_path: outputs/stem/stem_simple_results.json
+
+top_m: 20
+top_k: 200
+combine_ent_sim: 0.93
+q_combine_sim: 0.93
+aft_combine_sim: 0.93
+semantic_overlap_sim: 0.93
+
+skip_update_meta: false

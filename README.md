@@ -1,141 +1,100 @@
-<h1 align="center">AutoPrunedRetriever</h1>
-<p align="center">
-    <img src="https://github.com/NingWang0123/AutoPrunedRetriever/blob/main/py_files/img/octopus_pruned.png" width="45%" style="max-width: 300px;">
-</p>
+# AutoPrunedRetriever
 
-[![View Workflow](https://img.shields.io/badge/View%20Workflow-PDF-blue)](./Workflow.pdf)
+Code for **AutoPrunedRetriever (APR)** and **AutoPruned Layer (APL)** — a structured knowledge graph retrieval system for complex reasoning over documents.
 
-Suggested Python: 3.10.12
+## Repository Structure
 
-## Reproducibility Steps
-
-### 1) Clone this repo
-```bash
-git clone https://github.com/NingWang0123/relational_graph_llm
-cd relational_graph_llm
-````
-
-### 2) Create & activate a virtual environment
-
-#### macOS / Linux (bash/zsh)
-
-```bash
-python -m venv venv_rgl
-source venv_rgl/bin/activate
+```
+AutoPrunedRetriever/
+├── gpu/                        # Simple version (APR + APL, requires GPU)
+│   ├── run_apr.py              # Run APR standalone
+│   ├── run_apl.py              # Run APL on baseline RAG predictions
+│   ├── auto_pruned_retriever.py
+│   ├── auto_pruned_layer.py
+│   ├── retrieve_simple.py
+│   ├── retrieve_gpu_cached_combined.py
+│   ├── combine_ent_cached_aligned.py
+│   ├── sentence_embed_overlap_cached.py
+│   ├── test_continous_chunk_cached.py
+│   ├── llm_api.py
+│   ├── mem_debug.py
+│   ├── graph_generator/
+│   │   ├── llm_parser.py
+│   │   └── llm_parser_concurrent.py
+│   └── configs/
+│       ├── stem_simple.yaml
+│       └── tv_simple.yaml
+├── cpu/                        # Legacy version (original codebase)
+│   └── ...
+├── data/                       # Shared datasets
+│   ├── stem_question.json
+│   ├── tv_questions.json
+│   └── corpus/
+│       ├── stem_corpus.json
+│       └── tv_corpus.json
+├── requirements.txt
+└── README.md
 ```
 
-#### Windows (PowerShell)
+## Quick Start
 
-```powershell
-python -m venv venv_rgl
-.\venv_rgl\Scripts\Activate.ps1
-```
-
-### 3) Install base dependencies
+### Setup
 
 ```bash
 pip install -r requirements.txt
+export OPENAI_API_KEY="sk-..."
 ```
 
-### 4) Install PyTorch (choose ONE)
-
-#### Option A — CPU only (simple, works everywhere)
+### Run APR (standalone retrieval system)
 
 ```bash
-pip install torch==2.9.1
+cd gpu
+
+# STEM dataset
+python run_apr.py --config configs/stem_simple.yaml
+
+# TV dataset
+python run_apr.py --config configs/tv_simple.yaml
 ```
 
-#### Option B — GPU (CUDA) build
+### Run APL (plug-in layer on baseline RAG)
 
-> Adjust the CUDA tag if needed (e.g., `cu121`, `cu124`). Example below uses `cu121`.
-
-**macOS/Linux (bash/zsh):**
+APL enhances any baseline RAG system's predictions by re-parsing retrieved context into structured KG edges and generating answers with cross-question memory.
 
 ```bash
-pip install --index-url https://download.pytorch.org/whl/cu121 torch==2.9.1
+cd gpu
+python run_apl.py --predictions path/to/baseline_predictions.json \
+                  --output path/to/apl_results.json
 ```
 
-**Windows (PowerShell):**
-
-```powershell
-pip install --index-url https://download.pytorch.org/whl/cu121 torch==2.9.1
-```
-
-### 6) Set API key for chunking
-
-#### macOS / Linux (bash/zsh)
-
-```bash
-export CHUNKING_API=""   # your api key for building graphs (only for LLM version)
-export OPENAI_API_KEY="" # your api key for answering questions
-```
-
-#### Windows (PowerShell)
-
-```powershell
-$env:CHUNKING_API = ""   # your api key for building graphs (only for LLM version)
-$env:OPENAI_API_KEY="" # your api key for answering questions
-```
-
-### 7) Run
-
-```bash
-make run CONFIG=configs/tv_cr_llm.yaml
-```
-
-## 🧪 Evaluation
-
-We use the same **LLM Judge** from the official  
-[GraphRAG-Benchmark](https://github.com/GraphRAG-Bench/GraphRAG-Benchmark)  
-to ensure APR is evaluated under identical metrics and scoring rules.
-
-### 1. Download the Evaluation Pipeline
-
-```
-mkdir -p py_files
-git -C py_files clone https://github.com/GraphRAG-Bench/GraphRAG-Benchmark.git
-```
-
-#### Fix imports in main evaluation scripts
-```bash
-cd py_files/GraphRAG-Benchmark
-
-sed -i 's/from Evaluation\.metrics import/from metrics import/g' Evaluation/generation_eval.py
-sed -i 's/from Evaluation\.llm import/from llm import/g' Evaluation/generation_eval.py
-sed -i 's/from Evaluation\.metrics import/from metrics import/g' Evaluation/retrieval_eval.py
-sed -i 's/from Evaluation\.llm import/from llm import/g' Evaluation/retrieval_eval.py
-```
-
-#### Fix imports inside metrics submodules
-```bash
-find Evaluation/metrics/ -name "*.py" -exec sed -i 's/from Evaluation\.metrics\.utils import/from .utils import/g' {} \;
-```
-
-### 2. Prepare Model Output Files
-
-Place all APR prediction files under:
-
-```
-configs/outputs/<dataset>/<run_name>.json
-```
-
-Each file must follow the GraphRAG-Bench format:
-
+**Expected input format** (`baseline_predictions.json`):
 ```json
-{
-  "id": "Q-1",
-  "question": "...",
-  "generated_answer": "...",
-  "ground_truth": "..."
-}
+[
+    {
+        "id": "q_001",
+        "question": "...",
+        "answer": "reference answer",
+        "question_type": "Complex Reasoning",
+        "retrieved_contexts": ["passage 1...", "passage 2..."]
+    }
+]
 ```
 
-### 3. Run Evaluation
+## Configuration
 
-```
-python py_files/GraphRAG-Benchmark/Evaluation/generation_eval.py \
-    --mode API \
-    --data_file configs/outputs/<dataset>/<run_name>.json
-    --embedding_model BAAI/bge-large-en-v1.5
-```
+Key parameters in YAML configs:
 
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `chunking_use` | `llm` | Triplet extraction method (GPT-4o-mini) |
+| `top_m` | `20` | Number of final retrieved results per question |
+| `top_k` | `200` | Candidate pool size for retrieval |
+| `combine_ent_sim` | `0.93` | Cosine similarity threshold for entity merging |
+| `semantic_overlap_sim` | `0.93` | Threshold for semantic deduplication |
+| `skip_update_meta` | `false` | If true, disables memory accumulation |
+
+## Hardware Requirements
+
+- **GPU**: CUDA-capable GPU with >= 8GB VRAM (for embedding computation)
+- **RAM**: >= 16GB
+- **API**: OpenAI API key with access to `gpt-4o-mini`

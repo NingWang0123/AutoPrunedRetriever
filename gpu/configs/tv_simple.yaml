@@ -1,0 +1,18 @@
+dataset: tv
+corpus_file: ../data/corpus/tv_corpus.json
+quest_file: ../data/tv_questions.json
+
+chunking_use: llm
+subchunk_mode: tokens
+
+ini_meta_json: outputs/tv/meta_codebook_llm.json
+final_json_path: outputs/tv/tv_simple_results.json
+
+top_m: 20
+top_k: 200
+combine_ent_sim: 0.93
+q_combine_sim: 0.93
+aft_combine_sim: 0.93
+semantic_overlap_sim: 0.93
+
+skip_update_meta: false
