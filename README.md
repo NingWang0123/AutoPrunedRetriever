@@ -9,7 +9,7 @@ Code for **AutoPrunedRetriever (APR)** and **AutoPruned Layer (APL)** — a stru
 ## Architecture
 
 <p align="center">
-  <img src="workflow.png" width="800" alt="APR Pipeline">
+  <img src="apr_pipeline.png" width="800" alt="APR Pipeline">
 </p>
 
 ## Repository Structure
