@@ -6,7 +6,7 @@ chunking_use: llm
 subchunk_mode: tokens
 
 ini_meta_json: outputs/stem/meta_codebook_llm.json
-final_json_path: outputs/stem/stem_simple_results.json
+final_json_path: outputs/stem/stem_results.json
 
 top_m: 20
 top_k: 200

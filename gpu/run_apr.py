@@ -1,9 +1,9 @@
 """
-Run AutoPrunedRetriever (simple version) on STEM or TV dataset.
+Run AutoPrunedRetriever on STEM or TV dataset.
 
 Usage:
-    python run_apr.py --config configs/stem_simple.yaml
-    python run_apr.py --config configs/tv_simple.yaml
+    python run_apr.py --config configs/stem.yaml
+    python run_apr.py --config configs/tv.yaml
 """
 
 import os, json, time, argparse, sys
@@ -13,7 +13,7 @@ from tqdm import tqdm
 import yaml
 
 def main():
-    parser = argparse.ArgumentParser(description="Run APR (simple version)")
+    parser = argparse.ArgumentParser(description="Run APR")
     parser.add_argument("--config", "-c", required=True, help="Path to YAML config")
     parser.add_argument("--api-key", default=None, help="OpenAI API key (or set OPENAI_API_KEY)")
     args = parser.parse_args()

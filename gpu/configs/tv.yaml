@@ -6,7 +6,7 @@ chunking_use: llm
 subchunk_mode: tokens
 
 ini_meta_json: outputs/tv/meta_codebook_llm.json
-final_json_path: outputs/tv/tv_simple_results.json
+final_json_path: outputs/tv/tv_results.json
 
 top_m: 20
 top_k: 200
