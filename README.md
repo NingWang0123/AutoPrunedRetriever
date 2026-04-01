@@ -1,5 +1,9 @@
 # AutoPrunedRetriever
 
+<p align="center">
+  <img src="octopus_pruned.png" width="400" alt="AutoPrunedRetriever">
+</p>
+
 Code for **AutoPrunedRetriever (APR)** and **AutoPruned Layer (APL)** — a structured knowledge graph retrieval system for complex reasoning over documents.
 
 ## Repository Structure
