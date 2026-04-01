@@ -6,42 +6,47 @@
 
 Code for **AutoPrunedRetriever (APR)** and **AutoPruned Layer (APL)** — a structured knowledge graph retrieval system for complex reasoning over documents.
 
+## Architecture
+
 <p align="center">
-  <img src="workflow.png" width="700" alt="APR Pipeline">
+  <img src="workflow.png" width="800" alt="APR Pipeline">
 </p>
 
 ## Repository Structure
 
 ```
 AutoPrunedRetriever/
-├── gpu/                        # Simple version (APR + APL, requires GPU)
-│   ├── run_apr.py              # Run APR standalone
-│   ├── run_apl.py              # Run APL on baseline RAG predictions
-│   ├── auto_pruned_retriever.py
-│   ├── auto_pruned_layer.py
-│   ├── retrieve_simple.py
+├── gpu/                            # APR + APL (requires GPU)
+│   ├── run_apr.py                  # Run APR standalone
+│   ├── run_apl.py                  # Run APL on baseline RAG predictions
+│   ├── auto_pruned_retriever.py    # Core APR class
+│   ├── auto_pruned_layer.py        # Core APL class
+│   ├── dpo_exactgraphrag.py        # DPO strategy learning
+│   ├── reward_func_dpo.py          # Reward functions (SBERT, BLEU, ROUGE)
+│   ├── retrieve_simple.py          # 6-signal hybrid retrieval
 │   ├── retrieve_gpu_cached_combined.py
 │   ├── combine_ent_cached_aligned.py
 │   ├── sentence_embed_overlap_cached.py
 │   ├── test_continous_chunk_cached.py
 │   ├── llm_api.py
-│   ├── dpo_exactgraphrag.py             # DPO strategy learning
-│   ├── reward_func_dpo.py               # Reward functions (SBERT, BLEU, ROUGE)
 │   ├── mem_debug.py
 │   ├── graph_generator/
-│   │   ├── llm_parser.py
+│   │   ├── llm_parser.py           # LLM-based triplet extraction
 │   │   └── llm_parser_concurrent.py
 │   └── configs/
-│       ├── stem_simple.yaml
-│       └── tv_simple.yaml
-├── cpu/                        # Legacy version (original codebase)
+│       ├── stem.yaml
+│       └── tv.yaml
+├── cpu/                            # Legacy version (original codebase)
 │   └── ...
-├── data/                       # Shared datasets
+├── data/                           # Shared datasets
 │   ├── stem_question.json
 │   ├── tv_questions.json
 │   └── corpus/
 │       ├── stem_corpus.json
 │       └── tv_corpus.json
+├── instructions/                   # Detailed usage guides
+│   ├── apr_guide.md
+│   └── apl_guide.md
 ├── requirements.txt
 └── README.md
 ```
@@ -106,6 +111,7 @@ Key parameters in YAML configs:
 | `top_k` | `200` | Candidate pool size for retrieval |
 | `combine_ent_sim` | `0.93` | Cosine similarity threshold for entity merging |
 | `semantic_overlap_sim` | `0.93` | Threshold for semantic deduplication |
+| `seed_n` | `20` | Number of seed questions for DPO training |
 | `skip_update_meta` | `false` | If true, disables memory accumulation |
 
 ## Hardware Requirements
@@ -113,3 +119,9 @@ Key parameters in YAML configs:
 - **GPU**: CUDA-capable GPU with >= 8GB VRAM (for embedding computation)
 - **RAM**: >= 16GB
 - **API**: OpenAI API key with access to `gpt-4o-mini`
+
+## Documentation
+
+See [`instructions/`](instructions/) for detailed guides:
+- [APR Guide](instructions/apr_guide.md) — full pipeline walkthrough, DPO details, config reference, custom datasets
+- [APL Guide](instructions/apl_guide.md) — input format, baseline conversion, step-by-step pipeline, tips
