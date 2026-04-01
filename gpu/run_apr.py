@@ -16,6 +16,7 @@ def main():
     parser = argparse.ArgumentParser(description="Run APR")
     parser.add_argument("--config", "-c", required=True, help="Path to YAML config")
     parser.add_argument("--api-key", default=None, help="OpenAI API key (or set OPENAI_API_KEY)")
+    parser.add_argument("--no-dpo", action="store_true", help="Disable DPO strategy selection")
     args = parser.parse_args()
 
     # ── Load config ──
@@ -134,23 +135,86 @@ def main():
         cr.combine_ents_func(mode="knn")
         print(f"  done in {time.time() - t0:.1f}s")
 
+    # ── DPO strategy training (unless --no-dpo) ──
+    use_dpo = not args.no_dpo
+    policy = None
+
+    if use_dpo:
+        from dpo_exactgraphrag import (
+            make_preference_dataset_2head, train_dpo_2head,
+            default_reward, answer_with_auto_strategy,
+            save_pref_examples, load_pref_examples,
+            ANSWERS_CHOICES, THINKINGS_CHOICES, FACTS_CHOICES,
+        )
+        from reward_func_dpo import reward_sbert_inclusive
+
+        seed_n = cfg.get("seed_n", 20)
+        all_seed_questions = all_questions[:seed_n]
+        midpoint = len(all_seed_questions) // 2
+        train_questions = all_seed_questions[:midpoint]
+        seed_questions = all_seed_questions[midpoint:]
+        train_answers = [gold_lookup.get(q) for q in train_questions]
+        test_questions = all_questions[seed_n:]
+
+        # Record seed Q&A for warm-up
+        cr.record_labeled_q_and_a(train_questions, train_answers)
+
+        # Build preference dataset
+        saved_pref = Path(cfg.get("saved_examples_name",
+                          f"outputs/{cfg['dataset']}/reasoning_pref.json"))
+        if saved_pref.exists():
+            pref_ds = load_pref_examples(str(saved_pref))
+            print(f"Loaded {len(pref_ds)} cached preference examples")
+        else:
+            print(f"Building DPO preference pairs on {len(seed_questions)} seed questions ...")
+            pref_ds = make_preference_dataset_2head(
+                cr, questions=seed_questions, gold_answers=gold_lookup,
+                per_q_samples=6, feature_dim=1024,
+                reward_fn=reward_sbert_inclusive, seed=0, isolate_state=True,
+                ANSWERS_CHOICES=ANSWERS_CHOICES,
+                THINKINGS_CHOICES=THINKINGS_CHOICES,
+                FACTS_CHOICES=FACTS_CHOICES,
+            )
+            saved_pref.parent.mkdir(parents=True, exist_ok=True)
+            save_pref_examples(str(saved_pref), pref_ds)
+
+        # Clear seed Q&A from memory before test
+        cr.meta_codebook["questions_lst"] = []
+        cr.meta_codebook["answers_lst"] = []
+
+        # Train DPO policy
+        print("Training DPO policy ...")
+        policy, _ = train_dpo_2head(pref_ds, input_dim=1024)
+    else:
+        test_questions = all_questions
+
     # ── Answer questions ──
-    print(f"\nAnswering {len(all_questions)} questions ...")
+    print(f"\nAnswering {len(test_questions)} questions ...")
     final_path = Path(cfg["final_json_path"])
     final_path.parent.mkdir(parents=True, exist_ok=True)
     results = []
 
-    for q in tqdm(all_questions, desc="Questions"):
+    for q in tqdm(test_questions, desc="Questions"):
         t_start = time.time()
         start_idx = len(llm.metrics_runs)
 
-        answer, context, q_json = cr.run_work_flow(
-            question=q,
-            rule="Answer questions using the given knowledge graph context.",
-            facts_json_path=cfg["corpus_file"],
-            warm_start="knn",
-            skip_update_meta=cfg.get("skip_update_meta", False),
-        )
+        if use_dpo and policy is not None:
+            answer, gen_metrics_dpo, fact_context = answer_with_auto_strategy(
+                cr, policy, q,
+                reward_fn=default_reward,
+                gold_answer=gold_lookup.get(q),
+                greedy=True,
+                skip_update_meta=cfg.get("skip_update_meta", False),
+            )
+            context = fact_context
+        else:
+            answer, context, q_json = cr.run_work_flow(
+                question=q,
+                rule="Answer questions using the given knowledge graph context.",
+                facts_json_path=cfg["corpus_file"],
+                warm_start="knn",
+                skip_update_meta=cfg.get("skip_update_meta", False),
+            )
 
         t_end = time.time()
         gen_metrics = (llm.metrics_runs[start_idx:] or [{}])[-1] or {}

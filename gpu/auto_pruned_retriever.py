@@ -3806,3 +3806,86 @@ class AutoPrunedRetriver:
         return (new_result, metrics_map, self.cur_fact_context) if return_metrics else new_result
         
     # dpo version for run work_flow, same process but return the collected metrics from the llm
+
+    def collect_results_dpo(self, final_merged_json, questions, retrieval_time: float = 0.0):
+        llm = self.llm
+        new_json_lst = []
+        new_result = None
+
+        if self.include_thinkings:
+            a_new, t_new = llm.take_questions(final_merged_json, questions, retrieval_time=retrieval_time)
+            new_result = a_new
+            a_new_json = get_code_book(a_new, type='answers')
+            t_new_json = get_code_book(t_new, type='thinkings')
+            if is_no_answer_text(a_new):
+                a_new_json["edges([e,r,e])"] = []
+            new_json_lst.extend([a_new_json, t_new_json])
+        else:
+            a_new = llm.take_questions(final_merged_json, questions, retrieval_time=retrieval_time)
+            new_result = a_new
+            a_new_json = get_code_book(a_new, type='answers')
+            if is_no_answer_text(a_new):
+                a_new_json["edges([e,r,e])"] = []
+            new_json_lst.append(a_new_json)
+
+        metrics_from_llm = llm.last_metrics
+        return new_result, new_json_lst, metrics_from_llm
+
+    def run_work_flow_for_dpo(self, q_prompt, rule="Answer questions",
+                               facts_json_path=None, chunk_chars=1024,
+                               overlap=0, warm_start="knn"):
+        self.set_includings()
+        q_json = self.encode_question(q_prompt, rule)
+
+        combined_facts_cb = None
+        if not getattr(self, "_facts_preloaded", False) and facts_json_path:
+            self.load_and_merge_facts(facts_json_path, chunk_chars, overlap)
+            self._facts_preloaded = True
+
+        if self.meta_codebook:
+            t0 = time.perf_counter()
+            all_answers, all_q_indices, all_facts = self.retrieve_new(q_json)
+            retrieval_time = time.perf_counter() - t0
+            domain_knowledge_lst = self.find_related_knowledge(all_answers, all_q_indices, all_facts)
+            final_merged_json = self.compact_indicies_for_prompt(q_json, domain_knowledge_lst)
+        else:
+            final_merged_json = combined_facts_cb if combined_facts_cb else q_json.copy()
+            retrieval_time = 0
+
+        q_txt, gk_txt, st_txt, ft_txt = select_best_context_by_keys(final_merged_json)
+        final_merged_json = slice_for_final_merged_json(final_merged_json, self.use_word)
+
+        if gk_txt:
+            self.cur_fact_context = ft_txt + gk_txt
+        else:
+            self.cur_fact_context = ft_txt
+
+        new_result, new_json_lst, metrics_from_llm = self.collect_results_dpo(
+            final_merged_json, questions=q_prompt, retrieval_time=retrieval_time
+        )
+        self.update_meta(new_json_lst, facts_cb=combined_facts_cb)
+
+        return new_result, metrics_from_llm, ft_txt
+
+    def record_labeled_q_and_a(self, questions, answers):
+        """Record labeled questions and answers into the meta_codebook."""
+        if len(questions) != len(answers):
+            raise ValueError("Number of questions and answers must match.")
+        for answer in answers:
+            codebook_sub = get_code_book(answer, type="answers")
+            self.meta_codebook = merging_codebook(
+                self.meta_codebook, codebook_sub, "answers", self.word_emb, True
+            )
+        for question in questions:
+            codebook_sub = get_code_book(question, type="questions")
+            self.meta_codebook = merging_codebook(
+                self.meta_codebook, codebook_sub, "questions", self.word_emb, True
+            )
+
+    def record_labeled_thinkings(self, thinkings):
+        """Record labeled thinkings into the meta_codebook."""
+        for t in thinkings:
+            codebook_sub_t = get_code_book(t, type='thinkings')
+            self.meta_codebook = merging_codebook(
+                self.meta_codebook, codebook_sub_t, "thinkings", self.word_emb, True
+            )

@@ -21,6 +21,8 @@ AutoPrunedRetriever/
 │   ├── sentence_embed_overlap_cached.py
 │   ├── test_continous_chunk_cached.py
 │   ├── llm_api.py
+│   ├── dpo_exactgraphrag.py             # DPO strategy learning
+│   ├── reward_func_dpo.py               # Reward functions (SBERT, BLEU, ROUGE)
 │   ├── mem_debug.py
 │   ├── graph_generator/
 │   │   ├── llm_parser.py
@@ -51,14 +53,19 @@ export OPENAI_API_KEY="sk-..."
 
 ### Run APR (standalone retrieval system)
 
+APR uses DPO (Direct Preference Optimization) to learn a lightweight strategy policy that selects the best retrieval configuration per question.
+
 ```bash
 cd gpu
 
-# STEM dataset
-python run_apr.py --config configs/stem_simple.yaml
+# STEM dataset (with DPO, default)
+python run_apr.py --config configs/stem.yaml
 
 # TV dataset
-python run_apr.py --config configs/tv_simple.yaml
+python run_apr.py --config configs/tv.yaml
+
+# Without DPO (fixed strategy)
+python run_apr.py --config configs/stem.yaml --no-dpo
 ```
 
 ### Run APL (plug-in layer on baseline RAG)
