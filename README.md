@@ -6,6 +6,10 @@
 
 Code for **AutoPrunedRetriever (APR)** and **AutoPruned Layer (APL)** — a structured knowledge graph retrieval system for complex reasoning over documents.
 
+<p align="center">
+  <img src="workflow.png" width="700" alt="APR Pipeline">
+</p>
+
 ## Repository Structure
 
 ```
