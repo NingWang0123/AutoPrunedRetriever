@@ -40,6 +40,8 @@ AutoPrunedRetriever/
 │       ├── stem_rebel.yaml         # STEM with REBEL parser (codebook-free)
 │       └── tv_rebel.yaml           # TV with REBEL parser (codebook-free)
 ├── cpu/                            # Legacy version (original codebase)
+│   ├── auto_pruned_layer.py        # APL for cpu version
+│   ├── run_apl.py                  # Run APL on baseline predictions
 │   └── ...
 ├── data/                           # Shared datasets
 │   ├── stem_question.json
