@@ -25,6 +25,7 @@ from graph_generator.llm_parser import (
     triplet_parser_llm_question_structured, TOKEN_STATS,
 )
 from graph_generator.llm_parser_concurrent import triplet_parser_llm_concurrent
+from graph_generator.rebel_large import triplet_parser
 from sentence_embed_overlap_cached import get_unique_or_overlap_by_sentence_embedded
 from test_continous_chunk_cached import embed_triples_as_sentences, segment_by_centroid_sim, merge_chunks_by_boundary
 from retrieve_gpu_cached_combined import coarse_filter_torch, _print_timings

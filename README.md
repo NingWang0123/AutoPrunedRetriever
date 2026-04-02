@@ -32,10 +32,13 @@ AutoPrunedRetriever/
 │   ├── mem_debug.py
 │   ├── graph_generator/
 │   │   ├── llm_parser.py           # LLM-based triplet extraction
-│   │   └── llm_parser_concurrent.py
+│   │   ├── llm_parser_concurrent.py
+│   │   └── rebel_large.py          # REBEL triplet extraction (local, no API)
 │   └── configs/
-│       ├── stem.yaml
-│       └── tv.yaml
+│       ├── stem.yaml               # STEM with LLM parser
+│       ├── tv.yaml                 # TV with LLM parser
+│       ├── stem_rebel.yaml         # STEM with REBEL parser (codebook-free)
+│       └── tv_rebel.yaml           # TV with REBEL parser (codebook-free)
 ├── cpu/                            # Legacy version (original codebase)
 │   └── ...
 ├── data/                           # Shared datasets
@@ -67,11 +70,15 @@ APR uses DPO (Direct Preference Optimization) to learn a lightweight strategy po
 ```bash
 cd gpu
 
-# STEM dataset (with DPO, default)
+# STEM dataset — LLM parser (with DPO, default)
 python run_apr.py --config configs/stem.yaml
 
-# TV dataset
+# TV dataset — LLM parser
 python run_apr.py --config configs/tv.yaml
+
+# REBEL parser variant (codebook-free, no API cost for graph construction)
+python run_apr.py --config configs/stem_rebel.yaml
+python run_apr.py --config configs/tv_rebel.yaml
 
 # Without DPO (fixed strategy)
 python run_apr.py --config configs/stem.yaml --no-dpo
@@ -106,7 +113,7 @@ Key parameters in YAML configs:
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
-| `chunking_use` | `llm` | Triplet extraction method (GPT-4o-mini) |
+| `chunking_use` | `llm` | Triplet extraction: `llm` (GPT-4o-mini) or `rebel` (local model, no API cost) |
 | `top_m` | `20` | Number of final retrieved results per question |
 | `top_k` | `200` | Candidate pool size for retrieval |
 | `combine_ent_sim` | `0.93` | Cosine similarity threshold for entity merging |
