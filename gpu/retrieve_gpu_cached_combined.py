@@ -159,7 +159,14 @@ class TorchDBCache:
             torch.backends.cuda.matmul.allow_tf32 = False
             torch.backends.cudnn.allow_tf32 = False
 
-        dev = torch.device(device if (device != "cuda" or torch.cuda.is_available()) else "cpu")
+        # Resolve device: cuda > mps > cpu
+        if device == "cuda" and not torch.cuda.is_available():
+            if hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+                dev = torch.device("mps")
+            else:
+                dev = torch.device("cpu")
+        else:
+            dev = torch.device(device)
 
         # ---- base embeddings (zero-copy numpy → torch when possible)
         t0 = time.perf_counter()

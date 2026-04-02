@@ -381,6 +381,8 @@ class DeviceAwareClusterer:
                 return 'faiss'
             elif TORCH_AVAILABLE and torch.cuda.is_available():
                 return 'torch'
+            elif TORCH_AVAILABLE and hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
+                return 'torch'  # MPS (Apple Silicon) via PyTorch
             else:
                 return 'cpu'
         elif backend == 'faiss' and not FAISS_AVAILABLE:
@@ -411,10 +413,16 @@ class DeviceAwareClusterer:
         elif self.backend == 'faiss':
             info['gpu_count'] = faiss.get_num_gpus()
         elif self.backend == 'torch':
-            info['gpu_count'] = torch.cuda.device_count()
-            if info['gpu_count'] > 0:
-                info['gpu_name'] = torch.cuda.get_device_name(0)
-                info['gpu_memory'] = torch.cuda.get_device_properties(0).total_memory
+            if torch.cuda.is_available():
+                info['gpu_count'] = torch.cuda.device_count()
+                if info['gpu_count'] > 0:
+                    info['gpu_name'] = torch.cuda.get_device_name(0)
+                    info['gpu_memory'] = torch.cuda.get_device_properties(0).total_memory
+            elif hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
+                info['device'] = 'mps'
+                info['gpu_name'] = 'Apple Silicon (MPS)'
+            else:
+                info['device'] = 'cpu'
         else:
             info['gpu_count'] = 0
             info['device'] = 'CPU'
@@ -454,7 +462,12 @@ class DeviceAwareClusterer:
         return labels, kmeans.centroids, inertia
 
     def _cluster_torch(self, X, n_clusters, n_init, max_iter, random_state):
-        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        if torch.cuda.is_available():
+            device = torch.device('cuda')
+        elif hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
+            device = torch.device('mps')
+        else:
+            device = torch.device('cpu')
         X_torch = torch.tensor(X, dtype=torch.float32, device=device)
         best_inertia = float('inf')
         best_labels = best_centroids = None
