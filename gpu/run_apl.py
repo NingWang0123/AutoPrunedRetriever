@@ -35,6 +35,14 @@ def main():
                         help="Path to write APL-enhanced results")
     parser.add_argument("--api-key", default=None,
                         help="OpenAI API key (or set OPENAI_API_KEY)")
+    parser.add_argument("--api-base", default=None,
+                        help="API base URL (for OpenAI-compatible endpoints)")
+    parser.add_argument("--model", default="gpt-4o-mini",
+                        help="LLM model name (default: gpt-4o-mini)")
+    parser.add_argument("--embedding-model", default="BAAI/bge-large-en-v1.5",
+                        help="Embedding model name (default: BAAI/bge-large-en-v1.5)")
+    parser.add_argument("--temperature", type=float, default=0.2)
+    parser.add_argument("--max-tokens", type=int, default=256)
     parser.add_argument("--top-m", type=int, default=20)
     parser.add_argument("--top-k", type=int, default=200)
     parser.add_argument("--combine-ent-sim", type=float, default=0.93)
@@ -42,6 +50,7 @@ def main():
     args = parser.parse_args()
 
     api_key = args.api_key or os.environ.get("OPENAI_API_KEY")
+    api_base = args.api_base or os.environ.get("OPENAI_API_BASE")
     if not api_key:
         sys.exit("Error: set OPENAI_API_KEY or pass --api-key")
 
@@ -52,22 +61,23 @@ def main():
     print(f"  {len(predictions)} predictions loaded")
 
     # ── Initialise APL ──
-    print("Initialising embeddings & LLM ...")
+    print(f"Initialising embeddings ({args.embedding_model}) & LLM ({args.model}) ...")
     from langchain_community.embeddings import HuggingFaceEmbeddings
     from auto_pruned_layer import AutoPrunedLayer
     from llm_api import OpenAILLM
 
-    word_emb = HuggingFaceEmbeddings(model_name="BAAI/bge-large-en-v1.5")
+    word_emb = HuggingFaceEmbeddings(model_name=args.embedding_model)
     sent_emb = word_emb
 
     llm = OpenAILLM(
         include_thinkings=False,
-        model_name="gpt-4o-mini",
-        max_new_tokens=256,
-        temperature=0.2,
+        model_name=args.model,
+        max_new_tokens=args.max_tokens,
+        temperature=args.temperature,
         top_p=0.9,
         use_cache=True,
         api_key=api_key,
+        base_url=api_base,
     )
 
     apl = AutoPrunedLayer(

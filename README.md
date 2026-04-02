@@ -109,11 +109,16 @@ python run_apl.py --predictions path/to/baseline_predictions.json \
 
 ## Configuration
 
-Key parameters in YAML configs:
+### YAML config parameters
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
-| `chunking_use` | `llm` | Triplet extraction: `llm` (GPT-4o-mini) or `rebel` (local model, no API cost) |
+| `chunking_use` | `llm` | Triplet extraction: `llm` (API-based) or `rebel` (local model, no API cost) |
+| `model_name` | `gpt-4o-mini` | LLM model for generation and parsing |
+| `embedding_model` | `BAAI/bge-large-en-v1.5` | Embedding model for entity/sentence embeddings |
+| `api_base` | — | API base URL (for OpenAI-compatible endpoints) |
+| `temperature` | `0.2` | LLM temperature |
+| `max_new_tokens` | `256` | Max generation tokens |
 | `top_m` | `20` | Number of final retrieved results per question |
 | `top_k` | `200` | Candidate pool size for retrieval |
 | `combine_ent_sim` | `0.93` | Cosine similarity threshold for entity merging |
@@ -121,11 +126,42 @@ Key parameters in YAML configs:
 | `seed_n` | `20` | Number of seed questions for DPO training |
 | `skip_update_meta` | `false` | If true, disables memory accumulation |
 
+### Command-line overrides
+
+All YAML parameters can be overridden via CLI:
+
+```bash
+# Use a different LLM
+python run_apr.py --config configs/stem.yaml --model gpt-4o --temperature 0.1
+
+# Use a different embedding model
+python run_apr.py --config configs/stem.yaml --embedding-model sentence-transformers/all-MiniLM-L6-v2
+
+# Use an OpenAI-compatible endpoint (e.g., vLLM, Ollama, Azure)
+python run_apr.py --config configs/stem.yaml \
+    --api-base http://localhost:8000/v1 \
+    --model my-local-model \
+    --api-key dummy
+
+# APL with custom model
+python run_apl.py -p predictions.json -o output.json \
+    --model gpt-4o \
+    --embedding-model BAAI/bge-base-en-v1.5 \
+    --api-base https://my-endpoint.com/v1
+```
+
+### Environment variables
+
+| Variable | Description |
+|----------|-------------|
+| `OPENAI_API_KEY` | API key (can also pass via `--api-key`) |
+| `OPENAI_API_BASE` | API base URL (can also pass via `--api-base`) |
+
 ## Hardware Requirements
 
 - **GPU**: CUDA-capable GPU with >= 8GB VRAM (for embedding computation)
 - **RAM**: >= 16GB
-- **API**: OpenAI API key with access to `gpt-4o-mini`
+- **API**: Any OpenAI-compatible API (OpenAI, Azure, vLLM, Ollama, etc.)
 
 ## Documentation
 

@@ -16,6 +16,11 @@ def main():
     parser = argparse.ArgumentParser(description="Run APR")
     parser.add_argument("--config", "-c", required=True, help="Path to YAML config")
     parser.add_argument("--api-key", default=None, help="OpenAI API key (or set OPENAI_API_KEY)")
+    parser.add_argument("--api-base", default=None, help="API base URL (for OpenAI-compatible endpoints)")
+    parser.add_argument("--model", default=None, help="LLM model name (overrides config, default: gpt-4o-mini)")
+    parser.add_argument("--embedding-model", default=None, help="Embedding model name (default: BAAI/bge-large-en-v1.5)")
+    parser.add_argument("--temperature", type=float, default=None, help="LLM temperature (default: 0.2)")
+    parser.add_argument("--max-tokens", type=int, default=None, help="Max generation tokens (default: 256)")
     parser.add_argument("--no-dpo", action="store_true", help="Disable DPO strategy selection")
     args = parser.parse_args()
 
@@ -23,28 +28,35 @@ def main():
     with open(args.config, "r", encoding="utf-8") as f:
         cfg = yaml.safe_load(f)
 
-    api_key = args.api_key or os.environ.get("OPENAI_API_KEY")
-    if not api_key:
-        sys.exit("Error: set OPENAI_API_KEY or pass --api-key")
+    api_key = args.api_key or cfg.get("api_key") or os.environ.get("OPENAI_API_KEY")
+    api_base = args.api_base or cfg.get("api_base") or os.environ.get("OPENAI_API_BASE")
+    model_name = args.model or cfg.get("model_name", "gpt-4o-mini")
+    emb_model = args.embedding_model or cfg.get("embedding_model", "BAAI/bge-large-en-v1.5")
+    temperature = args.temperature if args.temperature is not None else cfg.get("temperature", 0.2)
+    max_tokens = args.max_tokens if args.max_tokens is not None else cfg.get("max_new_tokens", 256)
+
+    if not api_key and cfg.get("chunking_use") != "rebel":
+        sys.exit("Error: set OPENAI_API_KEY or pass --api-key (not needed for rebel parser)")
 
     # ── Initialise embeddings & LLM ──
-    print("Initialising embeddings & LLM ...")
+    print(f"Initialising embeddings ({emb_model}) & LLM ({model_name}) ...")
     from langchain_community.embeddings import HuggingFaceEmbeddings
     from auto_pruned_retriever import AutoPrunedRetriver
     from llm_api import OpenAILLM
     from graph_generator.llm_parser import TOKEN_STATS
 
-    word_emb = HuggingFaceEmbeddings(model_name="BAAI/bge-large-en-v1.5")
+    word_emb = HuggingFaceEmbeddings(model_name=emb_model)
     sent_emb = word_emb
 
     llm = OpenAILLM(
         include_thinkings=False,
-        model_name="gpt-4o-mini",
-        max_new_tokens=256,
-        temperature=0.2,
+        model_name=model_name,
+        max_new_tokens=max_tokens,
+        temperature=temperature,
         top_p=0.9,
         use_cache=True,
         api_key=api_key,
+        base_url=api_base,
     )
 
     # ── Load questions ──
